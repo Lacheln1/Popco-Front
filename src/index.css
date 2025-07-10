@@ -30,6 +30,13 @@
 
 :root {
     --color-popcoSunglasses-blue: #3b7db5;
+    --color-popcoSunglasses-deepBlue: #205385;
+    --color-popcoSunglasses-red: #f38166;
+    --color-popcoSideLogo-blueGray: #44455a;
+    --color-popcornBox: #e54b2f;
+    --color-popcoMainColor: #ffd751;
+    --color-popcoFootColor: #fbad2a;
+    --colorpopcoHairColor: #fdedae;
 
     --font-pretendard: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
         system-ui, sans-serif;
