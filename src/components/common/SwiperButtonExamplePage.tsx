@@ -3,15 +3,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import "swiper/swiper-bundle.css";
 
 const SwiperButtonExamplePage: React.FC = () => {
     const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(undefined);
     const [isBeginning, setIsBeginning] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
-    const [currentSlide, setCurrentSlide] = useState(0);
 
     //swiper 초기화 완료 시 실행되는 콜백함수. 초기화 안하면 undefined 상태가 되어 작동안함
     const handleSwiperInit = (swiper: SwiperType) => {
@@ -25,7 +22,6 @@ const SwiperButtonExamplePage: React.FC = () => {
         console.log("슬라이드 변경:", swiper.activeIndex);
         setIsBeginning(swiper.isBeginning);
         setIsEnd(swiper.isEnd);
-        setCurrentSlide(swiper.activeIndex);
     };
 
     // 샘플 데이터 (추후 api를 통해 받아온 데이터를 넣으면 됨.)
