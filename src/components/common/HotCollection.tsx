@@ -4,7 +4,7 @@ import EmptySaveIcon from "../../assets/empty-save.svg";
 import FullSaveIcon from "../../assets/full-save.svg";
 
 interface HotCollectionProps {
-  /** 콜렉션 고유 아이디 */
+  /** 콜렉션의 고유 아이디 */
   collectionId: number;
   /** 콜렉션의 제목 */
   title: string;
