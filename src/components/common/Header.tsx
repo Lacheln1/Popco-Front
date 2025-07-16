@@ -114,12 +114,12 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`backdrop-blur-md" fixed left-0 right-0 top-0 z-50 bg-white transition-all duration-300 md:bg-transparent`}
+      className={`fixed left-0 right-0 top-0 z-50 bg-white transition-all duration-300 md:bg-transparent`}
     >
       <div
         className={`transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-2 max-w-6xl rounded-2xl bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            ? "mx-auto mt-4 max-w-6xl rounded-2xl bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         }`}
       >
