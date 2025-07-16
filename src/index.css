@@ -42,8 +42,9 @@
   --color-popcoFootColor: #fbad2a;
   --colorpopcoHairColor: #fdedae;
 
-  --font-pretendard: "Pretendard Variable", Pretendard, -apple-system,
-    BlinkMacSystemFont, system-ui, sans-serif;
+  --font-pretendard:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, sans-serif;
   --font-gmarket: "GmarketSans", sans-serif;
 }
 
@@ -65,7 +66,9 @@ a {
 button {
   cursor: pointer;
   outline: none;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .gmarket {
@@ -135,7 +138,9 @@ button {
   border: none;
   background: none;
   font-family: inherit;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 /* 입력 요소들도 폰트 상속 */
