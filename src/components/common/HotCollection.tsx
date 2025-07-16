@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import EmptySaveIcon from "../../assets/empty-save.svg";
 import FullSaveIcon from "../../assets/full-save.svg";
-import { CollectionBase } from "../../types/collectionTypes";
+import { CollectionBase } from "../../types/collection";
 
 interface HotCollectionProps extends CollectionBase {
   saveCount: number;
