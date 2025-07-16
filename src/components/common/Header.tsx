@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`backdrop-blur-md" } fixed left-0 right-0 top-0 z-50 transition-all duration-300`}
+      className={`backdrop-blur-md" fixed left-0 right-0 top-0 z-50 bg-white transition-all duration-300 md:bg-transparent`}
     >
       <div
         className={`transition-all duration-300 ${
