@@ -1,0 +1,234 @@
+import React, { useState, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import popcoLogoImg from "@/assets/popco-logo.svg";
+
+//로그인 유저에 관한 타입
+interface User {
+  id: string;
+  nickname: string;
+  isLoggedIn: boolean;
+}
+
+interface NavItem {
+  name: string;
+  path: string;
+}
+
+interface HeaderProps {
+  user?: User;
+  onLogin?: () => void;
+  onLogout?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({
+  user = { id: "", nickname: "", isLoggedIn: false },
+  onLogin,
+  onLogout,
+}) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  //헤더 탭 메뉴들
+  const navItems: NavItem[] = [
+    { name: "홈", path: "/" },
+    { name: "전체 콘텐츠", path: "/list" },
+    { name: "컬렉션", path: "/collections" },
+    { name: "취향 분석", path: "/analysis" },
+  ];
+
+  // 드롭다운 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleUserClick = () => {
+    if (user.isLoggedIn) {
+      setIsDropdownOpen(!isDropdownOpen);
+    } else {
+      onLogin?.();
+      navigateToLogin();
+    }
+  };
+
+  const handleMyActivity = () => {
+    setIsDropdownOpen(false);
+    navigate("/my-activity");
+  };
+
+  const handleLogout = () => {
+    setIsDropdownOpen(false);
+    onLogout?.();
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const navigateToLogin = () => {
+    navigate("/login");
+  };
+
+  return (
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* 로고 영역 */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center">
+              <img
+                src={popcoLogoImg}
+                alt="POPCO"
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+          </div>
+
+          {/* 네비게이션 메뉴 */}
+          <nav className="hidden flex-1 justify-end md:flex">
+            <ul className="flex items-center space-x-8">
+              {navItems.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.path}
+                    className="rounded-full px-1 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-white/10"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+              {/* 로그인/사용자 버튼*/}
+              <li>
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    className="flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-white/30 hover:bg-white/20"
+                    onClick={handleUserClick}
+                  >
+                    {user.isLoggedIn ? `${user.nickname}님` : "로그인"}
+                    {user.isLoggedIn && (
+                      <span
+                        className={`text-xs transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+                      >
+                        ▼
+                      </span>
+                    )}
+                  </button>
+
+                  {/* 드롭다운 메뉴 */}
+                  {user.isLoggedIn && isDropdownOpen && (
+                    <div className="animate-in fade-in-0 zoom-in-95 absolute right-0 z-50 mt-2 w-32 rounded-lg border border-gray-200 bg-white py-2 shadow-xl duration-200">
+                      <button
+                        className="w-full px-4 py-2 text-left text-gray-700 transition-colors duration-150 first:rounded-t-lg hover:bg-gray-50"
+                        onClick={handleMyActivity}
+                      >
+                        내활동
+                      </button>
+                      <button
+                        className="w-full px-4 py-2 text-left text-gray-700 transition-colors duration-150 last:rounded-b-lg hover:bg-gray-50"
+                        onClick={handleLogout}
+                      >
+                        로그아웃
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
+            </ul>
+          </nav>
+
+          {/* 모바일 메뉴 버튼 */}
+          <div className="md:hidden">
+            <button
+              className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+              onClick={toggleMobileMenu}
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* 모바일 네비게이션 */}
+        {isMobileMenuOpen && (
+          <div className="border-t border-white/20 pb-4 pt-4 md:hidden">
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className="rounded-lg px-4 py-2 font-medium text-white transition-colors hover:bg-white/10"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+              {/* 모바일 로그인/사용자 버튼 */}
+              {!user.isLoggedIn ? (
+                <button
+                  className="rounded-lg px-4 py-2 text-left font-medium text-white transition-colors hover:bg-white/10"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onLogin?.();
+                    navigateToLogin();
+                    console.log("로그인클릭됨");
+                  }}
+                >
+                  로그인
+                </button>
+              ) : (
+                <>
+                  <div className="rounded-lg px-4 py-2 font-medium text-white">
+                    {user.nickname}님
+                  </div>
+                  <button
+                    className="rounded-lg px-4 py-2 text-left font-medium text-white transition-colors hover:bg-white/10"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleMyActivity();
+                    }}
+                  >
+                    내활동
+                  </button>
+                  <button
+                    className="rounded-lg px-4 py-2 text-left font-medium text-white transition-colors hover:bg-white/10"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    로그아웃
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Header;
