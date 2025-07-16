@@ -110,16 +110,12 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-gradient-to-r from-purple-600/95 to-purple-700/95 shadow-2xl backdrop-blur-md"
-          : "bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg"
-      }`}
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300`}
     >
       <div
         className={`transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-2 max-w-6xl rounded-2xl border border-white/20 bg-white/10 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            ? "mx-auto mt-2 max-w-6xl rounded-2xl border border-gray-200 bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         }`}
       >
@@ -144,8 +140,8 @@ const Header: React.FC<HeaderProps> = ({
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`rounded-full px-1 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-white/10 ${
-                      isScrolled ? "text-sm" : "text-base"
+                    className={`rounded-full px-1 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
+                      isScrolled ? "text-base" : "text-xl"
                     }`}
                   >
                     {item.name}
@@ -156,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-white/30 hover:bg-white/20 ${
+                    className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-gray-200 bg-gray-100 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-200 ${
                       isScrolled ? "px-4 py-1 text-sm" : "px-6 py-2 text-base"
                     }`}
                     onClick={handleUserClick}
@@ -196,7 +192,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden">
             <button
-              className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+              className="rounded-md p-2 text-black transition-colors hover:bg-gray-100"
               onClick={toggleMobileMenu}
             >
               <svg
@@ -217,13 +213,13 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* 모바일 네비게이션 */}
         {isMobileMenuOpen && (
-          <div className="border-t border-white/20 pb-4 pt-4 md:hidden">
+          <div className="border-t border-gray-200 bg-white pb-4 pt-4 md:hidden">
             <div className="flex flex-col space-y-2">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.path}
-                  className="rounded-lg px-4 py-2 font-medium text-white transition-colors hover:bg-white/10"
+                  className="rounded-lg px-4 py-2 font-medium text-black transition-colors hover:bg-gray-100"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
@@ -233,7 +229,7 @@ const Header: React.FC<HeaderProps> = ({
               {/* 모바일 로그인/사용자 버튼 */}
               {!user.isLoggedIn ? (
                 <button
-                  className="rounded-lg px-4 py-2 text-left font-medium text-white transition-colors hover:bg-white/10"
+                  className="rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     onLogin?.();
@@ -245,11 +241,11 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
               ) : (
                 <>
-                  <div className="rounded-lg px-4 py-2 font-medium text-white">
+                  <div className="rounded-lg px-4 py-2 font-medium text-black">
                     {user.nickname}님
                   </div>
                   <button
-                    className="rounded-lg px-4 py-2 text-left font-medium text-white transition-colors hover:bg-white/10"
+                    className="rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       handleMyActivity();
@@ -258,7 +254,7 @@ const Header: React.FC<HeaderProps> = ({
                     내활동
                   </button>
                   <button
-                    className="rounded-lg px-4 py-2 text-left font-medium text-white transition-colors hover:bg-white/10"
+                    className="rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       handleLogout();
