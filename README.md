@@ -1,51 +1,190 @@
-**각 팀원분들 vscode에 아래 스샷 처럼 설정해주셔야 합니다**
-![image](https://github.com/user-attachments/assets/d1621b54-e18a-4b5e-ba7b-f3865c782a24)
-![image](https://github.com/user-attachments/assets/df81fefa-0907-46c5-ad7c-e295b96a6978)
+# 🍿 POPCO
 
-**font 적용법 (tailwindCSS의 경우)**
-```bash
-      //Pretendard 다른 weight 
-      <h1 className="font-bold ">Pretendard Bold </h1>
-      <h2 className="font-semibold ">Pretendard Semi Bold</h2>
-      
-      //G마켓 폰트
-      <h1 className="gmarket-bold">G마켓 Bold 제목</h1>
-      <p className="gmarket-light">G마켓 Light 본문</p>
+> 당신의 OTT 취향을 찾아주는 콘텐츠 추천 서비스
+
+POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인화된 추천을 통해 새로운 콘텐츠 경험을 제공하는 서비스입니다.  
+귀여운 메인 캐릭터 **'POPCO'** 와 함께 사용자의 평가 이력, 선호도, 그리고 독자적인 **페르소나 진단 시스템**을 활용하여 영화 및 시리즈 콘텐츠를 지능적으로 추천합니다.
+
+---
+
+## 📌 Table of Contents
+- [기술 스택](#기술-스택)
+- [✨ 주요 기능](#-주요-기능)
+    - [👥 회원 시스템](#-회원-시스템)
+    - [🎬 콘텐츠 탐색 및 개인화 시스템](#-콘텐츠-탐색-및-개인화-시스템)
+        - [개인화된 콘텐츠 추천 엔진](#개인화된-콘텐츠-추천-엔진)
+    - [🏆 퀴즈 시스템](#-퀴즈-시스템)
+    - [📊 나의 기록 페이지](#-나의-기록-페이지)
+- [진행 정도](#진행-정도)
+- [🗂 ERD](#-erd)
+- [팀원 소개](#-fe-팀원-소개)
+
+---
+
+## 기술 스택
+[![My Skills](https://skillicons.dev/icons?i=ts,react,tailwindcss,html,redux)](https://skillicons.dev)
+
+---
+
+## ✨ 주요 기능
+
+### 👥 회원 시스템
+
+- **소셜 로그인**: 소셜 계정을 통해 간편하게 로그인 및 회원 가입을 진행합니다.
+
+---
+
+### 🎬 콘텐츠 탐색 및 개인화 시스템
+
+- **콘텐츠 조회 및 필터링**:
+    - OTT 콘텐츠를 다양한 기준으로 탐색
+    - 기본정보(타입, 장르, 별점), 이용환경(플랫폼, 연도), 개인화(연령대, 사용자 맞춤 추천, 페르소나 캐릭터) 기준으로 정교한 필터링 제공
+
+- **AI 기반 콘텐츠 상세**:
+    - AI가 모든 리뷰를 요약
+    - 사용자의 취향에 맞춰 해당 콘텐츠에 대한 AI 멘트 제공
+
+- **핫한 컬렉션**:
+    - 사용자 제작 테마별 콘텐츠 묶음인 '컬렉션'(플레이리스트 개념)을 주간 스케줄링으로 인기순 제공
+
+---
+
+#### 개인화된 콘텐츠 추천 엔진
+
+- **콘텐츠 주간 랭킹 & 유사 작품 추천 (콘텐츠 기반 필터링)**:
+    - 카테고리별(영화/시리즈/전체) 주간 랭킹 TOP 5 제공
+    - 주간 랭킹 1위 콘텐츠와 유사한 작품 추천 (줄거리, 제목, 장르, 키워드 기반)
+
+- **개인 맞춤 추천 (협업 필터링)**:
+    - 사용자 피드백('좋아요', '싫어요', 별점)을 기반으로 협업 필터링 적용
+
+- **페르소나 진단 및 추천 (협업 필터링)**:
+    - **7가지 페르소나 유형 진단**
+        - 🎢 **액션헌터**: 짜릿한 전개, 폭발적인 액션 (액션, 모험, 스릴러, SF, 전쟁)
+        - 🧠 **무비 셜록**: 디테일 분석, 반전 추리 (미스터리, 범죄, 다큐멘터리, 역사)
+        - 🎭 **시네파 울보**: 감정 이입, 눈물과 감동 (드라마, 로맨스, 음악)
+        - 🧸 **온기 수집가**: 따뜻한 위로, 편안한 힐링 (가족, 애니메이션, 코미디)
+        - 🌀 **이세계 유랑자**: 상상력 대마왕, 세계관 탐험 (판타지, SF, 애니메이션)
+        - 😱 **무서워도본다맨**: 스릴 마니아, 긴장감 중독 (공포, 스릴러)
+        - 🏜️ **레트로 캡틴**: 고전의 매력, 아날로그 감성 (서부, 역사, 음악)
+    - **초기 진단**:
+        - 최초 로그인 시 5가지 질문과 시청 이력 분석
+        - '아기 POPCO' / '어른 POPCO' 로 취향 선명도 구분
+    - **실시간 반영**:
+        - '좋아요', '싫어요', 별점(0.5 ~ 5.0) 피드백을 실시간 반영
+    - **페르소나 기반 추천**:
+        - 사용자의 '좋아요', '싫어요', 별점 피드백을 실시간 반영하여 페르소나를 동적으로 업데이트하고,
+        - 각 페르소나에 매핑된 장르 선호도를 기반으로 개인 맞춤 추천을 제공,
+        - 같은 페르소나를 가진 사용자들의 선호 콘텐츠를 분석해 추천
+    - **AI 취향 멘트**:
+      - AI가 사용자의 복합적인 취향을 말풍선 멘트로 생성
+- **AI 챗봇 추천**:
+  - "비 오는 날 보기 좋은 영화 뭐야?" 등 자연어 질문에 콘텐츠 추천
+
+---
+
+### 🏆 퀴즈 시스템
+
+- **주간 선착순 퀴즈 이벤트**:
+    - 매주 1회
+    - 특정 콘텐츠와 연계된 약 5개의 문제 출제
+    - 최종 1명의 우승자 선정
+
+---
+
+### 📊 나의 기록 페이지
+
+- **달력 연동**:
+    - 날짜별 콘텐츠 평가 기록 제공
+
+- **개인화된 시청 기록**:
+    - 내가 만든/저장한 다른 사람의 컬렉션
+    - 남긴 리뷰
+    - 보고 싶은/좋아요 누른 콘텐츠 목록
+
+- **시청 통계**:
+    - 별점 취향 그래프
+    - 평균 별점
+    - 이벤트 참여 수
+    - 시청 콘텐츠 수
+    - 좋아요/싫어요 비율 등 개인 시청 스타일 분석
+
+---
+
+## 🗂 ERD
+<img width="1991" height="1186" alt="image" src="https://github.com/user-attachments/assets/123c5c96-2cd7-4778-8696-e15ef7037763" />
+
+---
+
+## 📁 디렉토리 구조
+
 ```
-**font 적용법(module.css의 경우)**
-```css
-/* Pretendard 폰트 사용 */
-.title {
-  font-family: var(--font-pretendard);
-  font-weight: 700;  // 이 부분 필요할 경우 500,600,700 중 하나로 수정
-}
-
-/* G마켓 폰트 사용 */
-.gmarketTitle {
-  font-family: var(--font-gmarket);
-  font-weight: 700; // 이 부분 필요할 경우 300,500,700 중 하나로 수정
-}
+📂Popco
+|
+|-- Popco-front/ 
+|   |
+|   |-- node_modules/
+|   |-- public/
+|   |-- src/
+|   |   |
+|   |   |-- apis/
+|   |   |-- assets/
+|   |   |-- components/
+|   |   |-- contexts/
+|   |   |-- data/
+|   |   |-- hooks/
+|   |   |-- pages/
+|   |   |-- routes/
+|   |   |
+|   |   |-- index.css
+|   |   |-- main.jsx        (리액트 앱 시작점)
+|   |
+|   |-- .gitignore
+|   |-- index.html
+|   |-- package.json
+|   |-- vite.config.js
 ```
-**styled-Components의 경우**
-```css
-/* Pretendard 폰트 사용 */
-const Title = styled.h1`
-  font-family: var(--font-pretendard);
-  font-weight: 700; // 이 부분 필요할 경우 500,600,700 중 하나로 수정
-`;
 
-/* G마켓 폰트 사용 */
-const Title = styled.h1`
-  font-family: var(--font-gmarket);
-  font-weight: 700; // 이 부분 필요할 경우 300,500,700 중 하나로 수정
-`;
-```
-**Pretendard weight 매핑:**
-- Medium: 500 
-- SemiBold: 600
-- Bold: 700
+---
 
-**gmarket sans weithg 매핑**
-- gmarket-light: 300
-- gmarket-medium: 500
-- gmarket-bold: 700
+## 👩‍💻 FE 팀원 소개
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top">
+        <a href="https://github.com/yeeun426">
+            <img src="https://avatars.githubusercontent.com/u/88296511?v=4" width="120px;" /><br />
+          <b>이예은</b>
+        </a>
+        <div style="height:45px"></div>
+         <hr/>
+        <p style="font-size:10px;"># 제작중</p>
+      </td>
+      <td align="center" valign="top">
+        <a href="https://github.com/zeromin41">
+          <img src="https://avatars.githubusercontent.com/u/130297212?v=4" width="120px;" /><br />
+          <b>심영민</b>
+        </a>
+        <div style="height:45px"></div>
+         <hr/>
+        <p># 제작중</p>
+      </td>
+      <td align="center" valign="top">
+        <a href="https://github.com/Lacheln1">
+          <img src="https://avatars.githubusercontent.com/u/59949555?v=4" width="120px;" /><br />
+          <b>홍성현</b>
+        </a>
+         <hr/>
+        <div style="height:45px"></div>
+        <p># 제작중</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 진행 정도
+### 프론트엔드 개발 진행 : 1. 공통 컴포넌트 제작(진행중) 2. 페이지 제작
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/5ee1b729-1cba-4e84-a24d-620dc3af56a3" />
