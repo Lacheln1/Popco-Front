@@ -39,15 +39,31 @@ const Header: React.FC<HeaderProps> = ({
     { name: "취향 분석", path: "/analysis" },
   ];
 
-  // 스크롤 감지
+  // 스크롤 감지 (모바일에서는 축소 비활성화)
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 10);
+      const isMobile = window.innerWidth < 768; // md 브레이크포인트
+      setIsScrolled(scrollTop > 10 && !isMobile);
+    };
+
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        setIsScrolled(false);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
+    // 초기 실행
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   // 드롭다운 외부 클릭 감지
@@ -95,13 +111,15 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <header
       className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
-        isScrolled ? "hadow-2xl bg-gradient-to-r" : "bg-gradient-to-r shadow-lg"
+        isScrolled
+          ? "bg-gradient-to-r from-purple-600/95 to-purple-700/95 shadow-2xl backdrop-blur-md"
+          : "bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg"
       }`}
     >
       <div
         className={`transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-2 max-w-6xl rounded-2xl border border-white/20 bg-white/10 px-6 lg:px-10"
+            ? "mx-auto mt-2 max-w-6xl rounded-2xl border border-white/20 bg-white/10 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         }`}
       >
@@ -126,7 +144,7 @@ const Header: React.FC<HeaderProps> = ({
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`rounded-full px-1 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-white/10 ${
+                    className={`rounded-full px-1 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-white/10 ${
                       isScrolled ? "text-sm" : "text-base"
                     }`}
                   >
@@ -138,7 +156,7 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-white/30 hover:bg-white/20 ${
+                    className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-white/30 hover:bg-white/20 ${
                       isScrolled ? "px-4 py-1 text-sm" : "px-6 py-2 text-base"
                     }`}
                     onClick={handleUserClick}
@@ -178,11 +196,11 @@ const Header: React.FC<HeaderProps> = ({
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden">
             <button
-              className="rounded-md p-2 text-black transition-colors hover:bg-white/10"
+              className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
               onClick={toggleMobileMenu}
             >
               <svg
-                className={`h-6 w-6 fill-none transition-all duration-300`}
+                className={`fill-none transition-all duration-300 ${isScrolled ? "h-5 w-5" : "h-6 w-6"}`}
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
