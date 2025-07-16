@@ -23,7 +23,7 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm install
     
     # 기본 빌드만 (거의 모든 프로젝트에 있음)
     - name: Build application
