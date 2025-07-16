@@ -153,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({
                 <div className="relative" ref={dropdownRef}>
                   <button
                     className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-gray-200 bg-gray-100 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-200 ${
-                      isScrolled ? "px-4 py-1 text-sm" : "px-6 py-2 text-base"
+                      isScrolled ? "px-4 py-1 text-base" : "px-6 py-2 text-xl"
                     }`}
                     onClick={handleUserClick}
                   >
