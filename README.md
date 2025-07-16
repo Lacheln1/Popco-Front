@@ -22,7 +22,7 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
 ---
 
 ## 기술 스택
-[![My Skills](https://skillicons.dev/icons?i=js,html,css,react,tailwindcss,vite,typescript)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=ts,react,tailwindcss,html,redux)](https://skillicons.dev)
 
 ---
 
@@ -111,15 +111,39 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
 
 ---
 
-## 진행 정도
-### 프론트엔드 개발 진행 : 1. 공통 컴포넌트 제작(진행중) 2. 페이지 제작
-<img width="755" height="682" alt="image" src="https://github.com/user-attachments/assets/6c06d5a0-95b5-4865-b81b-8846bec6cda2" />
-
----
-
 ## 🗂 ERD
 <img width="1991" height="1186" alt="image" src="https://github.com/user-attachments/assets/123c5c96-2cd7-4778-8696-e15ef7037763" />
 
+---
+
+## 📁 디렉토리 구조
+
+```
+📂Popco
+|
+|-- Popco-front/ 
+|   |
+|   |-- node_modules/
+|   |-- public/
+|   |-- src/
+|   |   |
+|   |   |-- apis/
+|   |   |-- assets/
+|   |   |-- components/
+|   |   |-- contexts/
+|   |   |-- data/
+|   |   |-- hooks/
+|   |   |-- pages/
+|   |   |-- routes/
+|   |   |
+|   |   |-- index.css
+|   |   |-- main.jsx        (리액트 앱 시작점)
+|   |
+|   |-- .gitignore
+|   |-- index.html
+|   |-- package.json
+|   |-- vite.config.js
+```
 
 ---
 
@@ -159,31 +183,8 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
   </tbody>
 </table>
 
-## 📁 디렉토리 구조
+---
 
-```
-📂Popco
-|
-|-- Popco-front/ 
-|   |
-|   |-- node_modules/
-|   |-- public/
-|   |-- src/
-|   |   |
-|   |   |-- apis/
-|   |   |-- assets/
-|   |   |-- components/
-|   |   |-- contexts/
-|   |   |-- data/
-|   |   |-- hooks/
-|   |   |-- pages/
-|   |   |-- routes/
-|   |   |
-|   |   |-- index.css
-|   |   |-- main.jsx        (리액트 앱 시작점)
-|   |
-|   |-- .gitignore
-|   |-- index.html
-|   |-- package.json
-|   |-- vite.config.js
-```
+## 진행 정도
+### 프론트엔드 개발 진행 : 1. 공통 컴포넌트 제작(진행중) 2. 페이지 제작
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/5ee1b729-1cba-4e84-a24d-620dc3af56a3" />
