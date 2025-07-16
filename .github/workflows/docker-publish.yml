@@ -1,0 +1,151 @@
+name: Docker Build and Push
+
+on:
+  schedule:
+    - cron: '0 21 * * *'  # 매일 한국시간 새벽 6시 (UTC 21시)
+  push:
+    branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 레포지토리 이름을 소문자로 변환 (Docker 이미지명 규칙)
+      - name: Set lowercase repository name
+        id: repo
+        run: echo "name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
+      # Set up BuildKit Docker container builder
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to GitHub Container Registry (not on PR)
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract metadata for Docker
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+
+      # Build and push Docker image
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Test Docker container (only on PR)
+      - name: Test Docker container
+        if: github.event_name == 'pull_request'
+        run: |
+          # Create simple nginx config for testing
+          cat > nginx-test.conf << 'EOF'
+          server {
+              listen 80;
+              server_name localhost;
+              root /usr/share/nginx/html;
+              index index.html;
+              
+              location / {
+                  try_files $uri $uri/ /index.html;
+              }
+          }
+          EOF
+          
+          # Build test image with simple config
+          cat > Dockerfile.test << 'EOF'
+          FROM node:20-alpine AS builder
+          WORKDIR /app
+          COPY package*.json ./
+          RUN npm ci
+          COPY . .
+          RUN npm run build
+          
+          FROM nginx:alpine
+          COPY --from=builder /app/dist /usr/share/nginx/html
+          COPY nginx-test.conf /etc/nginx/conf.d/default.conf
+          EXPOSE 80
+          CMD ["nginx", "-g", "daemon off;"]
+          EOF
+          
+          docker build -f Dockerfile.test -t frontend-test .
+          
+          # Run container in background
+          docker run -d \
+            --name frontend-test \
+            -p 3000:80 \
+            frontend-test
+          
+          # Wait for container to start
+          echo "Waiting for container to start..."
+          sleep 10
+          
+          # Health check
+          echo "Testing frontend endpoint..."
+          curl -f http://localhost:3000 || {
+            echo "❌ Frontend health check failed!"
+            docker logs frontend-test
+            exit 1
+          }
+          
+          # Check if React app loads
+          curl -s http://localhost:3000 | grep -q "root\|app" || {
+            echo "❌ React app root element not found!"
+            exit 1
+          }
+          
+          echo "✅ All health checks passed!"
+          
+          # Cleanup
+          docker stop frontend-test
+          docker rm frontend-test
+          docker rmi frontend-test
+          rm nginx-test.conf Dockerfile.test
+
+      # Build summary
+      - name: Build Summary
+        run: |
+          echo "## 🐳 Docker Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tags**: ${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "- **Status**: ✅ Built and pushed to GHCR" >> $GITHUB_STEP_SUMMARY
+            echo "- **Pull Command**: \`docker pull ${{ env.REGISTRY }}/${{ steps.repo.outputs.name }}:main\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Status**: ✅ Built and tested (not pushed)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- **Digest**: ${{ steps.build-and-push.outputs.digest }}" >> $GITHUB_STEP_SUMMARY

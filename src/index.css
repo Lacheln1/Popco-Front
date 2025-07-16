@@ -4,50 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: var(--font-pretendard);
-    font-weight: 500;
-  }
-
-  a {
-    text-decoration: none;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-pretendard);
-    font-weight: 600;
-    line-height: 1.2;
-    margin: 0;
-    color: inherit;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  button {
-    cursor: pointer;
-    outline: none;
-    border: none;
-    background: none;
-    font-family: inherit;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-}
-
 @font-face {
   font-family: "GmarketSans";
   font-weight: 300;
@@ -78,6 +34,7 @@
 :root {
   --color-popcoSunglasses-blue: #3b7db5;
   --color-popcoSunglasses-deepBlue: #205385;
+  --color-footerBlue: #172039;
   --color-popcoSunglasses-red: #f38166;
   --color-popcoSideLogo-blueGray: #44455a;
   --color-popcornBox: #e54b2f;
@@ -88,6 +45,27 @@
   --font-pretendard: "Pretendard Variable", Pretendard, -apple-system,
     BlinkMacSystemFont, system-ui, sans-serif;
   --font-gmarket: "GmarketSans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-pretendard);
+  font-weight: 500;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .gmarket {
@@ -107,6 +85,19 @@
 .gmarket-bold {
   font-family: var(--font-gmarket) !important;
   font-weight: 700 !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-pretendard);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  color: inherit;
 }
 
 h1 {
@@ -133,12 +124,86 @@ h6 {
   font-size: 1rem; /* 16px */
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  outline: none;
+  border: none;
+  background: none;
+  font-family: inherit;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 /* 입력 요소들도 폰트 상속 */
 input,
 textarea,
 select {
   font-family: inherit;
   font-size: inherit;
+}
+
+@layer utilities {
+  /* 배경색  */
+  .bg-sunglasses-blue {
+    background-color: var(--color-popcoSunglasses-blue);
+  }
+  .bg-sunglasses-deepBlue {
+    background-color: var(--color-popcoSunglasses-deepBlue);
+  }
+  .bg-sunglasses-red {
+    background-color: var(--color-popcoSunglasses-red);
+  }
+  .bg-footerBlue {
+    background-color: var(--color-footerBlue);
+  }
+  .bg-sidelogo-blueGray {
+    background-color: var(--color-popcoSideLogo-blueGray);
+  }
+  .bg-popcorn-box {
+    background-color: var(--color-popcornBox);
+  }
+  .bg-popco-main {
+    background-color: var(--color-popcoMainColor);
+  }
+  .bg-popco-foot {
+    background-color: var(--color-popcoFootColor);
+  }
+  .bg-popco-hair {
+    background-color: var(--colorpopcoHairColor);
+  }
+
+  /* 글씨  */
+  .text-sunglasses-blue {
+    color: var(--color-popcoSunglasses-blue);
+  }
+  .text-sunglasses-deepBlue {
+    color: var(--color-popcoSunglasses-deepBlue);
+  }
+  .text-sunglasses-red {
+    color: var(--color-popcoSunglasses-red);
+  }
+  .text-footerBlue {
+    color: var(--color-footerBlue);
+  }
+  .text-sidelogo-blueGray {
+    color: var(--color-popcoSideLogo-blueGray);
+  }
+  .text-popcorn-box {
+    color: var(--color-popcornBox);
+  }
+  .text-popco-main {
+    color: var(--color-popcoMainColor);
+  }
+  .text-popco-foot {
+    color: var(--color-popcoFootColor);
+  }
+  .text-popco-hair {
+    color: var(--colorpopcoHairColor);
+  }
 }
 
 @import "tailwindcss";
