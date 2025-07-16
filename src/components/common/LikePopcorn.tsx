@@ -1,16 +1,16 @@
 import { useState } from "react";
 
 interface LikePopcornProps {
-  isLiked: boolean;
+  isSelected: boolean;
   onClick: () => void;
 }
 
-const LikePopcorn = ({ isLiked, onClick }: LikePopcornProps) => {
+const LikePopcorn = ({ isSelected, onClick }: LikePopcornProps) => {
   const [showPops, setShowPops] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
   const handleClick = () => {
-    if (isLiked) {
+    if (isSelected) {
       onClick();
       return;
     }
@@ -31,8 +31,8 @@ const LikePopcorn = ({ isLiked, onClick }: LikePopcornProps) => {
       disabled={isDisabled}
       className="relative flex flex-col disabled:cursor-not-allowed"
     >
-      {isLiked && (
-        <div className="absolute left-2 top-2 z-0 h-11 w-11 rounded-full bg-[#ff8c00] blur-[7.5px]" />
+      {isSelected && (
+        <div className="absolute left-2 top-2 z-0 h-11 w-11 rounded-full bg-green-700 blur-[7.5px]" />
       )}
 
       <img
