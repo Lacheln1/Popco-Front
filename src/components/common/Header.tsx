@@ -27,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -37,6 +38,17 @@ const Header: React.FC<HeaderProps> = ({
     { name: "컬렉션", path: "/collections" },
     { name: "취향 분석", path: "/analysis" },
   ];
+
+  // 스크롤 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // 드롭다운 외부 클릭 감지
   useEffect(() => {
@@ -81,16 +93,28 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+    <header
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
+        isScrolled ? "hadow-2xl bg-gradient-to-r" : "bg-gradient-to-r shadow-lg"
+      }`}
+    >
+      <div
+        className={`transition-all duration-300 ${
+          isScrolled
+            ? "mx-auto mt-2 max-w-6xl rounded-2xl border border-white/20 bg-white/10 px-6 lg:px-10"
+            : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+        }`}
+      >
+        <div
+          className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? "h-12" : "h-16"}`}
+        >
           {/* 로고 영역 */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
               <img
                 src={popcoLogoImg}
                 alt="POPCO"
-                className="h-10 w-auto object-contain"
+                className={`w-auto object-contain transition-all duration-300 ${isScrolled ? "h-7" : "h-10"}`}
               />
             </Link>
           </div>
@@ -102,7 +126,9 @@ const Header: React.FC<HeaderProps> = ({
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className="rounded-full px-1 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-white/10"
+                    className={`rounded-full px-1 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-white/10 ${
+                      isScrolled ? "text-sm" : "text-base"
+                    }`}
                   >
                     {item.name}
                   </Link>
@@ -112,7 +138,9 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className="flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-white/30 hover:bg-white/20"
+                    className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-white/30 hover:bg-white/20 ${
+                      isScrolled ? "px-4 py-1 text-sm" : "px-6 py-2 text-base"
+                    }`}
                     onClick={handleUserClick}
                   >
                     {user.isLoggedIn ? `${user.nickname}님` : "로그인"}
@@ -150,12 +178,11 @@ const Header: React.FC<HeaderProps> = ({
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden">
             <button
-              className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+              className="rounded-md p-2 text-black transition-colors hover:bg-white/10"
               onClick={toggleMobileMenu}
             >
               <svg
-                className="h-6 w-6"
-                fill="none"
+                className={`h-6 w-6 fill-none transition-all duration-300`}
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
