@@ -4,9 +4,11 @@ import EmptySaveIcon from "../../assets/empty-save.svg";
 import FullSaveIcon from "../../assets/full-save.svg";
 
 interface HotCollectionProps {
+  /** 콜렉션 고유 아이디 */
+  collectionId: number;
   /** 콜렉션의 제목 */
   title: string;
-  /** 포스터 URL 배열 */
+  /** 포스터 URL 배열 (콘텐츠id 여기로)*/
   posters: string[];
   /** 찜 총 갯수 */
   saveCount: number;
@@ -14,11 +16,12 @@ interface HotCollectionProps {
   isInitiallySaved: boolean;
   /** 클릭 시 이동할 상세 페이지 경로 */
   href: string;
-  /** 찜 상태 변경 시 콜백 함수 */
-  onSaveToggle?: (isSaved: boolean) => void;
+  /** 찜 상태 변경 시 콜백 함수 (collectionId와 찜 상태를 전달) */
+  onSaveToggle?: (collectionId: number, isSaved: boolean) => void;
 }
 
 const HotCollection: React.FC<HotCollectionProps> = ({
+  collectionId,
   title,
   posters,
   saveCount,
@@ -33,7 +36,7 @@ const HotCollection: React.FC<HotCollectionProps> = ({
     e.stopPropagation();
     const newSavedState = !isSaved;
     setIsSaved(newSavedState);
-    onSaveToggle?.(newSavedState);
+    onSaveToggle?.(collectionId, newSavedState);
   };
 
   const displayPosters = new Array(4).fill(null);
