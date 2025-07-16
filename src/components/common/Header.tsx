@@ -109,6 +109,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const isActiveItem = (path: string) => {
+    if (path === "/") return false; //홈 탭은 선택됐을 경우의 효과를 주지 않음
     return location.pathname === path;
   };
 
