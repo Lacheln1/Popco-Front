@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import Footer from "../components/common/footer";
+import Footer from "../components/common/Footer";
 const Layout = () => {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <main className="flex-grow">
         <Outlet />
       </main>
