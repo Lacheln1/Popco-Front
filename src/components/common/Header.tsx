@@ -119,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({
       <div
         className={`transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-2 max-w-6xl rounded-2xl border bg-white/90 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            ? "mx-auto mt-2 max-w-6xl rounded-2xl border bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         }`}
       >
@@ -144,11 +144,11 @@ const Header: React.FC<HeaderProps> = ({
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`rounded-full py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
+                    className={`flex min-w-[100px] items-center justify-center rounded-full px-4 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
                       isScrolled ? "text-base" : "text-xl"
                     } ${
                       isActiveItem(item.path)
-                        ? "bg-gray-800 text-white hover:bg-gray-700"
+                        ? "bg-sidelogo-blueGray text-white hover:bg-gray-700"
                         : ""
                     }`}
                   >
@@ -160,15 +160,15 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className={`flex items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-200 ${
-                      isScrolled ? "px-4 py-1 text-base" : "py-2 text-xl"
+                    className={`flex min-w-[100px] items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-100 ${
+                      isScrolled ? "px-4 py-1 text-base" : "px-4 py-2 text-xl"
                     }`}
                     onClick={handleUserClick}
                   >
                     {user.isLoggedIn ? `${user.nickname}님` : "로그인"}
                     {user.isLoggedIn && (
                       <span
-                        className={`text-xs transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
+                        className={`ml-1 text-xs transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : ""}`}
                       >
                         ▼
                       </span>
