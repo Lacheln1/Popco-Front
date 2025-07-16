@@ -4,7 +4,7 @@ interface SectionHeaderProps {
 }
 const SectionHeader = ({ title, description }: SectionHeaderProps) => {
   return (
-    <header className="relative h-[250px] bg-[#172039] text-white sm:h-[350px] md:h-[400px] lg:h-[450px]">
+    <section className="relative h-[250px] bg-[#172039] text-white sm:h-[350px] md:h-[400px] lg:h-[450px]">
       <section className="m-auto w-full px-4 pt-[100px] sm:w-[640px] sm:pt-[120px] md:w-[768px] md:pt-[160px] lg:w-[1024px] lg:pt-[200px] xl:w-[1200px]">
         <h2 className="gmarket-medium text-xl sm:text-2xl md:text-3xl lg:text-4xl">
           {title}
@@ -33,7 +33,7 @@ const SectionHeader = ({ title, description }: SectionHeaderProps) => {
         src="/images/components/glossy_tv.png"
         alt="tv"
       />
-    </header>
+    </section>
   );
 };
 export default SectionHeader;
