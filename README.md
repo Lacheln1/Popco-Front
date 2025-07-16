@@ -153,7 +153,7 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
   <tbody>
     <tr>
       <td align="center" valign="top">
-        <a href="https://github.com/gusdn6288">
+        <a href="https://github.com/yeeun426">
             <img src="https://avatars.githubusercontent.com/u/88296511?v=4" width="120px;" /><br />
           <b>이예은</b>
         </a>
