@@ -119,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({
       <div
         className={`transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-2 max-w-6xl rounded-2xl border bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            ? "mx-auto mt-2 max-w-6xl rounded-2xl bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         }`}
       >
