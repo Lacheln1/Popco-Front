@@ -197,7 +197,7 @@ const Header: React.FC<HeaderProps> = ({
             </ul>
           </nav>
 
-          {/* 모바일 메뉴 버튼 */}
+          {/* 모바일 메뉴(햄버거) 버튼 */}
           <div className="md:hidden">
             <button
               className="rounded-md p-2 text-black transition-all duration-300 hover:bg-gray-100"
@@ -228,9 +228,13 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* 모바일 네비게이션 */}
-        {isMobileMenuOpen && (
-          <div className="border-t border-gray-200 pb-4 pt-4 md:hidden">
+        {/* 햄버거 눌렀을 때 나오는 모바일 탭  */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
+            isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="border-t border-gray-200 pb-4 pt-4">
             <div className="flex flex-col space-y-2">
               {navItems.map((item) => (
                 <Link
@@ -247,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({
                 </Link>
               ))}
 
-              {/* 모바일 로그인/사용자 버튼 */}
+              {/* 모바일 로그인 버튼 */}
               {!user.isLoggedIn ? (
                 <button
                   className="rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
@@ -287,7 +291,7 @@ const Header: React.FC<HeaderProps> = ({
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
