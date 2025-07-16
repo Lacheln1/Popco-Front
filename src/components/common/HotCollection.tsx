@@ -2,22 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import EmptySaveIcon from "../../assets/empty-save.svg";
 import FullSaveIcon from "../../assets/full-save.svg";
+import { CollectionBase } from "../../types/collectionTypes";
 
-interface HotCollectionProps {
-  /** 콜렉션의 고유 아이디 */
-  collectionId: number;
-  /** 콜렉션의 제목 */
-  title: string;
-  /** 포스터 URL 배열 (콘텐츠id 여기로)*/
-  posters: string[];
-  /** 찜 총 갯수 */
+interface HotCollectionProps extends CollectionBase {
   saveCount: number;
-  /** 초기 찜 상태 */
-  isInitiallySaved: boolean;
-  /** 클릭 시 이동할 상세 페이지 경로 */
-  href: string;
-  /** 찜 상태 변경 시 콜백 함수 (collectionId와 찜 상태를 전달) */
-  onSaveToggle?: (collectionId: number, isSaved: boolean) => void;
 }
 
 const HotCollection: React.FC<HotCollectionProps> = ({

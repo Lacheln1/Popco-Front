@@ -2,17 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import EmptySaveIcon from "../../assets/empty-save.svg";
 import FullSaveIcon from "../../assets/full-save.svg";
+import { CollectionBase } from "../../types/collectionTypes";
 
-interface NewCollectionProps {
-  collectionId: number;
+interface NewCollectionProps extends CollectionBase {
   userNickname: string;
-  title: string;
   description: string;
-  posters: string[];
   totalCount: number;
-  isInitiallySaved: boolean;
-  href: string;
-  onSaveToggle?: (collectionId: number, isSaved: boolean) => void;
 }
 
 const NewCollection: React.FC<NewCollectionProps> = ({
