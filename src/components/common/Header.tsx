@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import popcoLogoImg from "@/assets/popco-logo.svg";
 
-//로그인 유저에 관한 타입
 interface User {
   id: string;
   nickname: string;
@@ -30,6 +29,7 @@ const Header: React.FC<HeaderProps> = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   //헤더 탭 메뉴들
   const navItems: NavItem[] = [
@@ -108,6 +108,10 @@ const Header: React.FC<HeaderProps> = ({
     navigate("/login");
   };
 
+  const isActiveItem = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <header
       className={`backdrop-blur-md" } fixed left-0 right-0 top-0 z-50 transition-all duration-300`}
@@ -142,6 +146,10 @@ const Header: React.FC<HeaderProps> = ({
                     to={item.path}
                     className={`rounded-full py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
                       isScrolled ? "text-base" : "text-xl"
+                    } ${
+                      isActiveItem(item.path)
+                        ? "bg-gray-800 text-white hover:bg-gray-700"
+                        : ""
                     }`}
                   >
                     {item.name}
@@ -228,7 +236,11 @@ const Header: React.FC<HeaderProps> = ({
                 <Link
                   key={item.name}
                   to={item.path}
-                  className="rounded-lg px-4 py-2 font-medium text-black transition-colors hover:bg-gray-100"
+                  className={`rounded-lg px-4 py-2 font-medium text-black transition-colors hover:bg-gray-100 ${
+                    isActiveItem(item.path)
+                      ? "bg-gray-800 text-white hover:bg-gray-700"
+                      : ""
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
