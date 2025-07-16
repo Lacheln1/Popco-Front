@@ -8,7 +8,6 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
 ---
 
 ## 📌 Table of Contents
-- [Notion & Figma](#notion--figma)
 - [기술 스택](#기술-스택)
 - [✨ 주요 기능](#-주요-기능)
     - [👥 회원 시스템](#-회원-시스템)
@@ -19,12 +18,6 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
 - [진행 정도](#진행-정도)
 - [🗂 ERD](#-erd)
 - [팀원 소개](#-fe-팀원-소개)
----
-
-## Notion & Figma
-- ### [<img width="40" height="40" alt="image" src="https://github.com/user-attachments/assets/0991d171-d8c7-4d2a-8723-73783d6e6a29" />](https://www.figma.com/design/wmKshK5ZDxyHa33ZyxmDdc/%EC%9C%A0%EB%A0%88%EC%B9%B4-%EC%B5%9C%EC%A2%85-4%EC%A1%B0?node-id=1-2&t=8nJeTJyCz3fI55Od-1)
-  
-- ### [<img width="40" height="75" alt="image" src="https://github.com/user-attachments/assets/e6315adc-33a9-4ecb-92b7-aeee1bfd2082" />](https://www.figma.com/design/wmKshK5ZDxyHa33ZyxmDdc/%EC%9C%A0%EB%A0%88%EC%B9%B4-%EC%B5%9C%EC%A2%85-4%EC%A1%B0?node-id=1-2&t=8nJeTJyCz3fI55Od-1)
 
 ---
 
