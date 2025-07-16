@@ -1,5 +1,5 @@
 const TestMainPage = () => {
-    return <div>테스트 메인페이지 입니다</div>;
+  return <div>테스트</div>;
 };
 
 export default TestMainPage;
