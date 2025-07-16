@@ -41,46 +41,49 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
             disabled={disabled}
             className={`
         inline-flex items-center justify-center
-        w-10 h-10
-        border border-gray-300
+        w-8 h-8
+        rounded-full
         bg-white
+        border border-gray-200
+        shadow-sm
         hover:bg-gray-50
-        disabled:opacity-50 disabled:cursor-not-allowed
-        transition-colors duration-200
+        hover:shadow-md
+        disabled:opacity-40 disabled:cursor-not-allowed
+        transition-all duration-200
         ${className}
       `}
             aria-label={direction === "prev" ? "Previous slide" : "Next slide"}
         >
             {direction === "prev" ? (
                 <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="text-gray-600"
+                    className="text-gray-700"
                 >
                     <path
-                        d="M10 4L6 8L10 12"
+                        d="M12.5 5L7.5 10L12.5 15"
                         stroke="currentColor"
-                        strokeWidth="1.5"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
                 </svg>
             ) : (
                 <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="text-gray-600"
+                    className="text-gray-700"
                 >
                     <path
-                        d="M6 4L10 8L6 12"
+                        d="M7.5 5L12.5 10L7.5 15"
                         stroke="currentColor"
-                        strokeWidth="1.5"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
