@@ -110,12 +110,12 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300`}
+      className={`backdrop-blur-md" } fixed left-0 right-0 top-0 z-50 transition-all duration-300`}
     >
       <div
         className={`transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-2 max-w-6xl rounded-2xl border border-gray-200 bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            ? "mx-auto mt-2 max-w-6xl rounded-2xl border bg-white/90 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         }`}
       >
@@ -135,12 +135,12 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* 네비게이션 메뉴 */}
           <nav className="hidden flex-1 justify-end md:flex">
-            <ul className="flex items-center space-x-8">
+            <ul className="flex items-center space-x-4">
               {navItems.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`rounded-full px-1 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
+                    className={`rounded-full py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
                       isScrolled ? "text-base" : "text-xl"
                     }`}
                   >
@@ -148,12 +148,12 @@ const Header: React.FC<HeaderProps> = ({
                   </Link>
                 </li>
               ))}
-              {/* 로그인/사용자 버튼*/}
+              {/* 로그인 버튼*/}
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className={`flex min-w-[100px] items-center justify-center gap-2 rounded-full border-2 border-gray-200 bg-gray-100 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-200 ${
-                      isScrolled ? "px-4 py-1 text-base" : "px-6 py-2 text-xl"
+                    className={`flex items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-200 ${
+                      isScrolled ? "px-4 py-1 text-base" : "py-2 text-xl"
                     }`}
                     onClick={handleUserClick}
                   >
@@ -192,20 +192,29 @@ const Header: React.FC<HeaderProps> = ({
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden">
             <button
-              className="rounded-md p-2 text-black transition-colors hover:bg-gray-100"
+              className="rounded-md p-2 text-black transition-all duration-300 hover:bg-gray-100"
               onClick={toggleMobileMenu}
             >
               <svg
-                className={`fill-none transition-all duration-300 ${isScrolled ? "h-5 w-5" : "h-6 w-6"}`}
+                className={`fill-none transition-all duration-300 ${isScrolled ? "h-5 w-5" : "h-6 w-6"} ${isMobileMenuOpen ? "rotate-90" : "rotate-0"}`}
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                {isMobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
               </svg>
             </button>
           </div>
@@ -213,7 +222,7 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* 모바일 네비게이션 */}
         {isMobileMenuOpen && (
-          <div className="border-t border-gray-200 bg-white pb-4 pt-4 md:hidden">
+          <div className="border-t border-gray-200 pb-4 pt-4 md:hidden">
             <div className="flex flex-col space-y-2">
               {navItems.map((item) => (
                 <Link
