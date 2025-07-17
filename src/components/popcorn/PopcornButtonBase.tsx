@@ -47,20 +47,27 @@ const PopcornButtonBase = ({
     >
       {isSelected && (
         <div
-          className={`absolute left-1 top-2 z-0 h-10 w-10 rounded-full blur-md ${
+          className={`absolute inset-0 bottom-[35%] left-0 right-0 top-0 z-0 rounded-full blur-md ${
             COLOR_MAP[color].split(" ")[0]
           }`}
         />
       )}
-
-      <img className="relative z-10 h-12 w-auto" src={iconSrc} alt="popcorn" />
+      <img
+        className={`relative z-10 w-auto transition-transform duration-500 sm:h-12 ${
+          isSelected && color === "red"
+            ? "rotate-[90deg] scale-110"
+            : "rotate-0 scale-100"
+        }`}
+        src={iconSrc}
+        alt="popcorn"
+      />
       <div
-        className={`mt-1 text-center text-xs ${COLOR_MAP[color].split(" ")[1]}`}
+        className={`whitespace-nowrap text-center text-[clamp(0.7rem,2vw,1rem)] ${COLOR_MAP[color].split(" ")[1]}`}
       >
         {label}
       </div>
 
-      {showPops && (
+      {showPops && color === "green" && (
         <>
           <img
             className="absolute left-[10%] top-[10%] h-4 w-auto animate-popcorn1"
