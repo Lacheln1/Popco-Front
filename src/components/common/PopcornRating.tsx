@@ -186,11 +186,9 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
         <span
           style={{
             marginLeft: "8px",
-            fontSize: "14px",
-            color: "#666",
-            fontWeight: "500",
             minWidth: "60px",
           }}
+          className={`${className}`}
         >
           {(hoverRating || rating).toFixed(1)}
         </span>
