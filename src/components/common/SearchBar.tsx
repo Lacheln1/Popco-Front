@@ -53,8 +53,45 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // 더미 데이터 (테스트용)
+  const dummyData: SearchResult[] = [
+    {
+      id: 1,
+      title: "React 시작하기",
+    },
+    {
+      id: 2,
+      title: "JavaScript 기초",
+    },
+    {
+      id: 3,
+      title: "JavaScript 배우기",
+    },
+    {
+      id: 4,
+      title: "Node.js 서버 개발",
+    },
+    {
+      id: 5,
+      title: "CSS 스타일링 가이드",
+    },
+  ];
+
   // ElasticSearch(자동완성기능 백엔드 처리)가 적용된 API 호출
   const searchAPI = async (query: string): Promise<SearchResult[]> => {
+    // 실제 API 호출 대신 더미 데이터로 시뮬레이션
+    if (!apiURL) {
+      // 더미 데이터에서 검색어와 일치하는 항목 필터링
+      const filteredResults = dummyData.filter((item) =>
+        item.title.toLowerCase().includes(query.toLowerCase()),
+      );
+
+      // 실제 API 응답처럼 지연시간 추가
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      return filteredResults.slice(0, maxSuggestions);
+    }
+
     try {
       const response = await axios.get(apiURL, {
         params: {
