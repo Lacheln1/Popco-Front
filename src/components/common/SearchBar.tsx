@@ -256,7 +256,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-0 right-0 top-full z-50 max-h-80 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
+            className="absolute left-6 right-6 top-full z-50 max-h-80 min-w-80 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
           >
             {suggestions.map((option, index) => (
               <div
