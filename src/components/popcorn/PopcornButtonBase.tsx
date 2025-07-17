@@ -53,7 +53,7 @@ const PopcornButtonBase = ({
         />
       )}
       <img
-        className={`relative z-10 w-auto transition-transform duration-500 sm:h-12 ${
+        className={`relative z-10 h-[clamp(2rem,2vw,2.5rem)] w-auto transition-transform duration-500 sm:h-10 ${
           isSelected && color === "red"
             ? "rotate-[90deg] scale-110"
             : "rotate-0 scale-100"
@@ -62,7 +62,7 @@ const PopcornButtonBase = ({
         alt="popcorn"
       />
       <div
-        className={`whitespace-nowrap text-center text-[clamp(0.7rem,2vw,1rem)] ${COLOR_MAP[color].split(" ")[1]}`}
+        className={`whitespace-nowrap text-center text-[clamp(0.7rem,2vw,0.9rem)] ${COLOR_MAP[color].split(" ")[1]}`}
       >
         {label}
       </div>
