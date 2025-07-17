@@ -7,12 +7,6 @@ import { SearchOutlined } from "@ant-design/icons";
 interface SearchResult {
   id: number;
   title: string;
-  content: string;
-  hilights?: {
-    //검색 결과에서 검색어가 포함된 부분을 강조 표시해주는 기능
-    title?: string[];
-    content?: string[];
-  };
 }
 
 //자동완성 옵션 타입(글자 입력시 그에 맞는 검색어 나오는 기능 ex:안녕을 입력하면 아래에 자동완성으로 안녕하세요가 나오는 그런 기능)
@@ -97,7 +91,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
         params: {
           q: query,
           size: maxSuggestions,
-          highlight: true, // 하이라이팅 요청
         },
       });
 
@@ -128,20 +121,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             value: result.title,
             label: (
               <div className="py-1">
-                <div
-                  className="mb-[2px] font-bold"
-                  dangerouslySetInnerHTML={{
-                    __html: result.hilights?.title?.[0] || result.title,
-                  }}
-                />
-                <div
-                  className="text-xs text-gray-600"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      result.hilights?.content?.[0] ||
-                      result.content.substring(0, 100) + "...",
-                  }}
-                />
+                <div className="mb-[2px] font-bold">{result.title}</div>
               </div>
             ),
             data: result,
