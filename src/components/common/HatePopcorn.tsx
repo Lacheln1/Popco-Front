@@ -33,7 +33,7 @@ const HatePopcorn = ({ isSelected, onClick }: HatePopcornProps) => {
       )}
       <img
         className={`relative z-10 h-14 w-auto transition-transform duration-500 ${
-          isSelected ? "translate-x-3 rotate-[90deg]" : ""
+          isSelected ? "rotate-[90deg]" : ""
         }`}
         src="/images/components/hate-popcorn.svg"
         alt="popcorn-bucket"
