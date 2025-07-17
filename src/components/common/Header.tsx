@@ -120,12 +120,12 @@ const Header: React.FC<HeaderProps> = ({
       <div
         className={`gmarket transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-4 max-w-6xl rounded-[60px] bg-white/80 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
-            : "max-w-auto mx-auto bg-white/80 px-4 text-xl sm:px-6 lg:px-8"
+            ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/80 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            : "max-w-auto mx-auto bg-white/80 px-4 text-lg sm:px-6 lg:px-24"
         }`}
       >
         <div
-          className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? "h-12" : "h-16"}`}
+          className={`flex h-[4.5rem] items-center justify-between transition-all duration-300`}
         >
           {/* 로고 영역 */}
           <div className="flex-shrink-0">
@@ -133,20 +133,20 @@ const Header: React.FC<HeaderProps> = ({
               <img
                 src={popcoLogoImg}
                 alt="POPCO"
-                className={`w-auto object-contain transition-all duration-300 ${isScrolled ? "h-7" : "h-10"}`}
+                className={`w-auto object-contain transition-all duration-300 ${isScrolled ? "h-12" : "h-14"}`}
               />
             </Link>
           </div>
 
           {/* 네비게이션 메뉴 */}
           <nav className="hidden flex-1 justify-end md:flex">
-            <ul className="flex items-center space-x-4">
+            <ul className="flex items-center space-x-2">
               {navItems.map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`flex min-w-[100px] items-center justify-center rounded-full px-4 pt-1 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
-                      isScrolled ? "h-8 text-base" : "h-10 text-xl"
+                    className={`flex min-w-[90px] items-center justify-center rounded-full px-4 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
+                      isScrolled ? "h-8 text-base" : "h-10 text-lg"
                     } ${
                       isActiveItem(item.path)
                         ? "bg-sidelogo-blueGray text-white hover:bg-gray-700"
@@ -161,8 +161,8 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className={`flex min-w-[100px] items-center justify-center rounded-full border-2 border-gray-200 pt-1 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
-                      isScrolled ? "h-8 px-4 text-base" : "h-10 px-4 text-xl"
+                    className={`flex min-w-[90px] items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
+                      isScrolled ? "h-8 px-4 text-base" : "h-10 px-4 text-lg"
                     }`}
                     onClick={handleUserClick}
                   >
