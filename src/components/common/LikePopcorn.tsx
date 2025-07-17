@@ -32,15 +32,15 @@ const LikePopcorn = ({ isSelected, onClick }: LikePopcornProps) => {
       className="relative flex flex-col disabled:cursor-not-allowed"
     >
       {isSelected && (
-        <div className="absolute left-2 top-2 z-0 h-11 w-11 rounded-full bg-green-700 blur-[7.5px]" />
+        <div className="absolute left-1 top-2 z-0 h-10 w-10 rounded-full bg-green-700 blur-md" />
       )}
 
       <img
-        className="relative z-10 h-14 w-auto"
+        className="relative z-10 h-12 w-auto"
         src="/images/components/like-popcorn.svg"
         alt="popcorn-bucket"
       />
-      <div className="mt-1 text-center text-sm text-green-700">좋아요</div>
+      <div className="mt-1 text-center text-xs text-green-700">좋아요</div>
 
       {showPops && (
         <>
