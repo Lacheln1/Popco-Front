@@ -118,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({
       className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 md:bg-transparent`}
     >
       <div
-        className={`gmarket-medium transition-all duration-300 ${
+        className={`gmarket transition-all duration-300 ${
           isScrolled
             ? "mx-auto mt-4 max-w-6xl rounded-[60px] bg-white/80 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
             : "max-w-auto mx-auto bg-white/80 px-4 text-xl sm:px-6 lg:px-8"
@@ -145,8 +145,8 @@ const Header: React.FC<HeaderProps> = ({
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`flex min-w-[100px] items-center justify-center rounded-full px-4 py-2 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
-                      isScrolled ? "text-base" : "text-xl"
+                    className={`flex min-w-[100px] items-center justify-center rounded-full px-4 pt-1 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
+                      isScrolled ? "h-8 text-base" : "h-10 text-xl"
                     } ${
                       isActiveItem(item.path)
                         ? "bg-sidelogo-blueGray text-white hover:bg-gray-700"
@@ -161,8 +161,8 @@ const Header: React.FC<HeaderProps> = ({
               <li>
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    className={`flex min-w-[100px] items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:border-gray-300 hover:bg-gray-100 ${
-                      isScrolled ? "px-4 py-1 text-base" : "px-4 py-2 text-xl"
+                    className={`flex min-w-[100px] items-center justify-center rounded-full border-2 border-gray-200 pt-1 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
+                      isScrolled ? "h-8 px-4 text-base" : "h-10 px-4 text-xl"
                     }`}
                     onClick={handleUserClick}
                   >
@@ -241,7 +241,7 @@ const Header: React.FC<HeaderProps> = ({
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`rounded-lg px-4 py-2 font-medium text-black transition-colors hover:bg-gray-100 ${
+                  className={`h-10 rounded-lg px-4 pt-2 font-medium text-black transition-colors hover:bg-gray-100 ${
                     isActiveItem(item.path)
                       ? "bg-gray-800 text-white hover:bg-gray-700"
                       : ""
@@ -255,7 +255,7 @@ const Header: React.FC<HeaderProps> = ({
               {/* 모바일 로그인 버튼 */}
               {!user.isLoggedIn ? (
                 <button
-                  className="rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
+                  className="h-10 rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     onLogin?.();
