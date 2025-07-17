@@ -228,7 +228,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className="mr-3 flex h-16 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
           >
             {loading ? (
-              <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
             ) : (
               <SearchOutlined className="text-3xl" />
             )}
