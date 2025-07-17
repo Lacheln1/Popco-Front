@@ -70,17 +70,17 @@ const PopcornButtonBase = ({
       {showPops && color === "green" && (
         <>
           <img
-            className="absolute left-[10%] top-[10%] h-4 w-auto animate-popcorn1"
+            className="absolute left-[10%] top-[10%] h-3 w-auto animate-popcorn1 sm:h-4"
             src="/images/components/popcorn.svg"
             alt="pop1"
           />
           <img
-            className="absolute left-[40%] top-[5%] h-4 w-auto animate-popcorn2"
+            className="absolute left-[40%] top-[5%] h-3 w-auto animate-popcorn2 sm:h-4"
             src="/images/components/popcorn.svg"
             alt="pop2"
           />
           <img
-            className="absolute left-[60%] top-[12%] h-4 w-auto animate-popcorn3"
+            className="absolute left-[55%] top-[12%] h-3 w-auto animate-popcorn3 sm:h-4"
             src="/images/components/popcorn.svg"
             alt="pop3"
           />
