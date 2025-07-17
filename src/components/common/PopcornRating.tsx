@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
-import fullPopcornImg from "@/assets/full-popcorn.svg";
-import halfPopcornImg from "@/assets/half-popcorn.svg";
-import emptyPopcornImg from "@/assets/empty-popcorn.svg";
+import fullPopcornImg from "@/assets/rating-full-popcorn.svg";
+import halfPopcornImg from "@/assets/rating-half-popcorn.svg";
+import emptyPopcornImg from "@/assets/rating-empty-popcorn.svg";
 
 interface PopcornRatingProps {
   initialRating?: number; //초기 별점 값 (0-5)
@@ -183,13 +183,7 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
 
       {/* 현재 점수 표시 */}
       {showScore && (
-        <span
-          style={{
-            marginLeft: "8px",
-            minWidth: "60px",
-          }}
-          className={`${className}`}
-        >
+        <span className={`ml-2 min-w-[60px] ${className}`}>
           {(hoverRating || rating).toFixed(1)}
         </span>
       )}
