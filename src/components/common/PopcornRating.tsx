@@ -62,32 +62,17 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
 
     if (allowHalfRating && !readonly) {
       return (
-        <div
-          key={index}
-          className="popcorn-container"
-          style={{
-            position: "relative",
-            display: "inline-block",
-            cursor: "pointer",
-          }}
-        >
+        <div key={index} className="relative inline-block cursor-pointer">
           {/* 왼쪽 절반 (0.5점) */}
           <button
             type="button"
-            className="popcorn-half-button"
+            className="absolute left-0 top-0 z-20 cursor-pointer border-none bg-transparent"
             onClick={() => handleRatingChange(index + 0.5)}
             onMouseEnter={() => handleMouseEnter(index + 0.5)}
             onMouseLeave={handleMouseLeave}
             style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
               width: `${size / 2}px`,
               height: `${size}px`,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              zIndex: 2,
             }}
             aria-label={`${index + 0.5}점`}
           />
@@ -95,21 +80,14 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
           {/* 오른쪽 절반 (1점) */}
           <button
             type="button"
-            className="popcorn-full-button"
+            className="absolute right-0 top-0 z-20 cursor-pointer border-none bg-transparent"
+            style={{
+              width: `${size / 2}px`,
+              height: `${size}px`,
+            }}
             onClick={() => handleRatingChange(index + 1)}
             onMouseEnter={() => handleMouseEnter(index + 1)}
             onMouseLeave={handleMouseLeave}
-            style={{
-              position: "absolute",
-              right: 0,
-              top: 0,
-              width: `${size / 2}px`,
-              height: `${size}px`,
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              zIndex: 2,
-            }}
             aria-label={`${index + 1}점`}
           />
 
@@ -117,15 +95,9 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
           <img
             src={popcornImage}
             alt={`${index + 1}번째 팝콘`}
+            className="relative z-10 block transition-all duration-100 ease-in-out"
             width={size}
             height={size}
-            style={{
-              display: "block",
-              transition: "transform 0.1s ease, filter 0.1s ease",
-              position: "relative",
-              zIndex: 1,
-              transform: hoverRating > index ? "scale(1.05)" : "scale(1)",
-            }}
             draggable={false}
           />
         </div>
@@ -137,31 +109,21 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
       <button
         key={index}
         type="button"
-        className="popcorn-button"
+        className={`popcorn-button border-none bg-transparent p-0.5 transition-transform duration-100 ease-in-out ${
+          readonly ? "cursor-default" : "cursor-pointer"
+        }`}
         onClick={() => handleRatingChange(index + 1)}
         onMouseEnter={() => handleMouseEnter(index + 1)}
         onMouseLeave={handleMouseLeave}
         disabled={readonly}
-        style={{
-          background: "transparent",
-          border: "none",
-          padding: "2px",
-          cursor: readonly ? "default" : "pointer",
-          transition: "transform 0.1s ease",
-        }}
         aria-label={`${index + 1}점`}
       >
         <img
           src={popcornImage}
           alt={`${index + 1}번째 팝콘`}
+          className="block select-none transition-transform duration-100 ease-in-out"
           width={size}
           height={size}
-          style={{
-            display: "block",
-            transition: "transform 0.1s ease, filter 0.1s ease",
-            transform:
-              !readonly && hoverRating > index ? "scale(1.05)" : "scale(1)",
-          }}
           draggable={false}
         />
       </button>
@@ -169,15 +131,7 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
   };
 
   return (
-    <div
-      className={`popcorn-rating ${className}`}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "4px",
-        userSelect: "none",
-      }}
-    >
+    <div className={`user-select-none flex items-center gap-1 ${className}`}>
       {/* 5개의 팝콘 렌더링 */}
       {Array.from({ length: 5 }, (_, index) => renderPopcorn(index))}
 
