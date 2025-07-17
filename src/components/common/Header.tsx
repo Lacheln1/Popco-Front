@@ -115,13 +115,13 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 bg-white transition-all duration-300 md:bg-transparent`}
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 md:bg-transparent`}
     >
       <div
-        className={`transition-all duration-300 ${
+        className={`gmarket-medium transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-4 max-w-6xl rounded-2xl bg-white/70 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
-            : "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+            ? "mx-auto mt-4 max-w-6xl rounded-[60px] bg-white/80 px-6 backdrop-blur-sm sm:px-8 lg:px-10"
+            : "max-w-auto mx-auto bg-white/80 px-4 text-xl sm:px-6 lg:px-8"
         }`}
       >
         <div
@@ -145,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({
                 <li key={item.name}>
                   <Link
                     to={item.path}
-                    className={`flex min-w-[100px] items-center justify-center rounded-full px-4 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:transform hover:bg-gray-100 ${
+                    className={`flex min-w-[100px] items-center justify-center rounded-full px-4 py-2 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
                       isScrolled ? "text-base" : "text-xl"
                     } ${
                       isActiveItem(item.path)
