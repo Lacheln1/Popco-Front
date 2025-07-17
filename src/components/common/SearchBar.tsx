@@ -228,7 +228,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex justify-center px-4 pt-8">
       <div className="relative w-full max-w-[700px]">
-        <div className="relative flex items-center rounded-full border border-gray-300 bg-white">
+        <div className="relative flex min-w-96 items-center rounded-full border border-gray-300 bg-white">
           <input
             ref={inputRef}
             type="text"
