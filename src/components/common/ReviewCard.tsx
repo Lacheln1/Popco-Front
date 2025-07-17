@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 
@@ -8,7 +8,28 @@ import FullLikeIcon from "../../assets/full-like.png";
 import FullPopcornIcon from "../../assets/full-popcorn.svg";
 import HalfPopcornIcon from "../../assets/half-popcorn.svg";
 
-const ReviewCard = ({
+interface ReviewData {
+  movieTitle: string;
+  score: number;
+  reviewText: string;
+  nickname: string;
+  likeCount: number;
+  isSpoiler: boolean;
+  isOwnReview: boolean;
+  isLiked: boolean;
+  hasAlreadyReported: boolean;
+}
+
+interface ReviewCardProps {
+  reviewData: ReviewData;
+  onLikeClick: () => void;
+  onReport: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onCardClick: () => void;
+}
+
+const ReviewCard: React.FC<ReviewCardProps> = ({
   reviewData,
   onLikeClick,
   onReport,
@@ -43,7 +64,7 @@ const ReviewCard = ({
           key={`full-${i}`}
           src={FullPopcornIcon}
           alt="Full"
-          className="h-5 w-5 md:h-6 md:w-6"
+          className="h-6 w-6"
         />,
       );
     }
@@ -53,7 +74,7 @@ const ReviewCard = ({
           key="half"
           src={HalfPopcornIcon}
           alt="Half"
-          className="ml-1 h-5 w-2 md:h-6 md:w-2"
+          className="ml-1 h-6 w-2"
         />,
       );
     }
@@ -64,50 +85,41 @@ const ReviewCard = ({
     {
       key: "1",
       label: "신고하기",
-      onClick: (e) => {
-        e.stopPropagation();
-        onReport();
-      },
+      onClick: onReport,
       disabled: hasAlreadyReported,
     },
   ];
+
   if (isOwnReview) {
     items.push(
       {
         key: "2",
         label: "수정하기",
-        onClick: (e) => {
-          e.stopPropagation();
-          onEdit();
-        },
+        onClick: onEdit,
       },
       {
         key: "3",
         label: "삭제하기",
-        onClick: (e) => {
-          e.stopPropagation();
-          onDelete();
-        },
+        onClick: onDelete,
         danger: true,
       },
     );
   }
 
   const cardMenu = (
-    <div className="cursor-default" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="cursor-default"
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+    >
       <Dropdown menu={{ items }} trigger={["click"]} placement="bottomRight">
-        <button type="button" className="-mr-3 focus:outline-none md:-mr-2">
-          <img
-            src={MenuIcon}
-            alt="메뉴"
-            className="h-5 w-5 cursor-pointer md:h-6 md:w-6"
-          />
+        <button type="button" className="-mr-2 focus:outline-none">
+          <img src={MenuIcon} alt="메뉴" className="h-6 w-6 cursor-pointer" />
         </button>
       </Dropdown>
     </div>
   );
 
-  const handleSpoilerClick = (e) => {
+  const handleSpoilerClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
     if (!isSpoilerRevealed) {
       e.stopPropagation();
       setIsSpoilerRevealed(true);
@@ -141,7 +153,6 @@ const ReviewCard = ({
           body: { padding: 0 },
         }}
       >
-        {/* 내부 여백 및 폰트 크기 반응형 적용 */}
         <div
           onClick={onCardClick}
           className="flex cursor-pointer flex-col gap-y-1 p-2 pt-0 md:gap-y-3 md:p-4"
@@ -166,7 +177,7 @@ const ReviewCard = ({
 
           <div
             className="mt-auto flex cursor-default items-center justify-between border-t border-gray-100 pt-1 md:pt-2"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             <span className="text-xs text-gray-500 md:text-sm">{nickname}</span>
             <div className="flex items-center gap-x-1">
@@ -174,7 +185,10 @@ const ReviewCard = ({
                 src={isLiked ? FullLikeIcon : EmptyLikeIcon}
                 alt="좋아요"
                 className="h-4 w-4 cursor-pointer"
-                onClick={onLikeClick}
+                onClick={(e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  onLikeClick();
+                }}
               />
               <span className="text-xs font-medium text-gray-600 md:text-sm">
                 {likeCount}
