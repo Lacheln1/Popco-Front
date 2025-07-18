@@ -2,25 +2,29 @@ import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
+import { TbHandClick } from "react-icons/tb";
+import { GoArrowUpRight } from "react-icons/go";
+import { useState } from "react";
 
 const banners = [
-  "/images/main/banner-popco.png",
-  "/images/main/banner-event.png",
-  "/images/main/banner-chat.png",
-  "/images/main/banner-popco.png",
-  "/images/main/banner-event.png",
-  "/images/main/banner-chat.png",
+  { src: "/images/main/banner-popco.png", link: "/" },
+  { src: "/images/main/banner-event.png", link: "/event" },
+  { src: "/images/main/banner-chat.png", link: "/chat" }, // 챗봇 연결은 추후 수정
+  { src: "/images/main/banner-popco.png", link: "/" },
+  { src: "/images/main/banner-event.png", link: "/event" },
+  { src: "/images/main/banner-chat.png", link: "/chat" },
 ];
 
 const HeroCarousel = () => {
   const prevRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="relative w-screen overflow-hidden">
+    <div className="relative w-screen">
       <Swiper
         modules={[Navigation, Autoplay]}
-        className="mainSwiper"
+        className="mainSwiper overflow-visible"
         slidesPerView={1.7}
         spaceBetween={20}
         centeredSlides
@@ -29,6 +33,7 @@ const HeroCarousel = () => {
           delay: 2500,
           disableOnInteraction: false,
         }}
+        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         onBeforeInit={(swiper: SwiperType) => {
           if (
             swiper.params.navigation &&
@@ -61,7 +66,7 @@ const HeroCarousel = () => {
           },
         }}
       >
-        {banners.map((src, idx) => (
+        {banners.map(({ src }, idx) => (
           <SwiperSlide key={idx}>
             <img
               src={src}
@@ -70,6 +75,16 @@ const HeroCarousel = () => {
             />
           </SwiperSlide>
         ))}
+        <button
+          className="absolute -bottom-7 left-1/2 z-[1] flex h-14 -translate-x-1/2 items-center gap-1 gap-3 rounded-full bg-white bg-white/40 px-4 py-1 text-sm shadow-[0px_4px_15px_rgba(0,0,0,0.1)] shadow-md"
+          onClick={() => (window.location.href = banners[activeIndex].link)}
+        >
+          <div className="rounded-full bg-white p-2 shadow-md">
+            <TbHandClick className="text-xl text-red-600" />
+          </div>
+          <div className="gmarket-medium">See More</div>
+          <GoArrowUpRight className="text-2xl" />
+        </button>
         <NavigationButton ref={prevRef} position="left" />
         <NavigationButton ref={nextRef} position="right" />
       </Swiper>
