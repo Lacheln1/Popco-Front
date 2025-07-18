@@ -76,14 +76,16 @@ const HeroCarousel = () => {
           </SwiperSlide>
         ))}
         <button
-          className="absolute -bottom-7 left-1/2 z-[1] flex h-14 -translate-x-1/2 items-center gap-1 gap-3 rounded-full bg-white bg-white/40 px-4 py-1 text-sm shadow-[0px_4px_15px_rgba(0,0,0,0.1)] shadow-md"
+          className="absolute -bottom-7 left-1/2 z-[1] flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/40 px-4 py-2 text-sm shadow-[0px_4px_15px_rgba(0,0,0,0.1)] backdrop-blur-md sm:h-14 sm:gap-3 sm:px-6 sm:py-3 sm:text-base"
           onClick={() => (window.location.href = banners[activeIndex].link)}
         >
-          <div className="rounded-full bg-white p-2 shadow-md">
-            <TbHandClick className="text-xl text-red-600" />
+          <div className="rounded-full bg-white p-1.5 shadow-md sm:p-2">
+            <TbHandClick className="text-lg text-red-600 sm:text-xl" />
           </div>
-          <div className="gmarket-medium">See More</div>
-          <GoArrowUpRight className="text-2xl" />
+          <div className="gmarket-medium whitespace-nowrap text-sm sm:text-base">
+            See More
+          </div>
+          <GoArrowUpRight className="text-xl sm:text-2xl" />
         </button>
         <NavigationButton ref={prevRef} position="left" />
         <NavigationButton ref={nextRef} position="right" />
