@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({
         className={`gmarket transition-all duration-300 ${
           isScrolled
             ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/80 px-6 sm:px-8 lg:px-10"
-            : "max-w-auto mx-auto bg-white/50 px-4 text-lg sm:px-6 lg:px-24"
+            : "max-w-auto mx-auto bg-white/80 px-4 text-lg sm:px-6 md:bg-white/50 lg:px-24"
         }`}
       >
         <div
