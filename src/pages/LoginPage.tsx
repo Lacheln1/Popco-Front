@@ -123,8 +123,8 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 중간 - 로그인 폼 */}
-        <div className="px-4 pb-4 md:mx-10">
-          <div className="w-full rounded-3xl bg-white p-6 shadow-2xl md:mt-14">
+        <div className="flex justify-center px-4 pb-4 md:mx-10">
+          <div className="w-[600px] rounded-3xl bg-white p-6 shadow-2xl md:mt-14">
             <div className="mb-6 text-center">
               <h1 className="mb-2 text-xl font-bold text-gray-800">
                 지금 바로 POPCO에 입장해요 !
@@ -194,8 +194,8 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 하단 - 캐릭터들 */}
-        <div className="flex justify-center pb-8 sm:w-2 md:w-[580px]">
-          <img src={loginPopcoImg} alt="" className="" />
+        <div className="flex justify-center pb-8">
+          <img src={loginPopcoImg} alt="" className="w-[600px]" />
         </div>
       </div>
     </main>
