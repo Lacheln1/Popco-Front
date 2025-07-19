@@ -9,75 +9,81 @@ const LoginPage: React.FC = () => {
       {/* 데스크탑 레이아웃 */}
       <div className="hidden min-h-screen justify-center md:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
-        <div className="ml-8 flex w-full justify-end lg:ml-36">
-          <div className="fixed flex flex-col items-center">
+        <div className="flex w-full items-center justify-center">
+          <div className="flex flex-col items-center justify-center">
             <img
               src={spotlightWithLogoImg}
               alt=""
-              className="w-[475px] object-cover"
+              className="w-[280px] object-cover md:w-[350px] lg:w-[400px] xl:w-[475px]"
             />
 
-            <img src={loginPopcoImg} alt="" className="mr-3 mt-28 w-[675px]" />
+            <img
+              src={loginPopcoImg}
+              alt=""
+              className="mt-8 w-[320px] md:mt-12 md:w-[420px] lg:mt-16 lg:w-[520px] xl:mt-20 xl:w-[620px]"
+            />
           </div>
         </div>
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
-        <div className="mr-8 flex w-full items-center justify-center lg:mr-36">
-          <div className="flex h-[770px] w-[800px] flex-col justify-center rounded-3xl bg-white p-8 shadow-2xl">
+        <div className="flex w-full items-center justify-center">
+          <div className="flex h-[600px] w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:h-[650px] md:w-[700px] md:p-7 lg:h-[700px] lg:w-[750px] lg:p-8 xl:h-[770px] xl:w-[800px]">
             <div className="w-full">
-              <div className="mb-8 text-center">
-                <h1 className="mb-2 text-2xl font-bold text-gray-800">
+              <div className="mb-6 text-center md:mb-7 lg:mb-8">
+                <h1 className="mb-2 text-xl font-bold text-gray-800 md:text-2xl">
                   지금 바로 POPCO에 입장해요 !
                 </h1>
-                <p className="text-base text-gray-600">로그인 하시겠어요?</p>
+                <p className="text-sm text-gray-600 md:text-base">
+                  로그인 하시겠어요?
+                </p>
               </div>
 
-              <form className="space-y-4">
+              <form className="space-y-3 md:space-y-4">
                 <div className="">
-                  <label className="mb-2 block text-sm text-gray-700">
+                  <label className="mb-2 block text-xs text-gray-700 md:text-sm">
                     이메일
                   </label>
                   <input
                     type="email"
                     placeholder="Email Address"
-                    className="w-full rounded-xl border-0 bg-gray-100 px-4 py-4 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    className="w-full rounded-xl border-0 bg-gray-100 px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:px-4 md:py-4"
                   />
                 </div>
 
                 <div className="">
-                  <label className="mb-2 block text-sm text-gray-700">
+                  <label className="mb-2 block text-xs text-gray-700 md:text-sm">
                     비밀번호
                   </label>
                   <input
                     type="password"
                     placeholder="Password"
-                    className="w-full rounded-xl border-0 bg-gray-100 px-4 py-4 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    className="w-full rounded-xl border-0 bg-gray-100 px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:px-4 md:py-4"
                   />
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-3 md:pt-4">
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-yellow-400 px-4 py-4 font-medium text-black transition-colors hover:bg-yellow-500"
+                    className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-sm font-medium text-black transition-colors hover:bg-yellow-500 md:py-4"
                   >
                     로그인
                   </button>
                 </div>
               </form>
 
-              <div className="t mt-6">
-                <p className="text-sm text-gray-600">
+              <div className="t mt-4 md:mt-6">
+                <p className="text-xs text-gray-600 md:text-sm">
                   처음이 아니신가요?
                   <span className="ml-1 text-orange-500">회원가입 하기</span>
                 </p>
               </div>
 
-              <div className="mt-6 flex gap-3">
-                <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-4 py-3 font-medium text-white transition-colors hover:bg-green-600">
+              <div className="mt-4 flex gap-2 md:mt-6 md:gap-3">
+                <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-green-600 md:px-4 md:py-3 md:text-sm lg:text-base">
                   <span className="mr-2 font-bold">N</span>
                   네이버 로그인
                 </button>
-                <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-4 py-3 font-medium text-black transition-colors hover:bg-yellow-500">
+                <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500 md:px-4 md:py-3 md:text-sm lg:text-base">
                   <span className="mr-2">💬</span>
                   카카오 로그인
                 </button>
