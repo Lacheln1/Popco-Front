@@ -99,7 +99,7 @@ const LoginPage: React.FC = () => {
 
               <div className="mt-4 flex w-full justify-center md:mt-6 md:pt-8">
                 <div className="flex h-16 w-full max-w-[500px] gap-2 md:gap-3 xl:mt-5">
-                  <button className="transition-colorsmd:px-4 flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white md:py-3 md:text-sm lg:text-base">
+                  <button className="flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white transition-colors md:px-4 md:py-3 md:text-sm lg:text-base">
                     <img src={naverLoginBtnImg} alt="네이버로그인이미지" />
                   </button>
                   <button className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors md:px-4 md:py-3 md:text-sm lg:text-base">
@@ -132,7 +132,7 @@ const LoginPage: React.FC = () => {
 
         {/* 중간 - 로그인 폼 */}
         <div className="flex justify-center px-4 pb-4 md:mx-10">
-          <div className="w-[600px] rounded-3xl bg-white p-6 shadow-2xl md:mt-14">
+          <div className="w-[600px] rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-14">
             <div className="mb-6 text-center">
               <h1 className="mb-2 text-xl font-bold text-gray-800">
                 지금 바로 POPCO에 입장해요 !
@@ -140,33 +140,33 @@ const LoginPage: React.FC = () => {
               <p className="text-sm text-gray-600">로그인 하시겠어요?</p>
             </div>
 
-            <form className="space-y-3">
-              <div>
+            <form className="flex flex-col items-center space-y-3">
+              <div className="w-full max-w-[440px]">
                 <label className="mb-2 block text-xs text-gray-700">
                   이메일
                 </label>
                 <input
                   type="email"
                   placeholder="Email Address"
-                  className="w-full rounded-xl border-0 bg-gray-100 px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
                 />
               </div>
 
-              <div>
+              <div className="w-full max-w-[440px]">
                 <label className="mb-2 block text-xs text-gray-700">
                   비밀번호
                 </label>
                 <input
                   type="password"
                   placeholder="Password"
-                  className="w-full rounded-xl border-0 bg-gray-100 px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
                 />
               </div>
 
-              <div className="pt-3">
+              <div className="w-full max-w-[440px] pt-3">
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-sm font-medium text-black transition-colors hover:bg-yellow-500"
+                  className="bg-popco-main w-full rounded-[40px] px-4 py-3 text-base font-medium text-black transition-colors hover:bg-yellow-400"
                 >
                   로그인
                 </button>
@@ -182,21 +182,23 @@ const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="mt-4 flex gap-2">
-              <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-green-600">
-                <span className="mr-2 font-bold">N</span>
-                네이버 로그인
-              </button>
-              <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500">
-                <div className="pr-4">
-                  <img
-                    src={kakaoSymbolImg}
-                    alt="카카오심볼"
-                    className="w-5 object-contain"
-                  />
-                </div>
-                카카오 로그인
-              </button>
+            <div className="mt-4 flex w-full justify-center">
+              <div className="flex w-full max-w-[440px] gap-2">
+                <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors">
+                  <span className="mr-2 font-bold">N</span>
+                  네이버 로그인
+                </button>
+                <button className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors">
+                  <div className="pr-4">
+                    <img
+                      src={kakaoSymbolImg}
+                      alt="카카오심볼"
+                      className="w-5 object-contain"
+                    />
+                  </div>
+                  카카오 로그인
+                </button>
+              </div>
             </div>
           </div>
         </div>
