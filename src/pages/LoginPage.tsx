@@ -10,7 +10,7 @@ const LoginPage: React.FC = () => {
       <div className="mx-2 hidden min-h-screen justify-center md:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
         <div className="flex w-full justify-end">
-          <div className="">
+          <div>
             <div className="flex justify-center">
               <img
                 src={spotlightWithLogoImg}
@@ -32,6 +32,12 @@ const LoginPage: React.FC = () => {
         {/* 로그인 화면 오른쪽 로그인 폼 */}
         <div className="flex w-full xl:mr-32">
           <div className="ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-12 lg:h-[600px] xl:mt-16 xl:h-[770px]">
+            {/* 스포트라이트 */}
+            <img
+              src={spotlightImg}
+              alt=""
+              className="w-[471px]object-cover absolute"
+            />
             <div className="w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
                 <h1 className="mb-2 text-xl font-bold text-gray-800 md:text-2xl">
