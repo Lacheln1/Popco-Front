@@ -14,11 +14,13 @@ const LoginPage: React.FC = () => {
         <div className="flex w-full justify-end">
           <div>
             <div className="flex justify-center">
-              <img
-                src={spotlightWithLogoImg}
-                alt=""
-                className="object-cover md:h-[200px] lg:h-[280px] xl:h-[336px] xl:w-[471px]"
-              />
+              <a href="/">
+                <img
+                  src={spotlightWithLogoImg}
+                  alt=""
+                  className="object-cover md:h-[200px] lg:h-[280px] xl:h-[336px] xl:w-[471px]"
+                />
+              </a>
             </div>
 
             <div className="flex justify-center">
@@ -33,7 +35,7 @@ const LoginPage: React.FC = () => {
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
         <div className="flex w-full items-start justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-12 lg:h-[600px] xl:mt-16 xl:h-[770px]">
+          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-12 lg:h-[600px] xl:mt-16 xl:h-[770px]">
             {/* 스포트라이트 */}
             <img
               src={spotlightImg}
@@ -52,31 +54,31 @@ const LoginPage: React.FC = () => {
 
               <form className="flex flex-col items-center space-y-3 md:space-y-4">
                 <div className="w-full max-w-[500px]">
-                  <label className="mb-2 block text-xs text-gray-700 md:text-sm">
+                  <label className="mb-2 block text-xs text-gray-700 md:text-base">
                     이메일
                   </label>
                   <input
                     type="email"
                     placeholder="Email Address"
-                    className="w-full rounded-xl border-0 bg-gray-100 px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:px-4 md:py-4"
+                    className="white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
                   />
                 </div>
 
                 <div className="w-full max-w-[500px]">
-                  <label className="mb-2 block text-xs text-gray-700 md:text-sm">
+                  <label className="mb-2 block text-xs text-gray-700 md:text-base">
                     비밀번호
                   </label>
                   <input
                     type="password"
                     placeholder="Password"
-                    className="w-full rounded-xl border-0 bg-gray-100 px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 md:px-4 md:py-4"
+                    className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
                   />
                 </div>
 
                 <div className="w-full max-w-[500px] pt-3 md:pt-4">
                   <button
                     type="submit"
-                    className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-sm font-medium text-black transition-colors hover:bg-yellow-500 md:py-4"
+                    className="bg-popco-main w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 md:py-4"
                   >
                     로그인
                   </button>
@@ -84,19 +86,23 @@ const LoginPage: React.FC = () => {
               </form>
 
               <div className="t mt-4 flex justify-center md:mt-6">
-                <p className="text-xs text-gray-600 md:text-sm">
+                <p className="text-xs text-gray-600 md:text-base">
                   처음이 아니신가요?
-                  <span className="ml-1 text-orange-500">회원가입 하기</span>
+                  <a
+                    href="/register"
+                    className="ml-1 text-orange-500 hover:text-orange-600"
+                  >
+                    회원가입 하기
+                  </a>
                 </p>
               </div>
 
-              <div className="mt-4 flex w-full justify-center md:mt-6">
-                <div className="flex w-full max-w-[500px] gap-2 md:gap-3">
-                  <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-green-600 md:px-4 md:py-3 md:text-sm lg:text-base">
-                    <span className="mr-2 font-bold">N</span>
-                    네이버 로그인
+              <div className="mt-4 flex w-full justify-center md:mt-6 md:pt-8">
+                <div className="flex h-16 w-full max-w-[500px] gap-2 md:gap-3 xl:mt-5">
+                  <button className="transition-colorsmd:px-4 flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white md:py-3 md:text-sm lg:text-base">
+                    <img src={naverLoginBtnImg} alt="네이버로그인이미지" />
                   </button>
-                  <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500 md:px-4 md:py-3 md:text-sm lg:text-base">
+                  <button className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors md:px-4 md:py-3 md:text-sm lg:text-base">
                     <div className="pr-4">
                       <img
                         src={kakaoSymbolImg}
