@@ -228,7 +228,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex justify-center px-4 pt-8">
       <div className="relative w-full max-w-[700px]">
-        <div className="relative flex min-w-80 items-center rounded-full border border-gray-300 bg-white">
+        <div className="relative flex h-10 min-w-80 items-center rounded-full border border-gray-300 bg-white">
           <input
             ref={inputRef}
             type="text"
@@ -242,12 +242,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="mr-3 flex h-16 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
+            className="mr-3 flex h-10 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
           >
             {loading ? (
               <div className="h-3 w-3 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
             ) : (
-              <SearchOutlined className="text-3xl" />
+              <SearchOutlined className="text-xl" />
             )}
           </button>
         </div>
@@ -256,13 +256,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-6 right-6 top-full z-50 max-h-80 min-w-80 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
+            className="absolute left-4 right-4 top-full z-50 max-h-80 min-w-60 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
           >
             {suggestions.map((option, index) => (
               <div
                 key={index}
                 onClick={() => handleSelect(option)}
-                className={`cursor-pointer border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50 ${
+                className={`flex h-12 cursor-pointer items-center border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50 ${
                   selectedIndex === index ? "bg-blue-50" : ""
                 }`}
               >
