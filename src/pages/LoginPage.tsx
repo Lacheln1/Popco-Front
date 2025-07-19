@@ -7,27 +7,19 @@ const LoginPage: React.FC = () => {
   return (
     <main className="relative min-h-screen bg-slate-900">
       {/* 데스크탑 레이아웃 */}
-      <div className="hidden min-h-screen justify-center md:flex">
+      <div className="ml-2 hidden min-h-screen justify-center md:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
-        <div className="flex w-full items-center justify-center">
-          <div className="flex flex-col items-center justify-center">
-            <img
-              src={spotlightWithLogoImg}
-              alt=""
-              className="w-[280px] object-cover md:w-[350px] lg:w-[400px] xl:w-[475px]"
-            />
+        <div className="mr-28 flex w-full items-center justify-end">
+          <div className="flex flex-col items-center justify-end">
+            <img src={spotlightWithLogoImg} alt="" className="object-fill" />
 
-            <img
-              src={loginPopcoImg}
-              alt=""
-              className="mt-8 w-[320px] md:mt-12 md:w-[420px] lg:mt-16 lg:w-[520px] xl:mt-20 xl:w-[620px]"
-            />
+            <img src={loginPopcoImg} alt="" className="mt-8" />
           </div>
         </div>
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
-        <div className="flex w-full items-center justify-center">
-          <div className="flex h-[600px] w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:h-[650px] md:w-[700px] md:p-7 lg:h-[700px] lg:w-[750px] lg:p-8 xl:h-[770px] xl:w-[800px]">
+        <div className="mr-2 flex w-full items-center">
+          <div className="flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:h-[800px] md:max-w-[770px]">
             <div className="w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
                 <h1 className="mb-2 text-xl font-bold text-gray-800 md:text-2xl">
