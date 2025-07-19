@@ -1,4 +1,10 @@
-import React, { useCallback, useState, useRef, useEffect } from "react";
+import React, {
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import axios from "axios";
 import { debounce } from "lodash";
 import { SearchOutlined } from "@ant-design/icons";
@@ -102,8 +108,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   //디바운스 된 검색 함수
-  const debouncedSearch = useCallback(
-    debounce(async (value: string) => {
+  const searchFunction = useCallback(
+    async (value: string) => {
       if (!value.trim()) {
         setSuggestions([]);
         setSearchResult([]);
@@ -135,8 +141,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       } finally {
         setLoading(false);
       }
-    }, debounceTime),
-    [apiURL, showSuggestions, maxSuggestions, debounceTime, onSearch],
+    },
+    [apiURL, showSuggestions, maxSuggestions, onSearch, searchAPI],
+  );
+
+  const debouncedSearch = useMemo(
+    () => debounce(searchFunction, debounceTime),
+    [searchFunction, debounceTime],
   );
 
   //입력값 변경 핸들러
