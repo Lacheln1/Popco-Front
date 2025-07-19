@@ -2,12 +2,14 @@ import React from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
+import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
+import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
 
 const LoginPage: React.FC = () => {
   return (
     <main className="relative min-h-screen bg-slate-900">
       {/* 데스크탑 레이아웃 */}
-      <div className="mx-2 hidden min-h-screen justify-center md:flex">
+      <div className="mx-2 hidden min-h-screen justify-center lg:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
         <div className="flex w-full justify-end">
           <div>
@@ -94,7 +96,13 @@ const LoginPage: React.FC = () => {
                   네이버 로그인
                 </button>
                 <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500 md:px-4 md:py-3 md:text-sm lg:text-base">
-                  <span className="mr-2">💬</span>
+                  <div className="pr-4">
+                    <img
+                      src={kakaoSymbolImg}
+                      alt="카카오심볼"
+                      className="w-5 object-contain"
+                    />
+                  </div>
                   카카오 로그인
                 </button>
               </div>
@@ -104,7 +112,7 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* 모바일 레이아웃 */}
-      <div className="flex flex-col md:hidden">
+      <div className="flex flex-col lg:hidden">
         {/* 상단 - 스포트라이트와 로고 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
           <img
@@ -115,8 +123,8 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 중간 - 로그인 폼 */}
-        <div className="mx-4 px-4 pb-4">
-          <div className="w-full rounded-3xl bg-white p-6 shadow-2xl">
+        <div className="px-4 pb-4 md:mx-10">
+          <div className="w-full rounded-3xl bg-white p-6 shadow-2xl md:mt-14">
             <div className="mb-6 text-center">
               <h1 className="mb-2 text-xl font-bold text-gray-800">
                 지금 바로 POPCO에 입장해요 !
@@ -172,7 +180,13 @@ const LoginPage: React.FC = () => {
                 네이버 로그인
               </button>
               <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500">
-                <span className="mr-2">💬</span>
+                <div className="pr-4">
+                  <img
+                    src={kakaoSymbolImg}
+                    alt="카카오심볼"
+                    className="w-5 object-contain"
+                  />
+                </div>
                 카카오 로그인
               </button>
             </div>
@@ -180,8 +194,8 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 하단 - 캐릭터들 */}
-        <div className="flex flex-1 items-end justify-center pb-8">
-          <img src={loginPopcoImg} alt="" className="w-96" />
+        <div className="flex justify-center pb-8 sm:w-2 md:w-[580px]">
+          <img src={loginPopcoImg} alt="" className="" />
         </div>
       </div>
     </main>
