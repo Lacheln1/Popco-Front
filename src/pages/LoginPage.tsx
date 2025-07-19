@@ -104,7 +104,7 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* 모바일 레이아웃 */}
-      <div className="flex min-h-screen flex-col md:hidden">
+      <div className="flex flex-col md:hidden">
         {/* 상단 - 스포트라이트와 로고 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
           <img
@@ -115,7 +115,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 중간 - 로그인 폼 */}
-        <div className="px-4 pb-4">
+        <div className="mx-4 px-4 pb-4">
           <div className="w-full rounded-3xl bg-white p-6 shadow-2xl">
             <div className="mb-6 text-center">
               <h1 className="mb-2 text-xl font-bold text-gray-800">
@@ -160,7 +160,9 @@ const LoginPage: React.FC = () => {
             <div className="mt-4 text-center">
               <p className="text-xs text-gray-600">
                 처음이 아니신가요?
-                <span className="ml-1 text-orange-500">회원가입 하기</span>
+                <a href="/register" className="ml-1 text-orange-500">
+                  회원가입 하기
+                </a>
               </p>
             </div>
 
@@ -179,7 +181,7 @@ const LoginPage: React.FC = () => {
 
         {/* 하단 - 캐릭터들 */}
         <div className="flex flex-1 items-end justify-center pb-8">
-          <img src={loginPopcoImg} alt="" className="w-72" />
+          <img src={loginPopcoImg} alt="" className="w-96" />
         </div>
       </div>
     </main>
