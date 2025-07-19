@@ -90,21 +90,23 @@ const LoginPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="mt-4 flex w-full max-w-[500px] justify-center gap-2 md:mt-6 md:gap-3">
-                <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-green-600 md:px-4 md:py-3 md:text-sm lg:text-base">
-                  <span className="mr-2 font-bold">N</span>
-                  네이버 로그인
-                </button>
-                <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500 md:px-4 md:py-3 md:text-sm lg:text-base">
-                  <div className="pr-4">
-                    <img
-                      src={kakaoSymbolImg}
-                      alt="카카오심볼"
-                      className="w-5 object-contain"
-                    />
-                  </div>
-                  카카오 로그인
-                </button>
+              <div className="mt-4 flex w-full justify-center md:mt-6">
+                <div className="flex w-full max-w-[500px] gap-2 md:gap-3">
+                  <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-green-600 md:px-4 md:py-3 md:text-sm lg:text-base">
+                    <span className="mr-2 font-bold">N</span>
+                    네이버 로그인
+                  </button>
+                  <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-3 py-2.5 text-xs font-medium text-black transition-colors hover:bg-yellow-500 md:px-4 md:py-3 md:text-sm lg:text-base">
+                    <div className="pr-4">
+                      <img
+                        src={kakaoSymbolImg}
+                        alt="카카오심볼"
+                        className="w-5 object-contain"
+                      />
+                    </div>
+                    카카오 로그인
+                  </button>
+                </div>
               </div>
             </div>
           </div>
