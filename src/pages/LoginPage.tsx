@@ -10,79 +10,78 @@ const LoginPage: React.FC = () => {
       <div className="hidden min-h-screen justify-center md:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
         <div className="ml-8 flex w-full justify-end lg:ml-36">
-          <div className="fixed flex flex-col items-end">
+          <div className="fixed flex flex-col items-center">
             <img
               src={spotlightWithLogoImg}
               alt=""
-              className="w-64 object-cover lg:w-96"
+              className="w-[475px] object-cover"
             />
-            <img
-              src={loginPopcoImg}
-              alt=""
-              className="mr-3 mt-32 w-64 lg:mt-56 lg:w-96"
-            />
+
+            <img src={loginPopcoImg} alt="" className="mr-3 mt-28 w-[675px]" />
           </div>
         </div>
 
-        {/* 로그인 화면 오른쪽 로그인 폼  */}
-        <div className="mr-8 flex w-full items-center justify-start lg:mr-36">
-          <div className="relative z-10 h-[770px] max-h-[770px] w-full max-w-[800px] rounded-3xl bg-white p-8 shadow-2xl">
-            <div className="mb-8 text-center">
-              <h1 className="mb-2 text-2xl font-bold text-gray-800">
-                지금 바로 POPCO에 입장해요 !
-              </h1>
-              <p className="text-base text-gray-600">로그인 하시겠어요?</p>
-            </div>
-
-            <form className="justify-center">
-              <div>
-                <label className="mb-2 block text-sm text-gray-700">
-                  이메일
-                </label>
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  className="w-full rounded-xl border-0 bg-gray-100 px-4 py-4 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
+        {/* 로그인 화면 오른쪽 로그인 폼 */}
+        <div className="mr-8 flex w-full items-center justify-center lg:mr-36">
+          <div className="flex h-[770px] w-[800px] flex-col justify-center rounded-3xl bg-white p-8 shadow-2xl">
+            <div className="w-full">
+              <div className="mb-8 text-center">
+                <h1 className="mb-2 text-2xl font-bold text-gray-800">
+                  지금 바로 POPCO에 입장해요 !
+                </h1>
+                <p className="text-base text-gray-600">로그인 하시겠어요?</p>
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm text-gray-700">
-                  비밀번호
-                </label>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="w-full rounded-xl border-0 bg-gray-100 px-4 py-4 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
+              <form className="space-y-4">
+                <div className="">
+                  <label className="mb-2 block text-sm text-gray-700">
+                    이메일
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    className="w-full rounded-xl border-0 bg-gray-100 px-4 py-4 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  />
+                </div>
+
+                <div className="">
+                  <label className="mb-2 block text-sm text-gray-700">
+                    비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full rounded-xl border-0 bg-gray-100 px-4 py-4 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  />
+                </div>
+
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="w-full rounded-xl bg-yellow-400 px-4 py-4 font-medium text-black transition-colors hover:bg-yellow-500"
+                  >
+                    로그인
+                  </button>
+                </div>
+              </form>
+
+              <div className="t mt-6">
+                <p className="text-sm text-gray-600">
+                  처음이 아니신가요?
+                  <span className="ml-1 text-orange-500">회원가입 하기</span>
+                </p>
               </div>
 
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  className="w-full rounded-xl bg-yellow-400 px-4 py-4 font-medium text-black transition-colors hover:bg-yellow-500"
-                >
-                  로그인
+              <div className="mt-6 flex gap-3">
+                <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-4 py-3 font-medium text-white transition-colors hover:bg-green-600">
+                  <span className="mr-2 font-bold">N</span>
+                  네이버 로그인
+                </button>
+                <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-4 py-3 font-medium text-black transition-colors hover:bg-yellow-500">
+                  <span className="mr-2">💬</span>
+                  카카오 로그인
                 </button>
               </div>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                처음이 아니신가요?
-                <span className="ml-1 text-orange-500">회원가입 하기</span>
-              </p>
-            </div>
-
-            <div className="mt-6 flex gap-3">
-              <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-4 py-3 font-medium text-white transition-colors hover:bg-green-600">
-                <span className="mr-2 font-bold">N</span>
-                네이버 로그인
-              </button>
-              <button className="flex flex-1 items-center justify-center rounded-xl bg-yellow-400 px-4 py-3 font-medium text-black transition-colors hover:bg-yellow-500">
-                <span className="mr-2">💬</span>
-                카카오 로그인
-              </button>
             </div>
           </div>
         </div>
