@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
         <div className="flex w-full items-start justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-12 lg:h-[600px] xl:mt-16 xl:h-[770px]">
+          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-[62px] lg:h-[600px] xl:mt-16 xl:h-[770px]">
             {/* 스포트라이트 */}
             <img
               src={spotlightImg}
@@ -44,10 +44,10 @@ const LoginPage: React.FC = () => {
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
-                <h1 className="mb-2 font-semibold text-gray-800 lg:text-4xl xl:text-[40px]">
+                <h1 className="mb-2 font-semibold text-gray-800 lg:text-3xl xl:text-[40px]">
                   지금 바로 POPCO에 입장해요 !
                 </h1>
-                <p className="text-md text-gray-600 lg:text-lg xl:text-xl">
+                <p className="text-md text-gray-600 lg:text-base xl:text-xl">
                   로그인 하시겠어요?
                 </p>
               </div>
