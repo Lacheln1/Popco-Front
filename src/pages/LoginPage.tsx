@@ -7,19 +7,31 @@ const LoginPage: React.FC = () => {
   return (
     <main className="relative min-h-screen bg-slate-900">
       {/* 데스크탑 레이아웃 */}
-      <div className="ml-2 hidden min-h-screen justify-center md:flex">
+      <div className="mx-2 hidden min-h-screen justify-center md:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
-        <div className="mr-28 flex w-full items-center justify-end">
-          <div className="flex flex-col items-center justify-end">
-            <img src={spotlightWithLogoImg} alt="" className="object-fill" />
+        <div className="flex w-full justify-end">
+          <div className="">
+            <div className="flex justify-center">
+              <img
+                src={spotlightWithLogoImg}
+                alt=""
+                className="object-cover md:h-[200px] lg:h-[280px] xl:h-[336px] xl:w-[471px]"
+              />
+            </div>
 
-            <img src={loginPopcoImg} alt="" className="mt-8" />
+            <div className="flex justify-center">
+              <img
+                src={loginPopcoImg}
+                alt=""
+                className="object-cover md:mt-28 lg:mt-2 xl:mt-12 xl:h-[450px]"
+              />
+            </div>
           </div>
         </div>
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
-        <div className="mr-2 flex w-full items-center">
-          <div className="flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:h-[800px] md:max-w-[770px]">
+        <div className="flex w-full xl:mr-32">
+          <div className="ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-white p-6 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-12 lg:h-[600px] xl:mt-16 xl:h-[770px]">
             <div className="w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
                 <h1 className="mb-2 text-xl font-bold text-gray-800 md:text-2xl">
