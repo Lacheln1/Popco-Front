@@ -273,14 +273,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
 
         {/* 로딩 상태 표시 */}
-        {loading && showDropdown && (
-          <div className="absolute left-0 right-0 top-full z-50 rounded-b-lg border border-t-0 border-gray-300 bg-white p-4 text-center shadow-lg">
+        {/* {loading && showDropdown && (
+          <div className="absolute left-0 right-0 top-full z-50 w-64 rounded-b-lg border border-t-0 border-gray-300 bg-white p-4 text-center shadow-lg">
             <div className="flex items-center justify-center space-x-2">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+              <div className="h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
               <span className="text-gray-600">검색중...</span>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
