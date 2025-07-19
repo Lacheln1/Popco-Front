@@ -42,16 +42,16 @@ const LoginPage: React.FC = () => {
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
-                <h1 className="mb-2 text-xl font-bold text-gray-800 md:text-2xl">
+                <h1 className="mb-2 font-semibold text-gray-800 lg:text-4xl xl:text-[40px]">
                   지금 바로 POPCO에 입장해요 !
                 </h1>
-                <p className="text-sm text-gray-600 md:text-base">
+                <p className="text-md text-gray-600 lg:text-lg xl:text-xl">
                   로그인 하시겠어요?
                 </p>
               </div>
 
-              <form className="space-y-3 md:space-y-4">
-                <div className="">
+              <form className="flex flex-col items-center space-y-3 md:space-y-4">
+                <div className="w-full max-w-[500px]">
                   <label className="mb-2 block text-xs text-gray-700 md:text-sm">
                     이메일
                   </label>
@@ -62,7 +62,7 @@ const LoginPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="">
+                <div className="w-full max-w-[500px]">
                   <label className="mb-2 block text-xs text-gray-700 md:text-sm">
                     비밀번호
                   </label>
@@ -73,7 +73,7 @@ const LoginPage: React.FC = () => {
                   />
                 </div>
 
-                <div className="pt-3 md:pt-4">
+                <div className="w-full max-w-[500px] pt-3 md:pt-4">
                   <button
                     type="submit"
                     className="w-full rounded-xl bg-yellow-400 px-4 py-3 text-sm font-medium text-black transition-colors hover:bg-yellow-500 md:py-4"
@@ -83,14 +83,14 @@ const LoginPage: React.FC = () => {
                 </div>
               </form>
 
-              <div className="t mt-4 md:mt-6">
+              <div className="t mt-4 flex justify-center md:mt-6">
                 <p className="text-xs text-gray-600 md:text-sm">
                   처음이 아니신가요?
                   <span className="ml-1 text-orange-500">회원가입 하기</span>
                 </p>
               </div>
 
-              <div className="mt-4 flex gap-2 md:mt-6 md:gap-3">
+              <div className="mt-4 flex w-full max-w-[500px] justify-center gap-2 md:mt-6 md:gap-3">
                 <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-green-600 md:px-4 md:py-3 md:text-sm lg:text-base">
                   <span className="mr-2 font-bold">N</span>
                   네이버 로그인
