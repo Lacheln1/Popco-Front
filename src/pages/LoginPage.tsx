@@ -7,7 +7,7 @@ import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
 
 const LoginPage: React.FC = () => {
   return (
-    <main className="relative min-h-screen bg-slate-900">
+    <main className="relative min-h-screen bg-[#0F1525]">
       {/* 데스크탑 레이아웃 */}
       <div className="mx-2 hidden min-h-screen justify-center lg:flex">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
@@ -27,20 +27,20 @@ const LoginPage: React.FC = () => {
               <img
                 src={loginPopcoImg}
                 alt=""
-                className="object-cover md:mt-28 lg:mt-2 xl:mt-12 xl:h-[450px]"
+                className="lg:mt-18 object-cover md:mt-28 xl:mt-12 xl:h-[450px]"
               />
             </div>
           </div>
         </div>
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
-        <div className="flex w-full items-start justify-start xl:mr-32">
+        <div className="flex w-full items-center justify-start xl:mr-32">
           <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-[62px] lg:h-[600px] xl:mt-16 xl:h-[770px]">
             {/* 스포트라이트 */}
             <img
               src={spotlightImg}
               alt=""
-              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[50px] lg:w-[440px] xl:top-16 xl:w-[520px]"
+              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-13px] lg:w-[440px] xl:top-[30px] xl:w-[520px]"
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
