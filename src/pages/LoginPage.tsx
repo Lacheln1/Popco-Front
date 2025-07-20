@@ -123,11 +123,13 @@ const LoginPage: React.FC = () => {
       <div className="flex flex-col lg:hidden">
         {/* 상단 - 스포트라이트와 로고 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
-          <img
-            src={spotlightWithLogoImg}
-            alt=""
-            className="w-64 object-cover"
-          />
+          <a href="/">
+            <img
+              src={spotlightWithLogoImg}
+              alt=""
+              className="w-64 object-cover"
+            />
+          </a>
         </div>
 
         {/* 중간 - 로그인 폼 */}
