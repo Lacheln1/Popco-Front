@@ -15,27 +15,35 @@ const RegisterPage: React.FC = () => {
           <div>
             <div className="flex justify-center">
               <a href="/">
-                <img src={spotlightWithLogoImg} alt="로고with스포트라이트" />
+                <img
+                  src={spotlightWithLogoImg}
+                  alt="로고with스포트라이트"
+                  className="object-cover md:h-[200px] lg:h-[280px] xl:h-[336px] xl:w-[471px]"
+                />
               </a>
             </div>
 
             <div className="flex justify-center">
-              <img src={loginPopcoImg} alt="로그인팝코이미지" />
+              <img
+                src={loginPopcoImg}
+                alt="로그인팝코이미지"
+                className="obejct-cover lg:mt-18 md:mt-28 xl:mt-12 xl:h-[450px]"
+              />
             </div>
           </div>
         </div>
 
         {/* 회원가입 섹션 */}
         <div className="flex w-full items-center justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[800px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl lg:mt-[62px] lg:h-[600px] xl:mt-16 xl:h-[770px]">
+          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[700px] xl:mt-16 xl:h-[770px]">
             <img
               src={spotlightImg}
               alt=""
-              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover lg:top-[50px] lg:w-[440px] xl:top-16 xl:w-[520px]"
+              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-13px] lg:w-[440px] xl:top-[30px] xl:w-[520px]"
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
-                <h1 className="mb-2 break-all font-semibold text-gray-800 lg:text-3xl xl:text-[35px]">
+                <h1 className="mb-2 break-all font-semibold text-gray-800 lg:text-2xl xl:text-[35px]">
                   POPCO 멤버가 되어 특별한 경험을 만나보세요.
                 </h1>
                 <p className="text-md text-gray-600 lg:text-base xl:text-xl">
@@ -43,9 +51,9 @@ const RegisterPage: React.FC = () => {
                 </p>
               </div>
 
-              <form className="flex flex-col items-center space-y-3 lg:space-y-4">
+              <form className="flex flex-col items-center space-y-3 md:space-y-4">
                 <div className="w-full max-w-[500px]">
-                  <label className="text mb-2 ml-4 block text-black lg:text-base">
+                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
                     이메일
                   </label>
                   <input
@@ -56,7 +64,7 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 <div className="w-full max-w-[500px]">
-                  <label className="mb-2 ml-4 block text-black lg:text-base">
+                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
                     비밀번호
                   </label>
                   <input
@@ -67,7 +75,7 @@ const RegisterPage: React.FC = () => {
                 </div>
 
                 <div className="w-full max-w-[500px]">
-                  <label className="mb-2 ml-4 block text-black lg:text-base">
+                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
                     비밀번호 확인
                   </label>
                   <input
@@ -80,12 +88,12 @@ const RegisterPage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="w-full max-w-[500px] pt-3 lg:pt-4">
+                <div className="w-full max-w-[500px] pt-3 md:pt-4">
                   <button
                     type="submit"
                     className="bg-popco-main w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 md:py-4"
                   >
-                    로그인
+                    회원가입
                   </button>
                 </div>
               </form>
