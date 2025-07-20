@@ -85,9 +85,9 @@ const LoginPage: React.FC = () => {
                 </div>
               </form>
 
-              <div className="t mt-4 flex justify-center md:mt-6">
+              <div className="mt-4 flex justify-center md:mt-6">
                 <p className="text-xs text-gray-600 md:text-base">
-                  처음이 아니신가요?
+                  회원이 아니신가요?
                   <a
                     href="/register"
                     className="ml-1 text-[#e54b2f] hover:text-[#d4452b]"
