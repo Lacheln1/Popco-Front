@@ -54,7 +54,7 @@ const LoginPage: React.FC = () => {
 
               <form className="flex flex-col items-center space-y-3 md:space-y-4">
                 <div className="w-full max-w-[500px]">
-                  <label className="mb-2 block text-xs text-black md:text-base">
+                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
                     이메일
                   </label>
                   <input
@@ -65,7 +65,7 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 <div className="w-full max-w-[500px]">
-                  <label className="mb-2 block text-xs text-black md:text-base">
+                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
                     비밀번호
                   </label>
                   <input
@@ -144,7 +144,7 @@ const LoginPage: React.FC = () => {
 
             <form className="flex flex-col items-center space-y-3">
               <div className="w-full max-w-[440px]">
-                <label className="mb-2 block text-xs text-black">이메일</label>
+                <label className="mb-2 ml-4 block text-xs text-black">이메일</label>
                 <input
                   type="email"
                   placeholder="Email Address"
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="w-full max-w-[440px]">
-                <label className="mb-2 block text-xs text-black">
+                <label className="mb-2 ml-4 block text-xs text-black">
                   비밀번호
                 </label>
                 <input
@@ -175,7 +175,7 @@ const LoginPage: React.FC = () => {
 
             <div className="mt-4 text-center">
               <p className="text-xs text-gray-600">
-                처음이 아니신가요?
+                회원이 아니신가요?
                 <a href="/register" className="ml-1 text-[#e54b2f]">
                   회원가입 하기
                 </a>
