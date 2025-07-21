@@ -1,9 +1,12 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
+import TestLayout from "@/layout/TestLayout";
+import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
-import TestLayout from "./TestLayout";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,7 +19,17 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/test",
     element: <TestLayout />,
+    children: [
+      {
+        index: true,
+        element: <TestPage />,
+      },
+    ],
+  },
+  {
+    element: <WithoutHeaderFooterLayout />,
     children: [
       {
         path: "/login",
