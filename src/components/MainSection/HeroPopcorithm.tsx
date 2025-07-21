@@ -45,16 +45,16 @@ const HeroPopcorithm = () => {
             "linear-gradient(90deg, #25263C 2%, rgba(68,69,90,0.8) 46%)",
         }}
       >
-        <div className="relative m-auto flex items-center py-8 text-white">
+        <div className="relative m-auto flex flex-col items-center gap-8 py-16 text-white sm:gap-0 md:flex-row md:py-8">
           <div className="w-2/5 justify-items-center space-y-6 text-center">
             <p className="text-left text-xl font-semibold">
               고객님을 위한 <br /> 맞춤 추천 작품을 <br /> 확인해 보세요 !
             </p>
-            <button className="gmarket rounded-full border border-solid border-white px-6 py-4 font-semibold transition hover:bg-white hover:text-black">
+            <button className="gmarket rounded-full border border-solid border-white px-7 py-3 font-semibold transition hover:bg-white hover:text-black">
               View all +
             </button>
           </div>
-          <div className="w-3/5">
+          <div className="w-full md:w-3/5">
             <div className="mb-3 flex justify-end px-8">
               <SwiperNavigation
                 swiper={swiperInstance}
@@ -64,14 +64,25 @@ const HeroPopcorithm = () => {
             </div>
             <Swiper
               modules={[Navigation]}
-              spaceBetween={20}
-              slidesPerView={5}
+              slidesPerView={2}
               onSwiper={handleSwiperInit}
               onSlideChange={handleSlideChange}
               className="pb-6"
+              breakpoints={{
+                0: { slidesPerView: 2.3 },
+                638: { slidesPerView: 3 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 2.5 },
+                1280: { slidesPerView: 3.5 },
+                1440: { slidesPerView: 4 },
+                1920: { slidesPerView: 5 },
+              }}
             >
               {posterData.map(({ id, title }) => (
-                <SwiperSlide key={id} className="flex flex-col items-center">
+                <SwiperSlide
+                  key={id}
+                  className="flex flex-col items-center justify-items-center"
+                >
                   <Poster
                     title={title}
                     posterUrl="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
@@ -85,22 +96,22 @@ const HeroPopcorithm = () => {
           </div>
 
           <img
-            className="absolute bottom-4 left-32 w-[80px] mix-blend-screen sm:w-[100px] md:w-[120px] lg:w-[150px]"
+            className="absolute left-[5%] w-[80px] mix-blend-screen sm:bottom-[8%] sm:left-[3%] sm:w-[100px] md:w-[120px] lg:left-[5%] lg:w-[150px]"
             src="/images/components/glossy_popcorn.png"
             alt="popcorn"
           />
           <img
-            className="absolute left-32 top-4 mix-blend-screen sm:w-[100px] md:w-[130px] lg:w-[160px]"
+            className="width-[120px] absolute left-2/3 top-[3%] mix-blend-screen md:left-[7%] md:w-[130px] lg:w-[160px]"
             src="/images/components/glossy_glass.png"
             alt="glass"
           />
           <img
-            className="absolute left-1/4 top-[12%] w-[70px] mix-blend-screen sm:w-[70px] md:w-[100px] lg:w-[120px]"
+            className="absolute left-[10%] top-[25%] w-[70px] mix-blend-screen sm:left-1/4 sm:top-[4%] sm:w-[90px] md:w-[100px] lg:w-[120px]"
             src="/images/components/glossy_slate.png"
             alt="slate"
           />
           <img
-            className="absolute bottom-4 left-1/4 w-[80px] mix-blend-screen sm:w-[100px] md:w-[130px] lg:w-[160px]"
+            className="absolute left-[10%] top-[20%] hidden mix-blend-screen sm:bottom-[65%] sm:left-[15%] sm:top-auto sm:block sm:w-[100px] md:bottom-[10%] md:left-1/4 md:w-[130px] lg:bottom-[12%] lg:w-[160px]"
             src="/images/components/glossy_tv.png"
             alt="tv"
           />
@@ -111,3 +122,6 @@ const HeroPopcorithm = () => {
 };
 
 export default HeroPopcorithm;
+
+//     bottom: 65%;
+// left: 15%;
