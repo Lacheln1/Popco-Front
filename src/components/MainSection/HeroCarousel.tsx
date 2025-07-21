@@ -92,19 +92,19 @@ const HeroCarousel = () => {
       </button>
       <style>
         {`
-          .swiper-slide {
+          .mainSwiper .swiper-slide {
             transition: transform 0.3s ease, opacity 0.3s ease;
           }
-          .swiper-slide.swiper-slide-active {
+          .mainSwiper .swiper-slide.swiper-slide-active {
             transform: scale(1);
             opacity: 1;
           }
-          .swiper-slide:not(.swiper-slide-active) {
+          .mainSwiper .swiper-slide:not(.swiper-slide-active) {
             transform: scale(0.8);
             opacity: 0.6;
           }
           @media (max-width: 786px) {
-            .swiper-slide {
+            .mainSwiper .swiper-slide {
               transform: scale(1);
               opacity: 1;
             }
