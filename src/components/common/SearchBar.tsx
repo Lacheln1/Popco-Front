@@ -1,4 +1,10 @@
-import React, { useCallback, useState, useRef, useEffect } from "react";
+import React, {
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
 import axios from "axios";
 import { debounce } from "lodash";
 import { SearchOutlined } from "@ant-design/icons";
@@ -102,8 +108,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   //디바운스 된 검색 함수
-  const debouncedSearch = useCallback(
-    debounce(async (value: string) => {
+  const searchFunction = useCallback(
+    async (value: string) => {
       if (!value.trim()) {
         setSuggestions([]);
         setSearchResult([]);
@@ -135,8 +141,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       } finally {
         setLoading(false);
       }
-    }, debounceTime),
-    [apiURL, showSuggestions, maxSuggestions, debounceTime, onSearch],
+    },
+    [apiURL, showSuggestions, maxSuggestions, onSearch, searchAPI],
+  );
+
+  const debouncedSearch = useMemo(
+    () => debounce(searchFunction, debounceTime),
+    [searchFunction, debounceTime],
   );
 
   //입력값 변경 핸들러
@@ -228,7 +239,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex justify-center px-4 pt-8">
       <div className="relative w-full max-w-[700px]">
-        <div className="relative flex min-w-80 items-center rounded-full border border-gray-300 bg-white">
+        <div className="relative flex h-10 min-w-80 items-center rounded-full border border-gray-300 bg-white">
           <input
             ref={inputRef}
             type="text"
@@ -242,12 +253,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="mr-3 flex h-16 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
+            className="mr-3 flex h-10 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
           >
             {loading ? (
               <div className="h-3 w-3 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
             ) : (
-              <SearchOutlined className="text-3xl" />
+              <SearchOutlined className="text-xl" />
             )}
           </button>
         </div>
@@ -256,13 +267,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-6 right-6 top-full z-50 max-h-80 min-w-80 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
+            className="absolute left-4 right-4 top-full z-50 max-h-80 min-w-60 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
           >
             {suggestions.map((option, index) => (
               <div
                 key={index}
                 onClick={() => handleSelect(option)}
-                className={`cursor-pointer border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50 ${
+                className={`flex h-12 cursor-pointer items-center border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50 ${
                   selectedIndex === index ? "bg-blue-50" : ""
                 }`}
               >
@@ -273,14 +284,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
 
         {/* 로딩 상태 표시 */}
-        {loading && showDropdown && (
-          <div className="absolute left-0 right-0 top-full z-50 rounded-b-lg border border-t-0 border-gray-300 bg-white p-4 text-center shadow-lg">
+        {/* {loading && showDropdown && (
+          <div className="absolute left-0 right-0 top-full z-50 w-64 rounded-b-lg border border-t-0 border-gray-300 bg-white p-4 text-center shadow-lg">
             <div className="flex items-center justify-center space-x-2">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
+              <div className="h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
               <span className="text-gray-600">검색중...</span>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
