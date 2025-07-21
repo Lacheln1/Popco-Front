@@ -8,9 +8,7 @@ import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 
 const HeroRanking = () => {
-  const [viewMode, setViewMode] = useState<"mobile" | "swiper" | "desktop">(
-    "desktop",
-  );
+  const [viewMode, setViewMode] = useState<"swiper" | "desktop">("desktop");
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
@@ -31,9 +29,7 @@ const HeroRanking = () => {
   useEffect(() => {
     const checkView = () => {
       const width = window.innerWidth;
-      if (width < 640) {
-        setViewMode("mobile");
-      } else if (width >= 640 && width <= 1080) {
+      if (width <= 1080) {
         setViewMode("swiper");
       } else {
         setViewMode("desktop");
@@ -53,7 +49,7 @@ const HeroRanking = () => {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-8">
       <h3 className="gmarket text-xl sm:text-2xl md:text-3xl">
         POPCO의 주간 <strong className="text-popcorn-box">TOP 5</strong>
       </h3>
@@ -81,12 +77,12 @@ const HeroRanking = () => {
                 </span>
               </div>
 
-              <div className="sm:flex-column flex flex-col justify-between border-b p-2 text-base sm:border-none sm:py-4 md:flex-row md:border-solid lg:text-xl">
-                <div className="flex gap-2 sm:gap-6">
+              <div className="sm:flex-column flex flex-col justify-between border-b p-2 text-base sm:justify-start sm:border-none sm:py-4 md:flex-row md:gap-8 md:border-solid lg:text-xl">
+                <div className="flex gap-2 sm:gap-5">
                   <div className="text-popco-main font-semibold">POPCORN</div>
                   <div>3.5</div>
                 </div>
-                <div className="flex gap-2 sm:gap-6">
+                <div className="flex gap-2 sm:gap-5">
                   <div className="text-popco-main font-semibold">GENRE</div>
                   <div>액션, 서사/드라마</div>
                 </div>
@@ -111,7 +107,7 @@ const HeroRanking = () => {
         <>
           {viewMode === "swiper" ? (
             <>
-              <div className="mb-4 flex justify-end">
+              <div className="my-4 flex justify-end">
                 <SwiperNavigation
                   swiper={swiperInstance}
                   isBeginning={isBeginning}
@@ -120,14 +116,21 @@ const HeroRanking = () => {
               </div>
               <Swiper
                 modules={[Navigation]}
-                slidesPerView={3}
                 onSwiper={handleSwiperInit}
                 onSlideChange={handleSlideChange}
                 className="px-2"
+                breakpoints={{
+                  0: {
+                    slidesPerView: 2.3,
+                  },
+                  768: {
+                    slidesPerView: 3,
+                  },
+                }}
               >
                 {posterData.map(({ rank, id, title }) => (
-                  <SwiperSlide key={id} className="relative mx-4 my-2">
-                    <span className="absolute -left-4 -top-4 z-10 text-[50px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:2px_#0f1525]">
+                  <SwiperSlide key={id} className="relative my-2 ml-7">
+                    <span className="absolute -left-7 -top-4 z-10 text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:2px_#0f1525]">
                       {rank}
                     </span>
                     <Poster
@@ -142,10 +145,10 @@ const HeroRanking = () => {
               </Swiper>
             </>
           ) : (
-            <ul className="mt-12 grid grid-cols-2 justify-items-center gap-4 sm:mt-6 sm:flex sm:justify-between sm:gap-6">
+            <ul className="ml-9 mt-12 grid grid-cols-2 justify-items-center gap-4 sm:mt-6 sm:flex sm:justify-between sm:gap-6">
               {posterData.map(({ rank, id, title }) => (
                 <li key={id} className="relative flex-col items-center *:flex">
-                  <span className="absolute -left-6 -top-6 z-10 text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[100px]">
+                  <span className="absolute -left-11 -top-6 z-10 text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
                     {rank}
                   </span>
                   <Poster
