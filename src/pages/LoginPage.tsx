@@ -7,9 +7,9 @@ import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
 
 const LoginPage: React.FC = () => {
   return (
-    <main className="relative min-h-screen bg-[#0F1525]">
+    <main className="relative h-full bg-[#0F1525]">
       {/* 데스크탑 레이아웃 */}
-      <div className="mx-2 hidden min-h-screen justify-center lg:flex">
+      <div className="mx-2 hidden min-h-screen justify-center lg:flex lg:items-start">
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
         <div className="flex w-full justify-end">
           <div>
@@ -34,15 +34,15 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
-        <div className="flex w-full items-center justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[680px] xl:mt-16">
+        <div className="flex w-full justify-center lg:mt-[70px] xl:mr-32 xl:mt-[100px]">
+          <div className="relative ml-4 flex h-full w-full max-w-[600px] flex-col items-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[680px]">
             {/* 스포트라이트 */}
             <img
               src={spotlightImg}
               alt=""
-              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-22px] lg:w-[440px] xl:top-[-35px] xl:w-[520px]"
+              className="absolute left-1/2 w-[200px] -translate-x-1/2 object-cover md:top-[-40px] md:w-[350px] lg:top-[-125px] lg:w-[440px] xl:top-[-150px] xl:w-[520px]"
             />
-            <div className="relative z-10 w-full">
+            <div className="relative flex h-full w-full flex-col justify-center">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
                 <h1 className="mb-2 font-semibold text-gray-800 lg:text-3xl xl:text-[40px]">
                   지금 바로 POPCO에 입장해요 !
@@ -51,7 +51,6 @@ const LoginPage: React.FC = () => {
                   로그인 하시겠어요?
                 </p>
               </div>
-
               <form className="flex flex-col items-center space-y-3 md:space-y-4">
                 <div className="w-full max-w-[500px]">
                   <label className="mb-2 ml-4 block text-xs text-black md:text-base">
@@ -84,7 +83,6 @@ const LoginPage: React.FC = () => {
                   </button>
                 </div>
               </form>
-
               <div className="mt-4 flex justify-center md:mt-6">
                 <p className="text-xs text-gray-600 md:text-base">
                   회원이 아니신가요?
@@ -96,7 +94,6 @@ const LoginPage: React.FC = () => {
                   </a>
                 </p>
               </div>
-
               <div className="mt-4 flex w-full justify-center md:mt-6 md:pt-8">
                 <div className="flex h-16 w-full max-w-[500px] gap-2 md:gap-3 xl:mt-5">
                   <button className="flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white transition-colors md:px-4 md:py-3 md:text-sm lg:text-base">
