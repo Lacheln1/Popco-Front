@@ -35,25 +35,27 @@ const HeroPopcorithm = () => {
 
   return (
     <div>
-      <h3 className="gmarket m-auto xl:w-[1200px]">POP코리즘</h3>
+      <h3 className="gmarket m-auto px-3 text-xl leading-snug sm:text-2xl md:px-6 md:text-[28px] lg:px-0 xl:w-[1200px]">
+        POP코리즘
+      </h3>
       <section
-        className=""
+        className="relative"
         style={{
           background:
             "linear-gradient(90deg, #25263C 2%, rgba(68,69,90,0.8) 46%)",
         }}
       >
-        <div className="m-auto flex items-center gap-8 px-10 py-8 text-white">
-          <div className="w-1/3 space-y-6">
-            <p className="text-xl font-semibold leading-relaxed">
+        <div className="relative m-auto flex items-center py-8 text-white">
+          <div className="w-2/5 justify-items-center space-y-6 text-center">
+            <p className="text-left text-xl font-semibold">
               고객님을 위한 <br /> 맞춤 추천 작품을 <br /> 확인해 보세요 !
             </p>
             <button className="gmarket rounded-full border border-solid border-white px-6 py-4 font-semibold transition hover:bg-white hover:text-black">
               View all +
             </button>
           </div>
-          <div className="w-2/3">
-            <div className="mb-3 flex justify-end">
+          <div className="w-3/5">
+            <div className="mb-3 flex justify-end px-8">
               <SwiperNavigation
                 swiper={swiperInstance}
                 isBeginning={isBeginning}
@@ -81,6 +83,27 @@ const HeroPopcorithm = () => {
               ))}
             </Swiper>
           </div>
+
+          <img
+            className="absolute bottom-4 left-32 w-[80px] mix-blend-screen sm:w-[100px] md:w-[120px] lg:w-[150px]"
+            src="/images/components/glossy_popcorn.png"
+            alt="popcorn"
+          />
+          <img
+            className="absolute left-32 top-4 mix-blend-screen sm:w-[100px] md:w-[130px] lg:w-[160px]"
+            src="/images/components/glossy_glass.png"
+            alt="glass"
+          />
+          <img
+            className="absolute left-1/4 top-[12%] w-[70px] mix-blend-screen sm:w-[70px] md:w-[100px] lg:w-[120px]"
+            src="/images/components/glossy_slate.png"
+            alt="slate"
+          />
+          <img
+            className="absolute bottom-4 left-1/4 w-[80px] mix-blend-screen sm:w-[100px] md:w-[130px] lg:w-[160px]"
+            src="/images/components/glossy_tv.png"
+            alt="tv"
+          />
         </div>
       </section>
     </div>
