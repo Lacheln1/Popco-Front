@@ -48,7 +48,10 @@ const LoginForm: React.FC = () => {
 
   return (
     <>
-      <form className="flex flex-col items-center space-y-3 md:space-y-4">
+      <form
+        className="flex flex-col items-center space-y-3 md:space-y-4"
+        onSubmit={handleSubmit}
+      >
         <div className="w-full max-w-[500px]">
           <label className="mb-2 ml-4 block text-xs text-black md:text-base">
             이메일
@@ -58,6 +61,9 @@ const LoginForm: React.FC = () => {
             placeholder="Email Address"
             className="white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
           />
+          <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+            올바른 형식이 아닙니다
+          </p>
         </div>
 
         <div className="w-full max-w-[500px]">
@@ -69,6 +75,9 @@ const LoginForm: React.FC = () => {
             placeholder="Password"
             className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
           />
+          <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+            올바른 형식이 아닙니다
+          </p>
         </div>
 
         <div className="w-full max-w-[500px] pt-3 md:pt-4">
