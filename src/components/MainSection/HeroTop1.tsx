@@ -1,0 +1,76 @@
+import { useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import { Swiper as SwiperType } from "swiper";
+import { SwiperNavigation } from "@/components/common/SwiperButton";
+import Poster from "../common/Poster";
+import "swiper/swiper-bundle.css";
+
+const HeroTop1 = () => {
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
+    undefined,
+  );
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
+
+  const posterData = [
+    { id: "1", title: "첫번째 포스터" },
+    { id: "2", title: "두번째 포스터" },
+    { id: "3", title: "세번째 포스터" },
+    { id: "4", title: "네번째 포스터" },
+    { id: "5", title: "다섯번째 포스터" },
+    { id: "6", title: "여섯번째 포스터" },
+    { id: "7", title: "일곱번째 포스터" },
+    { id: "8", title: "여덟번째 포스터" },
+  ];
+
+  const handleSwiperInit = (swiper: SwiperType) => {
+    setSwiperInstance(swiper);
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
+  const handleSlideChange = (swiper: SwiperType) => {
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
+  return (
+    <div className="m-auto xl:w-[1200px]">
+      <h3 className="gmarket text-xl sm:text-2xl md:text-3xl">
+        TOP 1 <strong className="text-popcorn-box">‘F1 더 무비’</strong>와
+        비슷한 작품 이에요
+      </h3>
+      <section>
+        <div className="mb-4 flex justify-end">
+          <SwiperNavigation
+            swiper={swiperInstance}
+            isBeginning={isBeginning}
+            isEnd={isEnd}
+          />
+        </div>
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={20}
+          slidesPerView={5}
+          onSwiper={handleSwiperInit}
+          onSlideChange={handleSlideChange}
+        >
+          {posterData.map(({ id, title }) => (
+            <SwiperSlide key={id} className="flex justify-center">
+              <Poster
+                title={title}
+                posterUrl="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
+                id={id}
+                likeState="neutral"
+                onLikeChange={() => {}}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </section>
+    </div>
+  );
+};
+
+export default HeroTop1;
