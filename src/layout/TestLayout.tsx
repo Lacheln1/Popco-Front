@@ -1,17 +1,16 @@
-import { useState } from 'react'; // useState import
-import { Outlet, useOutletContext } from "react-router-dom";
-import { Progress } from 'antd';
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
+import { Progress } from "antd";
 
 const TOTAL_QUESTIONS = 5;
 
 const TestLayout = () => {
   const [step, setStep] = useState(0);
 
-  const percent = TOTAL_QUESTIONS > 0 ? ((step) / TOTAL_QUESTIONS) * 100 : 0;
+  const percent = TOTAL_QUESTIONS > 0 ? (step / TOTAL_QUESTIONS) * 100 : 0;
 
   return (
-    <div className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-dark-blueblack">
-
+    <div className="bg-dark-blueblack relative flex h-screen w-screen items-center justify-center overflow-hidden">
       {step > 0 && step <= TOTAL_QUESTIONS && (
         <div className="absolute top-10 z-20 w-full max-w-xs px-4 lg:max-w-md">
           <Progress
@@ -24,7 +23,7 @@ const TestLayout = () => {
         </div>
       )}
 
-      <main className="h-full w-full z-20">
+      <main className="z-20 h-full w-full">
         <Outlet context={{ step, total: TOTAL_QUESTIONS, setStep }} />
       </main>
     </div>

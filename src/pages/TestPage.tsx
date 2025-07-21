@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useOutletContext } from "react-router-dom";
 
@@ -19,8 +19,6 @@ import HorrorPopcoCard from "../assets/horror-popco-card.svg?react";
 import RetroPopcoCard from "../assets/retro-popco-card.svg?react";
 import ImaginePopcoCard from "../assets/imagine-popco-card.svg?react";
 import MovieSherlockCard from "../assets/movie-sherlock-card.svg?react";
-
-const TOTAL_QUESTIONS = 5;
 
 const cardRows = [
   [ActionHunterCard, CryPopcoCard, WarmPopcoCard],
