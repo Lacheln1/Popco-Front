@@ -13,7 +13,7 @@ const LoginPage: React.FC = () => {
         {/* 로그인 화면 왼쪽 팝콘 로고 + 캐릭터들 섹션 */}
         <div className="flex w-full justify-end">
           <div>
-            <div className="flex justify-center">
+            <div className="relative top-[-20px] flex justify-center">
               <a href="/">
                 <img
                   src={spotlightWithLogoImg}
@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
             <img
               src={spotlightImg}
               alt=""
-              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-22px] lg:w-[440px] xl:top-[-20px] xl:w-[520px]"
+              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-22px] lg:w-[440px] xl:top-[-35px] xl:w-[520px]"
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
