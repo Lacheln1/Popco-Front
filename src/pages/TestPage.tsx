@@ -5,6 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import MovieScreen from "../components/common/MovieScreen";
 import ArrowNext from "../assets/arrow-next.svg?react";
 import ArrowBefore from "../assets/arrow-before.svg?react";
+import Lighting from "../assets/lighting.svg?react";
 
 import PopcoRendering from "../assets/popco-movie-start.svg?react";
 import TheaterSeat1 from "../assets/popco-theater-1.svg?react";
@@ -155,25 +156,36 @@ const TestPage = () => {
   };
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center">
-      <MovieScreen>{renderStepContent()}</MovieScreen>
+    <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col items-center justify-center">
+      <Lighting className="absolute -left-20 -top-28 z-0 w-96 opacity-70" />
+      <Lighting className="absolute -right-20 -top-28 z-0 w-96 opacity-70" />
 
+      <div className="relative z-10">
+        <MovieScreen>{renderStepContent()}</MovieScreen>
+      </div>
       <div className="pointer-events-none absolute bottom-0 z-10 flex w-full items-end justify-center">
-        <TheaterSeat1 className="mb-[-15%] lg:mb-[-2%]" />
-        <TheaterSeat2 className="mb-[-8%] lg:mb-[-2%]" />
-        <TheaterSeat3 className="mb-[-15%] lg:mb-[-2%]" />
+        <TheaterSeat1 className="mb-[-15%] lg:mb-[-4%]" />
+        <TheaterSeat2 className="mb-[-8%] lg:mb-[-3%]" />
+        <TheaterSeat3 className="mb-[-15%] lg:mb-[-4%]" />
       </div>
 
+ {/* ✨ 1. 모바일 버튼에 호버 애니메이션 클래스 추가 */}
       <div className="absolute bottom-16 z-40 flex w-full items-center justify-between p-4 lg:hidden">
         {step > 1 ? (
-          <button onClick={handlePrev} className="group p-2">
+          <button 
+            onClick={handlePrev} 
+            className="group p-2 transition-transform hover:scale-110"
+          >
             <ArrowBefore className="h-8 w-8" />
           </button>
         ) : (
           <div aria-hidden="true" className="h-12 w-12" />
         )}
         {step > 0 && step <= TOTAL_QUESTIONS ? (
-          <button onClick={handleNext} className="group p-2">
+          <button 
+            onClick={handleNext} 
+            className="group p-2 transition-transform hover:scale-110"
+          >
             <ArrowNext className="h-8 w-8" />
           </button>
         ) : (
@@ -181,28 +193,24 @@ const TestPage = () => {
         )}
       </div>
 
-      <div className="absolute top-1/2 z-40 hidden w-full max-w-[1360px] -translate-y-1/2 items-center justify-between lg:flex">
-        {step > 1 ? (
-          <button
-            onClick={handlePrev}
-            className="group transition-transform hover:scale-110"
-          >
-            <ArrowNext className="rotate-180" />
-          </button>
-        ) : (
-          <div />
-        )}
-        {step > 0 && step <= TOTAL_QUESTIONS ? (
-          <button
-            onClick={handleNext}
-            className="group transition-transform hover:scale-110"
-          >
-            <ArrowNext />
-          </button>
-        ) : (
-          <div />
-        )}
-      </div>
+      {/* ✨ 2. PC 버튼을 독립적으로 위치시켜 MovieScreen 밖으로 이동 */}
+      {step > 1 ? (
+        <button
+          onClick={handlePrev}
+          className="group absolute left-[-110px] top-1/2 z-40 hidden -translate-y-1/2 p-2 transition-transform hover:scale-110 lg:block"
+        >
+          <ArrowBefore />
+        </button>
+      ) : null}
+
+      {step > 0 && step <= TOTAL_QUESTIONS ? (
+        <button
+          onClick={handleNext}
+          className="group absolute right-[-110px] top-1/2 z-40 hidden -translate-y-1/2 p-2 transition-transform hover:scale-110 lg:block"
+        >
+          <ArrowNext />
+        </button>
+      ) : null}
     </div>
   );
 };

@@ -41,7 +41,7 @@
   --color-popcoMainColor: #ffd751;
   --color-popcoFootColor: #fbad2a;
   --colorpopcoHairColor: #fdedae;
-
+  --color-dark-blueblack: #0f1525;
   --font-pretendard:
     "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
     system-ui, sans-serif;
@@ -179,6 +179,10 @@ select {
   }
   .bg-popco-hair {
     background-color: var(--colorpopcoHairColor);
+  }
+
+  .bg-dark-blueblack {
+    background-color: var(--color-dark-blueblack);
   }
 
   /* 글씨  */

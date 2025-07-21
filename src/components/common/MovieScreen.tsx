@@ -21,9 +21,12 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ children }) => {
       <ScreenClipPath />
 
       <div
-        className="relative h-[60vh] w-[calc(100%-2rem)] rounded-lg bg-white/80 shadow-2xl shadow-blue-500/10 lg:h-[640px] lg:w-[1200px] lg:[clip-path:url(#concaveScreenShape)]" 
+        className="relative h-[60vh] w-full rounded-lg bg-white/80 shadow-2xl shadow-blue-500/10 lg:h-[640px] lg:w-[1200px] lg:[clip-path:url(#concaveScreenShape)]" 
       >
-        <div className="h-full w-full overflow-y-auto p-8 text-black lg:p-12">
+        {/* 조명 효과 스크린내부로 줌. 외부로 주면 이상하게 깨져보임 */}
+        <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.5)_0%,rgba(255,255,255,0)_70%)]"></div>
+
+        <div className="relative z-20 h-full w-full overflow-y-auto p-8 text-black lg:p-12">
           {children}
         </div>
       </div>
