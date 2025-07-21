@@ -36,10 +36,10 @@ const HeroTop1 = () => {
   };
 
   return (
-    <div className="m-auto xl:w-[1200px]">
-      <h3 className="gmarket text-xl sm:text-2xl md:text-3xl">
-        TOP 1 <strong className="text-popcorn-box">‘F1 더 무비’</strong>와
-        비슷한 작품 이에요
+    <div className="m-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-8">
+      <h3 className="gmarket flex flex-wrap items-center gap-2 text-xl sm:text-2xl md:text-3xl">
+        TOP 1 <strong className="text-popcorn-box">'F1 더 무비'</strong>와
+        비슷한 작품이에요
       </h3>
       <section>
         <div className="mb-4 flex justify-end">
@@ -51,10 +51,23 @@ const HeroTop1 = () => {
         </div>
         <Swiper
           modules={[Navigation]}
-          spaceBetween={20}
-          slidesPerView={5}
+          spaceBetween={15}
           onSwiper={handleSwiperInit}
           onSlideChange={handleSlideChange}
+          breakpoints={{
+            0: {
+              slidesPerView: 2.5,
+            },
+            768: {
+              slidesPerView: 3.5,
+            },
+            1024: {
+              slidesPerView: 4.5,
+            },
+            1200: {
+              slidesPerView: 5,
+            },
+          }}
         >
           {posterData.map(({ id, title }) => (
             <SwiperSlide key={id} className="flex justify-center">
