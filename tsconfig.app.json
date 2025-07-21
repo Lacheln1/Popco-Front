@@ -26,9 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-<<<<<<< HEAD
-  "include": ["src", "vite-env.d.ts"]
-=======
-  "include": ["src", "src/global.d.ts"]
->>>>>>> 1ae9c2398abe5c2100bdcd9a9ae3c45d206383d3
+
+  "include": ["src", "vite-env.d.ts", "src/global.d.ts"]
 }

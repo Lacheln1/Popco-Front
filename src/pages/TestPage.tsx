@@ -27,8 +27,18 @@ const cardRows = [
   [HorrorPopcoCard, RetroPopcoCard, ImaginePopcoCard, MovieSherlockCard],
 ];
 
+type TestContextType = {
+  step: number;
+  total: number;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+};
+
 const TestPage = () => {
-  const { step, total: TOTAL_QUESTIONS, setStep } = useOutletContext();
+  const {
+    step,
+    total: TOTAL_QUESTIONS,
+    setStep,
+  } = useOutletContext<TestContextType>();
 
   useEffect(() => {
     if (step === 0) {
@@ -40,11 +50,11 @@ const TestPage = () => {
   }, [step, setStep]);
 
   const handleNext = () => {
-    setStep((prev) => Math.min(prev + 1, TOTAL_QUESTIONS + 1));
+    setStep((prev: number) => Math.min(prev + 1, TOTAL_QUESTIONS + 1));
   };
 
   const handlePrev = () => {
-    setStep((prev) => Math.max(1, prev - 1));
+    setStep((prev: number) => Math.max(1, prev - 1));
   };
 
   const renderStepContent = () => {
@@ -169,11 +179,11 @@ const TestPage = () => {
         <TheaterSeat3 className="mb-[-15%] lg:mb-[-4%]" />
       </div>
 
- {/* ✨ 1. 모바일 버튼에 호버 애니메이션 클래스 추가 */}
+      {/* ✨ 1. 모바일 버튼에 호버 애니메이션 클래스 추가 */}
       <div className="absolute bottom-16 z-40 flex w-full items-center justify-between p-4 lg:hidden">
         {step > 1 ? (
-          <button 
-            onClick={handlePrev} 
+          <button
+            onClick={handlePrev}
             className="group p-2 transition-transform hover:scale-110"
           >
             <ArrowBefore className="h-8 w-8" />
@@ -182,8 +192,8 @@ const TestPage = () => {
           <div aria-hidden="true" className="h-12 w-12" />
         )}
         {step > 0 && step <= TOTAL_QUESTIONS ? (
-          <button 
-            onClick={handleNext} 
+          <button
+            onClick={handleNext}
             className="group p-2 transition-transform hover:scale-110"
           >
             <ArrowNext className="h-8 w-8" />
