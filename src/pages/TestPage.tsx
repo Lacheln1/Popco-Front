@@ -22,7 +22,7 @@ import MovieSherlockCard from "../assets/movie-sherlock-card.svg?react";
 
 import PosterInTest from "../components/test/PosterInTest";
 import QuizStepLayout from "../components/test/QuizStepLayout";
-import { Input, App, ConfigProvider, DatePicker, message } from "antd";
+import { Input, ConfigProvider, DatePicker, message } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 
 //  임시 영화 데이터 (40개)
