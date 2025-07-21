@@ -6,9 +6,9 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 const RegisterPage: React.FC = () => {
   return (
-    <main className="relative min-h-screen bg-[#0F1525]">
+    <main className="relative h-full bg-[#0F1525]">
       {/* 데스크탑 */}
-      <div className="mx-2 hidden min-h-screen justify-center lg:flex">
+      <div className="mx-2 hidden min-h-screen justify-center lg:flex lg:items-start">
         {/* 이미지 영역 */}
         <div className="flex w-full justify-end">
           <div>
@@ -33,12 +33,12 @@ const RegisterPage: React.FC = () => {
         </div>
 
         {/* 회원가입 섹션 */}
-        <div className="flex w-full items-center justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[710px] xl:mt-16">
+        <div className="flex w-full items-center justify-center lg:mt-[75px] xl:mr-32 xl:mt-[98px]">
+          <div className="relative ml-4 flex h-full w-full max-w-[600px] flex-col items-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[680px]">
             <img
               src={spotlightImg}
               alt=""
-              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-22px] lg:w-[440px] xl:top-[-20px] xl:w-[520px]"
+              className="absolute left-1/2 w-[200px] -translate-x-1/2 object-cover lg:top-[-125px] lg:w-[440px] xl:top-[-150px] xl:w-[520px]"
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 mt-4 text-center md:mb-7">
