@@ -35,12 +35,12 @@ const LoginPage: React.FC = () => {
 
         {/* 로그인 화면 오른쪽 로그인 폼 */}
         <div className="flex w-full items-center justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:mt-[62px] lg:h-[600px] xl:mt-16 xl:h-[770px]">
+          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[680px] xl:mt-16">
             {/* 스포트라이트 */}
             <img
               src={spotlightImg}
               alt=""
-              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-13px] lg:w-[440px] xl:top-[30px] xl:w-[520px]"
+              className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-22px] lg:w-[440px] xl:top-[-20px] xl:w-[520px]"
             />
             <div className="relative z-10 w-full">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
@@ -144,7 +144,9 @@ const LoginPage: React.FC = () => {
 
             <form className="flex flex-col items-center space-y-3">
               <div className="w-full max-w-[440px]">
-                <label className="mb-2 ml-4 block text-xs text-black">이메일</label>
+                <label className="mb-2 ml-4 block text-xs text-black">
+                  이메일
+                </label>
                 <input
                   type="email"
                   placeholder="Email Address"
