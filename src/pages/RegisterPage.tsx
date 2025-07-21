@@ -2,8 +2,7 @@ import React from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
-import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
-import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 const RegisterPage: React.FC = () => {
   return (
@@ -61,6 +60,10 @@ const RegisterPage: React.FC = () => {
                     placeholder="Email Address"
                     className="white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
                   />
+                  <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+                    <ExclamationCircleOutlined className="mr-1" />
+                    올바른 형식이 아닙니다
+                  </p>
                 </div>
 
                 <div className="w-full max-w-[500px]">
@@ -72,6 +75,10 @@ const RegisterPage: React.FC = () => {
                     placeholder="Password"
                     className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
                   />
+                  <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+                    <ExclamationCircleOutlined className="mr-1" />
+                    올바른 형식이 아닙니다
+                  </p>
                 </div>
 
                 <div className="w-full max-w-[500px]">
@@ -83,7 +90,8 @@ const RegisterPage: React.FC = () => {
                     placeholder="Password"
                     className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
                   />
-                  <p className="text-popcorn-box ml-4 mt-2 lg:text-xs xl:text-sm">
+                  <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+                    <ExclamationCircleOutlined className="mr-1" />
                     일치하지 않습니다
                   </p>
                 </div>
@@ -150,6 +158,10 @@ const RegisterPage: React.FC = () => {
                   placeholder="Email Address"
                   className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
                 />
+                <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+                  <ExclamationCircleOutlined className="mr-1" />
+                  올바른 형식이 아닙니다
+                </p>
               </div>
 
               <div className="w-full max-w-[440px]">
@@ -161,7 +173,8 @@ const RegisterPage: React.FC = () => {
                   placeholder="Password"
                   className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
                 />
-                <p className="text-popcorn-box ml-4 mt-2 text-xs">
+                <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+                  <ExclamationCircleOutlined className="mr-1" />
                   올바른 형식이 아닙니다
                 </p>
               </div>
@@ -175,7 +188,9 @@ const RegisterPage: React.FC = () => {
                   placeholder="Password"
                   className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
                 />
-                <p className="text-popcorn-box ml-4 mt-2 text-xs">
+
+                <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
+                  <ExclamationCircleOutlined className="mr-1" />
                   일치하지 않습니다
                 </p>
               </div>
