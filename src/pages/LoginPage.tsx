@@ -4,6 +4,7 @@ import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
 import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
 import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
+import LoginForm from "@/components/LoginResgister/LoginForm";
 
 const LoginPage: React.FC = () => {
   return (
@@ -51,38 +52,9 @@ const LoginPage: React.FC = () => {
                   로그인 하시겠어요?
                 </p>
               </div>
-              <form className="flex flex-col items-center space-y-3 md:space-y-4">
-                <div className="w-full max-w-[500px]">
-                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
-                    이메일
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    className="white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
-                  />
-                </div>
 
-                <div className="w-full max-w-[500px]">
-                  <label className="mb-2 ml-4 block text-xs text-black md:text-base">
-                    비밀번호
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
-                  />
-                </div>
+              <LoginForm />
 
-                <div className="w-full max-w-[500px] pt-3 md:pt-4">
-                  <button
-                    type="submit"
-                    className="bg-popco-main w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 md:py-4"
-                  >
-                    로그인
-                  </button>
-                </div>
-              </form>
               <div className="mt-4 flex justify-center md:mt-6">
                 <p className="text-xs text-gray-600 md:text-base">
                   회원이 아니신가요?
@@ -139,38 +111,7 @@ const LoginPage: React.FC = () => {
               <p className="text-sm text-gray-600">로그인 하시겠어요?</p>
             </div>
 
-            <form className="flex flex-col items-center space-y-3">
-              <div className="w-full max-w-[440px]">
-                <label className="mb-2 ml-4 block text-xs text-black">
-                  이메일
-                </label>
-                <input
-                  type="email"
-                  placeholder="Email Address"
-                  className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
-                />
-              </div>
-
-              <div className="w-full max-w-[440px]">
-                <label className="mb-2 ml-4 block text-xs text-black">
-                  비밀번호
-                </label>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751]"
-                />
-              </div>
-
-              <div className="w-full max-w-[440px] pt-3">
-                <button
-                  type="submit"
-                  className="bg-popco-main w-full rounded-[40px] px-4 py-3 text-base font-medium text-black transition-colors hover:bg-yellow-400"
-                >
-                  로그인
-                </button>
-              </div>
-            </form>
+            <LoginForm />
 
             <div className="mt-4 text-center">
               <p className="text-xs text-gray-600">
