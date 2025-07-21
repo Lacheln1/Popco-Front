@@ -73,7 +73,6 @@ const quizData = {
 };
 
 const TestPage = () => {
-  const { message } = App.useApp();
   const {
     step,
     total: TOTAL_QUESTIONS,
