@@ -1,4 +1,7 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "swiper/css/autoplay";
 
 @tailwind base;
 @tailwind components;
