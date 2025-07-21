@@ -45,7 +45,7 @@ const LoginPage: React.FC = () => {
             />
             <div className="relative flex h-full w-full flex-col justify-center">
               <div className="mb-6 text-center md:mb-7 lg:mb-8">
-                <h1 className="mb-2 font-semibold text-gray-800 lg:text-3xl xl:text-[40px]">
+                <h1 className="mb-2 font-semibold text-gray-800 lg:text-3xl xl:text-[30px]">
                   지금 바로 POPCO에 입장해요 !
                 </h1>
                 <p className="text-md text-gray-600 lg:text-base xl:text-xl">
