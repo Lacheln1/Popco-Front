@@ -1,6 +1,7 @@
 import SearchBar from "@/components/common/SearchBar";
 import HeroCarousel from "@/components/MainSection/HeroCarousel";
 import HeroRanking from "@/components/MainSection/HeroRanking";
+import HeroTop1 from "@/components/MainSection/HeroTop1";
 
 const MainPage = () => {
   return (
@@ -10,8 +11,8 @@ const MainPage = () => {
         <SearchBar onSearch={() => {}} />
         <HeroRanking />
       </div>
+      <HeroTop1 />
     </div>
   );
 };
-
 export default MainPage;
