@@ -12,7 +12,7 @@ const RegisterPage: React.FC = () => {
         {/* 이미지 영역 */}
         <div className="flex w-full justify-end">
           <div>
-            <div className="flex justify-center">
+            <div className="relative top-[-20px] flex justify-center">
               <a href="/">
                 <img
                   src={spotlightWithLogoImg}
@@ -34,15 +34,15 @@ const RegisterPage: React.FC = () => {
 
         {/* 회원가입 섹션 */}
         <div className="flex w-full items-center justify-start xl:mr-32">
-          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[680px] xl:mt-16">
+          <div className="relative ml-4 flex w-full max-w-[600px] flex-col justify-center rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-8 md:h-[550px] md:max-w-[800px] lg:h-[710px] xl:mt-16">
             <img
               src={spotlightImg}
               alt=""
               className="absolute left-1/2 w-[200px] -translate-x-1/2 -translate-y-1/2 object-cover md:top-12 md:w-[350px] lg:top-[-22px] lg:w-[440px] xl:top-[-20px] xl:w-[520px]"
             />
             <div className="relative z-10 w-full">
-              <div className="mb-6 text-center md:mb-7 lg:mb-8">
-                <h1 className="mb-2 break-all font-semibold text-gray-800 lg:text-2xl xl:text-[35px]">
+              <div className="mb-6 mt-4 text-center md:mb-7">
+                <h1 className="mb-2 break-all font-semibold text-gray-800 lg:text-3xl xl:text-[30px]">
                   POPCO 멤버가 되어 특별한 경험을 만나보세요.
                 </h1>
                 <p className="text-md text-gray-600 lg:text-base xl:text-xl">
