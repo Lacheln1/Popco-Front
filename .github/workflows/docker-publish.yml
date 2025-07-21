@@ -39,8 +39,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/popco-client:${{ github.sha }}
-            ${{ secrets.DOCKER_HUB_USERNAME }}/popco-client:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/popco-front:${{ github.sha }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/popco-front:latest
   
       - name: Trigger Popco-Infra Deploy
         uses: peter-evans/repository-dispatch@v2
