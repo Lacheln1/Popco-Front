@@ -41,6 +41,16 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/test",
+    element: <TestLayout />,
+    children: [
+      {
+        index: true,
+        element: <TestPage />,
+      },
+    ],
+  },
 ]);
 
 export default router;
