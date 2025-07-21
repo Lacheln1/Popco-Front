@@ -37,9 +37,11 @@ const HeroTop1 = () => {
 
   return (
     <div className="m-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-8">
-      <h3 className="gmarket flex flex-wrap items-center gap-2 text-xl sm:text-2xl md:text-3xl">
-        TOP 1 <strong className="text-popcorn-box">'F1 더 무비'</strong>와
-        비슷한 작품이에요
+      <h3 className="gmarket flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:text-3xl">
+        <span className="whitespace-nowrap">
+          TOP 1 <strong className="text-popcorn-box">'F1 더 무비'</strong>와
+        </span>
+        <span>비슷한 작품이에요</span>
       </h3>
       <section>
         <div className="mb-4 flex justify-end">
