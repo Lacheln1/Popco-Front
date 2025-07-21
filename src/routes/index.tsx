@@ -1,6 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
+import TestLayout from "@/layout/TestLayout";
+import TestMainPage from "@/pages/TestMainPage";
+import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
+
 const router = createBrowserRouter([
   {
     path: "/",
