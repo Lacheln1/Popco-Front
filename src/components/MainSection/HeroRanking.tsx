@@ -6,6 +6,9 @@ import Poster from "../common/Poster";
 import { LuEye } from "react-icons/lu";
 import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
+import type { MenuProps } from "antd";
+import { Dropdown } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 
 const HeroRanking = () => {
   const [viewMode, setViewMode] = useState<"swiper" | "desktop">("desktop");
@@ -14,6 +17,7 @@ const HeroRanking = () => {
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [selected, setSelected] = useState("전체");
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -35,8 +39,7 @@ const HeroRanking = () => {
         setViewMode("desktop");
       }
     };
-
-    checkView(); // 초기 확인
+    checkView();
     window.addEventListener("resize", checkView);
     return () => window.removeEventListener("resize", checkView);
   }, []);
@@ -48,10 +51,34 @@ const HeroRanking = () => {
     { rank: 5, id: "5", title: "5위 포스터" },
   ];
 
+  const items: MenuProps["items"] = [
+    {
+      key: "all",
+      label: "전체",
+      onClick: () => setSelected("전체"),
+    },
+    {
+      key: "series",
+      label: "시리즈",
+      onClick: () => setSelected("시리즈"),
+    },
+    {
+      key: "movie",
+      label: "영화",
+      onClick: () => setSelected("영화"),
+    },
+  ];
+
   return (
     <div className="mx-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-8">
-      <h3 className="gmarket text-xl sm:text-2xl md:text-3xl">
-        POPCO의 주간 <strong className="text-popcorn-box">TOP 5</strong>
+      <h3 className="gmarket font-we flex items-center gap-2 text-xl sm:text-2xl md:text-3xl">
+        주간 POPCO의
+        <Dropdown menu={{ items }} placement="bottomLeft" arrow>
+          <button className="inline-flex items-center rounded-md bg-[#ffffff9c] px-3 py-1 text-sm sm:text-xl">
+            {selected} <DownOutlined className="ml-1 text-lg" />
+          </button>
+        </Dropdown>
+        <span className="text-popcorn-box"> TOP 5</span>
       </h3>
 
       <section>
