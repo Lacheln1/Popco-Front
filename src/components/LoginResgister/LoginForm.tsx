@@ -1,12 +1,49 @@
 import React, { useState } from "react";
+const API_URL = import.meta.env.VITE_BACK_URL;
+import { loginUser } from "@/apis/userApi.ts";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    //로그인 api 로직
+
+    let hasError = false;
+
+    if (!email) {
+      setEmailError("ⓘ 이메일을 입력해주세요.");
+      hasError = true;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("ⓘ 비밀번호를 입력해주세요.");
+      hasError = true;
+    } else {
+      setPasswordError("");
+    }
+
+    if (hasError) return;
+
+    try {
+      const result = await loginUser({ email, password });
+
+      if (result.resultCode === 200) {
+        localStorage.setItem("accessToken", result.data.accessToken);
+        // url이동이나 기타 액션
+        console.log("로그인 성공");
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("로그인 오류", error);
+      alert("로그인에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
