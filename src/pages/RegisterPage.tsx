@@ -3,6 +3,16 @@ import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
 import RegisterForm from "@/components/LoginResgisterPage/RegisterForm";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import {
+  pageVariants,
+  characterVariants,
+  headerVariants,
+  linkVariants,
+  socialContainerVariants,
+  socialButtonVariants,
+} from "@/components/LoginResgisterPage/Animation";
 
 const RegisterPage: React.FC = () => {
   return (
