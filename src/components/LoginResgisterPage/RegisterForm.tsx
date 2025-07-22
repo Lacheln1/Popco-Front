@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import {
@@ -13,9 +13,68 @@ const RegisterForm: React.FC = () => {
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
 
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [checkPasswordError, setCheckPasswordError] = useState("");
+
+  const [checkEmailValue, setCheckEmailValue] = useState(false); // 이메일 중복 체크
+
+  useEffect(() => {
+    const resetCheckEmailValue = () => {
+      setCheckEmailValue(false);
+    };
+    resetCheckEmailValue();
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    let hasError = false;
+    if (!email) {
+      setEmailError("이메일을 입력해주세요.");
+      hasError = true;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("비밀번호를 입력해주세요.");
+      hasError = true;
+    } else {
+      setPasswordError("");
+    }
+
+    if (!checkPassword) {
+      setCheckPasswordError("비밀번호를 한번 더 입력해주세요.");
+      hasError = true;
+    } else {
+      setCheckPasswordError("");
+    }
+
+    if (!checkEmailValue) {
+      alert("이메일 중복확인을 해주세요.");
+      hasError = true;
+    } else {
+      setCheckEmailValue(true);
+    }
+
+    if (password != checkPassword) {
+      setCheckPasswordError("비밀번호가 일치하지 않습니다.");
+      hasError = true;
+    } else {
+      setCheckPasswordError("");
+    }
+
+    if (hasError) return;
+
+    if (!hasError) console.log("회원가입성공");
+
     //회원가입 로직
+  };
+
+  const handleCheckEmail = () => {
+    alert("중복확인완료");
+    setCheckEmailValue(true);
   };
   return (
     <>
