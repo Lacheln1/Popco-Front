@@ -73,8 +73,13 @@ const LoginForm: React.FC = () => {
             variants={shakeVariants}
           >
             <input
+              value={email}
               type="email"
               placeholder="Email Address"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (e.target.value) setEmailError("");
+              }}
               className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
                 emailError ? "border-2 border-red-400" : ""
               }`}
@@ -100,8 +105,13 @@ const LoginForm: React.FC = () => {
             variants={shakeVariants}
           >
             <input
+              value={password}
               type="password"
               placeholder="Password"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (e.target.value) setPasswordError("");
+              }}
               className={`w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
                 passwordError ? "border-2 border-red-500" : ""
               }`}
@@ -124,7 +134,7 @@ const LoginForm: React.FC = () => {
         >
           <motion.button
             type="submit"
-            className="bg-popco-main w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 md:py-4"
+            className="bg-popco-main pretendard w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 md:py-4"
             variants={buttonVariants}
             whileTap="tap"
           >

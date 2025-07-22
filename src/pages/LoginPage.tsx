@@ -108,14 +108,15 @@ const LoginPage: React.FC = () => {
                   animate="visible"
                 >
                   <motion.button
-                    className="flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white transition-colors md:px-4 md:py-3 md:text-sm lg:text-base"
+                    className="flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white transition-colors md:px-4 md:py-3 md:text-sm lg:text-base xl:text-xl"
                     variants={socialButtonVariants}
                     whileTap="tap"
                   >
-                    <img src={naverLoginBtnImg} alt="네이버로그인이미지" />
+                    <span className="mr-2 font-bold">N</span>
+                    네이버 로그인
                   </motion.button>
                   <motion.button
-                    className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors md:px-4 md:py-3 md:text-sm lg:text-base"
+                    className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors md:px-4 md:py-3 md:text-sm lg:text-base xl:text-xl"
                     variants={socialButtonVariants}
                     whileTap="tap"
                   >
@@ -140,37 +141,52 @@ const LoginPage: React.FC = () => {
         {/* 상단 - 스포트라이트와 로고 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
           <Link to="/">
-            <img
+            <motion.img
               src={spotlightWithLogoImg}
               alt=""
               className="w-64 object-cover"
+              variants={characterVariants}
+              initial="hidden"
+              animate="visible"
             />
           </Link>
         </div>
 
         {/* 중간 - 로그인 폼 */}
         <div className="flex justify-center px-4 pb-4 md:mx-10">
-          <div className="w-[600px] rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-14">
-            <div className="mb-6 text-center">
+          <motion.div
+            className="w-[600px] rounded-3xl bg-gray-100 p-6 opacity-95 shadow-2xl md:mt-14"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <motion.div className="mb-6 text-center">
               <h1 className="mb-2 text-xl font-bold text-gray-800">
                 지금 바로 POPCO에 입장해요 !
               </h1>
-              <p className="text-sm text-gray-600">로그인 하시겠어요?</p>
-            </div>
+              <p className="text-sm font-medium text-gray-600">
+                로그인 하시겠어요?
+              </p>
+            </motion.div>
 
             <LoginForm />
 
-            <div className="mt-4 text-center">
+            <motion.div className="mt-4 text-center">
               <p className="text-xs text-gray-600">
                 회원이 아니신가요?
                 <Link to="/register" className="ml-1 text-[#e54b2f]">
                   회원가입 하기
                 </Link>
               </p>
-            </div>
+            </motion.div>
 
             <div className="mt-4 flex w-full justify-center">
-              <div className="flex w-full max-w-[440px] gap-2">
+              <motion.div
+                className="flex w-full max-w-[440px] gap-2"
+                variants={socialContainerVariants}
+                initial="hidden"
+                animate="visible"
+              >
                 <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors">
                   <span className="mr-2 font-bold">N</span>
                   네이버 로그인
@@ -185,9 +201,9 @@ const LoginPage: React.FC = () => {
                   </div>
                   카카오 로그인
                 </button>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* 하단 - 캐릭터들 */}
