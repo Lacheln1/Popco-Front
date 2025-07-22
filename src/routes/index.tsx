@@ -9,6 +9,7 @@ import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
+import AnalysisPage from "@/pages/AnalysisPage";
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,7 @@ const router = createBrowserRouter([
       { index: true, element: <MainPage /> },
       { path: "/list", element: <MainPage /> },
       { path: "/collections", element: <MainPage /> },
-      { path: "/analysis", element: <MainPage /> },
+      { path: "/analysis", element: <AnalysisPage /> },
     ],
   },
   {
