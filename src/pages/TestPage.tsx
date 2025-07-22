@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useOutletContext } from "react-router-dom";
 
@@ -20,6 +20,18 @@ import RetroPopcoCard from "../assets/retro-popco-card.svg?react";
 import ImaginePopcoCard from "../assets/imagine-popco-card.svg?react";
 import MovieSherlockCard from "../assets/movie-sherlock-card.svg?react";
 
+import PosterInTest from "../components/test/PosterInTest";
+import QuizStepLayout from "../components/test/QuizStepLayout";
+import { Input, ConfigProvider, DatePicker, message } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
+
+//  임시 영화 데이터 (40개)
+const tempMovieData = Array.from({ length: 40 }, (_, i) => ({
+  id: `movie_${i + 1}`,
+  title: `임시 영화 제목 ${i + 1}`,
+  posterUrl: `https://picsum.photos/seed/${i + 1}/200/300`, // 임시 이미지
+}));
+
 const cardRows = [
   [ActionHunterCard, CryPopcoCard, WarmPopcoCard],
   [HorrorPopcoCard, RetroPopcoCard, ImaginePopcoCard, MovieSherlockCard],
@@ -31,12 +43,46 @@ type TestContextType = {
   setStep: React.Dispatch<React.SetStateAction<number>>;
 };
 
+// 임시질문
+const quizData = {
+  5: {
+    question: "어떤 상황에서 영화를 자주 보시나요?",
+    subText: "알려주신 내용을 기반으로 컨텐츠를 추천해드릴게요!",
+    answers: [
+      "스트레스 풀고 싶을 때",
+      "혼자 조용히 감상에 젖고 싶을 때",
+      "상상력 자극받고 싶을 때",
+      "뭔가 알고 싶고 추리하고 싶을 때",
+    ],
+  },
+  6: {
+    question: "두 번째 질문",
+    subText: "두 번째 질문 부연설명",
+    answers: ["답1", "답2", "답3", "답4"],
+  },
+  7: {
+    question: "세 번째 질문",
+    subText: "세 번째 질문 부연설명",
+    answers: ["답1", "답2", "답3", "답4"],
+  },
+  8: {
+    question: "네 번째 질문",
+    subText: "네 번째 질문 부연설명",
+    answers: ["답1", "답2", "답3", "답4"],
+  },
+};
+
 const TestPage = () => {
   const {
     step,
     total: TOTAL_QUESTIONS,
     setStep,
   } = useOutletContext<TestContextType>();
+
+  const [nickname, setNickname] = useState("");
+  const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
+  const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
+  const [quizAnswers, setQuizAnswers] = useState<{ [key: number]: number }>({});
 
   useEffect(() => {
     if (step === 0) {
@@ -47,7 +93,35 @@ const TestPage = () => {
     }
   }, [step, setStep]);
 
+  const handleSelectAnswer = (stepIndex: number, answerIndex: number) => {
+    setQuizAnswers((prev) => ({
+      ...prev,
+      [stepIndex]: answerIndex,
+    }));
+  };
+
   const handleNext = () => {
+    if (step === 2) {
+      if (nickname.trim() === "") {
+        message.warning("닉네임을 입력해주세요!");
+        return;
+      }
+    } else if (step === 3) {
+      if (!birthDate) {
+        message.warning("생년월일을 선택해주세요!");
+        return;
+      }
+    } else if (step === 4) {
+      if (selectedMovies.length < 3) {
+        message.warning("최소 3개 이상의 컨텐츠를 선택해주세요!");
+        return;
+      }
+    } else if (step >= 5 && step <= 8) {
+      if (quizAnswers[step] === undefined) {
+        message.warning("답변을 선택해주세요!");
+        return;
+      }
+    }
     setStep((prev: number) => Math.min(prev + 1, TOTAL_QUESTIONS + 1));
   };
 
@@ -55,11 +129,19 @@ const TestPage = () => {
     setStep((prev: number) => Math.max(1, prev - 1));
   };
 
+  const handleToggleMovieSelect = (id: string) => {
+    setSelectedMovies(
+      (prevSelected) =>
+        prevSelected.includes(id)
+          ? prevSelected.filter((movieId) => movieId !== id) // 이미 있으면 제거
+          : [...prevSelected, id], // 없으면 추가
+    );
+  };
   const renderStepContent = () => {
     const contentWrapperStyle =
       "flex h-full flex-col items-center justify-center p-4 text-center text-black";
-    const headingStyle = "font-bold leading-snug text-2xl lg:text-3xl";
-    const paragraphStyle = "mt-4 text-gray-600 text-sm lg:text-base";
+    const headingStyle = "font-bold leading-snug text-xl lg:text-3xl";
+    const paragraphStyle = "mt-4 text-gray-600 text-xs lg:text-base";
 
     switch (step) {
       case 0:
@@ -84,14 +166,15 @@ const TestPage = () => {
               <h3 className={headingStyle}>
                 안녕하세요!
                 <br />
-                POPCO는 사용자님의 취향을 분석해 7가지 캐릭터로 보여줘요
+                POPCO는 사용자님의 취향을 분석해 <br className="md:hidden" />{" "}
+                7가지 캐릭터로 보여줘요
               </h3>
               <p className={`${paragraphStyle} mt-4`}>
-                사용자님의 취향 선명도에 따라 ‘아기 팝코’와 ‘어른 팝코’로
-                표현돼요.
+                사용자님의 취향 선명도에 따라 ‘아기 팝코’와{" "}
+                <br className="md:hidden" /> ‘어른 팝코’로 표현돼요.
                 <br />
-                앞으로 사용자님의 작품 평가에 따라 캐릭터는 언제든 바뀔 수
-                있답니다.
+                앞으로 사용자님의 작품 평가에 따라 <br className="md:hidden" />{" "}
+                캐릭터는 언제든 바뀔 수 있답니다.
               </p>
             </div>
 
@@ -115,8 +198,19 @@ const TestPage = () => {
           <div className={contentWrapperStyle}>
             <h3 className={headingStyle}>사용자님을 뭐라고 불러드릴까요?</h3>
             <p className={paragraphStyle}>
-              POPCO 닉네임으로 사용되며 다른 사용자들에게도 보여져요!
+              POPCO 닉네임으로 사용되며 <br /> 다른 사용자들에게도 보여져요!
             </p>
+
+            <div className="mt-8 w-full max-w-xs">
+              <Input
+                placeholder="닉네임을 입력해주세요"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                maxLength={7}
+                size="large"
+                className="text-center"
+              />
+            </div>
           </div>
         );
       case 3:
@@ -127,35 +221,80 @@ const TestPage = () => {
               연령대에 맞는 콘텐츠를 추천해드려요.
               <br />더 즐겁게 POPCO를 즐길 수 있도록 알려주세요!
             </p>
+            <div className="mt-8 w-full max-w-xs">
+              <ConfigProvider
+                theme={{
+                  token: {
+                    colorPrimary: "var(--color-popcoMainColor)",
+                  },
+                }}
+              >
+                <DatePicker
+                  placeholder="생년월일을 입력해주세요 (0000-00-00)"
+                  onChange={(date) => setBirthDate(date)}
+                  size="large"
+                  className="w-full"
+                  picker="date"
+                  disabledDate={(current) => current && current > dayjs()}
+                />
+              </ConfigProvider>
+            </div>
           </div>
         );
       case 4:
         return (
-          <div className={contentWrapperStyle}>
-            <h3 className={headingStyle}>어떤 컨텐츠를 재밌게 보셨나요?</h3>
-            <p className={paragraphStyle}>
-              마음에 드는 컨텐츠를 최소 3개이상 골라주세요.
-              <br />
-              많이 선택하실수록 취향 분석이 정교해져, 더 완벽한 추천이 가능해요.
-            </p>
+          <div className="flex h-full flex-col gap-4 py-4">
+            <div className="px-4 text-center">
+              <h3 className={headingStyle}>어떤 컨텐츠를 재밌게 보셨나요?</h3>
+              <p className={paragraphStyle}>
+                마음에 드는 컨텐츠를 최소 3개이상 골라주세요.
+                <br className="md:hidden" />
+                많이 선택하실수록 취향 분석이 정교해져,{" "}
+                <br className="md:hidden" /> 더 완벽한 추천이 가능해요.
+              </p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 pt-2">
+              <div className="grid grid-cols-3 gap-x-4 gap-y-6 lg:grid-cols-5">
+                {tempMovieData.map((movie) => (
+                  <PosterInTest
+                    key={movie.id}
+                    id={movie.id}
+                    title={movie.title}
+                    posterUrl={movie.posterUrl}
+                    isSelected={selectedMovies.includes(movie.id)}
+                    onToggleSelect={handleToggleMovieSelect}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         );
       case 5:
+      case 6:
+      case 7:
+      case 8:
+        const currentQuiz = quizData[step];
         return (
-          <div className={contentWrapperStyle}>
-            <h3 className={headingStyle}>
-              어떤 상황에서 영화를 자주 보시나요?
-            </h3>
-            <p className={paragraphStyle}>
-              알려주신 내용을 기반으로 컨텐츠를 추천해드릴게요!
-            </p>
-          </div>
+          <QuizStepLayout
+            question={currentQuiz.question}
+            subText={currentQuiz.subText}
+            answers={currentQuiz.answers}
+            selectedAnswer={quizAnswers[step]}
+            onSelectAnswer={(answerIndex) =>
+              handleSelectAnswer(step, answerIndex)
+            }
+          />
         );
-      default:
+
+      // ✨최종 결과 페이지(9단계)
+      default: // case 9
         return (
-          <div className={contentWrapperStyle}>
-            <h2 className={headingStyle}>당신의 캐릭터는?</h2>
-            <p className={paragraphStyle}>
+          <div className="flex h-full flex-col items-center justify-center p-4 text-center text-black">
+            <h2 className="text-2xl font-bold leading-snug lg:text-3xl">
+              당신의 캐릭터는?
+            </h2>
+            <p className="mt-4 text-sm text-gray-600 lg:text-base">
               선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
             </p>
           </div>
@@ -168,7 +307,7 @@ const TestPage = () => {
       <Lighting className="absolute -left-20 -top-28 z-0 w-96 opacity-70" />
       <Lighting className="absolute -right-20 -top-28 z-0 w-96 opacity-70" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full px-4 lg:w-auto lg:px-0">
         <MovieScreen>{renderStepContent()}</MovieScreen>
       </div>
       <div className="pointer-events-none absolute bottom-0 z-10 flex w-full items-end justify-center">
@@ -177,7 +316,6 @@ const TestPage = () => {
         <TheaterSeat3 className="mb-[-15%] lg:mb-[-4%]" />
       </div>
 
-      {/* ✨ 1. 모바일 버튼에 호버 애니메이션 클래스 추가 */}
       <div className="absolute bottom-16 z-40 flex w-full items-center justify-between p-4 lg:hidden">
         {step > 1 ? (
           <button
@@ -201,7 +339,6 @@ const TestPage = () => {
         )}
       </div>
 
-      {/* ✨ 2. PC 버튼을 독립적으로 위치시켜 MovieScreen 밖으로 이동 */}
       {step > 1 ? (
         <button
           onClick={handlePrev}

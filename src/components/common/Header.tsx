@@ -120,9 +120,17 @@ const Header: React.FC<HeaderProps> = ({
       <div
         className={`gmarket transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/80 px-6 sm:px-8 lg:px-10"
+            ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/70 px-6 sm:px-8 lg:px-10"
             : "max-w-auto mx-auto bg-white/80 px-4 text-lg sm:px-6 md:bg-white/50 lg:px-24"
         }`}
+        style={
+          isScrolled
+            ? {
+                boxShadow: "3px 4px 5px #dad8d870",
+                backdropFilter: "blur(5px)",
+              }
+            : undefined
+        }
       >
         <div
           className={`flex h-[4.5rem] items-center justify-between transition-all duration-300`}
@@ -146,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({
                   <Link
                     to={item.path}
                     className={`flex min-w-[90px] items-center justify-center rounded-full px-4 pt-1 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
-                      isScrolled ? "h-8 text-base" : "h-10 text-xl"
+                      isScrolled ? "h-8 text-base" : "h-10 text-lg"
                     } ${
                       isActiveItem(item.path)
                         ? "bg-sidelogo-blueGray text-white hover:bg-gray-700"
@@ -164,7 +172,7 @@ const Header: React.FC<HeaderProps> = ({
                     className={`flex min-w-[90px] items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
                       isScrolled
                         ? "h-8 px-4 text-base"
-                        : "mt-1 h-10 px-4 text-xl"
+                        : "mt-1 h-10 px-4 text-lg"
                     }`}
                     onClick={handleUserClick}
                   >

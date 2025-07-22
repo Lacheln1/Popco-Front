@@ -24,7 +24,7 @@ const HeroCarousel = () => {
     <div className="relative w-screen">
       <Swiper
         modules={[Navigation, Autoplay]}
-        className="mainSwiper overflow-visible"
+        className="mainSwiper overflow-hidden"
         slidesPerView={1.7}
         spaceBetween={20}
         centeredSlides
@@ -75,36 +75,36 @@ const HeroCarousel = () => {
             />
           </SwiperSlide>
         ))}
-        <button
-          className="absolute -bottom-7 left-1/2 z-[1] flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/40 px-4 py-2 text-sm shadow-[0px_4px_15px_rgba(0,0,0,0.1)] backdrop-blur-md sm:h-14 sm:gap-3 sm:px-6 sm:py-3 sm:text-base"
-          onClick={() => (window.location.href = banners[activeIndex].link)}
-        >
-          <div className="rounded-full bg-white p-1.5 shadow-md sm:p-2">
-            <TbHandClick className="text-lg text-red-600 sm:text-xl" />
-          </div>
-          <div className="gmarket-medium whitespace-nowrap text-sm sm:text-base">
-            See More
-          </div>
-          <GoArrowUpRight className="text-xl sm:text-2xl" />
-        </button>
         <NavigationButton ref={prevRef} position="left" />
         <NavigationButton ref={nextRef} position="right" />
       </Swiper>
+      <button
+        className="absolute -bottom-7 left-1/2 z-[1] flex -translate-x-1/2 items-center gap-2 rounded-full bg-white/40 px-4 py-2 text-sm shadow-[0px_4px_15px_rgba(0,0,0,0.1)] backdrop-blur-md sm:h-14 sm:gap-3 sm:px-6 sm:py-3 sm:text-base"
+        onClick={() => (window.location.href = banners[activeIndex].link)}
+      >
+        <div className="rounded-full bg-white p-1.5 shadow-md sm:p-2">
+          <TbHandClick className="text-lg text-red-600 sm:text-xl" />
+        </div>
+        <div className="gmarket-medium whitespace-nowrap text-sm sm:text-base">
+          See More
+        </div>
+        <GoArrowUpRight className="text-xl sm:text-2xl" />
+      </button>
       <style>
         {`
-          .swiper-slide {
+          .mainSwiper .swiper-slide {
             transition: transform 0.3s ease, opacity 0.3s ease;
           }
-          .swiper-slide.swiper-slide-active {
+          .mainSwiper .swiper-slide.swiper-slide-active {
             transform: scale(1);
             opacity: 1;
           }
-          .swiper-slide:not(.swiper-slide-active) {
+          .mainSwiper .swiper-slide:not(.swiper-slide-active) {
             transform: scale(0.8);
             opacity: 0.6;
           }
           @media (max-width: 786px) {
-            .swiper-slide {
+            .mainSwiper .swiper-slide {
               transform: scale(1);
               opacity: 1;
             }
