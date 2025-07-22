@@ -1,5 +1,12 @@
 import React, { useState } from "react";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { motion } from "framer-motion";
+import {
+  formVariants,
+  itemVariants,
+  shakeVariants,
+  buttonVariants,
+} from "@/components/LoginResgisterPage/Animation";
 
 const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,51 +19,110 @@ const RegisterForm: React.FC = () => {
   };
   return (
     <>
-      <form className="flex flex-col items-center space-y-3 md:space-y-4">
-        <div className="w-full max-w-[500px]">
-          <label className="mb-2 ml-4 block text-xs text-black md:text-base">
-            이메일
-          </label>
+      <motion.form
+        className="flex flex-col items-center space-y-3 md:space-y-4"
+        variants={formVariants}
+        initial="hidden"
+        animate="visible"
+        onSubmit={handleSubmit}
+      >
+        <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
+          <div className="flex justify-between">
+            <label className="mb-2 ml-4 block text-xs text-black md:text-base">
+              이메일
+            </label>
+            <button
+              className="absolute mb-2 ml-2 block translate-x-56 translate-y-[38px] text-xs text-black md:ml-5 md:translate-x-96 md:translate-y-[46px] md:text-base lg:ml-9 lg:translate-x-96 lg:translate-y-[47px]"
+              onClick={handleCheckEmail}
+            >
+              중복확인
+            </button>
+          </div>
           <input
+            value={email}
             type="email"
             placeholder="Email Address"
-            className="white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
+            className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
+              emailError ? "border-2 border-red-400" : ""
+            }`}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (e.target.value) setEmailError("");
+            }}
           />
-          <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
-            <ExclamationCircleOutlined className="mr-1" />
-            올바른 형식이 아닙니다
-          </p>
-        </div>
+          {emailError && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs"
+            >
+              <ExclamationCircleOutlined className="mr-1" /> {emailError}
+            </motion.p>
+          )}
+        </motion.div>
 
-        <div className="w-full max-w-[500px]">
+        <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
           <label className="mb-2 ml-4 block text-xs text-black md:text-base">
             비밀번호
           </label>
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
-          />
-          <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
-            <ExclamationCircleOutlined className="mr-1" />
-            올바른 형식이 아닙니다
-          </p>
-        </div>
+          <motion.div
+            animate={passwordError ? "shake" : undefined}
+            variants={shakeVariants}
+          >
+            <input
+              value={password}
+              type="password"
+              placeholder="Password"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (e.target.value) setPasswordError("");
+              }}
+              className={`w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
+                passwordError ? "border-2 border-red-500" : ""
+              }`}
+            />
+          </motion.div>
+          {passwordError && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs"
+            >
+              <ExclamationCircleOutlined className="mr-1" /> {passwordError}
+            </motion.p>
+          )}
+        </motion.div>
 
-        <div className="w-full max-w-[500px]">
+        <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
           <label className="mb-2 ml-4 block text-xs text-black md:text-base">
             비밀번호 확인
           </label>
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4"
-          />
-          <p className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs">
-            <ExclamationCircleOutlined className="mr-1" />
-            일치하지 않습니다
-          </p>
-        </div>
+          <motion.div
+            animate={passwordError ? "shake" : undefined}
+            variants={shakeVariants}
+          >
+            <input
+              value={checkPassword}
+              type="password"
+              placeholder="Password"
+              onChange={(e) => {
+                setCheckPassword(e.target.value);
+                if (e.target.value) setCheckPasswordError("");
+              }}
+              className={`} w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4`}
+            />
+          </motion.div>
+          {checkPasswordError && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-popcorn-box ml-4 mt-2 flex justify-start text-xs"
+            >
+              <ExclamationCircleOutlined className="mr-1" />{" "}
+              {checkPasswordError}
+            </motion.p>
+          )}
+        </motion.div>
 
         <div className="w-full max-w-[500px] pt-3 md:pt-4">
           <button
@@ -66,7 +132,7 @@ const RegisterForm: React.FC = () => {
             회원가입
           </button>
         </div>
-      </form>
+      </motion.form>
     </>
   );
 };
