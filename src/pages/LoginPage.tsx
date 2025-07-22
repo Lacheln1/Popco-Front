@@ -19,7 +19,7 @@ import {
 const LoginPage: React.FC = () => {
   return (
     <motion.main
-      className="relative h-full bg-[#0F1525]"
+      className="pretendard relative h-full bg-[#0F1525]"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
