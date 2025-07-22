@@ -5,6 +5,8 @@ import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import DetailPage from "@/pages/DetailPage";
+
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 
 import { ConfigProvider } from "antd";
@@ -16,6 +18,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
+      { path: "/movie/:movieId", element: <DetailPage /> },
       { path: "/list", element: <MainPage /> },
       { path: "/collections", element: <MainPage /> },
       { path: "/analysis", element: <MainPage /> },
