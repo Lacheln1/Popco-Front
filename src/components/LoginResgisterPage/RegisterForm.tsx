@@ -51,18 +51,18 @@ const RegisterForm: React.FC = () => {
       setCheckPasswordError("");
     }
 
-    if (!checkEmailValue) {
-      alert("이메일 중복확인을 해주세요.");
-      hasError = true;
-    } else {
-      setCheckEmailValue(true);
-    }
-
     if (password != checkPassword) {
       setCheckPasswordError("비밀번호가 일치하지 않습니다.");
       hasError = true;
     } else {
       setCheckPasswordError("");
+    }
+
+    if (!checkEmailValue) {
+      alert("이메일 중복확인을 해주세요.");
+      hasError = true;
+    } else {
+      setCheckEmailValue(true);
     }
 
     if (hasError) return;
@@ -73,8 +73,11 @@ const RegisterForm: React.FC = () => {
   };
 
   const handleCheckEmail = () => {
-    alert("중복확인완료");
-    setCheckEmailValue(true);
+    if (!email) alert("이메일을 입력해주세요.");
+    else {
+      alert("중복확인완료");
+      setCheckEmailValue(true);
+    }
   };
   return (
     <>
@@ -91,10 +94,11 @@ const RegisterForm: React.FC = () => {
               이메일
             </label>
             <button
-              className="absolute mb-2 ml-2 block translate-x-56 translate-y-[38px] text-xs text-black md:ml-5 md:translate-x-96 md:translate-y-[46px] md:text-base lg:ml-9 lg:translate-x-96 lg:translate-y-[47px]"
+              type="button"
+              className="mb-2 mr-4"
               onClick={handleCheckEmail}
             >
-              중복확인
+              중복 확인
             </button>
           </div>
           <input
