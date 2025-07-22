@@ -160,7 +160,12 @@ const LoginPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            <motion.div className="mb-6 text-center">
+            <motion.div
+              className="mb-6 text-center"
+              variants={headerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               <h1 className="mb-2 text-xl font-bold text-gray-800">
                 지금 바로 POPCO에 입장해요 !
               </h1>
@@ -171,7 +176,12 @@ const LoginPage: React.FC = () => {
 
             <LoginForm />
 
-            <motion.div className="mt-4 text-center">
+            <motion.div
+              className="mt-4 text-center"
+              variants={linkVariants}
+              initial="hidden"
+              animate="visible"
+            >
               <p className="text-xs text-gray-600">
                 회원이 아니신가요?
                 <Link to="/register" className="ml-1 text-[#e54b2f]">
