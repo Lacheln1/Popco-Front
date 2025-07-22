@@ -7,22 +7,22 @@ import ArrowNext from "../assets/arrow-next.svg?react";
 import ArrowBefore from "../assets/arrow-before.svg?react";
 import Lighting from "../assets/lighting.svg?react";
 
-import PopcoRendering from "../assets/popco-movie-start.svg?react";
-import TheaterSeat1 from "../assets/popco-theater-1.svg?react";
-import TheaterSeat2 from "../assets/popco-theater-2.svg?react";
-import TheaterSeat3 from "../assets/popco-theater-3.svg?react";
+import popcoRenderingUrl from "../assets/popco-movie-start.png";
+import theaterSeat1Url from "../assets/popco-theater-1.png";
+import theaterSeat2Url from "../assets/popco-theater-2.png";
+import theaterSeat3Url from "../assets/popco-theater-3.png";
 
-import ActionHunterCard from "../assets/action-hunter-card.svg?react";
-import CryPopcoCard from "../assets/cry-popco-card.svg?react";
-import WarmPopcoCard from "../assets/warm-popco-card.svg?react";
-import HorrorPopcoCard from "../assets/horror-popco-card.svg?react";
-import RetroPopcoCard from "../assets/retro-popco-card.svg?react";
-import ImaginePopcoCard from "../assets/imagine-popco-card.svg?react";
-import MovieSherlockCard from "../assets/movie-sherlock-card.svg?react";
+import actionHunterCardUrl from "../assets/action-hunter-card.png";
+import cryPopcoCardUrl from "../assets/cry-popco-card.png";
+import warmPopcoCardUrl from "../assets/warm-popco-card.png";
+import horrorPopcoCardUrl from "../assets/horror-popco-card.png";
+import retroPopcoCardUrl from "../assets/retro-popco-card.png";
+import imaginePopcoCardUrl from "../assets/imagine-popco-card.png";
+import movieSherlockCardUrl from "../assets/movie-sherlock-card.png";
 
 import PosterInTest from "../components/test/PosterInTest";
 import QuizStepLayout from "../components/test/QuizStepLayout";
-import { Input, ConfigProvider, DatePicker, message } from "antd";
+import { Input, App, DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 
 //  임시 영화 데이터 (40개)
@@ -32,9 +32,14 @@ const tempMovieData = Array.from({ length: 40 }, (_, i) => ({
   posterUrl: `https://picsum.photos/seed/${i + 1}/200/300`, // 임시 이미지
 }));
 
-const cardRows = [
-  [ActionHunterCard, CryPopcoCard, WarmPopcoCard],
-  [HorrorPopcoCard, RetroPopcoCard, ImaginePopcoCard, MovieSherlockCard],
+const cardImageRows = [
+  [actionHunterCardUrl, cryPopcoCardUrl, warmPopcoCardUrl],
+  [
+    horrorPopcoCardUrl,
+    retroPopcoCardUrl,
+    imaginePopcoCardUrl,
+    movieSherlockCardUrl,
+  ],
 ];
 
 type TestContextType = {
@@ -73,6 +78,7 @@ const quizData = {
 };
 
 const TestPage = () => {
+  const { message } = App.useApp();
   const {
     step,
     total: TOTAL_QUESTIONS,
@@ -153,7 +159,11 @@ const TestPage = () => {
               animate={{ scale: 1.15, z: 0 }}
               transition={{ duration: 2, ease: "easeOut" }}
             >
-              <PopcoRendering className="w-11/12 max-w-lg" />
+              <img
+                src={popcoRenderingUrl}
+                alt="팝코 시작 이미지"
+                className="w-12/13 max-w-lg"
+              />
             </motion.div>
           </div>
         );
@@ -180,13 +190,19 @@ const TestPage = () => {
 
             {/* 카드 렌더링 영역 */}
             <div className="flex flex-1 flex-col items-center justify-center gap-y-4">
-              {cardRows.map((row, rowIndex) => (
+              {cardImageRows.map((row, rowIndex) => (
                 <div
                   key={rowIndex}
                   className="flex flex-col items-center gap-4 md:flex-row md:flex-wrap md:justify-center"
                 >
-                  {row.map((CardComponent, cardIndex) => (
-                    <CardComponent key={cardIndex} className="w-56 md:w-64" />
+                  {/* ✨ <img> 태그를 사용하도록 변경합니다. */}
+                  {row.map((imageUrl, cardIndex) => (
+                    <img
+                      key={cardIndex}
+                      src={imageUrl}
+                      alt={`취향 카드 ${cardIndex + 1}`}
+                      className="w-56 rounded-md md:w-64"
+                    />
                   ))}
                 </div>
               ))}
@@ -222,22 +238,14 @@ const TestPage = () => {
               <br />더 즐겁게 POPCO를 즐길 수 있도록 알려주세요!
             </p>
             <div className="mt-8 w-full max-w-xs">
-              <ConfigProvider
-                theme={{
-                  token: {
-                    colorPrimary: "var(--color-popcoMainColor)",
-                  },
-                }}
-              >
-                <DatePicker
-                  placeholder="생년월일을 입력해주세요 (0000-00-00)"
-                  onChange={(date) => setBirthDate(date)}
-                  size="large"
-                  className="w-full"
-                  picker="date"
-                  disabledDate={(current) => current && current > dayjs()}
-                />
-              </ConfigProvider>
+              <DatePicker
+                placeholder="생년월일을 입력해주세요 (0000-00-00)"
+                onChange={(date) => setBirthDate(date)}
+                size="large"
+                className="w-full"
+                picker="date"
+                disabledDate={(current) => current && current > dayjs()}
+              />
             </div>
           </div>
         );
@@ -287,7 +295,7 @@ const TestPage = () => {
           />
         );
 
-      // ✨최종 결과 페이지(9단계)
+      // 최종 결과 페이지(9단계)
       default: // case 9
         return (
           <div className="flex h-full flex-col items-center justify-center p-4 text-center text-black">
@@ -306,14 +314,25 @@ const TestPage = () => {
     <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col items-center justify-center">
       <Lighting className="absolute -left-20 -top-28 z-0 w-96 opacity-70" />
       <Lighting className="absolute -right-20 -top-28 z-0 w-96 opacity-70" />
-
       <div className="relative z-10 w-full px-4 lg:w-auto lg:px-0">
         <MovieScreen>{renderStepContent()}</MovieScreen>
       </div>
       <div className="pointer-events-none absolute bottom-0 z-10 flex w-full items-end justify-center">
-        <TheaterSeat1 className="mb-[-15%] lg:mb-[-4%]" />
-        <TheaterSeat2 className="mb-[-8%] lg:mb-[-3%]" />
-        <TheaterSeat3 className="mb-[-15%] lg:mb-[-4%]" />
+        <img
+          src={theaterSeat1Url}
+          alt="영화관 의자 1"
+          className="mb-[-2%] w-[30%] lg:mb-[-2%] lg:w-[260px]"
+        />
+        <img
+          src={theaterSeat2Url}
+          alt="영화관 의자 2"
+          className="-mx-4 mb-[-0%] ml-5 w-[45%] lg:w-[500px]"
+        />
+        <img
+          src={theaterSeat3Url}
+          alt="영화관 의자 3"
+          className="mb-[-2%] w-[32%] lg:mb-[-2%] lg:w-[300px]"
+        />
       </div>
 
       <div className="absolute bottom-16 z-40 flex w-full items-center justify-between p-4 lg:hidden">

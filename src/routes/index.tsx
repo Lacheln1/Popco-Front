@@ -7,6 +7,9 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 
+import { ConfigProvider } from "antd";
+import koKR from "antd/locale/ko_KR";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -33,7 +36,18 @@ const router = createBrowserRouter([
   },
   {
     path: "/test",
-    element: <TestLayout />,
+    element: (
+      <ConfigProvider
+        locale={koKR}
+        theme={{
+          token: {
+            colorPrimary: "#ffd751",
+          },
+        }}
+      >
+        <TestLayout />
+      </ConfigProvider>
+    ),
     children: [
       {
         index: true,
