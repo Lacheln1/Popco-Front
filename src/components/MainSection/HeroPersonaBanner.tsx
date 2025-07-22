@@ -43,7 +43,7 @@ const HeroPersonaBanner = () => {
       </div>
       {/* 모바일 위치 */}
       <img
-        className="absolute top-0 z-[-1] w-[40vw] -translate-x-[25%] blur-sm md:hidden"
+        className="2sm:block absolute top-0 z-[-1] hidden w-[40vw] -translate-x-[25%] blur-sm md:hidden"
         src="/images/main/persona1.svg"
         alt="character-1"
       />
