@@ -24,6 +24,9 @@ export default {
         popcorn2: "popcorn2 0.7s ease-in-out",
         popcorn3: "popcorn3 0.7s ease-in-out",
       },
+      screens: {
+        "3xl": "1920px",
+      },
     },
   },
   plugins: [],
