@@ -1,7 +1,8 @@
 import SearchBar from "@/components/common/SearchBar";
 import HeroCarousel from "@/components/MainSection/HeroCarousel";
+import HeroPopcorithm from "@/components/MainSection/HeroPopcorithm";
 import HeroRanking from "@/components/MainSection/HeroRanking";
-
+import HeroTop1 from "@/components/MainSection/HeroTop1";
 const MainPage = () => {
   return (
     <div className="flex flex-col gap-32">
@@ -10,8 +11,9 @@ const MainPage = () => {
         <SearchBar onSearch={() => {}} />
         <HeroRanking />
       </div>
+      <HeroTop1 />
+      <HeroPopcorithm />
     </div>
   );
 };
-
 export default MainPage;

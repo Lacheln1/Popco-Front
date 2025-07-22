@@ -89,7 +89,7 @@ const Poster = ({
 
       {/* 모바일 하단 버튼 */}
       <div className="flex w-full items-center justify-between gap-2">
-        <div className="w-1/2 overflow-hidden truncate text-ellipsis text-[clamp(0.78rem,3vw,1rem)] sm:text-[17px]">
+        <div className="w-1/2 overflow-hidden truncate text-ellipsis text-[clamp(0.78rem,3vw,1rem)] sm:w-full sm:text-[17px]">
           {title}
         </div>
         <div className="flex w-1/2 items-center justify-end gap-2 sm:hidden">
