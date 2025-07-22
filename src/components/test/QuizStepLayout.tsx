@@ -34,7 +34,7 @@ const QuizStepLayout: React.FC<QuizStepLayoutProps> = ({
             <button
               key={index}
               onClick={() => onSelectAnswer(index)}
-              className={`rounded-full border px-6 py-3 text-sm font-semibold transition-colors lg:text-base ${
+              className={`font-regular rounded-full border px-6 py-3 text-sm transition-colors lg:text-base ${
                 isSelected
                   ? "border-popco-main bg-popco-main"
                   : "border-gray-300 bg-white text-black hover:bg-gray-100"
