@@ -19,13 +19,14 @@ const AnalysisHeroSection = () => {
           {/* 캐릭터 이미지 및 텍스트 */}
           <div className="flex pt-56">
             <div className="mx-auto flex">
-              <div className="absolute flex -translate-x-80 flex-col pt-4">
-                <span className="bg-popco-main gmarket-medium mb-2 px-2 py-1">
+              <div className="absolute flex -translate-x-[97px] -translate-y-10 flex-col pt-4">
+                <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white">
                   심장 쫄깃한 전개와 스케일 없는 세계관 없이는 못참아!
                 </span>
                 <img
                   src="/images/persona/Persona-text-line.svg"
                   alt="텍스트 라인"
+                  className="hidden"
                 />
               </div>
               <img
@@ -37,7 +38,7 @@ const AnalysisHeroSection = () => {
           </div>
         </div>
       </div>
-      <div className="gmarket-medium flex justify-center text-4xl">
+      <div className="gmarket-medium flex justify-center text-3xl">
         애기 액션 헌터
       </div>
     </div>
