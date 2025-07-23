@@ -8,6 +8,7 @@ import {
   shakeVariants,
   buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,8 @@ const LoginForm: React.FC = () => {
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,12 +43,12 @@ const LoginForm: React.FC = () => {
     try {
       const result = await loginUser({ email, password });
 
-      if (result.resultCode === 200) {
-        localStorage.setItem("accessToken", result.data.accessToken);
-        // url이동이나 기타 액션
+      if (result.data) {
+        navigate("/");
         console.log("로그인 성공");
+        console.log(result.data);
       } else {
-        alert(result.message);
+        alert("아이디 또는 비밀번호 오류입니다");
       }
     } catch (error) {
       console.error("로그인 오류", error);
