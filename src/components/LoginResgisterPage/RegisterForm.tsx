@@ -6,9 +6,15 @@ import {
   itemVariants,
   shakeVariants,
 } from "@/components/LoginResgisterPage/Animation";
+import { checkEmail, registerUser } from "@/apis/userApi";
+import { useNavigate } from "react-router-dom";
 
-const RegisterForm: React.FC = () => {
-  const [email, setEmail] = useState("");
+interface RegisterFormProps {
+  kakaoEmail?: string;
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
+  const [email, setEmail] = useState(kakaoEmail || "");
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
 
@@ -17,18 +23,27 @@ const RegisterForm: React.FC = () => {
   const [checkPasswordError, setCheckPasswordError] = useState("");
 
   const [checkEmailValue, setCheckEmailValue] = useState(false); // 이메일 중복 체크
+  const isKakaoEmail = Boolean(kakaoEmail); //카카오 이메일 여부 확인
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const resetCheckEmailValue = () => {
       setCheckEmailValue(false);
+      if (kakaoEmail) {
+        setCheckEmailValue(true);
+        setEmailError("");
+      }
     };
     resetCheckEmailValue();
-  }, []);
+  }, [kakaoEmail]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 로그인 버튼 핸들러
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let hasError = false;
+
     if (!email) {
       setEmailError("이메일을 입력해주세요.");
       hasError = true;
@@ -66,16 +81,42 @@ const RegisterForm: React.FC = () => {
 
     if (hasError) return;
 
-    if (!hasError) console.log("회원가입성공");
+    try {
+      const result = await registerUser({ email, password });
+      console.log(result.data);
 
-    //회원가입 로직
+      if (result.code == "409") {
+        alert("이미 가입된 회원입니다");
+        navigate("/login");
+      }
+      // 응답코드 받기
+      // if (result.code == "200") {
+      //   alert("회원가입이 완료되었습니다. 가입 한 계정으로 로그인 해주세요.");
+      //   navigate("/login");
+      // }
+    } catch (error) {
+      console.log("회원가입 실패", error);
+    }
   };
 
-  const handleCheckEmail = () => {
-    if (!email) alert("이메일을 입력해주세요.");
-    else {
-      alert("중복확인완료");
-      setCheckEmailValue(true);
+  // 이메일 중복 확인 핸들러
+  const handleCheckEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (isKakaoEmail) {
+      return; //카카오 이메일인 경우 중복확인 버튼 클릭 방지
+    }
+
+    if (!email) {
+      alert("이메일을 입력해주세요.");
+      return;
+    }
+
+    try {
+      const result = await checkEmail({ email });
+      console.log("이메일 중복 확인 프론트", result.data);
+    } catch (error) {
+      console.log("이메일 중복 확인 중 오류!", error);
     }
   };
   return (
@@ -90,12 +131,13 @@ const RegisterForm: React.FC = () => {
         <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
           <div className="flex justify-between">
             <label className="mb-2 ml-4 block text-xs text-black md:text-base">
-              이메일
+              이메일 {isKakaoEmail && <span>&nbsp;(카카오)</span>}
             </label>
             <button
               type="button"
-              className="mb-2 mr-4"
+              className={`mb-2 mr-4 ${isKakaoEmail ? "cursor-not-allowed" : ""}`}
               onClick={handleCheckEmail}
+              disabled={isKakaoEmail}
             >
               중복 확인
             </button>
@@ -106,10 +148,12 @@ const RegisterForm: React.FC = () => {
             placeholder="Email Address"
             className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
               emailError ? "border-2 border-red-400" : ""
-            }`}
+            } ${isKakaoEmail ? "cursor-not-allowed" : ""}`}
             onChange={(e) => {
-              setEmail(e.target.value);
-              if (e.target.value) setEmailError("");
+              if (!isKakaoEmail) {
+                setEmail(e.target.value);
+                if (e.target.value) setEmailError("");
+              }
             }}
           />
           {emailError && (
