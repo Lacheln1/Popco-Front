@@ -5,7 +5,7 @@ import loginPopcoImg from "@/assets/login-popco.svg";
 import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
 import LoginForm from "@/components/LoginResgisterPage/LoginForm";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   pageVariants,
   characterVariants,
