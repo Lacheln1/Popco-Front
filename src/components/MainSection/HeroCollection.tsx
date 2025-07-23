@@ -26,7 +26,7 @@ const HeroCollection = () => {
 
   return (
     <section>
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between overflow-x-hidden px-3 md:flex-row md:gap-0 md:px-6 lg:gap-16 xl:px-0">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between overflow-x-hidden px-3 md:flex-row md:gap-4 md:px-6 lg:gap-16 xl:px-0">
         <div className="flex flex-col gap-6 2xl:w-[550px]">
           <div>
             <div className="text-popco-foot mb-3 text-lg font-bold">HOT</div>
@@ -45,9 +45,9 @@ const HeroCollection = () => {
             View more +
           </button>
         </div>
-        <div className="flex gap-5 px-4 pb-5 pt-12 sm:gap-12 md:p-0">
+        <div className="flex gap-5 px-4 pb-5 pt-12 md:p-0 lg:gap-12">
           <div className="relative">
-            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[70px]">
+            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] lg:text-[70px]">
               1
             </span>
             <HotCollection
@@ -57,7 +57,7 @@ const HeroCollection = () => {
             />
           </div>
           <div className="relative">
-            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[80px] md:text-[70px]">
+            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] lg:text-[70px]">
               2
             </span>
             <HotCollection
@@ -67,7 +67,7 @@ const HeroCollection = () => {
             />
           </div>
           <div className="relative">
-            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[80px] md:text-[70px]">
+            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] lg:text-[70px]">
               3
             </span>
             <HotCollection

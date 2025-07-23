@@ -5,8 +5,8 @@ import HeroPersona from "@/components/MainSection/HeroPersona";
 import HeroPersonaBanner from "@/components/MainSection/HeroPersonaBanner";
 import HeroPopcorithm from "@/components/MainSection/HeroPopcorithm";
 import HeroRanking from "@/components/MainSection/HeroRanking";
-import HeroReview from "@/components/MainSection/HeroReview";
 import HeroTop1 from "@/components/MainSection/HeroTop1";
+import HeroReview from "@/components/MainSection/HeroReview";
 
 const MainPage = () => {
   return (
