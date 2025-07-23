@@ -16,7 +16,7 @@ const RegisterForm: React.FC = () => {
   const [passwordError, setPasswordError] = useState("");
   const [checkPasswordError, setCheckPasswordError] = useState("");
 
-  const [checkEmailValue, setCheckEmailValue] = useState(false); // 이메일 중복 체크
+  const [checkEmailValue, setCheckEmailValue] = useState(false); // 이메일 중복 체크.
 
   useEffect(() => {
     const resetCheckEmailValue = () => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
@@ -18,6 +18,11 @@ import {
 const KAKAO_LOGIN_URL = `${import.meta.env.VITE_KAKAO_LOGIN_URL}`;
 
 const LoginPage: React.FC = () => {
+  useEffect(() => {
+    console.log("VITE_BACK_URL:", import.meta.env.VITE_BACK_URL);
+    console.log("VITE_KAKAO_LOGIN_URL:", import.meta.env.VITE_KAKAO_LOGIN_URL);
+  }, []);
+
   const handleKakaoLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 

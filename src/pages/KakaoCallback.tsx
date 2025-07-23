@@ -37,7 +37,6 @@ const KakaoCallback: React.FC = () => {
         );
 
         console.log("백엔드 응답:", response.data);
-
         // 성공 시 메인 페이지로 이동
         navigate("/");
         console.log("카카오 로그인 성공");
