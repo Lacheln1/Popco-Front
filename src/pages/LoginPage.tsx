@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
 import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
-import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
 import LoginForm from "@/components/LoginResgisterPage/LoginForm";
 import { motion } from "framer-motion";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   pageVariants,
   characterVariants,

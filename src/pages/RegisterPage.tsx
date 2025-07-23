@@ -10,8 +10,6 @@ import {
   characterVariants,
   headerVariants,
   linkVariants,
-  socialContainerVariants,
-  socialButtonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 
 const RegisterPage: React.FC = () => {
