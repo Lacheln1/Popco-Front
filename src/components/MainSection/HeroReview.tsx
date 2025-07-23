@@ -39,9 +39,7 @@ const HeroReview = () => {
     wrapperRefs.current.forEach((wrapper, index) => {
       const section = sectionRefs.current[index];
       if (!wrapper || !section) return;
-
       const distance = wrapper.scrollWidth - section.offsetWidth;
-
       const [startX, endX] =
         index % 2 === 0
           ? [-distance, 0] // 왼 → 오
@@ -68,7 +66,7 @@ const HeroReview = () => {
 
   const renderCardRow = (rowIndex: number) => (
     <section
-      className="overflow-hidden py-6"
+      className="overflow-hidden pb-6"
       ref={(el) => {
         sectionRefs.current[rowIndex] = el as HTMLDivElement | null;
       }}
@@ -80,7 +78,7 @@ const HeroReview = () => {
         }}
       >
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="w-[280px] flex-shrink-0">
+          <div key={i} className="flex-shrink-0">
             <ReviewCard reviewData={reviewData} {...handlers} />
           </div>
         ))}
@@ -89,8 +87,8 @@ const HeroReview = () => {
   );
 
   return (
-    <div className="overflow-x-hidden">
-      <h3 className="gmarket mx-auto px-4 py-8 text-xl leading-snug sm:text-2xl md:text-[28px] xl:w-[1200px]">
+    <div className="bg-footerBlue overflow-x-hidden py-10">
+      <h3 className="gmarket mx-auto px-4 py-8 text-xl leading-snug text-white sm:text-2xl md:text-[28px] xl:w-[1200px]">
         최근 뜨고 있는 리뷰
       </h3>
       {renderCardRow(0)}
