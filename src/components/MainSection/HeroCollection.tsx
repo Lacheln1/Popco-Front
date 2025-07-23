@@ -41,11 +41,11 @@ const HeroCollection = () => {
             <br />
             POPCO에서 당신만의 OTT 컬렉션을 만들어 공유해보세요.
           </div>
-          <button className="bg-popco-foot hidden w-fit rounded-full px-7 py-4 text-base text-white md:block">
+          <button className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block">
             View more +
           </button>
         </div>
-        <div className="flex gap-12 p-12 md:p-0">
+        <div className="flex gap-5 px-4 pb-5 pt-12 sm:gap-12 md:p-0">
           <div className="relative">
             <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[70px]">
               1
@@ -57,7 +57,7 @@ const HeroCollection = () => {
             />
           </div>
           <div className="relative">
-            <span className="absolute -left-4 -top-6 z-10 font-mono text-[60px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[80px] md:text-[70px]">
+            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[80px] md:text-[70px]">
               2
             </span>
             <HotCollection
@@ -67,17 +67,17 @@ const HeroCollection = () => {
             />
           </div>
           <div className="relative">
-            <span className="absolute -left-4 -top-6 z-10 font-mono text-[60px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[80px] md:text-[70px]">
+            <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] sm:text-[80px] md:text-[70px]">
               3
             </span>
             <HotCollection
               {...mockCollection}
               saveCount={123}
               onSaveToggle={() => handleSaveToggle}
-            />{" "}
+            />
           </div>
         </div>
-        <button className="bg-popco-foot w-fit rounded-full px-7 py-4 text-base text-white md:hidden">
+        <button className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden">
           View more +
         </button>
       </div>
