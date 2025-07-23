@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useOutletContext } from "react-router-dom";
 
@@ -94,7 +94,7 @@ const TestPage = () => {
     if (step === 0) {
       const timer = setTimeout(() => {
         setStep(1);
-      }, 2000);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [step, setStep]);
@@ -195,7 +195,6 @@ const TestPage = () => {
                   key={rowIndex}
                   className="flex flex-col items-center gap-4 md:flex-row md:flex-wrap md:justify-center"
                 >
-                  {/* ✨ <img> 태그를 사용하도록 변경합니다. */}
                   {row.map((imageUrl, cardIndex) => (
                     <img
                       key={cardIndex}
@@ -279,8 +278,11 @@ const TestPage = () => {
           </div>
         );
       case 5:
+      /* falls through */
       case 6:
+      /* falls through */
       case 7:
+      /* falls through */
       case 8:
         const currentQuiz = quizData[step];
         return (

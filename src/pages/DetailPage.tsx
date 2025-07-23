@@ -1,18 +1,17 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 // --- 컴포넌트 임포트 ---
-import PopcornRating from "@/components/common/PopcornRating";
 import LikePopcorn from "@/components/popcorn/LikePopcorn";
 import HatePopcorn from "@/components/popcorn/HatePopcorn";
+import CastAndCrew from "@/components/detail/CastAndCrew";
+import TrailerSection from "@/components/detail/TrailerSection";
+import RatingDisplay from "@/components/detail/RatingDisplay";
+import MovieInfo from "@/components/detail/MovieInfo";
+import ActionButtons from "@/components/detail/ActionButtons";
 
-// --- PNG 아이콘 임포트 ---
-import reviewIconUrl from "@/assets/review.png";
-import emptyPlusIconUrl from "@/assets/empty-plus.png";
-import fullPlusIconUrl from "@/assets/full-plus.png";
-import folderIconUrl from "@/assets/folder.png";
 
-// --- 임시 목업 데이터 ---
+// --- UI 개발을 위한 임시 목업 데이터 ---
 const movieData = {
   title: "F1 더 무비",
   country: "미국",
@@ -25,7 +24,7 @@ const movieData = {
   runtime: "150분",
   ott: ["wavve", "netflix"],
   synopsis:
-    "한때 주목받는 유망주였지만 끔찍한 사고로 F1®에서 우승하지 못하고 한순간에 추락한 드라이버 ‘소니 헤이스’(브래드 피트). 그의 오랜 동료인 ‘루벤 세르반테스’(하비에르 바르뎀)에게 레이싱 복귀를 제안받으며 최하위 팀인 APXGP에 합류한다. 그러나 팀 내 떠오르는 천재 드라이버 ‘조슈아 피어스’(댐슨 이드리스)와 ‘소니 헤이스’의 갈등은 날이 갈수록 심해지고, 설상가상 우승을 향한 팀의 전략 또한 번번이 ...",
+    "한때 주목받는 유망주였지만 끔찍한 사고로 F1®에서 우승하지 못하고 한순간에 추락한 드라이버 ‘소니 헤이스’(브래드 피트). 그의 오랜 동료인 ‘루벤 세르반테스’(하비에르 바르뎀)에게 레이싱 복귀를 제안받으며 최하위 팀인 APXGP에 합류한다. 그러나 팀 내 떠오르는 천재 드라이버 ‘조슈아 피어스’(댐슨 이드리스)와 ‘소니 헤이스’의 갈등은 날이 갈수록 심해지고, 설상가상 우승을 향한 팀의 전략 또한 번번이 실패한다. 하지만 ‘소니 헤이스’는 포기하지 않고 팀을 위해 헌신하며, 결국 팀은 F1® 역사상 가장 위대한 드라이버로 거듭난다.",
 };
 
 const ottLogos: { [key: string]: string } = {
@@ -33,10 +32,67 @@ const ottLogos: { [key: string]: string } = {
   netflix: "https://placehold.co/32x32/E50914/ffffff?text=N",
 };
 
+// 출연진/제작진 데이터 (감독 1, 출연진 10명 고정)
+const directorData = {
+  name: "조셉 코신스키",
+  role: "감독",
+  imageUrl: "https://i.pravatar.cc/100?u=director",
+};
+
+const castData = [
+  { name: "브래드 피트", imageUrl: "https://i.pravatar.cc/100?u=bradpitt" },
+  {
+    name: "댐슨 이드리스",
+    imageUrl: "https://i.pravatar.cc/100?u=damsonidris",
+  },
+  { name: "케리 콘던", imageUrl: "https://i.pravatar.cc/100?u=kerrycondon" },
+  {
+    name: "하비에르 바르뎀",
+    imageUrl: "https://i.pravatar.cc/100?u=javierbardem",
+  },
+  {
+    name: "토비어스 멘지스",
+    imageUrl: "https://i.pravatar.cc/100?u=tobiasmenzies",
+  },
+  { name: "사라 나일스", imageUrl: "https://i.pravatar.cc/100?u=sarahniles" },
+  { name: "윌 메릭", imageUrl: "https://i.pravatar.cc/100?u=willmerrick" },
+  {
+    name: "루이스 해밀턴",
+    imageUrl: "https://i.pravatar.cc/100?u=lewishamilton",
+  },
+  { name: "샘 클라플린", imageUrl: "https://i.pravatar.cc/100?u=samclaflin" },
+  { name: "게리 콜", imageUrl: "https://i.pravatar.cc/100?u=garycole" },
+];
+
+const trailerData = [
+  {
+    videoId: "dQw4w9WgXcQ", // 릭롤 영상 (테스트용, 항상 재생 가능)
+    thumbnailUrl: "https://i.ytimg.com/vi/dQw4w9WgXcQ/sddefault.jpg",
+  },
+  {
+    videoId: "eX2qFMC8cFo", // 토이스토리 4 예고편
+    thumbnailUrl: "https://i.ytimg.com/vi/eX2qFMC8cFo/sddefault.jpg",
+  },
+  {
+    videoId: "JfVOs4VSpmA", // 슈퍼마리오 브라더스 무비 예고편
+    thumbnailUrl: "https://i.ytimg.com/vi/JfVOs4VSpmA/sddefault.jpg",
+  },
+  {
+    videoId: "tN1A2mVnrOM", // 엘리멘탈 예고편
+    thumbnailUrl: "https://i.ytimg.com/vi/tN1A2mVnrOM/sddefault.jpg",
+  },
+];
+
 export default function DetailPage() {
   const [isWished, setIsWished] = useState(false);
   const [myCurrentRating, setMyCurrentRating] = useState(movieData.myRating);
 
+  // '보고싶어요' 클릭 핸들러 최적화
+  const handleWishClick = useCallback(() => {
+    setIsWished((prev) => !prev);
+  }, []);
+
+  // 스크롤 애니메이션 Hook
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: scrollRef,
@@ -47,8 +103,8 @@ export default function DetailPage() {
   const bannerY = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
-    <div ref={scrollRef} className="bg-white dark:bg-gray-900">
-      {/* 1. 배너 섹션 (높이 축소) */}
+    <div ref={scrollRef} className="bg-white">
+      {/* 1. 배너 섹션 */}
       <motion.div
         style={{
           backgroundImage: `linear-gradient(to top, rgba(18, 18, 18, 1) 10%, rgba(18, 18, 18, 0.4) 100%), url(${movieData.bannerUrl})`,
@@ -60,238 +116,103 @@ export default function DetailPage() {
       >
         <div className="absolute bottom-10 left-4 flex flex-col items-start text-white md:left-10">
           <h1 className="text-3xl font-black md:text-5xl">{movieData.title}</h1>
-          <p className="text-lg">{movieData.country}</p>
-          <p className="text-lg">{movieData.year}</p>
+          <p className="text-lg">{`${movieData.country} · ${movieData.year}`}</p>
         </div>
       </motion.div>
 
-      {/* 2. 메인 컨텐츠 (배너 제외, max-w-6xl 적용 및 겹침 문제 해결) */}
-      <div className="mx-auto mt-8 max-w-6xl px-4 pb-16">
-        {/* --- 데스크탑 (md 이상) 전용 레이아웃 --- */}
+      {/* 2. 메인 컨텐츠 */}
+      <div className="mx-auto mt-8 max-w-6xl pb-16">
+        {/* --- 데스크톱 (md 이상) --- */}
         <div className="hidden md:block">
-          {/* A. 평가 및 액션 바 */}
-          <div className="mb-8 flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-                  평균
-                </span>
-                <PopcornRating
-                  initialRating={movieData.avgRating}
-                  readonly
-                  size={20}
-                  showScore={true}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
-                  나의
-                </span>
-                <PopcornRating
-                  initialRating={myCurrentRating}
-                  onRatingChange={setMyCurrentRating}
-                  size={20}
-                  showScore={true}
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-4 text-center text-gray-600 dark:text-gray-300">
-                <button
-                  type="button"
-                  className="flex flex-col items-center gap-1 hover:opacity-80"
-                >
-                  <img
-                    src={reviewIconUrl}
-                    alt="리뷰 쓰기"
-                    className="h-5 w-5"
-                  />
-                  <span className="text-xs font-semibold">리뷰</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsWished(!isWished)}
-                  className="flex flex-col items-center gap-1 hover:opacity-80"
-                >
-                  <img
-                    src={isWished ? fullPlusIconUrl : emptyPlusIconUrl}
-                    alt="보고싶어요"
-                    className="h-5 w-5"
-                  />
-                  <span className="text-xs font-semibold">보고싶어요</span>
-                </button>
-                <button
-                  type="button"
-                  className="flex flex-col items-center gap-1 hover:opacity-80"
-                >
-                  <img
-                    src={folderIconUrl}
-                    alt="콜렉션 추가"
-                    className="h-5 w-5"
-                  />
-                  <span className="text-xs font-semibold">콜렉션</span>
-                </button>
-              </div>
-              <div className="flex items-center gap-4 border-l border-gray-300 pl-6 dark:border-gray-600">
-                <LikePopcorn />
-                <HatePopcorn />
-              </div>
-            </div>
-          </div>
-          {/* B. 포스터 및 상세 정보 */}
-          <div className="flex flex-row gap-8">
-            <div className="w-56 flex-shrink-0">
-              <img
-                src={movieData.posterUrl}
-                alt={`${movieData.title} poster`}
-                className="w-full rounded-lg shadow-2xl"
+          <div className="mb-8 flex items-center justify-between border-y border-gray-200 py-4">
+            <div className="flex items-center gap-10">
+              <RatingDisplay
+                label="평균 팝콘"
+                rating={movieData.avgRating}
+                size={36}
+              />
+              <RatingDisplay
+                label="나의 팝콘"
+                rating={myCurrentRating}
+                onRatingChange={setMyCurrentRating}
+                size={36}
               />
             </div>
+            <ActionButtons
+              isWished={isWished}
+              onWishClick={handleWishClick}
+              isDesktop
+            />
+          </div>
+          <div className="flex flex-row items-center gap-12">
+            <img
+              src={movieData.posterUrl}
+              alt={`${movieData.title} poster`}
+              className="w-56 flex-shrink-0 rounded-lg shadow-2xl"
+            />
             <div className="flex-grow">
-              <h2 className="mb-4 text-3xl font-bold dark:text-white">
-                {movieData.title}
-              </h2>
-              <div className="space-y-4 text-gray-800 dark:text-gray-200">
-                <div className="flex">
-                  <p className="w-24 shrink-0 font-semibold">장르</p>
-                  <p>{movieData.genres.join(", ")}</p>
-                </div>
-                <div className="flex">
-                  <p className="w-24 shrink-0 font-semibold">OTT</p>
-                  <div className="flex items-center gap-2">
-                    {movieData.ott.map((o) => (
-                      <img
-                        key={o}
-                        src={ottLogos[o]}
-                        alt={o}
-                        className="h-6 w-6 rounded-md"
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex">
-                  <p className="w-24 shrink-0 font-semibold">상영 시간</p>
-                  <p>{movieData.runtime}</p>
-                </div>
-                <div className="mt-4 flex flex-col">
-                  <p className="mb-2 font-semibold">줄거리</p>
-                  <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                    {movieData.synopsis}
-                  </p>
+              <div className="mb-4 flex items-start justify-between">
+                <h2 className="text-3xl font-bold">{movieData.title}</h2>
+                <div className="ml-4 flex flex-shrink-0 items-center gap-4">
+                  <LikePopcorn />
+                  <HatePopcorn />
                 </div>
               </div>
+              <MovieInfo movie={movieData} ottLogos={ottLogos} isDesktop />
             </div>
           </div>
         </div>
 
-        {/* --- 모바일 (md 미만) 전용 레이아웃 --- */}
-        <div className="flex flex-col md:hidden">
-          <div className="flex flex-row gap-4">
-            <div className="w-1/3 flex-shrink-0">
-              <img
-                src={movieData.posterUrl}
-                alt={`${movieData.title} poster`}
-                className="w-full rounded-lg shadow-2xl"
-              />
-            </div>
-            <div className="flex w-2/3 flex-col items-center justify-start gap-3">
-              <div className="flex w-full justify-around">
+        {/* --- 모바일 (md 미만) --- */}
+        <div className="flex flex-col px-4 md:hidden">
+          <div className="flex flex-row items-center gap-4">
+            <img
+              src={movieData.posterUrl}
+              alt={`${movieData.title} poster`}
+              className="w-1/3 flex-shrink-0 rounded-lg shadow-2xl"
+            />
+            <div className="flex w-2/3 flex-col items-stretch justify-start gap-4">
+              <div className="flex w-full justify-around border-b border-gray-200 pb-2">
                 <LikePopcorn />
                 <HatePopcorn />
               </div>
-              <div className="w-full rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
-                <p className="mb-1 text-center text-xs dark:text-gray-300">
-                  평균 팝콘
-                </p>
-                <PopcornRating
-                  initialRating={movieData.avgRating}
-                  readonly
-                  size={20}
-                  showScore={true}
-                  className="justify-center"
+              <div className="flex items-center justify-center gap-6">
+                <RatingDisplay
+                  label="평균 팝콘"
+                  rating={movieData.avgRating}
+                  size={28}
                 />
               </div>
-              <div className="w-full rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
-                <p className="mb-1 text-center text-xs dark:text-gray-300">
-                  나의 팝콘
-                </p>
-                <PopcornRating
-                  initialRating={myCurrentRating}
+              <div className="flex items-center justify-center gap-6">
+                <RatingDisplay
+                  label="나의 팝콘"
+                  rating={myCurrentRating}
                   onRatingChange={setMyCurrentRating}
-                  size={20}
-                  showScore={true}
-                  className="justify-center"
+                  size={28}
                 />
               </div>
-              <div className="flex w-full items-center justify-around border-t border-gray-200 pt-2 text-center text-gray-600 dark:border-gray-700 dark:text-gray-300">
-                <button
-                  type="button"
-                  className="flex flex-col items-center gap-1 hover:opacity-80"
-                >
-                  <img
-                    src={reviewIconUrl}
-                    alt="리뷰 쓰기"
-                    className="h-5 w-5"
-                  />
-                  <span className="text-xs font-semibold">리뷰</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsWished(!isWished)}
-                  className="flex flex-col items-center gap-1 hover:opacity-80"
-                >
-                  <img
-                    src={isWished ? fullPlusIconUrl : emptyPlusIconUrl}
-                    alt="보고싶어요"
-                    className="h-5 w-5"
-                  />
-                  <span className="text-xs font-semibold">보고싶어요</span>
-                </button>
-                <button
-                  type="button"
-                  className="flex flex-col items-center gap-1 hover:opacity-80"
-                >
-                  <img
-                    src={folderIconUrl}
-                    alt="콜렉션 추가"
-                    className="h-5 w-5"
-                  />
-                  <span className="text-xs font-semibold">콜렉션</span>
-                </button>
+              <div className="border-t border-gray-200 pt-2">
+                <ActionButtons
+                  isWished={isWished}
+                  onWishClick={handleWishClick}
+                />
               </div>
             </div>
           </div>
-          <div className="mt-6 space-y-4 text-gray-800 dark:text-gray-200">
-            <h2 className="text-2xl font-bold dark:text-white">
-              {movieData.title}
-            </h2>
-            <div className="flex">
-              <p className="w-24 shrink-0 font-semibold">장르</p>
-              <p>{movieData.genres.join(", ")}</p>
-            </div>
-            <div className="flex">
-              <p className="w-24 shrink-0 font-semibold">OTT</p>
-              <div className="flex items-center gap-2">
-                {movieData.ott.map((o) => (
-                  <img
-                    key={o}
-                    src={ottLogos[o]}
-                    alt={o}
-                    className="h-6 w-6 rounded-md"
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="flex">
-              <p className="w-24 shrink-0 font-semibold">상영 시간</p>
-              <p>{movieData.runtime}</p>
-            </div>
-            <div className="mt-4 flex flex-col">
-              <p className="mb-2 font-semibold">줄거리</p>
-              <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400">
-                {movieData.synopsis}
-              </p>
-            </div>
+          <div className="mt-10">
+            <h2 className="text-2xl font-bold">{movieData.title}</h2>
+            <MovieInfo movie={movieData} ottLogos={ottLogos} />
+          </div>
+        </div>
+
+        {/* --- 공통 섹션 --- */}
+        <hr className="my-12 border-t border-gray-200" />
+        <div className="flex flex-col-reverse lg:flex-row lg:gap-24">
+          <div className="mt-12 flex justify-center lg:mt-0 lg:w-1/2">
+            <TrailerSection trailers={trailerData} />
+          </div>
+          <div className="lg:w-5/12">
+            <CastAndCrew director={directorData} cast={castData} />
           </div>
         </div>
       </div>
