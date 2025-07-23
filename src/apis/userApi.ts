@@ -27,3 +27,11 @@ export const loginUser = async ({ email, password }: LoginParams) => {
   );
   return response.data;
 };
+
+export const kakaoLogin = async () => {
+  const response = await axios.get(
+    "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=38d47d7dcbf1aeb45f49056620058541&redirect_uri=https://localhost:5173/auth/kakao/login",
+  );
+
+  return response.data;
+};

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
@@ -6,7 +6,7 @@ import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
 import naverLoginBtnImg from "@/assets/naver-login-btn-image.svg";
 import LoginForm from "@/components/LoginResgisterPage/LoginForm";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   pageVariants,
   characterVariants,
@@ -16,7 +16,17 @@ import {
   socialButtonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 
+const KAKAO_LOGIN_URL = `${import.meta.env.VITE_KAKAO_LOGIN_URL}`;
+
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleKakaoLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    window.location.href = KAKAO_LOGIN_URL;
+  };
+
   return (
     <motion.main
       className="pretendard relative h-full bg-[#0F1525]"
@@ -119,6 +129,7 @@ const LoginPage: React.FC = () => {
                     className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors md:px-4 md:py-3 md:text-sm lg:text-base xl:text-xl"
                     variants={socialButtonVariants}
                     whileTap="tap"
+                    onClick={handleKakaoLogin}
                   >
                     <div className="pr-4">
                       <img
