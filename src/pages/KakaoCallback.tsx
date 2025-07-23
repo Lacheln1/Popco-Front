@@ -32,14 +32,15 @@ const KakaoCallback: React.FC = () => {
         console.log("API_URL:", API_URL);
 
         // 백엔드에 코드 전송
-        const response = await axios.post(`${API_URL}/auth/kakao/login`, {
-          code: code,
-        });
+        const response = await axios.post(
+          `${API_URL}/auth/kakao/login?code=${code}`,
+        );
 
         console.log("백엔드 응답:", response.data);
 
         // 성공 시 메인 페이지로 이동
         navigate("/");
+        console.log("카카오 로그인 성공");
       } catch (error) {
         console.error("카카오 로그인 에러 상세:", error);
         if (axios.isAxiosError(error)) {
