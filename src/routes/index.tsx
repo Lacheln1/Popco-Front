@@ -11,6 +11,7 @@ import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
+import KakaoCallback from "@/pages/KakaoCallback";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <RegisterPage />,
+      },
+      {
+        path: "/auth/kakao/login",
+        element: <KakaoCallback />,
       },
     ],
   },
