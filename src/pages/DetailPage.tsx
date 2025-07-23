@@ -9,7 +9,7 @@ import TrailerSection from "@/components/detail/TrailerSection";
 import RatingDisplay from "@/components/detail/RatingDisplay";
 import MovieInfo from "@/components/detail/MovieInfo";
 import ActionButtons from "@/components/detail/ActionButtons";
-
+import ReviewSection from "@/components/detail/ReviewSection";
 
 // --- UI 개발을 위한 임시 목업 데이터 ---
 const movieData = {
@@ -104,7 +104,7 @@ export default function DetailPage() {
 
   return (
     <div ref={scrollRef} className="bg-white">
-      {/* 1. 배너 섹션 */}
+      {/* 배너 섹션 */}
       <motion.div
         style={{
           backgroundImage: `linear-gradient(to top, rgba(18, 18, 18, 1) 10%, rgba(18, 18, 18, 0.4) 100%), url(${movieData.bannerUrl})`,
@@ -120,7 +120,7 @@ export default function DetailPage() {
         </div>
       </motion.div>
 
-      {/* 2. 메인 컨텐츠 */}
+      {/*메인 컨텐츠 */}
       <div className="mx-auto mt-8 max-w-6xl pb-16">
         {/* --- 데스크톱 (md 이상) --- */}
         <div className="hidden md:block">
@@ -214,6 +214,11 @@ export default function DetailPage() {
           <div className="lg:w-5/12">
             <CastAndCrew director={directorData} cast={castData} />
           </div>
+        </div>
+        {/* --- 리뷰 섹션 --- */}
+        <hr className="my-12 border-t border-gray-200" />
+        <div className="px-4 lg:px-0">
+          <ReviewSection />
         </div>
       </div>
     </div>
