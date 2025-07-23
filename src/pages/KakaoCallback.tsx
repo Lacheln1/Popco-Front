@@ -28,25 +28,32 @@ const KakaoCallback: React.FC = () => {
           throw new Error("인증 코드를 받지 못했습니다.");
         }
 
-        console.log("카카오 인증 코드:", code);
-        console.log("API_URL:", API_URL);
-
         // 백엔드에 코드 전송
         const response = await axios.post(
           `${API_URL}/auth/kakao/login?code=${code}`,
         );
-
         console.log("백엔드 응답:", response.data);
 
-        // 성공 시 메인 페이지로 이동
-        navigate("/");
+        const result = response.data;
+
+        if (result.message == "SIGNUP") {
+          navigate("/register", {
+            state: {
+              kakaoEmail: result.data.email,
+            },
+          });
+        }
+
+        if (result.message == "LOGIN") {
+          if (result.data.profileComplete) {
+            navigate("/");
+          } else {
+            navigate("/test");
+          }
+        }
+
         console.log("카카오 로그인 성공");
       } catch (error) {
-        console.error("카카오 로그인 에러 상세:", error);
-        if (axios.isAxiosError(error)) {
-          console.error("Axios 에러 응답:", error.response?.data);
-          console.error("Axios 에러 상태:", error.response?.status);
-        }
         alert(
           `로그인에 실패했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
         );
