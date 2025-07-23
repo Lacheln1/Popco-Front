@@ -9,8 +9,6 @@ import {
   buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 
-const API_URL = import.meta.env.VITE_BACK_URL;
-
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

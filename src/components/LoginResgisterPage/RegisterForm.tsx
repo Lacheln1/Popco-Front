@@ -5,7 +5,6 @@ import {
   formVariants,
   itemVariants,
   shakeVariants,
-  buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 
 const RegisterForm: React.FC = () => {
