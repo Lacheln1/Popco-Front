@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
