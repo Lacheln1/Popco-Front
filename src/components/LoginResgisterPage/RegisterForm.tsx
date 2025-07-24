@@ -114,7 +114,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
 
     try {
       const result = await checkEmail({ email });
-      console.log("이메일 중복 확인 프론트", result.data);
+      if (result.data) {
+        alert("이미 존재하는 이메일입니다");
+      } else {
+        alert("사용 가능한 이메일 입니다!");
+        setCheckEmailValue(true);
+      }
     } catch (error) {
       console.log("이메일 중복 확인 중 오류!", error);
     }

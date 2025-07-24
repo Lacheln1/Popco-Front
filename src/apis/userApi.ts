@@ -55,8 +55,10 @@ export const registerUser = async ({ email, password }: RegisterParams) => {
 };
 
 export const checkEmail = async ({ email }: CheckEmailParams) => {
-  const response = await axios.get(`${API_URL}/users/${email}`);
-  console.log("중복확인", response.data);
+  const response = await axios.get(`${API_URL}/users/email`, {
+    params: { email },
+  });
+  console.log("중복 확인", response.data);
 
   return response.data;
 };
