@@ -191,8 +191,8 @@ export default function DetailPage() {
 
             <div className="col-span-2 flex flex-col justify-between">
               <div className="flex w-full justify-around border-b border-gray-200 pb-2">
-                <LikePopcorn />
-                <HatePopcorn />
+                <LikePopcorn onClick={handleLikeClick} isSelected={isLiked} />
+                <HatePopcorn onClick={handleHateClick} isSelected={isHated} />
               </div>
               <div className="flex flex-grow flex-col justify-center gap-2">
                 <div className="flex items-center justify-center">

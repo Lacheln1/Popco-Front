@@ -9,7 +9,7 @@ interface MovieInfoProps {
   isDesktop?: boolean;
 }
 
-const MovieInfo: React.FC<MovieInfoProps> = ({ movie, ottLogos, isDesktop }) => (
+const MovieInfo: React.FC<MovieInfoProps> = ({ movie, ottLogos }) => (
   <div className="space-y-4 text-sm text-gray-800 md:text-base">
     <div className="flex w-full">
       <div className="w-1/2 md:w-auto">
