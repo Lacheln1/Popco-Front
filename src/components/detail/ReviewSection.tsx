@@ -98,7 +98,7 @@ const initialMockReviews: ReviewData[] = [
 ];
 
 const ReviewSection: React.FC = () => {
-  const [swiper, setSwiper] = useState<SwiperType | null>(null);
+  const [swiper, setSwiper] = useState<SwiperType | undefined>(undefined);
   const [reviews, setReviews] = useState<ReviewData[]>(initialMockReviews);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);

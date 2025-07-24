@@ -138,10 +138,17 @@ const CollectionSection: React.FC = () => {
 
   const handleSlideChange = useCallback((swiperInstance: SwiperType) => {
     setIsBeginning(swiperInstance.isBeginning);
-    setIsEnd(
-      swiperInstance.isEnd ||
-        swiperInstance.slides.length <= swiperInstance.params.slidesPerView,
-    );
+
+    const slidesPerView = swiperInstance.params.slidesPerView;
+    let isEffectivelyEnd = swiperInstance.isEnd;
+
+    // slidesPerView가 숫자일 때만 추가로 마지막 슬라이드인지 체크
+    if (typeof slidesPerView === "number") {
+      isEffectivelyEnd =
+        isEffectivelyEnd || swiperInstance.slides.length <= slidesPerView;
+    }
+
+    setIsEnd(isEffectivelyEnd);
   }, []);
 
   const handleSortChange = useCallback(({ key }: { key: string }) => {

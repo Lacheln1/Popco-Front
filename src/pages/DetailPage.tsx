@@ -88,6 +88,19 @@ export default function DetailPage() {
   const [isWished, setIsWished] = useState(false);
   const [myCurrentRating, setMyCurrentRating] = useState(movieData.myRating);
 
+  const [isLiked, setIsLiked] = useState(false);
+  const [isHated, setIsHated] = useState(false);
+
+  const handleLikeClick = () => {
+    setIsLiked((prev) => !prev);
+    if (isHated) setIsHated(false);
+  };
+
+  const handleHateClick = () => {
+    setIsHated((prev) => !prev);
+    if (isLiked) setIsLiked(false);
+  };
+  
   const handleWishClick = useCallback(() => {
     setIsWished((prev) => !prev);
   }, []);

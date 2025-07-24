@@ -1,7 +1,14 @@
-// RatingDisplay.tsx
-// 평균 팝콘, 나의 팝콘을 표시하는 컴포넌트
-
+import React from "react";
 import PopcornRating from "@/components/common/PopcornRating";
+
+// Props 타입 정의
+interface RatingDisplayProps {
+  label: string;
+  rating: number;
+  size: number;
+  initialRating?: number;
+  onRatingChange?: (rating: number) => void;
+}
 
 const RatingDisplay = ({
   label,
@@ -9,7 +16,7 @@ const RatingDisplay = ({
   initialRating,
   onRatingChange,
   size,
-}) => (
+}: RatingDisplayProps) => (
   <div className="flex items-center gap-4">
     <PopcornRating
       initialRating={initialRating ?? rating}
