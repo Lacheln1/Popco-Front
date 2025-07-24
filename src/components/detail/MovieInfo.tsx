@@ -1,15 +1,15 @@
 interface MovieInfoProps {
   movie: {
-    isDesktop?: boolean;
     genres: string[];
     ott: string[];
     runtime: string;
     synopsis: string;
   };
   ottLogos: { [key: string]: string };
+  isDesktop?: boolean;
 }
 
-const MovieInfo: React.FC<MovieInfoProps> = ({ movie, ottLogos }) => (
+const MovieInfo: React.FC<MovieInfoProps> = ({ movie, ottLogos, isDesktop }) => (
   <div className="space-y-4 text-sm text-gray-800 md:text-base">
     <div className="flex w-full">
       <div className="w-1/2 md:w-auto">

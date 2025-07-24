@@ -101,7 +101,7 @@ const sortMenuItems: MenuProps["items"] = [
 ];
 
 const CollectionSection: React.FC = () => {
-  const [swiper, setSwiper] = useState<SwiperType | null>(null);
+  const [swiper, setSwiper] = useState<SwiperType | undefined>(undefined);
   const [collections, setCollections] = useState<CollectionData[]>([]);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(true);

@@ -100,7 +100,7 @@ export default function DetailPage() {
     setIsHated((prev) => !prev);
     if (isLiked) setIsLiked(false);
   };
-  
+
   const handleWishClick = useCallback(() => {
     setIsWished((prev) => !prev);
   }, []);
@@ -166,8 +166,8 @@ export default function DetailPage() {
               <div className="mb-4 flex items-start justify-between">
                 <h2 className="text-3xl font-bold">{movieData.title}</h2>
                 <div className="ml-4 flex flex-shrink-0 items-center gap-4">
-                  <LikePopcorn />
-                  <HatePopcorn />
+                  <LikePopcorn onClick={handleLikeClick} isSelected={isLiked} />
+                  <HatePopcorn onClick={handleHateClick} isSelected={isHated} />
                 </div>
               </div>
               <MovieInfo movie={movieData} ottLogos={ottLogos} isDesktop />

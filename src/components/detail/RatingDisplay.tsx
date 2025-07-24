@@ -1,4 +1,3 @@
-import React from "react";
 import PopcornRating from "@/components/common/PopcornRating";
 
 // Props 타입 정의

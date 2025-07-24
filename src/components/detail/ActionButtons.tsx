@@ -1,5 +1,3 @@
-import React from "react";
-// --- PNG 아이콘 임포트 ---
 import reviewIconUrl from "@/assets/review.png";
 import emptyPlusIconUrl from "@/assets/empty-plus.png";
 import fullPlusIconUrl from "@/assets/full-plus.png";
