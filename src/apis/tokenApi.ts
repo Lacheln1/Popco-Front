@@ -6,10 +6,6 @@ interface TokenResponse {
   accessToken: string;
 }
 
-interface RefreshTokenCheckResponse {
-  isExpired: boolean;
-}
-
 interface LoginResponse {
   accessToken: string;
 }
@@ -56,27 +52,43 @@ export const refreshTokens = async (): Promise<TokenResponse> => {
     );
     const { accessToken: newAccessToken } = response.data;
 
-    //새로운 액세스 토큰 설정, 리프레쉬 토큰은 서버에서 자동으로 쿠키/헤더로 설정됨
-    setAccessToken(newAccessToken);
+    setAccessToken(newAccessToken); //새로운 액세스 토큰 설정, 리프레쉬 토큰은 서버에서 자동으로 쿠키/헤더로 설정됨
 
     return response.data;
   } catch (error) {
     console.error("토큰 갱신 실패", error);
 
-    // 에러 응답 확인
     if (
       axios.isAxiosError(error) &&
       error.response?.data?.result === "REFRESH_TOKEN_EXPIRED"
     ) {
       console.log("리프레쉬 토큰 만료 - 재로그인 필요");
-      // 토큰 갱신 실패 시 로그아웃 처리
-      setAccessToken(null);
+
+      setAccessToken(null); // 토큰 갱신 실패 시 로그아웃 처리
       throw new Error("REFRESH_TOKEN_EXPIRED");
     }
 
-    // 기타 에러
-    setAccessToken(null);
+    setAccessToken(null); // 기타 에러
     throw error;
+  }
+};
+
+// 페이지 렌더링 시 토큰 상태 확인 및 갱신
+export const validateAndRefreshTokens = async (): Promise<boolean> => {
+  try {
+    await refreshTokens(); // /auth/refresh 토큰 갱신 시도
+    console.log("토큰 갱신 성공");
+    return true;
+  } catch (error) {
+    console.error("토큰 검증 및 갱신 실패:", error);
+
+    if (error instanceof Error && error.message === "REFRESH_TOKEN_EXPIRED") {
+      // 리프레쉬 토큰 만료인 경우
+      console.log("리프레쉬 토큰 만료 - 로그인 페이지로 리다이렉트 필요");
+      return false;
+    }
+
+    return false; // 기타 에러
   }
 };
 
@@ -84,8 +96,7 @@ export const refreshTokens = async (): Promise<TokenResponse> => {
 export const initializeTokens = (loginResonse: LoginResponse): void => {
   const { accessToken: initialAccessToken } = loginResonse;
 
-  //액세스 토큰만 메모리에 저장, 리프레쉬토큰은 서버에서 자동으로 쿠키/헤더로 설정됨
-  setAccessToken(initialAccessToken);
+  setAccessToken(initialAccessToken); //액세스 토큰만 메모리에 저장, 리프레쉬토큰은 서버에서 자동으로 쿠키/헤더로 설정됨
   console.log("토큰 초기 설정 성공");
 };
 
@@ -93,9 +104,9 @@ export const initializeTokens = (loginResonse: LoginResponse): void => {
 export const clearTokens = async (): Promise<void> => {
   try {
     const refreshTken = getRefreshTokenFromCookie();
-    //서버에 로그아웃 요청 (쿠키의 리프레쉬 토큰을 x-refresh-token헤더로 전송)
+
     await axios.post(
-      `${API_URL}/auth/logout`,
+      `${API_URL}/auth/logout`, //서버에 로그아웃 요청 (쿠키의 리프레쉬 토큰을 x-refresh-token헤더로 전송)
       {},
       {
         headers: {
@@ -107,7 +118,6 @@ export const clearTokens = async (): Promise<void> => {
   } catch (error) {
     console.error("로그아웃 요청 실패", error);
   } finally {
-    //메모리의 액세스 토큰 제거, 리프레쉬 토큰은 서버에서 쿠키 삭제 처리
-    setAccessToken(null);
+    setAccessToken(null); //메모리의 액세스 토큰 제거, 리프레쉬 토큰은 서버에서 쿠키 삭제 처리
   }
 };
