@@ -1,16 +1,16 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react"; // useEffect 추가
 import fullPopcornImg from "@/assets/rating-full-popcorn.svg";
 import halfPopcornImg from "@/assets/rating-half-popcorn.svg";
 import emptyPopcornImg from "@/assets/rating-empty-popcorn.svg";
 
 interface PopcornRatingProps {
-  initialRating?: number; //초기 별점 값 (0-5)
-  onRatingChange?: (rating: number) => void; // 별점 변경 시 호출되는 콜백 함수
-  readonly?: boolean; // 읽기 전용 모드 여부
-  size?: number; // 팝콘 아이콘 크기
-  className?: string; // 추가 CSS 클래스명
-  allowHalfRating?: boolean; // 0.5점 단위 클릭 허용 여부
-  showScore?: boolean; // 점수 표시 여부
+  initialRating?: number;
+  onRatingChange?: (rating: number) => void;
+  readonly?: boolean;
+  size?: number;
+  className?: string;
+  allowHalfRating?: boolean;
+  showScore?: boolean;
 }
 
 const PopcornRating: React.FC<PopcornRatingProps> = ({
@@ -23,122 +23,108 @@ const PopcornRating: React.FC<PopcornRatingProps> = ({
   showScore = true,
 }) => {
   const [rating, setRating] = useState<number>(initialRating);
-  const [hoverRating, setHoverRating] = useState<number>(0);
+  // [수정 2] hoverRating 상태 제거
+  // const [hoverRating, setHoverRating] = useState<number>(0);
 
-  const handleRatingChange = useCallback(
-    (newRating: number) => {
-      if (readonly) return;
+  // [수정 2] 마우스 누름 상태(드래그)를 추적하기 위한 상태 추가
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  
+  // prop이 변경될 때 내부 상태도 업데이트 (이전 리팩토링 제안 반영)
+  useEffect(() => {
+    setRating(initialRating);
+  }, [initialRating]);
 
-      setRating(newRating);
-      onRatingChange?.(newRating);
-    },
-    [readonly, onRatingChange],
-  );
-
-  const handleMouseEnter = useCallback(
-    (value: number) => {
-      if (readonly) return;
-      setHoverRating(value);
-    },
-    [readonly],
-  );
-
-  const handleMouseLeave = useCallback(() => {
+  const handleRatingChange = useCallback((newRating: number) => {
     if (readonly) return;
-    setHoverRating(0);
-  }, [readonly]);
+    setRating(newRating);
+    onRatingChange?.(newRating);
+  }, [readonly, onRatingChange]);
+
+  // [수정 2] 마우스를 눌렀을 때 드래그 시작
+  const handleMouseDown = (value: number) => {
+    if (readonly) return;
+    setIsDragging(true);
+    handleRatingChange(value); // 클릭 즉시 반영
+  }
+
+  // [수정 2] 드래그 중 다른 팝콘으로 이동했을 때 점수 변경
+  const handleMouseEnter = useCallback((value: number) => {
+    if (readonly || !isDragging) return; // 드래그 중이 아니면 아무것도 안 함
+    handleRatingChange(value);
+  }, [readonly, isDragging, handleRatingChange]);
+
 
   const getPopcornImage = (index: number, currentRating: number): string => {
     const ratingValue = currentRating - index;
-
     if (ratingValue >= 1) return fullPopcornImg;
     if (ratingValue >= 0.5) return halfPopcornImg;
     return emptyPopcornImg;
   };
 
   const renderPopcorn = (index: number) => {
-    const displayRating = hoverRating || rating;
-    const popcornImage = getPopcornImage(index, displayRating);
+    // [수정 2] hoverRating을 사용하지 않고 rating만 사용
+    const popcornImage = getPopcornImage(index, rating);
 
-    if (allowHalfRating && !readonly) {
-      return (
-        <div key={index} className="relative inline-block cursor-pointer">
-          {/* 왼쪽 절반 (0.5점) */}
-          <button
-            type="button"
-            className="absolute left-0 top-0 z-20 cursor-pointer border-none bg-transparent"
-            onClick={() => handleRatingChange(index + 0.5)}
-            onMouseEnter={() => handleMouseEnter(index + 0.5)}
-            onMouseLeave={handleMouseLeave}
-            style={{
-              width: `${size / 2}px`,
-              height: `${size}px`,
-            }}
-            aria-label={`${index + 0.5}점`}
-          />
-
-          {/* 오른쪽 절반 (1점) */}
-          <button
-            type="button"
-            className="absolute right-0 top-0 z-20 cursor-pointer border-none bg-transparent"
-            style={{
-              width: `${size / 2}px`,
-              height: `${size}px`,
-            }}
-            onClick={() => handleRatingChange(index + 1)}
-            onMouseEnter={() => handleMouseEnter(index + 1)}
-            onMouseLeave={handleMouseLeave}
-            aria-label={`${index + 1}점`}
-          />
-
-          {/* 팝콘 이미지 */}
-          <img
-            src={popcornImage}
-            alt={`${index + 1}번째 팝콘`}
-            className="relative z-10 block transition-all duration-100 ease-in-out"
-            width={size}
-            height={size}
-            draggable={false}
-          />
-        </div>
-      );
-    }
-
-    // 일반 클릭 모드 (1점 단위) 또는 읽기 전용
+    // [수정 1] readonly 여부와 관계없이 동일한 div 래퍼를 사용해 간격 문제 해결
     return (
-      <button
-        key={index}
-        type="button"
-        className={`popcorn-button border-none bg-transparent p-0.5 transition-transform duration-100 ease-in-out ${
-          readonly ? "cursor-default" : "cursor-pointer"
-        }`}
-        onClick={() => handleRatingChange(index + 1)}
+      <div 
+        key={index} 
+        className="relative inline-block"
         onMouseEnter={() => handleMouseEnter(index + 1)}
-        onMouseLeave={handleMouseLeave}
-        disabled={readonly}
-        aria-label={`${index + 1}점`}
+        // 0.5점 단위일 경우를 위해 각 영역에 이벤트 핸들러 배치
       >
+        {!readonly && allowHalfRating && (
+          <>
+            <div 
+              className="absolute left-0 top-0 h-full w-1/2 cursor-pointer z-20"
+              onMouseDown={() => handleMouseDown(index + 0.5)}
+              onMouseEnter={() => handleMouseEnter(index + 0.5)}
+            />
+            <div 
+              className="absolute right-0 top-0 h-full w-1/2 cursor-pointer z-20"
+              onMouseDown={() => handleMouseDown(index + 1)}
+              onMouseEnter={() => handleMouseEnter(index + 1)}
+            />
+          </>
+        )}
+        {!readonly && !allowHalfRating && (
+          <div 
+            className="absolute inset-0 h-full w-full cursor-pointer z-20"
+            onMouseDown={() => handleMouseDown(index + 1)}
+          />
+        )}
         <img
           src={popcornImage}
           alt={`${index + 1}번째 팝콘`}
-          className="block select-none transition-transform duration-100 ease-in-out"
+          className="relative z-10 block select-none"
           width={size}
           height={size}
           draggable={false}
         />
-      </button>
+      </div>
     );
   };
 
-  return (
-    <div className={`user-select-none flex items-center gap-1 ${className}`}>
-      {/* 5개의 팝콘 렌더링 */}
-      {Array.from({ length: 5 }, (_, index) => renderPopcorn(index))}
+  // [수정 2] 마우스를 뗄 때 드래그 종료. 컴포넌트 영역 밖에서 떼도 인식하도록 window에 이벤트 설정
+  useEffect(() => {
+    const handleMouseUp = () => setIsDragging(false);
+    
+    window.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
-      {/* 현재 점수 표시 */}
+  return (
+    <div className={`select-none flex items-center gap-1 ${className}`}>
+      <div className="flex">
+        {Array.from({ length: 5 }, (_, index) => renderPopcorn(index))}
+      </div>
       {showScore && (
-        <span className={`ml-2 min-w-[60px] ${className}`}>
-          {(hoverRating || rating).toFixed(1)}
+        // [수정 2] hoverRating을 사용하지 않음
+        <span className={`ml-2 min-w-[3rem] text-lg font-bold`}>
+          {rating.toFixed(1)}
         </span>
       )}
     </div>
