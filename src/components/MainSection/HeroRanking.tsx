@@ -175,7 +175,7 @@ const HeroRanking = () => {
             <ul className="ml-9 mt-12 grid grid-cols-2 justify-items-center gap-4 sm:mt-6 sm:flex sm:justify-between sm:gap-6">
               {posterData.map(({ rank, id, title }) => (
                 <li key={id} className="relative flex-col items-center *:flex">
-                  <span className="absolute -left-11 -top-6 z-10 text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
+                  <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
                     {rank}
                   </span>
                   <Poster

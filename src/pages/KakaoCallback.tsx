@@ -34,7 +34,6 @@ const KakaoCallback: React.FC = () => {
           `${API_URL}/auth/kakao/login?code=${code}`,
         );
         console.log("백엔드 응답:", response.data);
-
         const result = response.data;
 
         if (result.message == "SIGNUP") {
