@@ -10,6 +10,7 @@ import RatingDisplay from "@/components/detail/RatingDisplay";
 import MovieInfo from "@/components/detail/MovieInfo";
 import ActionButtons from "@/components/detail/ActionButtons";
 import ReviewSection from "@/components/detail/ReviewSection";
+import CollectionSection from "@/components/detail/CollectionSection";
 
 // --- UI 개발을 위한 임시 목업 데이터 ---
 const movieData = {
@@ -66,19 +67,19 @@ const castData = [
 
 const trailerData = [
   {
-    videoId: "dQw4w9WgXcQ", // 릭롤 영상 (테스트용, 항상 재생 가능)
+    videoId: "dQw4w9WgXcQ",
     thumbnailUrl: "https://i.ytimg.com/vi/dQw4w9WgXcQ/sddefault.jpg",
   },
   {
-    videoId: "eX2qFMC8cFo", // 토이스토리 4 예고편
+    videoId: "eX2qFMC8cFo",
     thumbnailUrl: "https://i.ytimg.com/vi/eX2qFMC8cFo/sddefault.jpg",
   },
   {
-    videoId: "JfVOs4VSpmA", // 슈퍼마리오 브라더스 무비 예고편
+    videoId: "JfVOs4VSpmA",
     thumbnailUrl: "https://i.ytimg.com/vi/JfVOs4VSpmA/sddefault.jpg",
   },
   {
-    videoId: "tN1A2mVnrOM", // 엘리멘탈 예고편
+    videoId: "tN1A2mVnrOM",
     thumbnailUrl: "https://i.ytimg.com/vi/tN1A2mVnrOM/sddefault.jpg",
   },
 ];
@@ -87,12 +88,10 @@ export default function DetailPage() {
   const [isWished, setIsWished] = useState(false);
   const [myCurrentRating, setMyCurrentRating] = useState(movieData.myRating);
 
-  // '보고싶어요' 클릭 핸들러 최적화
   const handleWishClick = useCallback(() => {
     setIsWished((prev) => !prev);
   }, []);
 
-  // 스크롤 애니메이션 Hook
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: scrollRef,
@@ -165,31 +164,39 @@ export default function DetailPage() {
 
         {/* --- 모바일 (md 미만) --- */}
         <div className="flex flex-col px-4 md:hidden">
-          <div className="flex flex-row items-center gap-4">
-            <img
-              src={movieData.posterUrl}
-              alt={`${movieData.title} poster`}
-              className="w-1/3 flex-shrink-0 rounded-lg shadow-2xl"
-            />
-            <div className="flex w-2/3 flex-col items-stretch justify-start gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-1 flex flex-col gap-6">
+              <img
+                src={movieData.posterUrl}
+                alt={`${movieData.title} poster`}
+                className="w-full rounded-lg shadow-2xl"
+              />
+              <h2 className="text-center text-lg font-bold">
+                {movieData.title}
+              </h2>
+            </div>
+
+            <div className="col-span-2 flex flex-col justify-between">
               <div className="flex w-full justify-around border-b border-gray-200 pb-2">
                 <LikePopcorn />
                 <HatePopcorn />
               </div>
-              <div className="flex items-center justify-center gap-6">
-                <RatingDisplay
-                  label="평균 팝콘"
-                  rating={movieData.avgRating}
-                  size={28}
-                />
-              </div>
-              <div className="flex items-center justify-center gap-6">
-                <RatingDisplay
-                  label="나의 팝콘"
-                  rating={myCurrentRating}
-                  onRatingChange={setMyCurrentRating}
-                  size={28}
-                />
+              <div className="flex flex-grow flex-col justify-center gap-2">
+                <div className="flex items-center justify-center">
+                  <RatingDisplay
+                    label="평균 팝콘"
+                    rating={movieData.avgRating}
+                    size={28}
+                  />
+                </div>
+                <div className="flex items-center justify-center">
+                  <RatingDisplay
+                    label="나의 팝콘"
+                    rating={myCurrentRating}
+                    onRatingChange={setMyCurrentRating}
+                    size={28}
+                  />
+                </div>
               </div>
               <div className="border-t border-gray-200 pt-2">
                 <ActionButtons
@@ -199,8 +206,8 @@ export default function DetailPage() {
               </div>
             </div>
           </div>
+
           <div className="mt-10">
-            <h2 className="text-2xl font-bold mb-3">{movieData.title}</h2>
             <MovieInfo movie={movieData} ottLogos={ottLogos} />
           </div>
         </div>
@@ -211,6 +218,7 @@ export default function DetailPage() {
           <div className="mt-12 flex justify-center lg:mt-0 lg:w-1/2">
             <TrailerSection trailers={trailerData} />
           </div>
+          <hr className="my-8 border-t border-gray-200 lg:hidden" />
           <div className="lg:w-5/12">
             <CastAndCrew director={directorData} cast={castData} />
           </div>
@@ -219,6 +227,11 @@ export default function DetailPage() {
         <hr className="my-12 border-t border-gray-200" />
         <div className="px-4 lg:px-0">
           <ReviewSection />
+        </div>
+        {/*-- 컬렉션 섹션 (새로 추가) --- */}
+        <hr className="my-12 border-t border-gray-200" />
+        <div className="px-4 lg:px-0">
+          <CollectionSection />
         </div>
       </div>
     </div>

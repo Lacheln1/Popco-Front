@@ -147,7 +147,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         variant="borderless"
         styles={{
           header: {
-            padding: "10px 12px",
+            padding: "4px 12px",
             minHeight: "auto",
           },
           body: { padding: 0 },
@@ -155,7 +155,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       >
         <div
           onClick={onCardClick}
-          className="flex h-full cursor-pointer flex-col gap-y-1 p-2 pt-0 md:gap-y-3 md:p-4"
+          className="flex h-full cursor-pointer flex-col gap-y-1 px-3 md:gap-y-3 md:px-4 md:py-2"
         >
           <div className="flex items-center gap-x-1 md:gap-x-2">
             <div className="flex items-center">{renderPopcorns()}</div>
@@ -176,7 +176,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           </p>
 
           <div
-            className="mt-auto flex cursor-default items-center justify-between border-t border-gray-100 pt-1 md:pt-2"
+            className="mt-auto flex cursor-default items-center justify-between border-t border-gray-100 py-1 md:py-2"
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             <span className="text-xs text-gray-500 md:text-sm">{nickname}</span>

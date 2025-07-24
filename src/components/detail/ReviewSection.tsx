@@ -24,7 +24,6 @@ interface ReviewData {
   hasAlreadyReported: boolean;
 }
 
-// 목업 데이터
 const initialMockReviews: ReviewData[] = [
   // isLiked 상태를 일부러 false로 설정하여 테스트
   {
@@ -100,7 +99,6 @@ const initialMockReviews: ReviewData[] = [
 
 const ReviewSection: React.FC = () => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  // ✅ 리뷰 목록을 state로 관리
   const [reviews, setReviews] = useState<ReviewData[]>(initialMockReviews);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
@@ -142,21 +140,26 @@ const ReviewSection: React.FC = () => {
     <section>
       <h3 className="mb-6 text-2xl font-bold">리뷰</h3>
 
-      {/* 부모 요소에 relative 추가하여 위치 기준점으로 설정 */}
       <div
         className="relative mx-auto mb-10 h-32 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-40"
         style={{ backgroundImage: `url(${AiReviewSummaryBg})` }}
       >
-        <p className="absolute left-[52%] top-[60%] w-full max-w-md -translate-x-1/2 -translate-y-1/2 px-4 text-center text-xs leading-relaxed text-gray-600 md:text-base">
-          리뷰에서 많이 언급된 특징을 AI가 분석했어요.
-          <br />
-          팝코가 요약한 결과, 액션과 연출에 대한 평이 높아요!
-        </p>
+        <div className="absolute left-1/2 top-1/2 ml-3 w-full max-w-md -translate-x-1/2 -translate-y-1/2 text-center">
+          <p className="mt-1 text-[0.6rem] leading-relaxed text-gray-400 md:mb-2 md:text-xs">
+            리뷰에서 많이 언급된 특징을 AI가 분석했어요.
+          </p>
+
+          <p className="text-xs leading-relaxed text-gray-600 md:text-base">
+            팝코가 요약한 결과, 액션과 연출에 대한 평이 높아요!
+            <br />
+            다만 스토리와 캐릭터에 대한 평가는 엇갈리고 있어요.
+          </p>
+        </div>
       </div>
 
       <div className="mb-4 flex items-center justify-between">
         <Dropdown menu={{ items: sortItems }} trigger={["click"]}>
-          <button className="ml-3 mt-3 flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900">
+          <button className="ml-1 mt-3 flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900">
             {sortOrder}
             <svg
               width="16"
@@ -185,10 +188,10 @@ const ReviewSection: React.FC = () => {
 
       <Swiper
         slidesPerView="auto"
-        spaceBetween={16}
+        spaceBetween={28}
         onSwiper={setSwiper}
         onSlideChange={handleSlideChange}
-        className="pb-2"
+        className="pb-2 pl-1"
       >
         {reviews.map((review, index) => (
           <SwiperSlide key={index} className="!h-auto !w-[150px] md:!w-[250px]">
