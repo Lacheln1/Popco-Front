@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.6.1",
+    "@motionone/utils": "^10.18.0",
     "@reduxjs/toolkit": "^2.8.2",
     "@types/node": "^24.0.12",
     "antd": "^5.26.4",

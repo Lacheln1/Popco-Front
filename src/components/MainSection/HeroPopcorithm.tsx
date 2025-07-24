@@ -39,7 +39,7 @@ const HeroPopcorithm = () => {
         POP코리즘
       </h3>
       <section
-        className="relative"
+        className="relative overflow-hidden"
         style={{
           background:
             "linear-gradient(90deg, #25263C 2%, rgba(68,69,90,0.8) 46%)",
