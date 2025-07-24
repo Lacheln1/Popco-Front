@@ -251,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`h-10 rounded-lg px-4 pt-2 font-medium text-black transition-colors hover:bg-gray-100 ${
+                  className={`h-10 rounded-lg px-4 pt-2 font-medium text-black transition-colors hover:bg-gray-100 hover:!text-black ${
                     isActiveItem(item.path)
                       ? "bg-gray-800 text-white hover:bg-gray-700"
                       : ""
