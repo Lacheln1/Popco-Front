@@ -34,13 +34,13 @@ const ListPage = () => {
           title="전체 작품 탐색"
           description="필터와 검색으로 나에게 딱 맞는 작품을 찾아보세요!"
         />
-        <div className="absolute left-1/2 top-3/4 z-10 w-[1200px] -translate-x-1/2 transform rounded-2xl bg-zinc-50 py-4 shadow-[0px_4px_10px_#0000001a]">
+        <div className="absolute left-1/2 top-3/4 z-40 w-[90vw] -translate-x-1/2 transform rounded-2xl bg-zinc-50 pb-4 shadow-[0px_4px_10px_#0000001a] sm:pb-12 sm:pt-4 xl:w-[1200px]">
           <SearchBar onSearch={() => {}} />
           <FilterSection />
         </div>
       </div>
-      <section className="m-auto max-w-[1200px] place-content-center pt-32">
-        <div className="self-right justify-self-end py-4">
+      <section className="m-auto max-w-[1200px] place-content-center pt-24 sm:pt-32">
+        <div className="self-right justify-self-end py-4 pr-4 xl:pr-0">
           <Select
             style={{ width: 80 }}
             onChange={handleChange}

@@ -2,66 +2,130 @@ import { DownOutlined } from "@ant-design/icons";
 import { JSX, useEffect, useState } from "react";
 import { Button, Tag, Space } from "antd";
 import { AnimatePresence } from "framer-motion";
-import { BasicInfo, Personalization, UsageEnvironment } from "./FilterItems";
 import { TAB_LIST, TabKey } from "@/constants/FilterTabs";
+import BasicInfo from "./FilterItems/BasicInfo";
+import UsageEnvironment from "./FilterItems/UsageEnvironment";
+import Personalization from "./FilterItems/Personalization";
+import { parseRatingFromTag, formatRatingTag } from "@/utils/filterUtils";
 
 const FilterSection = () => {
   const [activeKey, setActiveKey] = useState<number | null>(null);
-  const [selectedTags, setSelectedTags] = useState<
-    Record<TabKey, string | null>
-  >({
-    기본정보: null,
-    이용환경: null,
-    개인화: null,
+  const [selectedTags, setSelectedTags] = useState<Record<TabKey, string[]>>({
+    기본정보: [],
+    이용환경: [],
+    개인화: [],
   });
 
-  // 필터 값이 변경될 때 호출
   const handleTagChange = (
-    key: TabKey, // 어떤 필터에서 변경되었는지
-    value: Record<string, string | string[]>, // 필터 전체 값
+    key: TabKey,
+    value: Record<string, string | string[] | [number, number]>,
   ) => {
-    const labels = Object.entries(value)
-      .flatMap(([, v]) => {
-        if (!v || (Array.isArray(v) && v.length === 0)) return [];
-        return Array.isArray(v) ? v : [v];
-      })
-      .join(", ");
-    console.log(value);
-    setSelectedTags((prev) => ({ ...prev, [key]: labels }));
+    const labels = Object.entries(value).flatMap(([k, v]) => {
+      if (v == null) return [];
+      if (Array.isArray(v)) {
+        if (k === "rating" && typeof v[0] === "number") {
+          return [formatRatingTag(v as [number, number])];
+        }
+        return v;
+      }
+      return [v];
+    });
+
+    setSelectedTags((prev) => ({
+      ...prev,
+      [key]: labels,
+    }));
   };
 
-  const handleClose = (key: TabKey) => {
-    // 해당 탭의 필터 값 초기화
-    setSelectedTags((prev) => ({ ...prev, [key]: null }));
+  const handleClose = (tabKey: TabKey, tagValue: string) => {
+    setSelectedTags((prev) => {
+      const updated = prev[tabKey].filter((tag) => tag !== tagValue);
+      return {
+        ...prev,
+        [tabKey]: updated,
+      };
+    });
   };
-
-  useEffect(() => {
-    console.log(selectedTags);
-  }, [selectedTags]);
 
   const filterComponentMap: Record<TabKey, JSX.Element> = {
-    기본정보: <BasicInfo onChange={handleTagChange} key="기본정보" />,
-    이용환경: <UsageEnvironment onChange={handleTagChange} key="이용환경" />,
-    개인화: <Personalization onChange={handleTagChange} key="개인화" />,
+    기본정보: (() => {
+      const tags = selectedTags["기본정보"];
+      const ratingTag = tags.find((v) => v.includes("팝콘 별점"));
+
+      return (
+        <BasicInfo
+          onChange={handleTagChange}
+          value={{
+            type: tags.filter((v) => ["영화", "시리즈/드라마"].includes(v)),
+            genre: tags.filter((v) =>
+              [
+                "액션",
+                "드라마",
+                "가족",
+                "코미디",
+                "로맨스",
+                "공포",
+                "미스터리",
+              ].includes(v),
+            ),
+            rating: ratingTag ? parseRatingFromTag(ratingTag) : undefined,
+          }}
+          key="기본정보"
+        />
+      );
+    })(),
+    이용환경: (
+      <UsageEnvironment
+        onChange={handleTagChange}
+        value={{
+          platform: selectedTags["이용환경"].filter((v) =>
+            [
+              "넷플릭스",
+              "웨이브",
+              "티빙",
+              "디즈니플러스",
+              "쿠팡플레이",
+              "Apple TV",
+              "U+모바일tv",
+            ].includes(v),
+          ),
+        }}
+        key="이용환경"
+      />
+    ),
+    개인화: (
+      <Personalization
+        onChange={handleTagChange}
+        value={{
+          algorithm: selectedTags["개인화"].filter(
+            (v) => v === "나에게 딱인 컨텐츠 !",
+          ),
+          persona: selectedTags["개인화"].filter((v) =>
+            ["액션헌터", "온기수집가", "무서워도 본다맨"].includes(v),
+          ),
+        }}
+        key="개인화"
+      />
+    ),
   };
 
   return (
-    <div className="m-auto mt-8 w-[700px]">
-      <Space style={{ marginBottom: 16 }}>
+    <div className="m-auto mt-6 px-4 md:w-[700px]">
+      <Space className="mb-2 gap-4">
         {TAB_LIST.map((tab, idx) => (
           <Button
+            type="text"
             key={idx}
-            type={activeKey === idx ? "primary" : "default"}
             onClick={() => setActiveKey(activeKey === idx ? null : idx)}
+            className={`rounded-full border border-gray-300 px-2 py-1 text-gray-600 transition-colors duration-200 sm:px-4 ${activeKey === idx ? "bg-popco-hair border-none text-black" : "hover:bg-orange-100 hover:text-orange-500"} `}
           >
             {tab}
             <DownOutlined
-              style={{
-                marginLeft: 4,
-                transition: "transform 0.2s",
-                transform:
-                  activeKey === idx ? "rotate(180deg)" : "rotate(0deg)",
-              }}
+              className={`ml-1 transition-transform duration-200 ${
+                activeKey === idx
+                  ? "rotate-180 text-gray-700"
+                  : "rotate-0 text-gray-400"
+              }`}
             />
           </Button>
         ))}
@@ -70,18 +134,18 @@ const FilterSection = () => {
         {typeof activeKey === "number" &&
           filterComponentMap[TAB_LIST[activeKey]]}
       </AnimatePresence>
-      <div style={{ marginTop: 16 }}>
-        {TAB_LIST.map((key) =>
-          selectedTags[key] ? (
+      <div className="flex w-full flex-wrap break-words">
+        {TAB_LIST.flatMap((tabKey) =>
+          selectedTags[tabKey].map((tagValue) => (
             <Tag
-              key={key}
+              key={`${tabKey}-${tagValue}`}
               closable
-              onClose={() => handleClose(key)}
-              style={{ marginBottom: 8 }}
+              className="mb-2 max-w-full whitespace-normal break-words"
+              onClose={() => handleClose(tabKey, tagValue)}
             >
-              {`${key}: ${selectedTags[key]}`}
+              {`${tagValue}`}
             </Tag>
-          ) : null,
+          )),
         )}
       </div>
     </div>
