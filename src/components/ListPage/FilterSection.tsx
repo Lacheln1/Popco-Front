@@ -25,10 +25,7 @@ const FilterSection = () => {
   const [yearRange, setYearRange] = useState<[number, number]>();
   const [ageRange, setAgeRange] = useState<[number, number]>();
 
-  const handleTagChange = (
-    key: TabKey,
-    value: Record<string, string | string[] | [number, number]>,
-  ) => {
+  const handleTagChange = (key: TabKey, value: Record<string, unknown>) => {
     const labels = Object.entries(value).flatMap(([k, v]) => {
       if (v == null) return [];
 

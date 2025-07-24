@@ -3,17 +3,12 @@ import { Form, Checkbox, Slider } from "antd";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-interface UsageEnvFormValues {
-  platform?: string[];
-  year?: [number, number];
-}
-
 const UsageEnvironment = ({
   onChange,
   value,
 }: {
-  onChange: (key: TabKey, val: UsageEnvFormValues) => void;
-  value?: UsageEnvFormValues;
+  onChange: (key: TabKey, val: Record<string, unknown>) => void;
+  value?: Record<string, unknown>;
 }) => {
   const [form] = Form.useForm();
   const [year, setYear] = useState<[number, number]>([1980, 2025]);
@@ -29,7 +24,7 @@ const UsageEnvironment = ({
     }
   }, [form, value]);
 
-  const handleFormChange = (_: unknown, allValues: UsageEnvFormValues) => {
+  const handleFormChange = (_: unknown, allValues: Record<string, unknown>) => {
     const final = {
       ...allValues,
       year: value?.year, // 슬라이더는 따로 관리됨
