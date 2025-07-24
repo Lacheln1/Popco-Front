@@ -78,7 +78,7 @@ const UsageEnvironment = ({
             step={1}
             value={year}
             onChange={(val) => setYear(val as [number, number])}
-            onAfterChange={(val) => {
+            onChangeComplete={(val) => {
               const current = form.getFieldsValue();
               onChange("이용환경", {
                 ...current,

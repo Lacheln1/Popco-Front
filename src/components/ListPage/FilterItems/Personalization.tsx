@@ -62,7 +62,7 @@ const Personalization = ({
             step={1}
             value={age}
             onChange={(val: number[]) => setAge(val as [number, number])}
-            onAfterChange={(val) => {
+            onChangeComplete={(val) => {
               const current = form.getFieldsValue();
               onChange("개인화", {
                 ...current,

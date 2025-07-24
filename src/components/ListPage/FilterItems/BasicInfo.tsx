@@ -86,7 +86,7 @@ const BasicInfo = ({
             step={0.1}
             value={rating}
             onChange={(val: number[]) => setRating(val as [number, number])}
-            onAfterChange={(val) => {
+            onChangeComplete={(val) => {
               const current = form.getFieldsValue();
               onChange("기본정보", {
                 ...current,
