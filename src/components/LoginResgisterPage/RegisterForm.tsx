@@ -85,15 +85,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
       const result = await registerUser({ email, password });
       console.log(result.data);
 
+      if (result.code == "200") {
+        alert("회원가입이 완료되었습니다. 가입 한 계정으로 로그인 해주세요.");
+        navigate("/login");
+      }
+
       if (result.code == "409") {
         alert("이미 가입된 회원입니다");
         navigate("/login");
       }
-      // 응답코드 받기
-      // if (result.code == "200") {
-      //   alert("회원가입이 완료되었습니다. 가입 한 계정으로 로그인 해주세요.");
-      //   navigate("/login");
-      // }
     } catch (error) {
       console.log("회원가입 실패", error);
     }
