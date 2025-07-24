@@ -74,7 +74,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           key="half"
           src={HalfPopcornIcon}
           alt="Half"
-          className="ml-1 h-4 w-2 md:h-6 md:w-3"
+          className="ml-1 h-3 w-2 md:h-4 md:w-3"
         />,
       );
     }

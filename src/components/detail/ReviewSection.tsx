@@ -147,7 +147,7 @@ const ReviewSection: React.FC = () => {
         className="relative mx-auto mb-10 h-32 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-40"
         style={{ backgroundImage: `url(${AiReviewSummaryBg})` }}
       >
-        <p className="absolute left-[52%] top-[60%] w-full max-w-md -translate-x-1/2 -translate-y-1/2 px-4 text-center text-sm leading-relaxed text-gray-600 md:text-base">
+        <p className="absolute left-[52%] top-[60%] w-full max-w-md -translate-x-1/2 -translate-y-1/2 px-4 text-center text-xs leading-relaxed text-gray-600 md:text-base">
           리뷰에서 많이 언급된 특징을 AI가 분석했어요.
           <br />
           팝코가 요약한 결과, 액션과 연출에 대한 평이 높아요!

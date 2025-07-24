@@ -200,7 +200,7 @@ export default function DetailPage() {
             </div>
           </div>
           <div className="mt-10">
-            <h2 className="text-2xl font-bold">{movieData.title}</h2>
+            <h2 className="text-2xl font-bold mb-3">{movieData.title}</h2>
             <MovieInfo movie={movieData} ottLogos={ottLogos} />
           </div>
         </div>
