@@ -9,6 +9,8 @@ import {
   buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 import { useNavigate } from "react-router-dom";
+import { log } from "console";
+import { getAccessToken, initializeTokens } from "@/apis/tokenApi";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -44,11 +46,18 @@ const LoginForm: React.FC = () => {
       const result = await loginUser({ email, password });
 
       if (result.data) {
-        navigate("/");
-        console.log("로그인 성공");
-        console.log(result.data);
+        initializeTokens(result.data.jwtResponseDto);
+
+        // 선호도 진단 진행 여부 확인
+        if (!result.data.profileComplete) {
+          alert("선호도 진단을 먼저 진행해주세요.");
+          navigate("/test");
+        } else {
+          navigate("/");
+        }
       } else {
         alert("아이디 또는 비밀번호 오류입니다");
+        return;
       }
     } catch (error) {
       console.error("로그인 오류", error);
