@@ -254,3 +254,26 @@ select {
     transform: translateY(0);
   }
 }
+
+/* antd */
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: var(--color-dark-blueblack);
+  border: none;
+}
+
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: var(--color-dark-blueblack) !important;
+}
+
+.ant-checkbox-wrapper:hover .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: var(--color-popcoMainColor) !important;
+}
+
+/* antd slider */
+.ant-slider-track {
+  background-color: var(--color-dark-blueblack) !important;
+}
+
+.ant-checkbox-group {
+  gap: 1rem;
+}
