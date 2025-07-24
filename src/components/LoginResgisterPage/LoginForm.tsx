@@ -9,7 +9,6 @@ import {
   buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 import { useNavigate } from "react-router-dom";
-import { log } from "console";
 import { getAccessToken, initializeTokens } from "@/apis/tokenApi";
 
 const LoginForm: React.FC = () => {

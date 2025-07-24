@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 // --- 컴포넌트 임포트 ---
@@ -11,6 +11,8 @@ import MovieInfo from "@/components/detail/MovieInfo";
 import ActionButtons from "@/components/detail/ActionButtons";
 import ReviewSection from "@/components/detail/ReviewSection";
 import CollectionSection from "@/components/detail/CollectionSection";
+import { validateAndRefreshTokens } from "@/apis/tokenApi";
+import { useNavigate } from "react-router-dom";
 
 // --- UI 개발을 위한 임시 목업 데이터 ---
 const movieData = {
@@ -90,6 +92,24 @@ export default function DetailPage() {
 
   const [isLiked, setIsLiked] = useState(false);
   const [isHated, setIsHated] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const isValid = await validateAndRefreshTokens();
+      if (!isValid) {
+        // 로그인 페이지로 리다이렉트
+        navigate("/login");
+        console.log(isValid);
+      }
+      console.log("상세페이지로 이동함", isValid);
+    };
+
+    checkAuth();
+    console.log("상세페이지로 이동함");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLikeClick = () => {
     setIsLiked((prev) => !prev);
