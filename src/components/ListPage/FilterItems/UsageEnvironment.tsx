@@ -1,14 +1,48 @@
 import { TabKey } from "@/constants/FilterTabs";
 import { Form, Checkbox, Slider } from "antd";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+
+interface UsageEnvFormValues {
+  platform?: string[];
+  year?: [number, number];
+}
 
 const UsageEnvironment = ({
   onChange,
   value,
 }: {
-  onChange: (key: TabKey, val: any) => void;
-  value?: Record<string, any>;
+  onChange: (key: TabKey, val: UsageEnvFormValues) => void;
+  value?: UsageEnvFormValues;
 }) => {
+  const [form] = Form.useForm();
+  const [year, setYear] = useState<[number, number]>([1980, 2025]);
+
+  useEffect(() => {
+    if (value) {
+      form.setFieldsValue({
+        platform: value.platform,
+      });
+      if (Array.isArray(value.year)) {
+        setYear(value.year as [number, number]);
+      }
+    }
+  }, [form, value]);
+
+  const handleFormChange = (_: unknown, allValues: UsageEnvFormValues) => {
+    const final = {
+      ...allValues,
+      year: value?.year, // 슬라이더는 따로 관리됨
+    };
+    onChange("이용환경", final);
+  };
+
+  useEffect(() => {
+    if (value?.year && Array.isArray(value.year)) {
+      setYear(value.year as [number, number]);
+    }
+  }, [value?.year]);
+
   return (
     <motion.div
       key="filter-이용환경"
@@ -21,8 +55,8 @@ const UsageEnvironment = ({
       <Form
         layout="vertical"
         className="p-4"
-        onValuesChange={(_, allValues) => onChange("이용환경", allValues)}
-        initialValues={{ year: [2024, 2025] }}
+        form={form}
+        onValuesChange={handleFormChange}
       >
         <Form.Item
           label={<span className="text-gray-400">플랫폼</span>}
@@ -40,11 +74,24 @@ const UsageEnvironment = ({
             ]}
           />
         </Form.Item>
-        <Form.Item
-          label={<span className="text-gray-400">공개연도</span>}
-          name="year"
-        >
-          <Slider min={1980} max={2025} step={1} range />
+
+        <Form.Item label={<span className="text-gray-400">공개연도</span>}>
+          <Slider
+            range
+            min={1980}
+            max={2025}
+            step={1}
+            value={year}
+            onChange={(val) => setYear(val as [number, number])}
+            onAfterChange={(val) => {
+              const current = form.getFieldsValue();
+              onChange("이용환경", {
+                ...current,
+                year: val as [number, number],
+              });
+            }}
+            tooltip={{ formatter: (val) => `${val}년` }}
+          />
         </Form.Item>
       </Form>
     </motion.div>

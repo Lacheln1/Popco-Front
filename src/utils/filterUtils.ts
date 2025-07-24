@@ -1,6 +1,11 @@
-// utils/filterUtils.ts
 export const formatRatingTag = ([min, max]: [number, number]) =>
-  `팝콘 별점: ${min} ~ ${max}점`;
+  `${min} ~ ${max}점`;
+
+export const formatYearTag = ([min, max]: [number, number]) =>
+  `${min} ~ ${max}년`;
+
+export const formatAgeTag = ([min, max]: [number, number]) =>
+  `${min} ~ ${max}살`;
 
 export const parseRatingFromTag = (
   tag: string,

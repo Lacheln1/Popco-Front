@@ -1,20 +1,29 @@
 import { DownOutlined } from "@ant-design/icons";
-import { JSX, useEffect, useState } from "react";
+import { JSX, useState } from "react";
 import { Button, Tag, Space } from "antd";
 import { AnimatePresence } from "framer-motion";
 import { TAB_LIST, TabKey } from "@/constants/FilterTabs";
 import BasicInfo from "./FilterItems/BasicInfo";
 import UsageEnvironment from "./FilterItems/UsageEnvironment";
 import Personalization from "./FilterItems/Personalization";
-import { parseRatingFromTag, formatRatingTag } from "@/utils/filterUtils";
+import {
+  formatRatingTag,
+  formatAgeTag,
+  formatYearTag,
+} from "@/utils/filterUtils";
 
 const FilterSection = () => {
   const [activeKey, setActiveKey] = useState<number | null>(null);
+
   const [selectedTags, setSelectedTags] = useState<Record<TabKey, string[]>>({
     기본정보: [],
     이용환경: [],
     개인화: [],
   });
+
+  const [ratingRange, setRatingRange] = useState<[number, number]>();
+  const [yearRange, setYearRange] = useState<[number, number]>();
+  const [ageRange, setAgeRange] = useState<[number, number]>();
 
   const handleTagChange = (
     key: TabKey,
@@ -22,11 +31,21 @@ const FilterSection = () => {
   ) => {
     const labels = Object.entries(value).flatMap(([k, v]) => {
       if (v == null) return [];
+
       if (Array.isArray(v)) {
         if (k === "rating" && typeof v[0] === "number") {
+          setRatingRange(v as [number, number]);
           return [formatRatingTag(v as [number, number])];
         }
-        return v;
+        if (k === "year" && typeof v[0] === "number") {
+          setYearRange(v as [number, number]);
+          return [formatYearTag(v as [number, number])];
+        }
+        if (k === "age" && typeof v[0] === "number") {
+          setAgeRange(v as [number, number]);
+          return [formatAgeTag(v as [number, number])];
+        }
+        return (v as string[]).map((item) => String(item));
       }
       return [v];
     });
@@ -40,6 +59,19 @@ const FilterSection = () => {
   const handleClose = (tabKey: TabKey, tagValue: string) => {
     setSelectedTags((prev) => {
       const updated = prev[tabKey].filter((tag) => tag !== tagValue);
+
+      if (tabKey === "기본정보" && tagValue.includes("점")) {
+        setRatingRange(undefined);
+      }
+
+      if (tabKey === "이용환경" && tagValue.includes("년")) {
+        setYearRange(undefined);
+      }
+
+      if (tabKey === "개인화" && tagValue.includes("살")) {
+        setAgeRange(undefined);
+      }
+
       return {
         ...prev,
         [tabKey]: updated,
@@ -50,8 +82,6 @@ const FilterSection = () => {
   const filterComponentMap: Record<TabKey, JSX.Element> = {
     기본정보: (() => {
       const tags = selectedTags["기본정보"];
-      const ratingTag = tags.find((v) => v.includes("팝콘 별점"));
-
       return (
         <BasicInfo
           onChange={handleTagChange}
@@ -68,47 +98,62 @@ const FilterSection = () => {
                 "미스터리",
               ].includes(v),
             ),
-            rating: ratingTag ? parseRatingFromTag(ratingTag) : undefined,
+            rating: ratingRange,
           }}
           key="기본정보"
         />
       );
     })(),
-    이용환경: (
-      <UsageEnvironment
-        onChange={handleTagChange}
-        value={{
-          platform: selectedTags["이용환경"].filter((v) =>
-            [
-              "넷플릭스",
-              "웨이브",
-              "티빙",
-              "디즈니플러스",
-              "쿠팡플레이",
-              "Apple TV",
-              "U+모바일tv",
-            ].includes(v),
-          ),
-        }}
-        key="이용환경"
-      />
-    ),
-    개인화: (
-      <Personalization
-        onChange={handleTagChange}
-        value={{
-          algorithm: selectedTags["개인화"].filter(
-            (v) => v === "나에게 딱인 컨텐츠 !",
-          ),
-          persona: selectedTags["개인화"].filter((v) =>
-            ["액션헌터", "온기수집가", "무서워도 본다맨"].includes(v),
-          ),
-        }}
-        key="개인화"
-      />
-    ),
-  };
 
+    이용환경: (() => {
+      const tags = selectedTags["이용환경"];
+      return (
+        <UsageEnvironment
+          onChange={handleTagChange}
+          value={{
+            platform: tags.filter((v) =>
+              [
+                "넷플릭스",
+                "웨이브",
+                "티빙",
+                "디즈니플러스",
+                "쿠팡플레이",
+                "Apple TV",
+                "U+모바일tv",
+              ].includes(v),
+            ),
+            year: yearRange,
+          }}
+          key="이용환경"
+        />
+      );
+    })(),
+
+    개인화: (() => {
+      const tags = selectedTags["개인화"];
+      return (
+        <Personalization
+          onChange={handleTagChange}
+          value={{
+            algorithm: tags.filter((v) => ["나에게 딱인 컨텐츠 !"].includes(v)),
+            persona: tags.filter((v) =>
+              [
+                "온기수집가",
+                "무서워도 본다맨",
+                "액션헌터",
+                "코미디",
+                "로맨스",
+                "공포",
+                "미스터리",
+              ].includes(v),
+            ),
+            age: ageRange,
+          }}
+          key="개인화"
+        />
+      );
+    })(),
+  };
   return (
     <div className="m-auto mt-6 px-4 md:w-[700px]">
       <Space className="mb-2 gap-4">
@@ -117,7 +162,11 @@ const FilterSection = () => {
             type="text"
             key={idx}
             onClick={() => setActiveKey(activeKey === idx ? null : idx)}
-            className={`rounded-full border border-gray-300 px-2 py-1 text-gray-600 transition-colors duration-200 sm:px-4 ${activeKey === idx ? "bg-popco-hair border-none text-black" : "hover:bg-orange-100 hover:text-orange-500"} `}
+            className={`rounded-full border border-gray-300 px-2 py-1 text-gray-600 transition-colors duration-200 sm:px-4 ${
+              activeKey === idx
+                ? "bg-popco-hair border-none text-black"
+                : "hover:bg-orange-100 hover:text-orange-500"
+            }`}
           >
             {tab}
             <DownOutlined
@@ -130,10 +179,12 @@ const FilterSection = () => {
           </Button>
         ))}
       </Space>
+
       <AnimatePresence initial={false}>
         {typeof activeKey === "number" &&
           filterComponentMap[TAB_LIST[activeKey]]}
       </AnimatePresence>
+
       <div className="flex w-full flex-wrap break-words">
         {TAB_LIST.flatMap((tabKey) =>
           selectedTags[tabKey].map((tagValue) => (
@@ -143,7 +194,7 @@ const FilterSection = () => {
               className="mb-2 max-w-full whitespace-normal break-words"
               onClose={() => handleClose(tabKey, tagValue)}
             >
-              {`${tagValue}`}
+              {tagValue}
             </Tag>
           )),
         )}
