@@ -3,21 +3,21 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
 import { Navigation } from "swiper/modules";
 
-// Swiper 기본 스타일 import
 import "swiper/css";
 import "swiper/css/navigation";
 
 import PageLayout from "@/layout/PageLayout";
 import SectionHeader from "@/components/common/SectionHeader";
-import HotCollection from "@/components/common/HotCollection";
-import NewCollection from "@/components/common/NewCollection";
-import { SwiperNavigation } from "@/components/common/SwiperButton"; // 스와이퍼 버튼 import
+import HotCollection, {
+  HotCollectionProps,
+} from "@/components/common/HotCollection";
+import NewCollection, {
+  NewCollectionProps,
+} from "@/components/common/NewCollection";
+import { SwiperNavigation } from "@/components/common/SwiperButton";
 import { useSwiperResize } from "@/hooks/useSwiperResize";
 
-import { HotCollectionProps } from "@/components/common/HotCollection";
-import { NewCollectionProps } from "@/components/common/NewCollection";
-
-const mockHotCollections: HotCollectionProps[] = [
+const mockHotCollections: Omit<HotCollectionProps, "onSaveToggle">[] = [
   {
     collectionId: 101,
     title: "이번 주 저장수 TOP 4",
@@ -96,7 +96,7 @@ const mockHotCollections: HotCollectionProps[] = [
     onSaveToggle: () => {},
   },
 ];
-const mockNewCollections: NewCollectionProps[] = [
+const mockNewCollections: Omit<NewCollectionProps, "onSaveToggle">[] = [
   {
     collectionId: 201,
     userNickname: "영화광",
@@ -186,8 +186,8 @@ const mockNewCollections: NewCollectionProps[] = [
 ];
 
 const CollectionPage: React.FC = () => {
-  const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const { isBeginning, isEnd } = useSwiperResize(swiper); // 여기만 바뀜
+  const [swiper, setSwiper] = useState<SwiperType>();
+  const { isBeginning, isEnd } = useSwiperResize(swiper);
 
   const [hotCollections, setHotCollections] = useState<HotCollectionProps[]>(
     [],
@@ -196,12 +196,40 @@ const CollectionPage: React.FC = () => {
     [],
   );
 
-  useEffect(() => {
-    setHotCollections(mockHotCollections);
-    setNewCollections(mockNewCollections);
-  }, [swiper]);
+  // '저장' 상태를 토글하는 함수
+  const handleSaveToggle = useCallback(
+    (collectionId: number, type: "hot" | "new") => {
+      if (type === "hot") {
+        setHotCollections((prev) =>
+          prev.map((c) =>
+            c.collectionId === collectionId ? { ...c, isSaved: !c.isSaved } : c,
+          ),
+        );
+      } else if (type === "new") {
+        setNewCollections((prev) =>
+          prev.map((c) =>
+            c.collectionId === collectionId ? { ...c, isSaved: !c.isSaved } : c,
+          ),
+        );
+      }
+    },
+    [],
+  );
 
-  const handleSaveToggle = useCallback(/* ... */);
+  useEffect(() => {
+    setHotCollections(
+      mockHotCollections.map((c) => ({
+        ...c,
+        onSaveToggle: (id) => handleSaveToggle(id, "hot"),
+      })),
+    );
+    setNewCollections(
+      mockNewCollections.map((c) => ({
+        ...c,
+        onSaveToggle: (id) => handleSaveToggle(id, "new"),
+      })),
+    );
+  }, [handleSaveToggle]);
 
   return (
     <PageLayout
@@ -235,12 +263,7 @@ const CollectionPage: React.FC = () => {
                   key={collection.collectionId}
                   className="flex w-auto items-center pt-12"
                 >
-                  <HotCollection
-                    {...collection}
-                    onSaveToggle={() =>
-                      handleSaveToggle(collection.collectionId, "hot")
-                    }
-                  />
+                  <HotCollection {...collection} />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -260,13 +283,7 @@ const CollectionPage: React.FC = () => {
         </div>
         <div className="mt-10 grid grid-cols-1 justify-items-center gap-x-6 gap-y-8 lg:grid-cols-2">
           {newCollections.map((collection) => (
-            <NewCollection
-              {...collection}
-              key={collection.collectionId}
-              onSaveToggle={() =>
-                handleSaveToggle(collection.collectionId, "new")
-              }
-            />
+            <NewCollection {...collection} key={collection.collectionId} />
           ))}
         </div>
       </section>

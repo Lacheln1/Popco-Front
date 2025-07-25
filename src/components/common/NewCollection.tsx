@@ -4,13 +4,12 @@ import EmptySaveIcon from "../../assets/empty-save.svg";
 import FullSaveIcon from "../../assets/full-save.svg";
 import { CollectionBase } from "../../types/collection";
 
-interface NewCollectionProps extends CollectionBase {
+export interface NewCollectionProps extends CollectionBase {
   userNickname: string;
   description: string;
   totalCount: number;
   isSaved: boolean;
-  href: string;
-  onSaveToggle: (collectionId: number, newSavedState: boolean) => void;
+  onSaveToggle: (collectionId: number) => void; // 인자를 collectionId만 받도록 통일
 }
 
 const NewCollection: React.FC<NewCollectionProps> = React.memo(
@@ -30,7 +29,7 @@ const NewCollection: React.FC<NewCollectionProps> = React.memo(
     const handleSaveToggle = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSaveToggle(collectionId, !isSaved);
+      onSaveToggle(collectionId); // collectionId만 전달
     };
 
     const displayPosters = Array.from({ length: 6 }).map(

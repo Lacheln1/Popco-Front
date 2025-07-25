@@ -7,7 +7,7 @@ import { CollectionBase } from "@/types/collection";
 export interface HotCollectionProps extends CollectionBase {
   saveCount: number;
   isSaved: boolean;
-  onSaveToggle: (collectionId: number) => void;
+  onSaveToggle: (collectionId: number) => void; // 인자를 collectionId만 받도록 통일
 }
 
 const HotCollection: React.FC<HotCollectionProps> = React.memo(
@@ -23,10 +23,9 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
     const handleSaveToggle = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSaveToggle(collectionId);
+      onSaveToggle(collectionId); // collectionId만 전달
     };
 
-    // 최대 4개의 포스터 슬롯 생성 (빈 슬롯은 null로 채움)
     const displayPosters = Array.from(
       { length: 4 },
       (_, index) => posters[index] || null,
@@ -34,12 +33,10 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
 
     return (
       <div className="w-[180px] shrink-0 md:w-[235px]">
-        {/* 메인 컬렉션 카드 */}
         <Link
           to={href}
           className="group relative block aspect-square w-full rounded-xl bg-zinc-200 p-1.5 shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl md:rounded-2xl md:p-2"
         >
-          {/* 포스터 그리드 */}
           <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-1 md:gap-1.5">
             {displayPosters.map((posterUrl, index) => (
               <div
@@ -60,7 +57,6 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
             ))}
           </div>
 
-          {/* 저장 수 배지 */}
           <div className="absolute -top-4 right-2 h-12 w-12 drop-shadow-md md:-top-5 md:h-[54px] md:w-[54px]">
             <img
               src={FullSaveIcon}
@@ -75,7 +71,6 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
           </div>
         </Link>
 
-        {/* 제목과 저장 버튼 */}
         <div className="mt-3 flex items-start justify-between gap-2">
           <Link to={href} className="group min-w-0 flex-1">
             <h3 className="line-clamp-2 pl-1 text-base font-bold text-gray-800 transition-colors group-hover:text-black">
