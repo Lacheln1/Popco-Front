@@ -10,7 +10,7 @@ import HeroReview from "@/components/MainSection/HeroReview";
 import useAuthCheck from "@/hooks/useAuthCheck";
 
 const MainPage = () => {
-  const check = useAuthCheck();
+  useAuthCheck();
 
   return (
     <div className="flex flex-col gap-32 overflow-x-hidden pb-20 sm:gap-40 md:pb-32">

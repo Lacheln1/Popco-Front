@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 import MovieScreen from "../components/common/MovieScreen";
 import ArrowNext from "../assets/arrow-next.svg?react";
@@ -24,7 +24,6 @@ import PosterInTest from "../components/test/PosterInTest";
 import QuizStepLayout from "../components/test/QuizStepLayout";
 import { Input, App, DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
-import { getAccessToken, validateAndRefreshTokens } from "@/apis/tokenApi";
 import useAuthCheck from "@/hooks/useAuthCheck";
 
 //  임시 영화 데이터 (40개)
