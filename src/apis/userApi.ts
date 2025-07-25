@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //백엔드 url 넣어야함
-const API_URL = `${import.meta.env.VITE_BACK_URL}`;
+const API_URL = "/api/client";
 
 interface LoginParams {
   email: string;
@@ -47,9 +47,6 @@ export const registerUser = async ({ email, password }: RegisterParams) => {
       withCredentials: true,
     },
   );
-  console.log("보낸 이메일:", email);
-  console.log("보낸 비번", password);
-  console.log(response.data.code);
 
   return response.data;
 };
@@ -58,7 +55,6 @@ export const checkEmail = async ({ email }: CheckEmailParams) => {
   const response = await axios.get(`${API_URL}/users/email`, {
     params: { email },
   });
-  console.log("중복 확인", response.data);
 
   return response.data;
 };
