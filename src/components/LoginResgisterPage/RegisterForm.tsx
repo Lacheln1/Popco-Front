@@ -83,7 +83,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
 
     try {
       const result = await registerUser({ email, password });
-      console.log(result.data);
 
       if (result.code == "200") {
         alert("회원가입이 완료되었습니다. 가입 한 계정으로 로그인 해주세요.");
@@ -157,6 +156,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
             onChange={(e) => {
               if (!isKakaoEmail) {
                 setEmail(e.target.value);
+                setCheckEmailValue(false);
                 if (e.target.value) setEmailError("");
               }
             }}

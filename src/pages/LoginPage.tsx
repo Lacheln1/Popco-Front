@@ -18,11 +18,6 @@ import {
 const KAKAO_LOGIN_URL = `${import.meta.env.VITE_KAKAO_LOGIN_URL}`;
 
 const LoginPage: React.FC = () => {
-  useEffect(() => {
-    console.log("VITE_BACK_URL:", import.meta.env.VITE_BACK_URL);
-    console.log("VITE_KAKAO_LOGIN_URL:", import.meta.env.VITE_KAKAO_LOGIN_URL);
-  }, []);
-
   const handleKakaoLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 

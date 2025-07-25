@@ -11,9 +11,6 @@ const KakaoCallback: React.FC = () => {
   useEffect(() => {
     const handleKakaoCallback = async () => {
       try {
-        console.log("현재 URL:", window.location.href);
-        console.log("location.search:", location.search);
-
         const urlParams = new URLSearchParams(location.search);
         const code = urlParams.get("code");
         const error = urlParams.get("error");
@@ -32,7 +29,6 @@ const KakaoCallback: React.FC = () => {
         const response = await axios.post(
           `${API_URL}/auth/kakao/login?code=${code}`,
         );
-        console.log("백엔드 응답:", response.data);
         const result = response.data;
 
         if (result.message == "SIGNUP") {
@@ -50,8 +46,6 @@ const KakaoCallback: React.FC = () => {
             navigate("/test");
           }
         }
-
-        console.log("카카오 로그인 성공");
       } catch (error) {
         alert(
           `로그인에 실패했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
