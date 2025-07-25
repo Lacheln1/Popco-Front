@@ -62,8 +62,8 @@ const HeroRanking = () => {
   const { data = [], isLoading } = useContentsRanking(selected);
   const first = data[0];
   const contentsRank = data.slice(1);
+  if (isLoading) <div>Loading</div>;
 
-  console.log(data);
   return (
     <div className="mx-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-0">
       <h3 className="gmarket flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:text-[28px]">

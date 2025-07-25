@@ -14,12 +14,12 @@ const HeroPopcorithm = () => {
   const [isEnd, setIsEnd] = useState(false);
 
   const posterData = [
-    { id: "1", title: "케이팝 데몬 헌터스" },
-    { id: "2", title: "서초동" },
-    { id: "3", title: "쥬라기 월드 : 새로운 시작" },
-    { id: "4", title: "서초동" },
-    { id: "5", title: "다섯번째 포스터" },
-    { id: "6", title: "여섯번째 포스터" },
+    { id: 1, title: "케이팝 데몬 헌터스" },
+    { id: 2, title: "서초동" },
+    { id: 3, title: "쥬라기 월드 : 새로운 시작" },
+    { id: 4, title: "서초동" },
+    { id: 5, title: "다섯번째 포스터" },
+    { id: 6, title: "여섯번째 포스터" },
   ];
 
   const handleSwiperInit = (swiper: SwiperType) => {
