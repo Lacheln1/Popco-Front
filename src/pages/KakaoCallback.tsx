@@ -1,4 +1,3 @@
-import { getAccessToken, initializeTokens } from "@/apis/tokenApi";
 import axios from "axios";
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -45,8 +44,6 @@ const KakaoCallback: React.FC = () => {
         }
 
         if (result.message == "LOGIN") {
-          initializeTokens(result.data.jwtResponseDto);
-
           if (result.data.profileComplete) {
             navigate("/");
           } else {

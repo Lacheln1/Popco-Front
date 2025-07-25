@@ -9,7 +9,6 @@ import {
   buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 import { useNavigate } from "react-router-dom";
-import { getAccessToken, initializeTokens } from "@/apis/tokenApi";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -45,7 +44,7 @@ const LoginForm: React.FC = () => {
       const result = await loginUser({ email, password });
 
       if (result.data) {
-        initializeTokens(result.data.jwtResponseDto);
+        console.log(result.data);
 
         // 선호도 진단 진행 여부 확인
         if (!result.data.profileComplete) {

@@ -25,6 +25,7 @@ import QuizStepLayout from "../components/test/QuizStepLayout";
 import { Input, App, DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import { getAccessToken, validateAndRefreshTokens } from "@/apis/tokenApi";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 //  임시 영화 데이터 (40개)
 const tempMovieData = Array.from({ length: 40 }, (_, i) => ({
@@ -79,6 +80,7 @@ const quizData = {
 };
 
 const TestPage = () => {
+  useAuthCheck();
   const { message } = App.useApp();
   const {
     step,
@@ -90,39 +92,6 @@ const TestPage = () => {
   const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
   const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: number]: number }>({});
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      console.log("=== 메인페이지 토큰 검증 시작 ===");
-
-      // 현재 액세스 토큰 확인
-      const currentToken = getAccessToken();
-      console.log("현재 메모리의 액세스 토큰:", currentToken);
-
-      // 액세스 토큰이 없을 때만 갱신 시도
-      if (!currentToken) {
-        console.log("액세스 토큰이 없음 - 갱신 시도");
-
-        try {
-          const isValid = await validateAndRefreshTokens();
-          if (!isValid) {
-            console.log("토큰 갱신 실패 - 로그인 페이지로 이동");
-            navigate("/login");
-          }
-        } catch (error) {
-          console.error("토큰 검증 중 에러:", error);
-          navigate("/login");
-        }
-      } else {
-        console.log("액세스 토큰이 이미 있음 - 갱신 생략");
-      }
-    };
-
-    checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     if (step === 0) {
