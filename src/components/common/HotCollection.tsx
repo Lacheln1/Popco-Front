@@ -1,101 +1,106 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import EmptySaveIcon from "../../assets/empty-save.svg";
-import FullSaveIcon from "../../assets/full-save.svg";
-import { CollectionBase } from "../../types/collection";
+import EmptySaveIcon from "@/assets/empty-save.svg";
+import FullSaveIcon from "@/assets/full-save.svg";
+import { CollectionBase } from "@/types/collection";
 
-interface HotCollectionProps extends CollectionBase {
+export interface HotCollectionProps extends CollectionBase {
   saveCount: number;
+  isSaved: boolean;
+  onSaveToggle: (collectionId: number) => void;
 }
 
-const HotCollection: React.FC<HotCollectionProps> = ({
-  collectionId,
-  title,
-  posters,
-  saveCount,
-  isInitiallySaved,
-  href,
-  onSaveToggle,
-}) => {
-  const [isSaved, setIsSaved] = useState(isInitiallySaved);
+const HotCollection: React.FC<HotCollectionProps> = React.memo(
+  ({
+    collectionId,
+    title,
+    posters,
+    saveCount,
+    isSaved,
+    href,
+    onSaveToggle,
+  }) => {
+    const handleSaveToggle = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onSaveToggle(collectionId);
+    };
 
-  const handleSaveToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const newSavedState = !isSaved;
-    setIsSaved(newSavedState);
-    onSaveToggle?.(collectionId, newSavedState);
-  };
+    // 최대 4개의 포스터 슬롯 생성 (빈 슬롯은 null로 채움)
+    const displayPosters = Array.from(
+      { length: 4 },
+      (_, index) => posters[index] || null,
+    );
 
-  const displayPosters = new Array(4).fill(null);
-  posters.slice(0, 4).forEach((poster, index) => {
-    displayPosters[index] = poster;
-  });
-
-  return (
-    // 포스터 4개 담는 콜렉션 카드
-    <div className="w-full max-w-[235px]">
-      <Link
-        to={href}
-        className="group relative block aspect-square w-full rounded-xl bg-zinc-200 p-1.5 shadow-lg transition-shadow hover:shadow-xl md:rounded-2xl md:p-2"
-      >
-        <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-1 md:gap-1.5">
-          {displayPosters.map((posterUrl, index) => (
-            <div
-              key={index}
-              className="h-full w-full overflow-hidden rounded-xl bg-zinc-400 md:rounded-2xl"
-            >
-              {posterUrl ? (
-                <img
-                  src={posterUrl}
-                  alt={`${title} poster ${index + 1}`}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="h-full w-full bg-zinc-400" />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* 저장 총 개수 */}
-        <div className="absolute right-[8px] top-[-20px] h-[48px] w-[48px] md:h-[54px] md:w-[54px]">
-          <img
-            src={FullSaveIcon}
-            alt="Save count badge"
-            className="h-full w-full drop-shadow-md"
-          />
-          <div className="absolute inset-0 flex items-center justify-center pb-2 md:pb-2">
-            <span className="text-sunglasses-red text-sm font-bold md:text-base">
-              {saveCount}
-            </span>
+    return (
+      <div className="w-[180px] shrink-0 md:w-[235px]">
+        {/* 메인 컬렉션 카드 */}
+        <Link
+          to={href}
+          className="group relative block aspect-square w-full rounded-xl bg-zinc-200 p-1.5 shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl md:rounded-2xl md:p-2"
+        >
+          {/* 포스터 그리드 */}
+          <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-1 md:gap-1.5">
+            {displayPosters.map((posterUrl, index) => (
+              <div
+                key={index}
+                className="h-full w-full overflow-hidden rounded-lg bg-zinc-400 md:rounded-xl"
+              >
+                {posterUrl ? (
+                  <img
+                    src={posterUrl}
+                    alt={`${title} poster ${index + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-zinc-300" />
+                )}
+              </div>
+            ))}
           </div>
-        </div>
-      </Link>
 
-      {/* 제목과 찜 버튼 */}
-      <div className="mt-2 flex items-center justify-between">
-        <Link to={href} className="group min-w-0">
-          <h3 className="group-hover max-w-[160px] truncate pl-1 text-base font-bold">
-            {title}
-          </h3>
+          {/* 저장 수 배지 */}
+          <div className="absolute -top-4 right-2 h-12 w-12 drop-shadow-md md:-top-5 md:h-[54px] md:w-[54px]">
+            <img
+              src={FullSaveIcon}
+              alt="Save count badge"
+              className="h-full w-full"
+            />
+            <div className="absolute inset-0 flex items-center justify-center pb-1 md:pb-2">
+              <span className="text-sunglasses-red text-sm font-bold md:text-base">
+                {saveCount > 999 ? "999+" : saveCount}
+              </span>
+            </div>
+          </div>
         </Link>
 
-        <button
-          type="button"
-          onClick={handleSaveToggle}
-          aria-label="찜하기"
-          className="z-10 flex-shrink-0 p-1"
-        >
-          <img
-            src={isSaved ? FullSaveIcon : EmptySaveIcon}
-            alt={isSaved ? "찜 된 상태" : "찜 안 된 상태"}
-            className="h-6 w-6"
-          />
-        </button>
+        {/* 제목과 저장 버튼 */}
+        <div className="mt-3 flex items-start justify-between gap-2">
+          <Link to={href} className="group min-w-0 flex-1">
+            <h3 className="line-clamp-2 pl-1 text-base font-bold text-gray-800 transition-colors group-hover:text-black">
+              {title}
+            </h3>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleSaveToggle}
+            aria-label={isSaved ? "찜 해제" : "찜하기"}
+            className="flex-shrink-0 rounded-full p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <img
+              src={isSaved ? FullSaveIcon : EmptySaveIcon}
+              alt={isSaved ? "찜 된 상태" : "찜 안 된 상태"}
+              className="h-6 w-6"
+            />
+          </button>
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  },
+);
+
+HotCollection.displayName = "HotCollection";
 
 export default HotCollection;
