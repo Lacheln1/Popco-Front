@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Card, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 
-import MenuIcon from "../../assets/menu-3dot.svg";
-import EmptyLikeIcon from "../../assets/empty-like.png";
-import FullLikeIcon from "../../assets/full-like.png";
-import FullPopcornIcon from "../../assets/full-popcorn.svg";
-import HalfPopcornIcon from "../../assets/half-popcorn.svg";
+import MenuIcon from "@/assets/menu-3dot.svg";
+import EmptyLikeIcon from "@/assets/empty-like.png";
+import FullLikeIcon from "@/assets/full-like.png";
+import FullPopcornIcon from "@/assets/full-popcorn.svg";
+import HalfPopcornIcon from "@/assets/half-popcorn.svg";
 
 interface ReviewData {
   movieTitle: string;
@@ -64,7 +64,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           key={`full-${i}`}
           src={FullPopcornIcon}
           alt="Full"
-          className="h-6 w-6"
+          className="h-4 w-4 md:h-6 md:w-6"
         />,
       );
     }
@@ -74,7 +74,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           key="half"
           src={HalfPopcornIcon}
           alt="Half"
-          className="ml-1 h-6 w-2"
+          className="ml-1 h-3 w-2 md:h-4 md:w-3"
         />,
       );
     }
@@ -137,7 +137,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
 
   return (
     <div
-      className="w-[150px] rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl md:w-[250px]"
+      className="flex h-full w-[150px] flex-col rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl md:w-[250px]"
       onClick={onCardClick}
     >
       <Card
@@ -147,7 +147,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         variant="borderless"
         styles={{
           header: {
-            padding: "10px 12px",
+            padding: "4px 12px",
             minHeight: "auto",
           },
           body: { padding: 0 },
@@ -155,7 +155,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
       >
         <div
           onClick={onCardClick}
-          className="flex cursor-pointer flex-col gap-y-1 p-2 pt-0 md:gap-y-3 md:p-4"
+          className="flex h-full cursor-pointer flex-col gap-y-1 px-3 md:gap-y-3 md:px-4 md:py-2"
         >
           <div className="flex items-center gap-x-1 md:gap-x-2">
             <div className="flex items-center">{renderPopcorns()}</div>
@@ -165,7 +165,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           </div>
 
           <p
-            className={`line-clamp-2 min-h-[18px] text-xs leading-relaxed text-gray-800 md:min-h-[40px] md:text-sm ${
+            className={`line-clamp-2 min-h-[36px] text-xs leading-relaxed text-gray-800 md:min-h-[40px] md:text-sm ${
               isSpoiler && !isSpoilerRevealed
                 ? "select-none blur-sm filter"
                 : ""
@@ -176,7 +176,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
           </p>
 
           <div
-            className="mt-auto flex cursor-default items-center justify-between border-t border-gray-100 pt-1 md:pt-2"
+            className="mt-auto flex cursor-default items-center justify-between border-t border-gray-100 py-1 md:py-2"
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
             <span className="text-xs text-gray-500 md:text-sm">{nickname}</span>
