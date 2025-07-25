@@ -277,3 +277,31 @@ select {
 .ant-checkbox-group {
   gap: 1rem;
 }
+
+/* antd button */
+.ant-btn-primary {
+  background-color: var(--color-footerBlue);
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--colorpopcoHairColor) !important;
+  color: black !important;
+}
+
+.ant-btn-default:hover {
+  background-color: var(--colorpopcoHairColor) !important;
+  border: none;
+  color: black !important;
+}
+
+/* 모달 */
+.review-modal .ant-modal-body {
+  padding: 1rem 1rem 0;
+}
+
+@media (min-width: 640px) {
+  .review-modal .ant-modal-body {
+    padding: 2rem 1rem 0;
+  }
+}
