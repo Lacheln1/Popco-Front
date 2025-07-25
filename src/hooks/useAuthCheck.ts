@@ -23,8 +23,7 @@ const useAuthCheck = () => {
           setAccessToken(token);
         }
       } catch (error) {
-        console.error("토큰 검증 중 에러:", error);
-        navigate("/login");
+        console.error("토큰이 없음:", error);
       }
     };
 
