@@ -1,130 +1,173 @@
-import { Modal } from "antd";
-import PopcornRating from "../common/PopcornRating";
-import { Input, Avatar, Checkbox, Button } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Modal, Input, Avatar, Checkbox, Button } from "antd";
 import { CheckboxProps } from "antd/lib";
-import { AiOutlineLike } from "react-icons/ai";
-import { AiFillLike } from "react-icons/ai";
-
-type reviewProps = {
-  isModalOpen: boolean; // 모달 열렸는지
-  isMine: boolean; // 내가 쓴 글인지
-  isWriting: boolean; // 리뷰 쓰기인지
-  contentsTitle: string; // 컨텐츠 제목
-  contentsImg: string; // 컨텐츠 이미지
-  popcorn: number; // 팝콘(별점) 개수
-  reviewDetail: string; // 리뷰 내용
-  author: string; // 리뷰 작성자
-  likeCnt: number; // 리뷰 좋아요 수
-  setIsModalOpen: (val: boolean) => void; // 모달 열고 닫기 함수
-};
+import { UserOutlined } from "@ant-design/icons";
+import { AiOutlineLike, AiFillLike } from "react-icons/ai";
+import { useEffect, useState } from "react";
+import PopcornRating from "../common/PopcornRating";
+import { ReviewModalProps } from "@/types/Reviews.types";
 
 const ReviewModal = ({
   isModalOpen,
-  isMine,
+  setIsModalOpen,
+  isAuthor,
   isWriting,
   contentsTitle,
   contentsImg,
-  popcorn,
-  author,
-  likeCnt,
-  reviewDetail,
-  setIsModalOpen,
-}: reviewProps) => {
-  const onChange: CheckboxProps["onChange"] = (e) => {
-    console.log(`checked = ${e.target.checked}`);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
+  popcorn = 3.5,
+  reviewDetail = "",
+  author = "익명",
+  likeCount = 0,
+  isLiked = false,
+}: ReviewModalProps) => {
   const { TextArea } = Input;
+  const [review, setReview] = useState("");
 
-  return (
-    <Modal
-      centered
-      className="review-modal"
-      open={isModalOpen}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      styles={{
-        footer: {
-          justifySelf: "center",
-        },
-      }}
-      footer={[
-        <div className="flex w-full justify-center gap-4">
+  useEffect(() => {
+    setReview(isWriting ? "" : reviewDetail);
+  }, [isWriting, reviewDetail]);
+
+  const handleCancel = () => setIsModalOpen(false);
+  const handleOk = () => setIsModalOpen(false);
+  const handleSpoilerChange: CheckboxProps["onChange"] = (e) =>
+    console.log(`스포일러 포함: ${e.target.checked}`);
+
+  const renderReviewContent = () =>
+    isWriting ? (
+      <TextArea
+        placeholder="리뷰를 남겨주세요"
+        maxLength={250}
+        showCount
+        rows={10}
+        value={review}
+        onChange={(e) => setReview(e.target.value)}
+        className="mb-8 mt-4 h-[230px] w-full rounded-lg bg-slate-50 2sm:h-[280px]"
+        style={{
+          backgroundColor: "#f8fafc",
+          padding: "3rem 1rem 1rem 1rem",
+          outline: "none",
+          boxShadow: "none",
+          borderColor: "transparent",
+        }}
+      />
+    ) : (
+      <div
+        className="mb-8 mt-4 h-[230px] w-full whitespace-pre-wrap rounded-lg bg-slate-50 text-gray-700 2sm:h-[280px]"
+        style={{ padding: "3rem 1rem 1rem 1rem" }}
+      >
+        {reviewDetail || "작성된 리뷰가 없습니다."}
+      </div>
+    );
+  const renderTopMeta = () => (
+    <div
+      className={`absolute ${isWriting ? "top-8" : "top-3"} left-1/2 z-10 flex w-11/12 -translate-x-1/2 justify-between`}
+    >
+      <div className="flex items-center gap-2 text-xs">
+        <Avatar size="small" icon={<UserOutlined />} />
+        <span>{author}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        {isWriting ? (
+          <Checkbox onChange={handleSpoilerChange}>스포일러 포함</Checkbox>
+        ) : (
+          <>
+            {isLiked ? (
+              <AiFillLike className="size-5" />
+            ) : (
+              <AiOutlineLike className="size-5" />
+            )}
+            <span>{likeCount}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+  const renderFooterButtons = () => {
+    if (isWriting) {
+      return (
+        <>
           <Button
             className="rounded-3xl px-10 py-5 text-base"
-            key="back"
             onClick={handleCancel}
           >
             취소
           </Button>
           <Button
             className="rounded-3xl px-10 py-5 text-base"
-            key="submit"
             type="primary"
             onClick={handleOk}
           >
             등록
           </Button>
-        </div>,
-      ]}
+        </>
+      );
+    }
+
+    if (isAuthor) {
+      return (
+        <>
+          <Button
+            className="rounded-3xl px-10 py-5 text-base"
+            onClick={handleCancel}
+          >
+            삭제
+          </Button>
+          <Button
+            className="rounded-3xl px-10 py-5 text-base"
+            type="primary"
+            onClick={handleOk}
+          >
+            수정
+          </Button>
+        </>
+      );
+    }
+
+    return (
+      <Button
+        className="rounded-3xl px-10 py-5 text-base"
+        onClick={handleCancel}
+      >
+        확인
+      </Button>
+    );
+  };
+
+  return (
+    <Modal
+      centered
+      className="review-modal"
+      open={isModalOpen}
+      onCancel={handleCancel}
+      onOk={handleOk}
+      maskClosable={!isWriting}
+      styles={{ footer: { justifySelf: "center" } }}
+      footer={
+        <div className="flex w-full justify-center gap-4">
+          {renderFooterButtons()}
+        </div>
+      }
     >
+      {/* 헤더: 영화 정보 */}
       <div className="center flex gap-4">
         <img
           className="w-20 rounded-md 2sm:w-24"
-          src="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
-          alt="제목으로 변경"
+          src={`https://image.tmdb.org/t/p/original/${contentsImg}`}
+          alt={contentsTitle}
         />
         <div className="flex flex-col gap-2 self-center">
-          <div className="text-xl font-semibold">F1 더 무비</div>
-          <PopcornRating />
+          <div className="text-xl font-semibold">{contentsTitle}</div>
+          {isWriting ? (
+            <PopcornRating readonly={false} initialRating={0} />
+          ) : (
+            <PopcornRating readonly={true} initialRating={popcorn} />
+          )}
         </div>
       </div>
+
+      {/* 리뷰 콘텐츠 */}
       <div className="relative">
-        {isWriting ? (
-          <TextArea
-            placeholder="리뷰를 남겨주세요"
-            maxLength={250}
-            showCount
-            rows={10}
-            className="mb-8 mt-4 h-[230px] w-full rounded-lg bg-slate-50 2sm:h-[280px]"
-            style={{
-              backgroundColor: "#f8fafc",
-              padding: "3rem 1rem 1rem 1rem",
-              outline: "none",
-              boxShadow: "none",
-              borderColor: "transparent",
-            }}
-          />
-        ) : (
-          <div className="mb-8 mt-4 h-[230px] w-full whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-gray-700 2sm:h-[280px]">
-            {reviewDetail || "작성된 리뷰가 없습니다."}
-          </div>
-        )}
-        <div className="absolute left-6 top-8 z-10 flex w-11/12 justify-between">
-          <div className="flex items-center gap-2 text-xs">
-            <Avatar size="small" icon={<UserOutlined />} />
-            <span>너굴맨</span>
-          </div>
-          <div>
-            {isWriting ? (
-              <Checkbox onChange={onChange}>스포일러 포함</Checkbox>
-            ) : (
-              <div>
-                <AiOutlineLike />
-                <span>{likeCnt}</span>
-              </div>
-            )}
-          </div>
-        </div>
+        {renderReviewContent()}
+        {renderTopMeta()}
       </div>
     </Modal>
   );
