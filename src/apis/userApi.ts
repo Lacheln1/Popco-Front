@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //백엔드 url 넣어야함
-const API_URL = `${import.meta.env.VITE_BACK_URL}`;
+const API_URL = "/api/client";
 
 interface LoginParams {
   email: string;

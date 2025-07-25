@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BACK_URL}`;
+const API_URL = "/api/client";
 
 //토큰 갱신 시도(성공: 새로운 토큰 발급, 실패: 재로그인)
 export const refreshTokens = async () => {
