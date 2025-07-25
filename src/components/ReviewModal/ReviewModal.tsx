@@ -38,6 +38,7 @@ const ReviewModal = ({
         maxLength={250}
         showCount
         rows={10}
+        autoSize={false}
         value={review}
         onChange={(e) => setReview(e.target.value)}
         className="mb-8 mt-4 h-[230px] w-full rounded-lg bg-slate-50 2sm:h-[280px]"
@@ -47,6 +48,7 @@ const ReviewModal = ({
           outline: "none",
           boxShadow: "none",
           borderColor: "transparent",
+          resize: "none",
         }}
       />
     ) : (
