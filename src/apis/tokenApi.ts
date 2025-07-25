@@ -5,8 +5,6 @@ const API_URL = "/api/client";
 //토큰 갱신 시도(성공: 새로운 토큰 발급, 실패: 재로그인)
 export const refreshTokens = async () => {
   try {
-    console.log("HttpOnly 쿠키로 토큰 갱신 시도");
-
     const response = await axios.post(
       `${API_URL}/auth/refresh`,
       {},
@@ -14,7 +12,6 @@ export const refreshTokens = async () => {
         withCredentials: true,
       },
     );
-    console.log("refreshToken함수의 response.data", response.data);
 
     return response.data;
   } catch (error) {
