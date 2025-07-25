@@ -8,7 +8,7 @@ type LikeState = "liked" | "hated" | "neutral";
 type PosterProps = {
   title: string;
   posterUrl: string;
-  id: string;
+  id: number;
   likeState: LikeState;
   onLikeChange: (newState: LikeState) => void;
 };
