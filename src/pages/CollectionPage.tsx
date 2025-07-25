@@ -187,6 +187,7 @@ const mockNewCollections = [
 
 const CollectionPage: React.FC = () => {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
+
   const { isBeginning, isEnd } = useSwiperResize(swiper);
   const [hotCollections, setHotCollections] = useState<HotCollectionProps[]>(
     [],
