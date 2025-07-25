@@ -17,7 +17,7 @@ import NewCollection, {
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import { useSwiperResize } from "@/hooks/useSwiperResize";
 
-const mockHotCollections: Omit<HotCollectionProps, "onSaveToggle">[] = [
+const mockHotCollections = [
   {
     collectionId: 101,
     title: "이번 주 저장수 TOP 4",
@@ -96,7 +96,7 @@ const mockHotCollections: Omit<HotCollectionProps, "onSaveToggle">[] = [
     onSaveToggle: () => {},
   },
 ];
-const mockNewCollections: Omit<NewCollectionProps, "onSaveToggle">[] = [
+const mockNewCollections = [
   {
     collectionId: 201,
     userNickname: "영화광",
@@ -186,7 +186,7 @@ const mockNewCollections: Omit<NewCollectionProps, "onSaveToggle">[] = [
 ];
 
 const CollectionPage: React.FC = () => {
-  const [swiper, setSwiper] = useState<SwiperType>();
+  const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const { isBeginning, isEnd } = useSwiperResize(swiper);
 
   const [hotCollections, setHotCollections] = useState<HotCollectionProps[]>(
