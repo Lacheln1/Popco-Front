@@ -7,21 +7,16 @@ import { Select } from "antd";
 
 const ListPage = () => {
   const posterData = [
-    { id: "1", title: "1위 포스터" },
-    { id: "2", title: "2위 포스터" },
-    { id: "3", title: "3위 포스터" },
-    { id: "4", title: "4위 포스터" },
-    { id: "5", title: "5위 포스터" },
-    { id: "6", title: "6위 포스터" },
-    { id: "7", title: "7위 포스터" },
-    { id: "8", title: "8위 포스터" },
-    { id: "9", title: "9위 포스터" },
-    { id: "10", title: "10위 포스터" },
-    { id: "11", title: "11위 포스터" },
-    { id: "12", title: "12위 포스터" },
-    { id: "13", title: "13위 포스터" },
-    { id: "14", title: "14위 포스터" },
-    { id: "15", title: "15위 포스터" },
+    { id: 1, title: "1위 포스터" },
+    { id: 2, title: "2위 포스터" },
+    { id: 3, title: "3위 포스터" },
+    { id: 4, title: "4위 포스터" },
+    { id: 5, title: "5위 포스터" },
+    { id: 6, title: "6위 포스터" },
+    { id: 7, title: "7위 포스터" },
+    { id: 8, title: "8위 포스터" },
+    { id: 9, title: "9위 포스터" },
+    { id: 10, title: "10위 포스터" },
   ];
 
   const handleChange = (value: string) => {
