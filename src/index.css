@@ -59,7 +59,6 @@
 body {
   font-family: var(--font-pretendard);
   font-weight: 500;
-  
 }
 
 a {
@@ -72,6 +71,15 @@ button {
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+}
+
+.pretendard {
+  font-family: var(--font-pretendard) !important;
+}
+
+.pretendard-bold {
+  font-family: var(--font-pretendard) !important;
+  font-weight: 700 !important;
 }
 
 .gmarket {
