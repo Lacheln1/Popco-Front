@@ -47,7 +47,7 @@ const AnalysisHeroSection = () => {
           <div>
             <div className="flex justify-center">
               <img
-                src="/public/images/persona/애기액션헌터.png"
+                src="/images/persona/애기액션헌터.png"
                 alt="액션 헌터"
                 className="h-16 w-16"
               />
@@ -63,7 +63,7 @@ const AnalysisHeroSection = () => {
           <div className="">
             <div className="flex justify-center">
               <img
-                src="/public/images/persona/무비셜록-아기.svg"
+                src="/images/persona/무비셜록-아기.svg"
                 alt="온기 수집가"
                 className="h-16 w-16"
               />
