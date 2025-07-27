@@ -12,17 +12,17 @@ const RoleDashBoard: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
+      <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
+        <div className="gmarket-medium sm: text-3xl text-white">
+          <span>나와 같은&nbsp;</span>
+          <span className="gmarket-bold">액션 헌터</span>
+          <span>&nbsp;들은?</span>
+        </div>
+      </div>
       <div
-        className="pretendard mt-14 flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
+        className="pretendard flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="bg-footerBlue flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
-          <div className="gmarket-medium sm: text-3xl text-white">
-            <span>나와 같은&nbsp;</span>
-            <span className="gmarket-bold">액션 헌터</span>
-            <span>&nbsp;들은?</span>
-          </div>
-        </div>
         <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-28">
           <div className="flex flex-col items-center text-center">
             <span className="text-2xl">성별</span>
