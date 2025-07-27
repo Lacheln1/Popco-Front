@@ -42,6 +42,7 @@ const KakaoCallback: React.FC = () => {
         if (result.message == "LOGIN") {
           if (result.data.profileComplete) {
             navigate("/");
+            window.location.reload(); // 중요: Layout의 useAuthCheck가 새로운 토큰으로 사용자 정보를 가져옴
           } else {
             navigate("/test");
           }

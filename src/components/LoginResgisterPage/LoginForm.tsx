@@ -52,6 +52,7 @@ const LoginForm: React.FC = () => {
           navigate("/test");
         } else {
           navigate("/");
+          window.location.reload(); // 중요: Layout의 useAuthCheck가 새로운 토큰으로 사용자 정보를 가져옴
         }
       } else {
         alert("아이디 또는 비밀번호 오류입니다");
