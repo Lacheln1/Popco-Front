@@ -24,6 +24,7 @@ import PosterInTest from "../components/test/PosterInTest";
 import QuizStepLayout from "../components/test/QuizStepLayout";
 import { Input, App, DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 //  임시 영화 데이터 (40개)
 const tempMovieData = Array.from({ length: 40 }, (_, i) => ({
@@ -78,6 +79,7 @@ const quizData = {
 };
 
 const TestPage = () => {
+  useAuthCheck();
   const { message } = App.useApp();
   const {
     step,

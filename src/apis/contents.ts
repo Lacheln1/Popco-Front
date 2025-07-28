@@ -5,6 +5,6 @@ import axiosInstance from "./axiosInstance";
 export const fetchContentsRanking = async (
   type: ContentCategory,
 ): Promise<ContentItem[]> => {
-  const { data } = await axiosInstance.get(`/contents/popular/type/${type}`);
+  const { data } = await axiosInstance.get(`/contents/popular/types/${type}`);
   return data;
 };

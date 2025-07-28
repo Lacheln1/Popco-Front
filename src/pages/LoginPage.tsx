@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
 import loginPopcoImg from "@/assets/login-popco.svg";
@@ -18,11 +17,6 @@ import {
 const KAKAO_LOGIN_URL = `${import.meta.env.VITE_KAKAO_LOGIN_URL}`;
 
 const LoginPage: React.FC = () => {
-  useEffect(() => {
-    console.log("VITE_BACK_URL:", import.meta.env.VITE_BACK_URL);
-    console.log("VITE_KAKAO_LOGIN_URL:", import.meta.env.VITE_KAKAO_LOGIN_URL);
-  }, []);
-
   const handleKakaoLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -214,7 +208,10 @@ const LoginPage: React.FC = () => {
                   <span className="mr-2 font-bold">N</span>
                   네이버 로그인
                 </button>
-                <button className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors">
+                <button
+                  className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors"
+                  onClick={handleKakaoLogin}
+                >
                   <div className="pr-4">
                     <img
                       src={kakaoSymbolImg}

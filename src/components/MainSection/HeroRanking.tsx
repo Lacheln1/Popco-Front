@@ -60,6 +60,11 @@ const HeroRanking = () => {
   }, []);
 
   const { data = [], isLoading } = useContentsRanking(selected);
+  if (!Array.isArray(data)) {
+    console.error("HeroRanking Error: data is not an array", data);
+    return <div>데이터가 없습니다.</div>;
+  }
+
   const first = data[0];
   const contentsRank = data.slice(1);
   if (isLoading) <div>Loading</div>;
