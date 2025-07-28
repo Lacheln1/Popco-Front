@@ -3,11 +3,17 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const AverageDoubleDonutChart = () => {
-  const customerScore = 2.5; // 고객님 점수
-  const averageScore = 3.8; // 액션 헌터 평균 점수
-  const maxScore = 5.0; // 만점
+interface AverageDoubleDonutChartProps {
+  customerScore: number;
+  averageScore: number;
+  maxScore: number;
+}
 
+const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
+  customerScore,
+  averageScore,
+  maxScore,
+}) => {
   const data = {
     labels: ["고객님", "액션 헌터 평균"],
     datasets: [
@@ -44,7 +50,7 @@ const AverageDoubleDonutChart = () => {
   };
 
   return (
-    <div className="relative h-[120px] w-[120px]">
+    <div className="relative h-[120px] w-[120px] md:h-[200px] md:w-[200px]">
       <div className="relative h-full">
         <Doughnut data={data} options={options} />
         {/* 중앙에 점수 표시 */}
