@@ -9,7 +9,7 @@ const MyStyleSection: React.FC = () => {
       >
         <div className="flex flex-col text-center text-base md:text-2xl lg:text-2xl">
           <span className="gmarket-medium">내 OTT 시청 스타일은</span>
-          <span className="">상위 8.2% 의 #스릴러, 상위 8.3% 의 액션러!</span>
+          <span className="">#쫄깃전개러 #폭발장면없인못살아 #내심장살려</span>
         </div>
         <div className="flex w-full justify-center gap-6 pt-4 md:text-xl">
           <div className="bg-popco-main flex h-8 w-16 items-center justify-center rounded-lg md:w-24 lg:h-10 lg:w-28">
