@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = ({
         className={`gmarket transition-all duration-300 ${
           isScrolled
             ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/70 px-6 sm:px-8 lg:px-10"
-            : "max-w-auto mx-auto bg-white/80 px-4 text-lg sm:px-6 md:bg-white/50 lg:px-24"
+            : "max-w-auto mx-auto bg-white/80 px-4 text-lg sm:px-6 md:bg-white/50 lg:px-12"
         }`}
         style={
           isScrolled
@@ -171,8 +171,8 @@ const Header: React.FC<HeaderProps> = ({
                   <button
                     className={`flex min-w-[90px] items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black transition-all duration-300 hover:bg-gray-100 ${
                       isScrolled
-                        ? "h-8 px-4 text-base"
-                        : "mt-1 h-10 px-4 text-lg"
+                        ? "h-8 px-4 pt-1 text-base"
+                        : "h-10 px-4 pt-1 text-lg"
                     }`}
                     onClick={handleUserClick}
                   >
@@ -251,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`h-10 rounded-lg px-4 pt-2 font-medium text-black transition-colors hover:bg-gray-100 ${
+                  className={`h-10 rounded-lg px-4 pt-2 font-medium text-black transition-colors hover:bg-gray-100 hover:!text-black ${
                     isActiveItem(item.path)
                       ? "bg-gray-800 text-white hover:bg-gray-700"
                       : ""

@@ -4,7 +4,7 @@ import { Swiper as SwiperType } from "swiper";
 //네비게이션 버튼 하나 (개별버튼)
 interface NavigationButtonProps {
     direction: "prev" | "next";
-    swiper?: SwiperType;
+    swiper?: SwiperType | null; // null 추가
     disabled?: boolean;
     onClick?: () => void;
     className?: string;
@@ -95,7 +95,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
 
 //이전+다음 버튼 세트
 interface SwiperNavigationProps {
-    swiper?: SwiperType;
+    swiper?: SwiperType | null; // null 추가
     isBeginning?: boolean;
     isEnd?: boolean;
     className?: string;

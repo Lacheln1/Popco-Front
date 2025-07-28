@@ -239,7 +239,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className="flex justify-center px-4 pt-8">
       <div className="relative w-full max-w-[700px]">
-        <div className="relative flex h-10 min-w-80 items-center rounded-full border border-gray-300 bg-white sm:h-16">
+        <div className="relative flex h-10 min-w-80 items-center rounded-full border border-[#ededed] bg-white shadow-[0px_10px_15px_#0000000d] sm:h-16">
           <input
             name="search"
             ref={inputRef}
@@ -268,7 +268,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-4 right-4 top-full z-50 max-h-80 min-w-60 overflow-y-auto rounded-b-lg border border-t-0 border-gray-300 bg-white shadow-lg"
+            className="absolute left-4 right-4 top-full z-50 max-h-80 min-w-60 overflow-y-auto rounded-b-lg border border-t-0 border-[#ededed] bg-white shadow-lg"
           >
             {suggestions.map((option, index) => (
               <div
@@ -286,7 +286,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
         {/* 로딩 상태 표시 */}
         {/* {loading && showDropdown && (
-          <div className="absolute left-0 right-0 top-full z-50 w-64 rounded-b-lg border border-t-0 border-gray-300 bg-white p-4 text-center shadow-lg">
+          <div className="absolute left-0 right-0 top-full z-50 w-64 rounded-b-lg border border-t-0 border-[#ededed] bg-white p-4 text-center shadow-lg">
             <div className="flex items-center justify-center space-x-2">
               <div className="h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
               <span className="text-gray-600">검색중...</span>

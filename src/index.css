@@ -57,7 +57,7 @@
 }
 
 body {
-  font-family: var(--font-pretendard);
+  font-family: var(--font-pretendard) !important;
   font-weight: 500;
 }
 
@@ -71,6 +71,20 @@ button {
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
+}
+.pretendard {
+  font-family: var(--font-pretendard) !important;
+  font-weight: 500 !important;
+}
+
+.pretendard-light {
+  font-family: var(--font-pretendard) !important;
+  font-weight: 300 !important;
+}
+
+.pretendard-bold {
+  font-family: var(--font-pretendard) !important;
+  font-weight: 700 !important;
 }
 
 .pretendard {
@@ -247,5 +261,56 @@ select {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* antd */
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: var(--color-dark-blueblack);
+  border: none;
+}
+
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: var(--color-dark-blueblack) !important;
+}
+
+.ant-checkbox-wrapper:hover .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: var(--color-popcoMainColor) !important;
+}
+
+/* antd slider */
+.ant-slider-track {
+  background-color: var(--color-dark-blueblack) !important;
+}
+
+.ant-checkbox-group {
+  gap: 1rem;
+}
+
+/* antd button */
+.ant-btn-primary {
+  background-color: var(--color-footerBlue);
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--colorpopcoHairColor) !important;
+  color: black !important;
+}
+
+.ant-btn-default:hover {
+  background-color: var(--colorpopcoHairColor) !important;
+  border: none;
+  color: black !important;
+}
+
+/* 모달 */
+.review-modal .ant-modal-body {
+  padding: 1rem 1rem 0;
+}
+
+@media (min-width: 640px) {
+  .review-modal .ant-modal-body {
+    padding: 2rem 1rem 0;
   }
 }

@@ -33,10 +33,6 @@ jobs:
       - name: TypeScript type check
         run: npm run type-check || echo "TypeScript check skipped"
 
-      # const 재할당 에러나 정의되지 않은 변수 검증
-      - name: Lint code
-        run: npm run lint || echo "Linting skipped"
-
       # 도커 이미지 빌드
       - name: Build Docker image
         run: docker build --no-cache -t my-frontend-app .

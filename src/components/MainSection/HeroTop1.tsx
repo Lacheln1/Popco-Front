@@ -14,14 +14,14 @@ const HeroTop1 = () => {
   const [isEnd, setIsEnd] = useState(false);
 
   const posterData = [
-    { id: "1", title: "첫번째 포스터" },
-    { id: "2", title: "두번째 포스터" },
-    { id: "3", title: "세번째 포스터" },
-    { id: "4", title: "네번째 포스터" },
-    { id: "5", title: "다섯번째 포스터" },
-    { id: "6", title: "여섯번째 포스터" },
-    { id: "7", title: "일곱번째 포스터" },
-    { id: "8", title: "여덟번째 포스터" },
+    { id: 1, title: "첫번째 포스터" },
+    { id: 2, title: "두번째 포스터" },
+    { id: 3, title: "세번째 포스터" },
+    { id: 4, title: "네번째 포스터" },
+    { id: 5, title: "다섯번째 포스터" },
+    { id: 6, title: "여섯번째 포스터" },
+    { id: 7, title: "일곱번째 포스터" },
+    { id: 8, title: "여덟번째 포스터" },
   ];
 
   const handleSwiperInit = (swiper: SwiperType) => {

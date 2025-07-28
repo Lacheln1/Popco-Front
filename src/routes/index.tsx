@@ -5,11 +5,14 @@ import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import ListPage from "@/pages/ListPage";
+import DetailPage from "@/pages/DetailPage";
+import CollectionPage from "@/pages/CollectionPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
-
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
 import AnalysisPage from "@/pages/AnalysisPage";
+import KakaoCallback from "@/pages/KakaoCallback";
 
 const router = createBrowserRouter([
   {
@@ -17,9 +20,10 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "/list", element: <MainPage /> },
-      { path: "/collections", element: <MainPage /> },
-      { path: "/analysis", element: <AnalysisPage /> },
+      { path: "/detail/:movieId", element: <DetailPage /> },
+      { path: "/list", element: <ListPage /> },
+      { path: "/collections", element: <CollectionPage /> },
+      { path: "/analysis", element: <MainPage /> },
     ],
   },
   {
@@ -32,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "/register",
         element: <RegisterPage />,
+      },
+      {
+        path: "/auth/kakao/login",
+        element: <KakaoCallback />,
       },
     ],
   },
