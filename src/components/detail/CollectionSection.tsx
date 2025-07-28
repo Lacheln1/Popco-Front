@@ -2,15 +2,18 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Dropdown } from "antd";
 import type { MenuProps } from "antd";
 
-// Swiper 관련
+// Swiper 라이브러리 관련 import
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 
-// 관련 컴포넌트 임포트
+// 공통 컴포넌트 import
 import NewCollection from "@/components/common/NewCollection";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 
+/**
+ * @interface CollectionData
+ */
 interface CollectionData {
   collectionId: number;
   userNickname: string;
@@ -18,11 +21,10 @@ interface CollectionData {
   description: string;
   posters: string[];
   totalCount: number;
-  isInitiallySaved: boolean;
+  isSaved: boolean;
   href: string;
 }
 
-// 목업 데이터 배열
 const mockCollections: CollectionData[] = [
   {
     collectionId: 1,
@@ -38,7 +40,7 @@ const mockCollections: CollectionData[] = [
       "https://placehold.co/400x600/8B5CF6/FFFFFF?text=Poster+6",
     ],
     totalCount: 12,
-    isInitiallySaved: false,
+    isSaved: false,
     href: "/collection/1",
   },
   {
@@ -55,7 +57,7 @@ const mockCollections: CollectionData[] = [
       "https://placehold.co/400x600/78716C/FFFFFF?text=Poster+F",
     ],
     totalCount: 25,
-    isInitiallySaved: true,
+    isSaved: true,
     href: "/collection/2",
   },
   {
@@ -72,7 +74,7 @@ const mockCollections: CollectionData[] = [
       "https://placehold.co/400x600/D1D5DB/FFFFFF?text=Sci-Fi+6",
     ],
     totalCount: 18,
-    isInitiallySaved: false,
+    isSaved: false,
     href: "/collection/3",
   },
   {
@@ -89,12 +91,11 @@ const mockCollections: CollectionData[] = [
       "https://placehold.co/400x600/047857/FFFFFF?text=Ghibli+6",
     ],
     totalCount: 15,
-    isInitiallySaved: true,
+    isSaved: true,
     href: "/collection/4",
   },
 ];
 
-// 컴포넌트 외부에 선언하여 불필요한 재생성 방지
 const sortMenuItems: MenuProps["items"] = [
   { key: "recent", label: "최신순" },
   { key: "popular", label: "인기순" },
@@ -106,7 +107,6 @@ const CollectionSection: React.FC = () => {
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(true);
   const [sortOrder, setSortOrder] = useState("최신순");
-
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,15 +115,14 @@ const CollectionSection: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500)); // 0.5초의 로딩 지연 시뮬레이션
 
         const sortedData = [...mockCollections].sort((a, b) => {
           if (sortOrder === "인기순") {
-            return b.totalCount - a.totalCount;
+            return b.totalCount - a.totalCount; // 인기순: totalCount 내림차순
           }
-          return b.collectionId - a.collectionId;
+          return b.collectionId - a.collectionId; // 최신순: collectionId 내림차순
         });
-
         setCollections(sortedData);
       } catch (err) {
         setError("데이터를 불러오는 데 실패했습니다.");
@@ -132,44 +131,28 @@ const CollectionSection: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     fetchCollections();
   }, [sortOrder]);
 
   const handleSlideChange = useCallback((swiperInstance: SwiperType) => {
     setIsBeginning(swiperInstance.isBeginning);
-
-    const slidesPerView = swiperInstance.params.slidesPerView;
-    let isEffectivelyEnd = swiperInstance.isEnd;
-
-    // slidesPerView가 숫자일 때만 추가로 마지막 슬라이드인지 체크
-    if (typeof slidesPerView === "number") {
-      isEffectivelyEnd =
-        isEffectivelyEnd || swiperInstance.slides.length <= slidesPerView;
-    }
-
-    setIsEnd(isEffectivelyEnd);
+    setIsEnd(swiperInstance.isEnd);
   }, []);
 
   const handleSortChange = useCallback(({ key }: { key: string }) => {
     setSortOrder(key === "recent" ? "최신순" : "인기순");
   }, []);
 
-  const handleSaveToggle = useCallback(
-    (collectionId: number, newSavedState: boolean) => {
-      setCollections((currentCollections) =>
-        currentCollections.map((collection) =>
-          collection.collectionId === collectionId
-            ? { ...collection, isInitiallySaved: newSavedState }
-            : collection,
-        ),
-      );
-      console.log(
-        `Collection ${collectionId}의 찜 상태가 ${newSavedState}로 변경됨`,
-      );
-    },
-    [],
-  );
+  const handleSaveToggle = useCallback((collectionId: number) => {
+    setCollections((currentCollections) =>
+      currentCollections.map((collection) => {
+        if (collection.collectionId === collectionId) {
+          return { ...collection, isSaved: !collection.isSaved };
+        }
+        return collection;
+      }),
+    );
+  }, []);
 
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러: {error}</div>;
@@ -213,18 +196,18 @@ const CollectionSection: React.FC = () => {
 
       <Swiper
         slidesPerView="auto"
-        spaceBetween={32}
+        spaceBetween={64}
         onSwiper={setSwiper}
         onSlideChange={handleSlideChange}
         onUpdate={handleSlideChange}
         className="pb-2"
       >
         {collections.map((collection) => (
-          <SwiperSlide key={collection.collectionId} className="!w-auto">
+          <SwiperSlide key={collection.collectionId} className="!w-[350px]">
             <NewCollection
               {...collection}
-              isSaved={collection.isInitiallySaved}
               onSaveToggle={handleSaveToggle}
+              size="small"
             />
           </SwiperSlide>
         ))}

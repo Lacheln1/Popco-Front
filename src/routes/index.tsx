@@ -7,6 +7,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
+import CollectionPage from "@/pages/CollectionPage";
 
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
       { index: true, element: <MainPage /> },
       { path: "/detail/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
-      { path: "/collections", element: <MainPage /> },
+      { path: "/collections", element: <CollectionPage /> },
       { path: "/analysis", element: <MainPage /> },
     ],
   },
