@@ -1,7 +1,7 @@
 const AnalysisHeroSection = () => {
   return (
     <div className="pretendard">
-      <div className="relative h-[380px] overflow-hidden md:h-[425px] lg:h-[480px]">
+      <div className="relative h-[380px] overflow-hidden md:h-[445px] lg:h-[480px]">
         <div
           className="bg-footerBlue absolute inset-0"
           style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 80%)" }} //왼쪽 상단을 기준으로(x,y), 오른쪽 상단(x,y), 오른쪽 하단, 왼쪽 하단
@@ -19,26 +19,36 @@ const AnalysisHeroSection = () => {
           {/* 캐릭터 이미지 및 텍스트 */}
           <div className="flex pt-56">
             <div className="mx-auto flex">
-              <div className="absolute flex -translate-x-[97px] -translate-y-10 flex-col pt-4 md:-translate-x-60 lg:-translate-x-80 xl:translate-x-[270px] xl:pt-12">
-                <span className="gmarket-medium md:bg-popco-main mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl md:text-black">
+              <div className="absolute flex -translate-x-[97px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[500px]">
+                <span className="gmarket-medium lg:bg-popco-main mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
                   심장 쫄깃한 전개와 스케일 없는 세계관 없이는 못참아!
                 </span>
                 <img
                   src="/images/persona/Persona-text-line.svg"
                   alt="텍스트 라인"
-                  className="hidden object-cover md:inline md:w-60 lg:ml-24 xl:ml-2 xl:-scale-x-100"
+                  className="hidden object-cover lg:ml-36 lg:inline lg:w-52 xl:ml-56 xl:w-64"
+                />
+              </div>
+              <div className="absolute flex -translate-x-[98px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-190px] lg:-translate-y-[-30px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
+                <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl">
+                  하지만 웃음과 따뜻함이 있는 영화도 필요해!!
+                </span>
+                <img
+                  src="/images/persona/Persona-text-line.svg"
+                  alt="텍스트 라인"
+                  className="hidden -scale-x-100 object-cover lg:ml-8 lg:inline lg:w-52 xl:ml-0 xl:w-64"
                 />
               </div>
               <img
                 src="/images/persona/애기액션헌터.png"
                 alt="캐릭터이미지"
-                className="h-[150px] w-[150px] object-cover md:h-[200px] md:w-[200px] md:pt-10 lg:h-[220px] lg:w-[220px]"
+                className="s h-[150px] w-[150px] translate-y-5 object-cover md:h-[200px] md:w-[200px] md:pt-10 lg:h-[220px] lg:w-[220px]"
               />
             </div>
           </div>
         </div>
       </div>
-      <div className="gmarket-medium flex justify-center text-3xl md:mt-8 md:text-4xl lg:mt-0">
+      <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-4xl lg:mt-0">
         애기 액션 헌터
       </div>
 
