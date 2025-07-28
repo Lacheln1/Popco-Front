@@ -31,13 +31,18 @@ export const validateAndRefreshTokens = async () => {
 };
 
 //로그아웃 시 토큰 정리
-export const clearTokens = async (): Promise<void> => {
+export const clearTokens = async (accessToken?: string): Promise<void> => {
   try {
     await axios.post(
       `${API_URL}/auth/logout`,
       {},
       {
-        withCredentials: true, // HttpOnly 쿠키 자동 전송
+        headers: accessToken
+          ? {
+              Authorization: `Bearer ${accessToken}`,
+            }
+          : {},
+        withCredentials: true,
       },
     );
   } catch (error) {

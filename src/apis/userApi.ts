@@ -67,6 +67,7 @@ export const getUserDetail = async (accessToken: string) => {
       },
       withCredentials: true,
     });
+    console.log("유저 디테일", response.data);
 
     return response.data;
   } catch (error) {
