@@ -58,3 +58,20 @@ export const checkEmail = async ({ email }: CheckEmailParams) => {
 
   return response.data;
 };
+
+export const getUserDetail = async (accessToken: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/users/detail`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+    console.log("유저 디테일", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("getUserDetail 실패:", error);
+    throw error;
+  }
+};
