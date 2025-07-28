@@ -96,7 +96,6 @@ const mockCollections: CollectionData[] = [
   },
 ];
 
-// Dropdown 메뉴 아이템 (컴포넌트 외부에 선언하여 불필요한 리렌더링 방지)
 const sortMenuItems: MenuProps["items"] = [
   { key: "recent", label: "최신순" },
   { key: "popular", label: "인기순" },
@@ -165,7 +164,6 @@ const CollectionSection: React.FC = () => {
       </div>
 
       <div className="mb-4 ml-1 flex items-center justify-between">
-        {/* 정렬 순서 선택 드롭다운 */}
         <Dropdown
           menu={{ items: sortMenuItems, onClick: handleSortChange }}
           trigger={["click"]}
@@ -189,7 +187,6 @@ const CollectionSection: React.FC = () => {
             </svg>
           </button>
         </Dropdown>
-        {/* Swiper 좌/우 이동 버튼 */}
         <SwiperNavigation
           swiper={swiper}
           isBeginning={isBeginning}
@@ -197,18 +194,21 @@ const CollectionSection: React.FC = () => {
         />
       </div>
 
-      {/* 컬렉션 목록을 보여주는 Swiper */}
       <Swiper
-        slidesPerView="auto" // 슬라이드 너비를 컨텐츠에 맞게 자동 조정
-        spaceBetween={32}
-        onSwiper={setSwiper} // Swiper 인스턴스를 state에 저장
-        onSlideChange={handleSlideChange} // 슬라이드 변경 시 핸들러 연결
-        onUpdate={handleSlideChange} // Swiper 상태 업데이트 시 핸들러 연결
+        slidesPerView="auto"
+        spaceBetween={64}
+        onSwiper={setSwiper}
+        onSlideChange={handleSlideChange}
+        onUpdate={handleSlideChange}
         className="pb-2"
       >
         {collections.map((collection) => (
-          <SwiperSlide key={collection.collectionId} className="!w-auto">
-            <NewCollection {...collection} onSaveToggle={handleSaveToggle} />
+          <SwiperSlide key={collection.collectionId} className="!w-[350px]">
+            <NewCollection
+              {...collection}
+              onSaveToggle={handleSaveToggle}
+              size="small"
+            />
           </SwiperSlide>
         ))}
       </Swiper>

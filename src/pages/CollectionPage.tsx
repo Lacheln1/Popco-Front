@@ -281,7 +281,7 @@ const CollectionPage: React.FC = () => {
             컬렉션 만들기
           </button>
         </div>
-        <div className="mt-10 grid grid-cols-1 justify-items-center gap-x-6 gap-y-8 lg:grid-cols-2">
+        <div className="mt-10 grid grid-cols-1 justify-items-center gap-x-24 gap-y-16 lg:grid-cols-2">
           {newCollections.map((collection) => (
             <NewCollection {...collection} key={collection.collectionId} />
           ))}

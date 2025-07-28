@@ -9,7 +9,8 @@ export interface NewCollectionProps extends CollectionBase {
   description: string;
   totalCount: number;
   isSaved: boolean;
-  onSaveToggle: (collectionId: number) => void; // 인자를 collectionId만 받도록 통일
+  onSaveToggle: (collectionId: number) => void;
+  size?: "large" | "small";
 }
 
 const NewCollection: React.FC<NewCollectionProps> = React.memo(
@@ -23,21 +24,38 @@ const NewCollection: React.FC<NewCollectionProps> = React.memo(
     isSaved,
     href,
     onSaveToggle,
+    size = "large",
   }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const handleSaveToggle = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSaveToggle(collectionId); // collectionId만 전달
+      onSaveToggle(collectionId);
     };
 
     const displayPosters = Array.from({ length: 6 }).map(
       (_, index) => posters[index] || null,
     );
 
+    const styles = {
+      large: {
+        baseTranslateX: 86,
+        hoverTranslateX: 98,
+        scale: 1.15,
+      },
+      small: {
+        baseTranslateX: 62,
+        hoverTranslateX: 72,
+        scale: 1.1,
+      },
+    };
+    const currentStyle = styles[size];
+
     return (
-      <div className="w-[350px] rounded-xl bg-white shadow-lg transition-shadow hover:shadow-xl md:w-[450px] md:rounded-2xl">
+      <div
+        className={`w-full rounded-xl bg-white shadow-lg transition-shadow hover:shadow-xl md:rounded-2xl ${size === "small" ? "max-w-[350px]" : "max-w-[540px]"} `}
+      >
         <Link
           to={href}
           className="group relative block w-full overflow-hidden rounded-t-xl md:rounded-t-2xl"
@@ -50,9 +68,9 @@ const NewCollection: React.FC<NewCollectionProps> = React.memo(
                 key={index}
                 className="absolute h-[160px] w-[110px] rounded-lg bg-zinc-400 shadow-md transition-transform duration-300"
                 style={{
-                  transform: `translateX(${
-                    isHovered ? index * 80 : index * 68
-                  }px)`,
+                  transform: isHovered
+                    ? `translateX(${index * currentStyle.hoverTranslateX}px) scale(${currentStyle.scale})`
+                    : `translateX(${index * currentStyle.baseTranslateX}px) scale(1)`,
                   zIndex: 6 - index,
                 }}
               >
@@ -66,22 +84,24 @@ const NewCollection: React.FC<NewCollectionProps> = React.memo(
               </div>
             ))}
           </div>
-
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute bottom-3 left-4 z-10 flex items-baseline space-x-2 text-white">
             <p className="text-sm font-semibold">{userNickname} 님</p>
             <p className="text-xs">{totalCount}개 작품</p>
           </div>
         </Link>
-
         <div className="flex items-start justify-between p-4">
           <div className="min-w-0">
             <Link to={href}>
-              <h3 className="max-w-[380px] truncate text-lg font-bold text-gray-800 hover:text-black">
+              <h3
+                className={`truncate text-lg font-bold text-gray-800 hover:text-black ${size === "small" ? "max-w-[340px]" : "max-w-[460px]"} `}
+              >
                 {title}
               </h3>
             </Link>
-            <p className="mt-1 max-w-[380px] truncate text-sm text-gray-500">
+            <p
+              className={`mt-1 truncate text-sm text-gray-500 ${size === "small" ? "max-w-[340px]" : "max-w-[460px]"} `}
+            >
               {description}
             </p>
           </div>
