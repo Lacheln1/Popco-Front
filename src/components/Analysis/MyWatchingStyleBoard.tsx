@@ -58,40 +58,46 @@ const MyWatchingStyleBoard: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="relative mx-2 mt-4 w-full max-w-[1200px] md:text-2xl">
-          <div className="mx-3 flex justify-between">
-            <div>
-              <img
-                src="/images/components/like-popcorn.svg"
-                alt=""
-                className="h-10 w-10 md:h-12 md:w-12"
-              />
+        <div className="mt-4 w-full md:w-[700px] lg:w-[900px] xl:w-[1000px]">
+          <div className="flex flex-col">
+            <div className="mx-3 flex justify-between">
+              <div>
+                <img
+                  src="/images/components/like-popcorn.svg"
+                  alt=""
+                  className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 xl:h-12 xl:w-12"
+                />
+              </div>
+              <div>
+                <img
+                  src="/images/components/hate-popcorn.svg"
+                  alt=""
+                  className="h-8 w-8 rotate-90 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-11 lg:w-11 xl:h-12 xl:w-12"
+                />
+              </div>
             </div>
-            <div>
-              <img
-                src="/images/components/hate-popcorn.svg"
-                alt=""
-                className="h-10 w-10 rotate-90 md:h-12 md:w-12"
-              />
+            <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8 lg:h-9 xl:h-10">
+              <div
+                className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
+                style={{ width: "67%" }}
+              >
+                <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
+                  67%
+                </span>
+              </div>
+              <div
+                className="relative flex items-center justify-center bg-yellow-200 font-medium text-gray-700"
+                style={{ width: "33%" }}
+              >
+                <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
+                  33%
+                </span>
+              </div>
             </div>
-          </div>
-          <div className="mx-3 flex overflow-hidden rounded-full bg-gray-200 md:h-8">
-            <div
-              className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
-              style={{ width: "67%" }}
-            >
-              <span className="text-sm font-bold">67%</span>
+            <div className="mx-3 flex justify-between text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
+              <span>좋아요</span>
+              <span>싫어요</span>
             </div>
-            <div
-              className="relative flex items-center justify-center bg-yellow-200 font-medium text-gray-700"
-              style={{ width: "33%" }}
-            >
-              <span className="text-sm font-bold">33%</span>
-            </div>
-          </div>
-          <div className="mx-3 flex justify-between">
-            <span>좋아요</span>
-            <span>싫어요</span>
           </div>
         </div>
       </div>
