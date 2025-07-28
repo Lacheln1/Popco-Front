@@ -13,7 +13,7 @@ const RoleDashBoard: React.FC = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
-        <div className="gmarket-medium sm: text-3xl text-white">
+        <div className="gmarket-medium text-xl text-white md:text-3xl">
           <span>나와 같은&nbsp;</span>
           <span className="gmarket-bold">액션 헌터</span>
           <span>&nbsp;들은?</span>
