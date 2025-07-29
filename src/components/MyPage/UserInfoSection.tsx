@@ -86,19 +86,57 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   return (
     <div className="pretendard">
       <div className="flex w-full flex-col justify-center gap-8 pl-6">
+        {/* 사용자 프로필 */}
         <div className="relative flex items-center">
-          <div>
+          <div className="relative">
             <img
-              src="/images/mypage/testProfileImg.png"
-              alt="페르소나사진"
-              className="h-[45px] w-[45px] overflow-hidden rounded-full object-cover"
+              src={
+                previewUrl ||
+                currentProfileImage ||
+                "/images/mypage/testProfileImg.png"
+              }
+              alt="사용자프로필"
+              className="h-[45px] w-[45px] cursor-pointer overflow-hidden rounded-full object-cover"
+              onClick={() => fileInputRef.current?.click()}
             />
+            {/* 이미지 변경 아이콘 */}
+            <div
+              className="absolute -bottom-1 -right-1 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-black transition-colors hover:bg-gray-700"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <svg
+                className="h-3 w-3 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </div>
           </div>
           <div className="flex flex-col pl-5">
             <span className="pretendard-bold text-lg">{nickname}</span>
             <span className="text-base">{email}</span>
           </div>
+
+          {/* 선택된 이미지가 있을 때 업데이트 버튼 표시 */}
+          {selectedImage && (
+            <button
+              onClick={handleUpdateProfile}
+              disabled={isLoading}
+              className="ml-4 rounded-lg bg-black px-4 py-2 text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoading ? "업데이트 중..." : "프로필 변경"}
+            </button>
+          )}
         </div>
+
+        {/* 페르소나 정보 */}
         <div className="flex items-center">
           <div>
             <img
@@ -113,6 +151,15 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
           </div>
         </div>
       </div>
+
+      {/* 파일 입력 (숨김) */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageSelect}
+        className="hidden"
+      />
     </div>
   );
 };
