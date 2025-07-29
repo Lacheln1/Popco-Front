@@ -21,7 +21,6 @@ const HeroCollection = () => {
     }));
   }, [data]);
 
-  // 찜 상태를 { 컬렉션ID: 찜여부 } 형태로 관리
   const [savedMap, setSavedMap] = useState<Record<number, boolean>>({});
 
   const handleSaveToggle = useCallback((collectionId: number) => {
@@ -54,20 +53,26 @@ const HeroCollection = () => {
         </div>
 
         <div className="flex gap-5 px-4 pb-5 pt-12 md:p-0 lg:gap-12">
-          {isLoading
-            ? "로딩 중..."
-            : hotCollections.map((collection, index) => (
-                <div key={collection.collectionId} className="relative">
-                  <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] lg:text-[70px]">
-                    {index + 1}
-                  </span>
-                  <HotCollection
-                    {...collection}
-                    isSaved={savedMap[collection.collectionId] ?? false}
-                    onSaveToggle={handleSaveToggle}
-                  />
-                </div>
-              ))}
+          {isLoading ? (
+            <div className="text-base text-gray-400">Loading...</div>
+          ) : isError ? (
+            <div className="text-base text-red-500">
+              데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+            </div>
+          ) : (
+            hotCollections.map((collection, index) => (
+              <div key={collection.collectionId} className="relative">
+                <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] lg:text-[70px]">
+                  {index + 1}
+                </span>
+                <HotCollection
+                  {...collection}
+                  isSaved={savedMap[collection.collectionId] ?? false}
+                  onSaveToggle={handleSaveToggle}
+                />
+              </div>
+            ))
+          )}
         </div>
 
         <button className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden">
