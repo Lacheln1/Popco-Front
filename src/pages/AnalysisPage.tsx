@@ -42,6 +42,9 @@ const AnalysisPage = () => {
         console.log("API 호출 시작");
         setLoading(true);
         const response = await getUserPersonas(accessToken);
+        if (!response || !response.data) {
+          throw new Error("유효하지 않은 응답 데이터");
+        }
         console.log("API 응답:", response);
         setUserData(response.data);
         console.log("userdata 설정 후:", response.data);
