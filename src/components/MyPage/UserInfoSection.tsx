@@ -84,6 +84,36 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   };
 
   return (
+    <div className="pretendard">
+      <div className="flex w-full flex-col justify-center gap-8 pl-6">
+        <div className="relative flex items-center">
+          <div>
+            <img
+              src="/images/mypage/testProfileImg.png"
+              alt="페르소나사진"
+              className="h-[45px] w-[45px] overflow-hidden rounded-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col pl-5">
+            <span className="pretendard-bold text-lg">{nickname}</span>
+            <span className="text-base">{email}</span>
+          </div>
+        </div>
+        <div className="flex items-center">
+          <div>
+            <img
+              src="/images/mypage/testProfileImg.png"
+              alt="페르소나사진"
+              className="h-[45px] w-[45px] overflow-hidden rounded-xl object-cover"
+            />
+          </div>
+          <div className="flex flex-col pl-5">
+            <span className="pretendard-bold text-lg">현재 페르소나</span>
+            <span className="text-base">{currentPersona}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
