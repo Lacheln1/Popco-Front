@@ -75,3 +75,20 @@ export const getUserDetail = async (accessToken: string) => {
     throw error;
   }
 };
+
+export const getUserPersonas = async (accessToken: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/personas`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+
+    console.log("유저 페르소나 get", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.log("getPersonas실패", error);
+  }
+};
