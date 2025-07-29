@@ -41,6 +41,9 @@ const useAuthCheck = () => {
           setAccessToken(null);
           navigate("/login");
           return;
+        } else if (result.data.accessToken) {
+          // 성공 시 access token을 state에 저장하여 반환
+          setAccessToken(result.data.accessToken);
         } else {
           console.log("2️⃣ result.data.accessToken:", result?.data?.accessToken);
           const token = result.data.accessToken;

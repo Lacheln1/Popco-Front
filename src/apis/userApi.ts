@@ -1,6 +1,4 @@
 import axios from "axios";
-
-//백엔드 url 넣어야함
 const API_URL = "/api/client";
 
 interface LoginParams {
@@ -16,6 +14,25 @@ interface RegisterParams {
 interface CheckEmailParams {
   email: string;
 }
+
+interface UserDetailsParams {
+  nickname: string;
+  birthday: string; // "YYYY-MM-DD" 형식
+  gender: string;
+}
+
+export const updateUserDetails = async (
+  details: UserDetailsParams,
+  accessToken: string, // accessToken을 인자로 추가
+) => {
+  const response = await axios.post(`${API_URL}/users/details`, details, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
+    },
+    withCredentials: true,
+  });
+  return response.data;
+};
 
 export const getUserInfo = async () => {
   const response = await axios.get(`${API_URL}/users`);
