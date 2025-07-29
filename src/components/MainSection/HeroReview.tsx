@@ -29,7 +29,7 @@ const HeroReview = () => {
         },
       });
     });
-  }, []);
+  }, [data]);
 
   const topRowData = data?.slice(0, 10);
   const bottomRowData = data?.slice(10, 20);
