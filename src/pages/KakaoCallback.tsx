@@ -70,12 +70,7 @@ const KakaoCallback: React.FC = () => {
 
         if (result.message == "SIGNUP") {
           addDebugLog("SIGNUP 플로우 진입");
-          navigate("/register", {
-            state: {
-              kakaoEmail: result.data.email,
-            },
-          });
-          addDebugLog("회원가입 페이지로 이동 완료");
+          navigate("/test");
           console.log("signup됐음");
           return;
         }
