@@ -93,7 +93,7 @@ const LikeContentSection: React.FC = () => {
   ];
 
   return (
-    <div className="pretendard flex justify-center py-8">
+    <div className="pretendard flex justify-center px-3 py-8 md:px-8">
       <div className="flex w-full max-w-[1200px] flex-col bg-slate-50 px-4 py-5">
         {/* 헤더 섹션 */}
         <div className="mb-6 flex items-center justify-between">
