@@ -1,7 +1,8 @@
 import SectionHeader from "@/components/common/SectionHeader";
+import PageContents from "@/components/MyPage/PageContents";
 import UserInfoSection from "@/components/MyPage/UserInfoSection";
 import PageLayout from "@/layout/PageLayout";
-import React from "react";
+import React, { useState } from "react";
 
 const MyPage: React.FC = () => {
   return (
@@ -21,7 +22,7 @@ const MyPage: React.FC = () => {
           />
         }
       >
-        <div>칠드런영역임</div>
+        <PageContents />
       </PageLayout>
     </div>
   );
