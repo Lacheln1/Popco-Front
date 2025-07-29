@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import { getUserDetail } from "@/apis/userApi";
 
@@ -39,6 +39,9 @@ const useAuthCheck = () => {
       const currentPath = location.pathname;
       const needsAuth = isProtectedRoute(currentPath);
 
+      console.log("현재 경로:", currentPath);
+      console.log("인증 필요 여부:", needsAuth);
+
       try {
         setIsLoading(true);
         console.log("1️⃣ validateAndRefreshTokens 호출");
@@ -51,7 +54,7 @@ const useAuthCheck = () => {
         if (result.result === "INVALID_REFRESH_TOKEN") {
           console.log("❌ 토큰 만료");
 
-          //로그인이 필요한 url에 있다면 로그인 페이지로 이동
+          // 로그인이 필요한 url에 있을 때만 로그인 페이지로 리디렉션
           if (needsAuth) {
             alert("로그인이 필요한 페이지입니다. 로그인 해주세요.");
             navigate("/login", {
@@ -59,9 +62,8 @@ const useAuthCheck = () => {
             });
             return;
           }
-          alert(
-            "로그인 세션이 만료되어 로그아웃되었습니다. 다시 로그인 해주세요.",
-          );
+
+          // 로그인이 필요없는 url에서는 그냥 상태만 초기화
           setUser({
             userId: 0,
             email: "",
@@ -70,7 +72,6 @@ const useAuthCheck = () => {
             isLoggedIn: false,
           });
           setAccessToken(null);
-          navigate("/login");
           return;
         } else {
           console.log("2️⃣ result.data.accessToken:", result?.data?.accessToken);
@@ -84,14 +85,6 @@ const useAuthCheck = () => {
             const userInfo = await getUserDetail(token);
             console.log("3️⃣ userInfo:", userInfo);
             console.log("3️⃣ userInfo.data:", userInfo.data);
-            console.log("3️⃣ userInfo.data의 각 필드 확인:");
-            console.log("  - userInfo.data.userId:", userInfo.data?.userId);
-            console.log("  - userInfo.data.email:", userInfo.data?.email);
-            console.log("  - userInfo.data.nickname:", userInfo.data?.nickname);
-            console.log(
-              "  - userInfo.data.profileImageUrl:",
-              userInfo.data?.profileImageUrl,
-            );
 
             const newUserState = {
               userId: userInfo.data?.userId || 0,
@@ -107,7 +100,7 @@ const useAuthCheck = () => {
           } catch (userError) {
             console.error("❌ 사용자 정보 가져오기 실패:", userError);
 
-            //로그인이 필요한 url에서 사용자 정보를 가져오지 못했을 경우에만 로그인 페이지로 이동
+            // 로그인이 필요한 url에서 사용자 정보 가져오기 실패시에만 로그인 페이지로
             if (needsAuth) {
               navigate("/login", { state: { from: currentPath } });
               return;
@@ -125,6 +118,13 @@ const useAuthCheck = () => {
         }
       } catch (error) {
         console.error("❌ 토큰 확인 실패:", error);
+
+        // 로그인이 필요한 url에서만 로그인 페이지로 리디렉션
+        if (needsAuth) {
+          navigate("/login", { state: { from: currentPath } });
+          return;
+        }
+
         setUser({
           userId: 0,
           email: "",
@@ -140,7 +140,7 @@ const useAuthCheck = () => {
     };
 
     checkAuth();
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname]); // location.pathname 의존성 추가
 
   const logout = () => {
     // 1. 로그아웃 플래그 설정 (다음 useAuthCheck 실행을 막음)
