@@ -32,6 +32,18 @@ import retroPopcoCardUrl from "../assets/retro-popco-card.png";
 import imaginePopcoCardUrl from "../assets/imagine-popco-card.png";
 import movieSherlockCardUrl from "../assets/movie-sherlock-card.png";
 
+import PosterInTest from "../components/test/PosterInTest";
+import QuizStepLayout from "../components/test/QuizStepLayout";
+import { Input, App, DatePicker } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
+
+//  임시 영화 데이터 (40개)
+const tempMovieData = Array.from({ length: 40 }, (_, i) => ({
+  id: `movie_${i + 1}`,
+  title: `임시 영화 제목 ${i + 1}`,
+  posterUrl: `https://picsum.photos/seed/${i + 1}/200/300`, // 임시 이미지
+}));
+
 const cardImageRows = [
   [actionHunterCardUrl, cryPopcoCardUrl, warmPopcoCardUrl],
   [

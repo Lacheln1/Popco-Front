@@ -11,3 +11,17 @@ export type ReviewModalProps = {
   likeCount?: number;
   isLiked?: boolean;
 };
+
+export type ReviewProps = {
+  reviewId: number;
+  reviewText: string;
+  score: number;
+  status: "COMMON" | "SPOILER" | "BLIND";
+  likeCount: number;
+  userId: number;
+  userNickname: string;
+  contentId: number;
+  contentType: string;
+  contentTitle: string;
+  ranking: number;
+};

@@ -106,21 +106,13 @@ const LoginPage: React.FC = () => {
                   </Link>
                 </p>
               </motion.div>
-              <div className="mt-4 flex w-full justify-center md:mt-6 md:pt-8">
+              <div className="mt-4 flex w-full justify-center md:mt-6 md:pt-8 lg:mt-0 lg:pt-6">
                 <motion.div
                   className="flex h-16 w-full max-w-[500px] gap-2 md:gap-3 xl:mt-5"
                   variants={socialContainerVariants}
                   initial="hidden"
                   animate="visible"
                 >
-                  <motion.button
-                    className="flex flex-1 items-center justify-center rounded-xl bg-[#03c75a] px-3 py-2.5 text-xs font-medium text-white transition-colors md:px-4 md:py-3 md:text-sm lg:text-base xl:text-xl"
-                    variants={socialButtonVariants}
-                    whileTap="tap"
-                  >
-                    <span className="mr-2 font-bold">N</span>
-                    네이버 로그인
-                  </motion.button>
                   <motion.button
                     className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors md:px-4 md:py-3 md:text-sm lg:text-base xl:text-xl"
                     variants={socialButtonVariants}
@@ -204,10 +196,6 @@ const LoginPage: React.FC = () => {
                 initial="hidden"
                 animate="visible"
               >
-                <button className="flex flex-1 items-center justify-center rounded-xl bg-green-500 px-3 py-2.5 text-xs font-medium text-white transition-colors">
-                  <span className="mr-2 font-bold">N</span>
-                  네이버 로그인
-                </button>
                 <button
                   className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors"
                   onClick={handleKakaoLogin}

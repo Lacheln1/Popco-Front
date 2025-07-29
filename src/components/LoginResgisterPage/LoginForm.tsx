@@ -9,6 +9,7 @@ import {
   buttonVariants,
 } from "@/components/LoginResgisterPage/Animation";
 import { useNavigate } from "react-router-dom";
+import { App } from "antd";
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ const LoginForm: React.FC = () => {
   const [passwordError, setPasswordError] = useState("");
 
   const navigate = useNavigate();
+  const { message } = App.useApp();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,18 +50,18 @@ const LoginForm: React.FC = () => {
 
         // 선호도 진단 진행 여부 확인
         if (!result.data.profileComplete) {
-          alert("선호도 진단을 먼저 진행해주세요.");
-          navigate("/test");
+          message.info("선호도 진단 테스트부터 진행해주세요!", 1.5, () =>
+            navigate("/test"),
+          );
         } else {
-          navigate("/");
+          message.success("로그인 되었습니다!", 1.5, () => navigate("/"));
         }
       } else {
-        alert("아이디 또는 비밀번호 오류입니다");
-        return;
+        message.error(result.message || "아이디 또는 비밀번호 오류입니다");
       }
     } catch (error) {
       console.error("로그인 오류", error);
-      alert("로그인에 실패했습니다. 다시 시도해주세요.");
+      message.error("로그인에 실패했습니다. 다시 시도해주세요.");
     }
   };
 

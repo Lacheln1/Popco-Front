@@ -9,12 +9,8 @@ import {
 import { checkEmail, registerUser } from "@/apis/userApi";
 import { useNavigate } from "react-router-dom";
 
-interface RegisterFormProps {
-  kakaoEmail?: string;
-}
-
-const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
-  const [email, setEmail] = useState(kakaoEmail || "");
+const RegisterForm: React.FC = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
 
@@ -23,20 +19,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
   const [checkPasswordError, setCheckPasswordError] = useState("");
 
   const [checkEmailValue, setCheckEmailValue] = useState(false); // 이메일 중복 체크
-  const isKakaoEmail = Boolean(kakaoEmail); //카카오 이메일 여부 확인
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const resetCheckEmailValue = () => {
       setCheckEmailValue(false);
-      if (kakaoEmail) {
-        setCheckEmailValue(true);
-        setEmailError("");
-      }
     };
     resetCheckEmailValue();
-  }, [kakaoEmail]);
+  }, []);
 
   // 로그인 버튼 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,10 +93,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
   const handleCheckEmail = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isKakaoEmail) {
-      return; //카카오 이메일인 경우 중복확인 버튼 클릭 방지
-    }
-
     if (!email) {
       alert("이메일을 입력해주세요.");
       return;
@@ -135,13 +122,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
         <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
           <div className="flex justify-between">
             <label className="mb-2 ml-4 block text-xs text-black md:text-base">
-              이메일 {isKakaoEmail && <span>&nbsp;(카카오)</span>}
+              이메일
             </label>
             <button
               type="button"
-              className={`mb-2 mr-4 ${isKakaoEmail ? "cursor-not-allowed" : ""}`}
+              className={`mb-2 mr-4`}
               onClick={handleCheckEmail}
-              disabled={isKakaoEmail}
             >
               중복 확인
             </button>
@@ -152,13 +138,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ kakaoEmail }) => {
             placeholder="Email Address"
             className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
               emailError ? "border-2 border-red-400" : ""
-            } ${isKakaoEmail ? "cursor-not-allowed" : ""}`}
+            } `}
             onChange={(e) => {
-              if (!isKakaoEmail) {
-                setEmail(e.target.value);
-                setCheckEmailValue(false);
-                if (e.target.value) setEmailError("");
-              }
+              setEmail(e.target.value);
+              setCheckEmailValue(false);
+              if (e.target.value) setEmailError("");
             }}
           />
           {emailError && (
