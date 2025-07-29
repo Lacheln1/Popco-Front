@@ -107,5 +107,6 @@ export const getUserPersonas = async (accessToken: string) => {
     return response.data;
   } catch (error) {
     console.log("getPersonas실패", error);
+    throw error;
   }
 };
