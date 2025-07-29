@@ -1,4 +1,5 @@
 import { renderCount } from "@/components/EventPage/Countdown";
+import { useIsMediumUp } from "@/hooks/useMediaQuery";
 import React from "react";
 import Countdown from "react-countdown";
 
@@ -70,11 +71,14 @@ const renderPoster = (idx: number) => (
 );
 
 const EventPage = () => {
+  const isMediumUp = useIsMediumUp();
+  const postersToRender = isMediumUp ? 4 : 1;
+
   return (
     <div className="bg-[#eee]">
       {/* 배경 */}
       <div
-        className="relative mx-auto min-h-[330px] w-full min-w-[800px]"
+        className="relative mx-auto min-h-[330px] w-full"
         style={{
           backgroundRepeat: "no-repeat",
           backgroundImage:
@@ -86,8 +90,8 @@ const EventPage = () => {
       >
         {/* 카드 */}
         <div className="relative h-screen pt-20">
-          <aside className="absolute left-1/2 top-1/3 z-10 flex -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center rounded-xl bg-white/80 p-8 shadow-xl backdrop-blur-md md:h-[450px] md:w-[800px]">
-            <h3 className="gmarket mb-1 text-center font-medium tracking-tight text-gray-900">
+          <aside className="absolute left-1/2 top-1/2 z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-xl bg-white/80 px-4 py-8 shadow-xl backdrop-blur-md md:top-1/3 md:h-[450px] md:w-[800px] md:px-8">
+            <h3 className="gmarket md: mb-1 text-center text-xl font-medium tracking-tight text-gray-900 md:text-[1.75rem]">
               퀴즈 이벤트가 곧 시작됩니다!
             </h3>
             <Countdown
@@ -99,34 +103,40 @@ const EventPage = () => {
                 <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
                   이번주 작품
                 </span>
-                <span>F1 더 무비</span>
+                <span className="text-sm md:text-base">F1 더 무비</span>
               </div>
               <div className="pretendard flex items-center gap-3">
                 <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
                   시작 시간
                 </span>
-                <span>2025.08.12(화) 13:00</span>
+                <span className="text-sm md:text-base">
+                  2025.08.12(화) 13:00
+                </span>
               </div>
               <div className="pretendard flex items-center gap-3">
                 <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
                   대상
                 </span>
-                <span>노이즈를 본 모든 대상</span>
+                <span className="text-sm md:text-base">
+                  F1 더 무비를 본 모든 대상
+                </span>
               </div>
               <div className="pretendard flex items-center gap-3">
                 <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
                   경품안내
                 </span>
-                <span>CGV 5만원 상품권(1인)</span>
+                <span className="text-sm md:text-base">
+                  CGV 5만원 상품권(1인)
+                </span>
               </div>
-              <div className="pretendard flex items-baseline gap-3">
+              <div className="pretendard flex items-baseline gap-3 md:flex-row">
                 <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
                   참여방법
                 </span>
-                <span>
+                <span className="text-sm md:text-base">
                   이 페이지에서 대기해 주세요.
                   <br />
-                  이벤트 시간이 되면 자동으로 퀴즈가 시작됩니다!
+                  이벤트 시간이 되면 자동으로 버튼이 활성화됩니다!
                   <br /> 문제를 가장 빠르게 맞히면 선착순으로 다음 라운드에
                   진출할 수 있어요!
                 </span>
@@ -139,8 +149,16 @@ const EventPage = () => {
             alt="popco"
           />
         </div>
-        {/* 포스터 */}
-        {Array.from({ length: 4 }, (_, idx) => renderPoster(idx))}
+        <>
+          {/* 모바일 */}
+          <div className="block md:hidden">{renderPoster(0)}</div>
+          {/* PC */}
+          <div className="hidden md:block">
+            {Array.from({ length: postersToRender }, (_, idx) =>
+              renderPoster(idx),
+            )}
+          </div>
+        </>
       </div>
     </div>
   );

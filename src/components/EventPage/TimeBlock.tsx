@@ -1,7 +1,9 @@
 const TimeBlock = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col items-center">
-    <span className="text-footer-blue text-xs tracking-wide">{label}</span>
-    <div className="relative flex h-[80px] w-[72px] items-center justify-center rounded-lg text-4xl font-bold text-white shadow-lg">
+    <span className="text-footer-blue text-[10px] tracking-wide md:text-xs">
+      {label}
+    </span>
+    <div className="relative flex h-[65px] w-[60px] items-center justify-center rounded-lg text-4xl font-bold text-white shadow-lg md:h-[80px] md:w-[72px]">
       {/* 상단 어두운 배경 */}
       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-[#7577AC] to-[#172039]" />
       {/* 하단 오버레이 */}
