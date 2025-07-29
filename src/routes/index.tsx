@@ -7,6 +7,7 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
+import EventPage from "@/pages/EventPage";
 
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
       { path: "/list", element: <ListPage /> },
       { path: "/collections", element: <MainPage /> },
       { path: "/analysis", element: <MainPage /> },
+      { path: "/event", element: <EventPage /> },
     ],
   },
   {
