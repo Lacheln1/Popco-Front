@@ -78,7 +78,7 @@ export const checkEmail = async ({ email }: CheckEmailParams) => {
 
 export const getUserDetail = async (accessToken: string) => {
   try {
-    const response = await axios.get(`${API_URL}/users/detail`, {
+    const response = await axios.get(`${API_URL}/users/details`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
