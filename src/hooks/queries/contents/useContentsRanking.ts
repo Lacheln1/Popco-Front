@@ -6,7 +6,8 @@ export const useContentsRanking = (type: ContentCategory) => {
   return useQuery<ContentItem[]>({
     queryKey: ["contentsRanking", type],
     queryFn: () => fetchContentsRanking(type),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 60 * 12,
+    gcTime: 1000 * 60 * 60 * 13,
     retry: 1,
   });
 };
