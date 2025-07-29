@@ -22,7 +22,7 @@ const HeroReview = () => {
       gsap.to(wrapper, {
         x: isEven ? `+=${distance}` : `-=${distance}`,
         ease: "none",
-        duration: 40,
+        duration: 80,
         repeat: -1,
         modifiers: {
           x: gsap.utils.unitize(gsap.utils.wrap(-distance, 0)),
@@ -51,6 +51,7 @@ const HeroReview = () => {
               hasAlreadyReported: false,
             }}
             contentId={review.contentId}
+            contentType={review.contentType}
           />
         </div>
       )),

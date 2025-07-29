@@ -24,6 +24,7 @@ interface ReviewData {
 interface ReviewCardProps {
   reviewData: ReviewData;
   contentId?: number;
+  contentType?: string;
   onLikeClick?: () => void;
   onReport?: () => void;
   onEdit?: () => void;
@@ -34,6 +35,7 @@ interface ReviewCardProps {
 const ReviewCard: React.FC<ReviewCardProps> = ({
   reviewData,
   contentId,
+  contentType,
   onLikeClick,
   onReport,
   onEdit,
@@ -134,8 +136,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   const clickableTitle = (
     <div
       onClick={() => {
-        if (contentId) {
-          navigate(`/detail/${contentId}`);
+        if (contentId && contentType) {
+          navigate(`/detail/${contentType}/${contentId}`);
         } else {
           if (onCardClick) onCardClick();
         }
