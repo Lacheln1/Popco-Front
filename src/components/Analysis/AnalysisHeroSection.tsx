@@ -53,7 +53,7 @@ const AnalysisHeroSection = () => {
       </div>
 
       <div className="flex justify-around">
-        <div className="mt-3 flex w-full items-center px-1 md:max-w-[700px] lg:max-w-[1200px]">
+        <div className="mt-3 flex w-full items-center px-3 md:max-w-[700px] md:px-1 lg:max-w-[1200px]">
           <div>
             <div className="flex justify-center">
               <img
@@ -85,7 +85,7 @@ const AnalysisHeroSection = () => {
         </div>
       </div>
       <div className="flex justify-center">
-        <div className="relative -top-5 flex w-full justify-around px-1 md:max-w-[700px] lg:max-w-[1200px]">
+        <div className="relative -top-5 flex w-full justify-around px-3 md:max-w-[700px] md:px-1 lg:max-w-[1200px]">
           <div className="md:text-lg lg:text-xl xl:text-2xl">52%</div>
           <div className="md:text-lg lg:text-xl xl:text-2xl">48%</div>
         </div>
