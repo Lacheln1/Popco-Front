@@ -1,4 +1,5 @@
 import axios from "axios";
+import { profile } from "console";
 
 //백엔드 url 넣어야함
 const API_URL = "/api/client";
@@ -15,6 +16,11 @@ interface RegisterParams {
 
 interface CheckEmailParams {
   email: string;
+}
+
+interface UpdateProfileParams {
+  nickname: string;
+  profileImageUrl: File;
 }
 
 export const getUserInfo = async () => {
@@ -72,6 +78,29 @@ export const getUserDetail = async (accessToken: string) => {
     return response.data;
   } catch (error) {
     console.error("getUserDetail 실패:", error);
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (
+  { nickname, profileImageUrl }: UpdateProfileParams,
+  accessToken: string,
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("nickname", nickname);
+    formData.append("profileImageUrl", profileImageUrl);
+
+    const response = await axios.put(`${API_URL}/users/details`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+    console.log("프로필 업데이트 성공:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("updateUserProfile 실패:", error);
     throw error;
   }
 };
