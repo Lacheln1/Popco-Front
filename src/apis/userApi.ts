@@ -1,7 +1,6 @@
 import axios from "axios";
 import axiosInstance from "./axiosInstance";
 
-//백엔드 url 넣어야함
 const API_URL = "/api/client";
 
 interface LoginParams {
@@ -24,9 +23,16 @@ interface UserDetailsParams {
   gender: string;
 }
 
-export const updateUserDetails = async (details: UserDetailsParams) => {
-  // 인증 토큰이 자동으로 포함
-  const response = await axiosInstance.post("/users/details", details);
+export const updateUserDetails = async (
+  details: UserDetailsParams,
+  accessToken: string, // accessToken을 인자로 추가
+) => {
+  const response = await axios.post(`${API_URL}/users/details`, details, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
+    },
+    withCredentials: true,
+  });
   return response.data;
 };
 

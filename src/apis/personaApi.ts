@@ -1,8 +1,6 @@
-// src/apis/personaApi.ts
-
 import axiosInstance from "./axiosInstance";
+import axios from "axios";
 
-// API 응답 데이터 타입을 정의합니다.
 interface QuestionOption {
   optionId: number;
   content: string;
@@ -14,14 +12,19 @@ export interface QuestionData {
   options: QuestionOption[];
 }
 
-/**
- * 지정된 번호의 페르소나 질문을 가져오는 API
- * @param questionNumber - 가져올 질문 번호 (1~5)
- */
-export const getQuizQuestion = async (questionNumber: number): Promise<QuestionData> => {
+export const getQuizQuestion = async (
+  questionNumber: number,
+  accessToken: string,
+): Promise<QuestionData> => {
   try {
-    const response = await axiosInstance.get<{ data: QuestionData }>(
-      `/personas/question/${questionNumber}`
+    const response = await axios.get<{ data: QuestionData }>(
+      `/api/client/personas/question/${questionNumber}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 직접 추가
+        },
+        withCredentials: true,
+      },
     );
     return response.data.data;
   } catch (error) {
