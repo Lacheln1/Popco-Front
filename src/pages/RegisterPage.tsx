@@ -14,7 +14,6 @@ import {
 
 const RegisterPage: React.FC = () => {
   const location = useLocation();
-  const kakaoEmail = location.state?.kakaoEmail;
   return (
     <motion.main
       className="pretendard relative h-full bg-[#0F1525]"
@@ -80,7 +79,7 @@ const RegisterPage: React.FC = () => {
                 </p>
               </motion.div>
 
-              <RegisterForm kakaoEmail={kakaoEmail} />
+              <RegisterForm />
 
               <motion.div
                 className="mt-4 flex justify-center lg:mt-6"
