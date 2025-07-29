@@ -14,6 +14,8 @@ import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
 import KakaoCallback from "@/pages/KakaoCallback";
+import CollectionDetailPage from "@/pages/CollectionDetailPage";
+import CollectionCreatePage from "@/pages/CollectionCreatePage";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,8 @@ const router = createBrowserRouter([
       { path: "/detail/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
       { path: "/collections", element: <CollectionPage /> },
+      { path: "/collections/create", element: <CollectionCreatePage /> },
+      { path: "/collections/:collectionId", element: <CollectionDetailPage /> },
       { path: "/analysis", element: <MainPage /> },
     ],
   },
