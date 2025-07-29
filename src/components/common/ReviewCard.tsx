@@ -7,6 +7,7 @@ import EmptyLikeIcon from "@/assets/empty-like.png";
 import FullLikeIcon from "@/assets/full-like.png";
 import FullPopcornIcon from "@/assets/full-popcorn.svg";
 import HalfPopcornIcon from "@/assets/half-popcorn.svg";
+import { useNavigate } from "react-router-dom";
 
 interface ReviewData {
   movieTitle: string;
@@ -22,15 +23,17 @@ interface ReviewData {
 
 interface ReviewCardProps {
   reviewData: ReviewData;
-  onLikeClick: () => void;
-  onReport: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-  onCardClick: () => void;
+  contentId?: number;
+  onLikeClick?: () => void;
+  onReport?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onCardClick?: () => void;
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({
   reviewData,
+  contentId,
   onLikeClick,
   onReport,
   onEdit,
@@ -126,9 +129,17 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     }
   };
 
+  const navigate = useNavigate();
+
   const clickableTitle = (
     <div
-      onClick={onCardClick}
+      onClick={() => {
+        if (contentId) {
+          navigate(`/detail/${contentId}`);
+        } else {
+          if (onCardClick) onCardClick();
+        }
+      }}
       className="h-full w-full cursor-pointer text-sm font-bold md:text-lg"
     >
       {truncatedTitle}
@@ -179,7 +190,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
             className="mt-auto flex cursor-default items-center justify-between border-t border-gray-100 py-1 md:py-2"
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
-            <span className="text-xs text-gray-500 md:text-sm">{nickname}</span>
+            <span className="line-clamp-1 text-xs text-gray-500 md:text-sm">
+              {nickname}
+            </span>
             <div className="flex items-center gap-x-1">
               <img
                 src={isLiked ? FullLikeIcon : EmptyLikeIcon}
@@ -187,7 +200,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                 className="h-4 w-4 cursor-pointer"
                 onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
-                  onLikeClick();
+                  if (onLikeClick) onLikeClick();
                 }}
               />
               <span className="text-xs font-medium text-gray-600 md:text-sm">
