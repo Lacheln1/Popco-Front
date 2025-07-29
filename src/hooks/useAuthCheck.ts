@@ -4,16 +4,20 @@ import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import { getUserDetail } from "@/apis/userApi";
 
 interface User {
-  id: string;
+  userId: number;
+  email: string;
   nickname: string;
+  profileImageUrl: string;
   isLoggedIn: boolean;
 }
 
 const useAuthCheck = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User>({
-    id: "",
+    userId: 0,
+    email: "",
     nickname: "",
+    profileImageUrl: "",
     isLoggedIn: false,
   });
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -37,7 +41,13 @@ const useAuthCheck = () => {
           alert(
             "로그인 세션이 만료되어 로그아웃되었습니다. 다시 로그인 해주세요.",
           );
-          setUser({ id: "", nickname: "", isLoggedIn: false });
+          setUser({
+            userId: 0,
+            email: "",
+            nickname: "",
+            profileImageUrl: "",
+            isLoggedIn: false,
+          });
           setAccessToken(null);
           navigate("/login");
           return;
@@ -52,22 +62,48 @@ const useAuthCheck = () => {
             console.log("3️⃣ getUserDetail 호출");
             const userInfo = await getUserDetail(token);
             console.log("3️⃣ userInfo:", userInfo);
+            console.log("3️⃣ userInfo.data:", userInfo.data);
+            console.log("3️⃣ userInfo.data의 각 필드 확인:");
+            console.log("  - userInfo.data.userId:", userInfo.data?.userId);
+            console.log("  - userInfo.data.email:", userInfo.data?.email);
+            console.log("  - userInfo.data.nickname:", userInfo.data?.nickname);
+            console.log(
+              "  - userInfo.data.profileImageUrl:",
+              userInfo.data?.profileImageUrl,
+            );
 
-            setUser({
-              id: userInfo.id || "",
-              nickname: userInfo.nickname || "",
+            const newUserState = {
+              userId: userInfo.data?.userId || 0,
+              email: userInfo.data?.email || "",
+              nickname: userInfo.data?.nickname || "",
+              profileImageUrl: userInfo.data?.profileImageUrl || "",
               isLoggedIn: true,
-            });
+            };
+
+            console.log("3️⃣ 설정할 user 상태:", newUserState);
+            setUser(newUserState);
             console.log("✅ 사용자 정보 가져오기 성공", userInfo);
           } catch (userError) {
             console.error("❌ 사용자 정보 가져오기 실패:", userError);
-            setUser({ id: "", nickname: "", isLoggedIn: false });
+            setUser({
+              userId: 0,
+              email: "",
+              nickname: "",
+              profileImageUrl: "",
+              isLoggedIn: false,
+            });
             setAccessToken(null);
           }
         }
       } catch (error) {
         console.error("❌ 토큰 확인 실패:", error);
-        setUser({ id: "", nickname: "", isLoggedIn: false });
+        setUser({
+          userId: 0,
+          email: "",
+          nickname: "",
+          profileImageUrl: "",
+          isLoggedIn: false,
+        });
         setAccessToken(null);
       } finally {
         setIsLoading(false);
