@@ -8,11 +8,11 @@ import RegisterPage from "@/pages/RegisterPage";
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
 import EventPage from "@/pages/EventPage";
-
+import CollectionPage from "@/pages/CollectionPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
-
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
+import AnalysisPage from "@/pages/AnalysisPage";
 import KakaoCallback from "@/pages/KakaoCallback";
 
 const router = createBrowserRouter([
@@ -23,9 +23,9 @@ const router = createBrowserRouter([
       { index: true, element: <MainPage /> },
       { path: "/detail/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
-      { path: "/collections", element: <MainPage /> },
-      { path: "/analysis", element: <MainPage /> },
       { path: "/event", element: <EventPage /> },
+      { path: "/collections", element: <CollectionPage /> },
+      { path: "/analysis", element: <AnalysisPage /> },
     ],
   },
   {
