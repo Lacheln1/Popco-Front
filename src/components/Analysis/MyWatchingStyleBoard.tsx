@@ -3,7 +3,7 @@ import AverageDoubleDonutChart from "./AverageDoubleDonutChart";
 
 const MyWatchingStyleBoard: React.FC = () => {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center px-3 md:px-8">
       <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
         <div className="gmarket-medium text-xl text-white md:text-3xl">
           <span>나의 시청 스타일이 궁금해?</span>
