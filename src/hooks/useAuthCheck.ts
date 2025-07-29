@@ -160,8 +160,15 @@ const useAuthCheck = () => {
     });
     setAccessToken(null);
 
-    // 4. 로그인 페이지로 이동
-    navigate("/login");
+    // 4. 현재 경로 확인하여 로그인이 필요한 url에 있을 때만 홈으로 이동
+    const currentPath = location.pathname;
+    const needsAuth = isProtectedRoute(currentPath);
+
+    if (needsAuth) {
+      // 로그인이 필요한 url에 있다면 홈으로 이동
+      navigate("/");
+    }
+    // 로그인이 필요한 url에 있다면 그대로 머물기
   };
 
   return {
