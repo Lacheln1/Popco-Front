@@ -1,4 +1,3 @@
-import axiosInstance from "./axiosInstance";
 import axios from "axios";
 
 interface FeedbackItem {

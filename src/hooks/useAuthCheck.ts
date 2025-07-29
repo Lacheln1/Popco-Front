@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { App } from "antd";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import { getUserDetail } from "@/apis/userApi";
 

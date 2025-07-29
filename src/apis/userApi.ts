@@ -1,6 +1,4 @@
 import axios from "axios";
-import axiosInstance from "./axiosInstance";
-
 const API_URL = "/api/client";
 
 interface LoginParams {

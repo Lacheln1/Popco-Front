@@ -145,7 +145,7 @@ const TestPage = () => {
 
         setIsLoading(true);
         try {
-          const responseData = await getTestMovies(accessToken);
+          const responseData: any = await getTestMovies(accessToken);
           console.log("API로부터 받은 영화 데이터:", responseData);
 
           // ✅ 핵심 수정 부분!
@@ -455,7 +455,7 @@ const TestPage = () => {
         if (isQuizLoading || !currentQuiz) {
           return (
             <div className="flex h-full items-center justify-center">
-              <Spin टिप="질문을 불러오는 중..." />
+              <Spin tip="질문을 불러오는 중..." />
             </div>
           );
         }
@@ -492,9 +492,7 @@ const TestPage = () => {
                   선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
                 </p>
                 <img
-                  src={
-                    personaImages[personaResult.main_persona] || cryPopcoImage
-                  } // 매핑된 이미지 또는 기본 이미지
+                  src={personaImages[personaResult.main_persona]} // 매핑된 이미지
                   alt={personaResult.main_persona}
                   className="my-6 h-48 w-48"
                 />

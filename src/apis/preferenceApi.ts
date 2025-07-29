@@ -1,12 +1,9 @@
-// src/apis/preferenceApi.ts
-
-import axiosInstance from "./axiosInstance";
 import axios from "axios";
 
 export interface Movie {
   id: string;
   title: string;
-  posterUrl: string;
+  posterPath: string;
 }
 
 export const getTestMovies = async (accessToken: string): Promise<Movie[]> => {
