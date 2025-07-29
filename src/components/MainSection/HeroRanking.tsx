@@ -9,7 +9,7 @@ import { Swiper as SwiperType } from "swiper";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { useContentsRanking } from "@/hooks/quries/contents/useContentsRanking";
+import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
 import { ContentCategory } from "@/types/Contents.types";
 
 const HeroRanking = () => {

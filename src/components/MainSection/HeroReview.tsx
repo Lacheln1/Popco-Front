@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import ReviewCard from "../common/ReviewCard";
-import { useWeeklyReview } from "@/hooks/quries/review/useWeeklyReview";
+import { useWeeklyReview } from "@/hooks/queries/review/useWeeklyReview";
 
 const HeroReview = () => {
   const wrapperRefs = useRef<(HTMLDivElement | null)[]>([]);
