@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import { getUserDetail } from "@/apis/userApi";
 
@@ -11,8 +11,18 @@ interface User {
   isLoggedIn: boolean;
 }
 
+//로그인이 필요한 url들
+const PROTECTED_ROUTES = ["/analysis", "/mypage"];
+
+const isProtectedRoute = (pathname: string): boolean => {
+  return PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/"),
+  );
+};
+
 const useAuthCheck = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<User>({
     userId: 0,
     email: "",
@@ -26,6 +36,8 @@ const useAuthCheck = () => {
   useEffect(() => {
     const checkAuth = async () => {
       console.log("🔍 useAuthCheck 시작");
+      const currentPath = location.pathname;
+      const needsAuth = isProtectedRoute(currentPath);
 
       try {
         setIsLoading(true);
@@ -38,6 +50,15 @@ const useAuthCheck = () => {
 
         if (result.result === "INVALID_REFRESH_TOKEN") {
           console.log("❌ 토큰 만료");
+
+          //로그인이 필요한 url에 있다면 로그인 페이지로 이동
+          if (needsAuth) {
+            alert("로그인이 필요한 페이지입니다. 로그인 해주세요.");
+            navigate("/login", {
+              state: { from: currentPath }, // 로그인 후 돌아갈 경로 저장
+            });
+            return;
+          }
           alert(
             "로그인 세션이 만료되어 로그아웃되었습니다. 다시 로그인 해주세요.",
           );
@@ -85,6 +106,13 @@ const useAuthCheck = () => {
             console.log("✅ 사용자 정보 가져오기 성공", userInfo);
           } catch (userError) {
             console.error("❌ 사용자 정보 가져오기 실패:", userError);
+
+            //로그인이 필요한 url에서 사용자 정보를 가져오지 못했을 경우에만 로그인 페이지로 이동
+            if (needsAuth) {
+              navigate("/login", { state: { from: currentPath } });
+              return;
+            }
+
             setUser({
               userId: 0,
               email: "",
@@ -112,7 +140,7 @@ const useAuthCheck = () => {
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   const logout = () => {
     // 1. 로그아웃 플래그 설정 (다음 useAuthCheck 실행을 막음)
@@ -136,7 +164,12 @@ const useAuthCheck = () => {
     navigate("/login");
   };
 
-  return { user, accessToken, isLoading, logout };
+  return {
+    user,
+    accessToken,
+    isLoading,
+    logout,
+  };
 };
 
 export default useAuthCheck;
