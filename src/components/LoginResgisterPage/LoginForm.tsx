@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
 
       if (result.data) {
         console.log(result.data);
-
+        sessionStorage.removeItem("isLoggedOut");
         // 선호도 진단 진행 여부 확인
         if (!result.data.profileComplete) {
           message.info("선호도 진단 테스트부터 진행해주세요!", 1.5, () =>
