@@ -32,7 +32,7 @@ const useAuthCheck = () => {
         console.log("1️⃣ result.result:", result?.result);
         console.log("1️⃣ result.data:", result?.data);
 
-        if (result.result === "REFRESH_TOKEN_EXPIRED") {
+        if (result.result === "INVALID_REFRESH_TOKEN") {
           console.log("❌ 토큰 만료");
           alert(
             "로그인 세션이 만료되어 로그아웃되었습니다. 다시 로그인 해주세요.",
