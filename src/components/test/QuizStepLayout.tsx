@@ -1,18 +1,23 @@
 import React from "react";
 
+type AnswerOption = {
+  optionId: number;
+  content: string;
+};
+
 type QuizStepLayoutProps = {
   question: string;
   subText: string;
-  answers: string[];
-  selectedAnswer?: number; // 선택된 답변의 인덱스
-  onSelectAnswer: (index: number) => void;
+  answers: AnswerOption[]; // string[] 에서 AnswerOption[] 으로 변경
+  selectedAnswerId?: number; // 선택된 답변의 'optionId'
+  onSelectAnswer: (optionId: number) => void; // 'optionId'를 인자로 받도록 변경
 };
 
 const QuizStepLayout: React.FC<QuizStepLayoutProps> = ({
   question,
   subText,
   answers,
-  selectedAnswer,
+  selectedAnswerId,
   onSelectAnswer,
 }) => {
   const headingStyle = "font-bold leading-snug text-xl lg:text-2xl";
@@ -28,19 +33,19 @@ const QuizStepLayout: React.FC<QuizStepLayoutProps> = ({
 
       {/* 답변 선택지 */}
       <div className="flex w-full max-w-sm flex-col gap-3">
-        {answers.map((answer, index) => {
-          const isSelected = selectedAnswer === index;
+        {answers.map((option) => {
+          const isSelected = selectedAnswerId === option.optionId;
           return (
             <button
-              key={index}
-              onClick={() => onSelectAnswer(index)}
-              className={`font-regular rounded-full border px-6 py-3 text-sm transition-colors lg:text-base ${
+              key={option.optionId}
+              onClick={() => onSelectAnswer(option.optionId)}
+              className={`font-regular break-keep rounded-full border px-8 py-3 text-sm transition-colors lg:text-base ${
                 isSelected
-                  ? "border-popco-main bg-popco-main"
+                  ? "border-popco-main bg-popco-main text-black"
                   : "border-gray-300 bg-white text-black hover:bg-gray-100"
               }`}
             >
-              {answer}
+              {option.content}{" "}
             </button>
           );
         })}

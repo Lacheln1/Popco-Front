@@ -51,7 +51,7 @@ const router = createBrowserRouter([
         locale={koKR}
         theme={{
           token: {
-            colorPrimary: "#ffd751",
+            colorPrimary: "#fa9a00ff",
           },
         }}
       >
