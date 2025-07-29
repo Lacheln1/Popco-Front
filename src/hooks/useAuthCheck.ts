@@ -114,7 +114,29 @@ const useAuthCheck = () => {
     checkAuth();
   }, [navigate]);
 
-  return { user, accessToken, isLoading };
+  const logout = () => {
+    // 1. 로그아웃 플래그 설정 (다음 useAuthCheck 실행을 막음)
+    sessionStorage.setItem("isLoggedOut", "true");
+
+    // 2. 토큰 제거
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("accessToken");
+
+    // 3. 상태 초기화
+    setUser({
+      userId: 0,
+      email: "",
+      nickname: "",
+      profileImageUrl: "",
+      isLoggedIn: false,
+    });
+    setAccessToken(null);
+
+    // 4. 로그인 페이지로 이동
+    navigate("/login");
+  };
+
+  return { user, accessToken, isLoading, logout };
 };
 
 export default useAuthCheck;
