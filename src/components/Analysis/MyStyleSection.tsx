@@ -2,7 +2,7 @@ import React from "react";
 
 const MyStyleSection: React.FC = () => {
   return (
-    <section className="pretendard flex justify-center">
+    <section className="pretendard flex justify-center px-3 md:px-8">
       <div
         className="mx-1 flex w-full max-w-[1200px] flex-col bg-slate-50 py-5"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
