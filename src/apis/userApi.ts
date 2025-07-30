@@ -28,6 +28,28 @@ interface UserDetailsParams {
   gender: string;
 }
 
+interface MonthlyReviewsParams {
+  month: string; //YYYY-MM 형식
+}
+
+// 리뷰 응답 타입
+interface Review {
+  reviewId: number;
+  contentId: number;
+  contentType: string;
+  title: string;
+  posterPath: string;
+  score: number;
+  text: string;
+  createdAt: string;
+}
+interface MonthlyReviewsResponse {
+  code: number;
+  result: string;
+  message: string;
+  data: Review[];
+}
+
 export const updateUserDetails = async (
   details: UserDetailsParams,
   accessToken: string, // accessToken을 인자로 추가
@@ -137,6 +159,27 @@ export const updateUserProfile = async (
     return response.data;
   } catch (error) {
     console.error("updateUserProfile 실패:", error);
+    throw error;
+  }
+};
+
+export const getMonthlyReviews = async (
+  { month }: MonthlyReviewsParams,
+  accessToken: string,
+): Promise<MonthlyReviewsResponse> => {
+  try {
+    const response = await axios.get(`${API_URL}/reviews/my/monthly`, {
+      params: { month },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+
+    console.log(`월별 리뷰 조회 성공 (${month}):`, response.data);
+    return response.data;
+  } catch (error) {
+    console.error("getMonthlyReviews 실패:", error);
     throw error;
   }
 };

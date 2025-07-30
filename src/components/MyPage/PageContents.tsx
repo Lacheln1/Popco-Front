@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import MovieCalendar from "./MovieCalendar";
 
 const PageContents: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -6,7 +7,7 @@ const PageContents: React.FC = () => {
   return (
     <div>
       <div>
-        <div className="mb-6 flex space-x-1 rounded-lg bg-gray-100 p-1">
+        <div className="flex space-x-1 rounded-lg bg-gray-100 p-1">
           {tabTitles.map((title, i) => (
             <button
               key={i}
@@ -24,12 +25,7 @@ const PageContents: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           {activeTab === 0 && (
             <div>
-              <h3 className="mb-4 text-lg font-semibold">제목1</h3>
-              <p className="mb-2">내용 1</p>
-              <p className="mb-2">내용 2</p>
-              <p className="mb-2">내용 3</p>
-              <p className="mb-2">내용 4</p>
-              <p className="mb-2">내용 5</p>
+              <MovieCalendar />
             </div>
           )}
 
