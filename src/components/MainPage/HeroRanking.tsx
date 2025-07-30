@@ -180,7 +180,7 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                       title={title}
                       posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
                       id={contentId}
-                      likeState="neutral"
+                      likeState="NEUTRAL"
                       onLikeChange={() => {}}
                     />
                   </SwiperSlide>
@@ -201,7 +201,7 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                     title={title}
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
                     id={contentId}
-                    likeState="neutral"
+                    likeState="NEUTRAL"
                     onLikeChange={() => {}}
                   />
                 </li>

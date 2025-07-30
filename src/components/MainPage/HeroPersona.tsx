@@ -111,7 +111,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
                   title={title}
                   posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
                   id={contentId}
-                  likeState="neutral"
+                  likeState="NEUTRAL"
                   onLikeChange={() => {}}
                 />
               </SwiperSlide>
