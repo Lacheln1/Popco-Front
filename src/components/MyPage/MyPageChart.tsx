@@ -269,18 +269,19 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
 
       {/* 통계 정보 */}
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-lg bg-blue-50 p-4 text-center">
-          <div className="text-sm text-gray-600">평균 평점</div>
-          <div className="text-xl font-bold text-blue-600">
-            {scoreData.averageScore.toFixed(1)}점
-          </div>
-        </div>
         <div className="rounded-lg bg-green-50 p-4 text-center">
           <div className="text-sm text-gray-600">총 리뷰 수</div>
           <div className="text-xl font-bold text-green-600">
             {scoreData.totalCount}개
           </div>
         </div>
+        <div className="rounded-lg bg-blue-50 p-4 text-center">
+          <div className="text-sm text-gray-600">평균 평점</div>
+          <div className="text-xl font-bold text-blue-600">
+            {scoreData.averageScore.toFixed(1)}점
+          </div>
+        </div>
+
         <div className="rounded-lg bg-purple-50 p-4 text-center">
           <div className="text-sm text-gray-600">최다 평점</div>
           <div className="text-xl font-bold text-purple-600">
