@@ -3,6 +3,10 @@ import MovieCalendar from "./MovieCalendar";
 import ReviewCard from "../common/ReviewCard";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { getMonthlyReviews } from "@/apis/userApi";
+import { SwiperNavigation } from "../common/SwiperButton";
+import { Swiper as SwiperType } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
 
 interface Movie {
   date: string;
@@ -32,6 +36,12 @@ const PageContents: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<string>("");
+
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
+    undefined,
+  );
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
 
   const { accessToken, user } = useAuthCheck();
   const tabTitles = ["Calendar", "Collection", "MY"];
@@ -81,6 +91,19 @@ const PageContents: React.FC = () => {
     }
   };
 
+  const handleSwiperInit = (swiper: SwiperType) => {
+    console.log("Swiper 초기화됨:", swiper);
+    setSwiperInstance(swiper);
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
+  const handleSlideChange = (swiper: SwiperType) => {
+    console.log("슬라이드 변경:", swiper.activeIndex);
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
   // Movie 데이터를 ReviewCard가 요구하는 ReviewData 형태로 변환
   const convertToReviewData = (movie: Movie): ReviewData => {
     return {
@@ -88,10 +111,10 @@ const PageContents: React.FC = () => {
       score: movie.score || 0,
       reviewText: movie.reviewText || "리뷰 내용이 없습니다",
       nickname: user.nickname || "익명",
-      likeCount: 0, // API에 좋아요 수가 없으므로 기본값
-      isSpoiler: false, // API에 스포일러 정보가 없으므로 기본값
-      isOwnReview: true, // 내 리뷰이므로 true
-      isLiked: false, // 내 리뷰이므로 좋아요 불가
+      likeCount: 0,
+      isSpoiler: false,
+      isOwnReview: true,
+      isLiked: false,
       hasAlreadyReported: false,
     };
   };
@@ -145,21 +168,83 @@ const PageContents: React.FC = () => {
                 onMonthChange={handleMonthChange}
               />
 
-              {/* 리뷰 카드들을 그리드로 표시 */}
+              {/* 리뷰 카드 Swiper 섹션 */}
               <div className="mt-6">
-                <h2 className="mb-4 text-lg font-semibold">
-                  이번 달 내 리뷰 ({movies.length}개)
-                </h2>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                  {movies.map((movie) => (
-                    <ReviewCard
-                      key={movie.reviewId}
-                      reviewData={convertToReviewData(movie)}
-                      contentId={movie.contentId}
-                      contentType={movie.contentType}
-                    />
-                  ))}
+                <div className="mb-4 flex items-center justify-between">
+                  <h1 className="gmarket-bold py-2 text-base">
+                    이달엔 이런 리뷰를 남겼어요
+                  </h1>
+                  {/* 네비게이션 버튼 */}
+                  <SwiperNavigation
+                    swiper={swiperInstance}
+                    isBeginning={isBeginning}
+                    isEnd={isEnd}
+                  />
                 </div>
+
+                {/* 리뷰가 없을 때 */}
+                {movies.length === 0 && !loading && (
+                  <div className="flex h-32 items-center justify-center text-gray-500">
+                    이번 달에는 작성한 리뷰가 없습니다.
+                  </div>
+                )}
+
+                {/* 로딩 중 */}
+                {loading && (
+                  <div className="flex h-32 items-center justify-center text-gray-500">
+                    리뷰를 불러오는 중...
+                  </div>
+                )}
+
+                {/* Swiper 컨테이너 - 모바일 오버플로우 방지 */}
+                {movies.length > 0 && !loading && (
+                  <div className="relative -mx-6 px-6 md:mx-0 md:px-0">
+                    <Swiper
+                      modules={[Navigation]}
+                      spaceBetween={16}
+                      slidesPerView={2}
+                      onSwiper={handleSwiperInit}
+                      onSlideChange={handleSlideChange}
+                      navigation={{
+                        prevEl: ".swiper-button-prev",
+                        nextEl: ".swiper-button-next",
+                      }}
+                      breakpoints={{
+                        320: {
+                          slidesPerView: 2,
+                          spaceBetween: 12,
+                        },
+                        480: {
+                          slidesPerView: 2,
+                          spaceBetween: 12,
+                        },
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 14,
+                        },
+                        768: {
+                          slidesPerView: 2.7,
+                          spaceBetween: 16,
+                        },
+                        1024: {
+                          slidesPerView: 3.9,
+                          spaceBetween: 16,
+                        },
+                      }}
+                      className="w-full overflow-hidden"
+                    >
+                      {movies.map((movie) => (
+                        <SwiperSlide key={movie.reviewId} className="!h-auto">
+                          <ReviewCard
+                            reviewData={convertToReviewData(movie)}
+                            contentId={movie.contentId}
+                            contentType={movie.contentType}
+                          />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
+                )}
               </div>
             </div>
           )}

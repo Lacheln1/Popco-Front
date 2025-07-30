@@ -85,11 +85,6 @@ const MovieCalendar: React.FC<MovieCalendarProps> = ({
         onActiveStartDateChange={handleActiveStartDateChange}
         calendarType="gregory"
       />
-
-      {/* 현재 로드된 월 정보 표시 (개발용) */}
-      <div className="mt-4 text-xs text-gray-400">
-        현재 로드된 월: {currentMonth} ({movies.length}개 리뷰)
-      </div>
     </div>
   );
 };
