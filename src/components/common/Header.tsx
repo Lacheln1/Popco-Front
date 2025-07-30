@@ -3,8 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import popcoLogoImg from "@/assets/popco-logo.svg";
 
 interface User {
-  id: string;
+  userId: number;
+  email: string;
   nickname: string;
+  profileImageUrl: string;
   isLoggedIn: boolean;
 }
 
@@ -20,7 +22,13 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({
-  user = { id: "", nickname: "", isLoggedIn: false },
+  user = {
+    userId: 0,
+    email: "",
+    nickname: "",
+    profileImageUrl: "",
+    isLoggedIn: false,
+  },
   onLogin,
   onLogout,
 }) => {
@@ -92,7 +100,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleMyActivity = () => {
     setIsDropdownOpen(false);
-    navigate("/my-activity");
+    navigate("/mypage");
   };
 
   const handleLogout = () => {
@@ -277,9 +285,6 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
               ) : (
                 <>
-                  <div className="rounded-lg px-4 py-2 font-medium text-black">
-                    {user.nickname}님
-                  </div>
                   <button
                     className="rounded-lg px-4 py-2 text-left font-medium text-black transition-colors hover:bg-gray-100"
                     onClick={() => {
