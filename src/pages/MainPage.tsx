@@ -22,7 +22,7 @@ const MainPage = () => {
       <HeroTop1 />
       <HeroPopcorithm accessToken={accessToken ?? ""} userId={user.userId} />
       <HeroPersonaBanner />
-      <HeroPersona />
+      <HeroPersona accessToken={accessToken ?? ""} userId={user.userId} />
       <HeroReview />
       <HeroCollection />
     </div>
