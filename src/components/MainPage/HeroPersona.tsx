@@ -20,14 +20,11 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [contentType, setContentType] = useState<
-    "all" | "movie" | "tv" | undefined
-  >("all");
 
   const { data, isLoading, isError, isSuccess } = useHeroPersona(
     userId,
     accessToken,
-    contentType,
+    "all",
   );
 
   if (isLoading) {
