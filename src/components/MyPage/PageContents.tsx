@@ -3,10 +3,12 @@ import MovieCalendar from "./MovieCalendar";
 import ReviewCard from "../common/ReviewCard";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { getMonthlyReviews } from "@/apis/userApi";
+import { fetchMyCollections } from "@/apis/collectionApi"; // 컬렉션 API import
 import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import HotCollection from "../common/HotCollection"; // HotCollection import
 
 interface Movie {
   date: string;
@@ -31,11 +33,39 @@ interface ReviewData {
   hasAlreadyReported: boolean;
 }
 
+interface ContentPoster {
+  contentId: number;
+  contentType: string;
+  posterPath: string;
+  title: string;
+}
+
+interface Collection {
+  collectionId: number;
+  userId: number;
+  userNickname: string;
+  title: string;
+  description: string;
+  saveCount: number;
+  contentCount: number;
+  createdAt: string;
+  updatedAt: string;
+  contentPosters: ContentPoster[];
+}
+
 const PageContents: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<string>("");
+
+  // 컬렉션 관련 상태
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(false);
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [pageSize] = useState(20);
+  const [hasMore, setHasMore] = useState(true);
 
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
@@ -91,6 +121,67 @@ const PageContents: React.FC = () => {
     }
   };
 
+  // 컬렉션 목록 가져오기
+  const fetchMyCollectionsData = async (page = 0, reset = false) => {
+    if (!accessToken || !user.isLoggedIn || collectionsLoading) {
+      return;
+    }
+
+    try {
+      setCollectionsLoading(true);
+      setCollectionsError(null);
+
+      console.log(`컬렉션 API 요청: page=${page}, pageSize=${pageSize}`);
+      const response = await fetchMyCollections(accessToken, page, pageSize);
+      console.log("컬렉션 API 응답:", response);
+
+      if (response.code === 200 && response.data) {
+        const newCollections = response.data.collections;
+
+        if (reset) {
+          setCollections(newCollections);
+        } else {
+          setCollections((prev) => [...prev, ...newCollections]);
+        }
+
+        // 더 이상 데이터가 없으면 hasMore를 false로 설정
+        setHasMore(newCollections.length === pageSize);
+        setPageNumber(page);
+      }
+    } catch (err) {
+      console.error("컬렉션 조회 실패:", err);
+      setCollectionsError("컬렉션을 불러오는데 실패했습니다.");
+    } finally {
+      setCollectionsLoading(false);
+    }
+  };
+
+  // 컬렉션 저장/취소 토글
+  const handleSaveToggle = async (collectionId: number) => {
+    try {
+      // 실제로는 저장/취소 API를 호출해야 합니다
+      console.log("저장 토글:", collectionId);
+      // API 호출 후 성공하면 상태 업데이트
+      // await axios.post/delete('/collections/save', { collectionId }, { headers: { Authorization: `Bearer ${accessToken}` }});
+    } catch (err) {
+      console.error("저장 토글 실패:", err);
+    }
+  };
+
+  // 더 보기 버튼 클릭
+  const handleLoadMore = () => {
+    if (!collectionsLoading && hasMore) {
+      fetchMyCollectionsData(pageNumber + 1, false);
+    }
+  };
+
+  // 새로고침
+  const handleRefresh = () => {
+    setPageNumber(0);
+    setHasMore(true);
+    fetchMyCollectionsData(0, true);
+  };
+
   const handleSwiperInit = (swiper: SwiperType) => {
     console.log("Swiper 초기화됨:", swiper);
     setSwiperInstance(swiper);
@@ -125,6 +216,18 @@ const PageContents: React.FC = () => {
     setCurrentMonth(initialMonth);
     fetchMonthlyReviews(initialMonth);
   }, [accessToken, user.isLoggedIn]);
+
+  // 컬렉션 탭이 활성화될 때 컬렉션 데이터 가져오기
+  useEffect(() => {
+    if (
+      activeTab === 1 &&
+      accessToken &&
+      user.isLoggedIn &&
+      collections.length === 0
+    ) {
+      fetchMyCollectionsData(0, true);
+    }
+  }, [activeTab, accessToken, user.isLoggedIn]);
 
   // 달력에서 월이 변경될 때 호출될 함수
   const handleMonthChange = (activeStartDate: Date | null) => {
@@ -251,12 +354,187 @@ const PageContents: React.FC = () => {
 
           {activeTab === 1 && (
             <div>
-              <h3 className="mb-4 text-lg font-semibold">제목2</h3>
-              <p className="mb-2">두 번째 탭 내용 1</p>
-              <p className="mb-2">두 번째 탭 내용 2</p>
-              <p className="mb-2">두 번째 탭 내용 3</p>
-              <p className="mb-2">두 번째 탭 내용 4</p>
-              <p className="mb-2">두 번째 탭 내용 5</p>
+              {/* 컬렉션 Swiper 섹션 */}
+              <div className="mt-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
+                    내가 만든 컬렉션
+                  </h1>
+                  {/* 네비게이션 버튼 */}
+                  <SwiperNavigation
+                    swiper={swiperInstance}
+                    isBeginning={isBeginning}
+                    isEnd={isEnd}
+                  />
+                </div>
+
+                {/* 로딩 상태 (첫 로드) */}
+                {collectionsLoading && collections.length === 0 && (
+                  <div className="flex h-32 items-center justify-center text-gray-500">
+                    컬렉션을 불러오는 중...
+                  </div>
+                )}
+
+                {/* 컬렉션이 없는 경우 */}
+                {!collectionsLoading &&
+                  collections.length === 0 &&
+                  !collectionsError &&
+                  user.isLoggedIn && (
+                    <div className="flex h-32 items-center justify-center text-gray-500">
+                      아직 만든 컬렉션이 없습니다.
+                    </div>
+                  )}
+
+                {/* Swiper 컨테이너 - 모바일 오버플로우 방지 */}
+                {collections.length > 0 && !collectionsLoading && (
+                  <div className="relative -mx-6 px-6 md:mx-0 md:px-0">
+                    <Swiper
+                      modules={[Navigation]}
+                      spaceBetween={16}
+                      slidesPerView={2}
+                      onSwiper={handleSwiperInit}
+                      onSlideChange={handleSlideChange}
+                      navigation={{
+                        prevEl: ".swiper-button-prev",
+                        nextEl: ".swiper-button-next",
+                      }}
+                      breakpoints={{
+                        320: {
+                          slidesPerView: 1.2,
+                          spaceBetween: 12,
+                        },
+                        480: {
+                          slidesPerView: 1.5,
+                          spaceBetween: 12,
+                        },
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 14,
+                        },
+                        768: {
+                          slidesPerView: 2.5,
+                          spaceBetween: 16,
+                        },
+                        1024: {
+                          slidesPerView: 3,
+                          spaceBetween: 16,
+                        },
+                      }}
+                      className="w-full overflow-hidden pt-5"
+                    >
+                      {collections.map((collection) => (
+                        <SwiperSlide
+                          key={collection.collectionId}
+                          className="!h-auto"
+                        >
+                          <HotCollection
+                            collectionId={collection.collectionId}
+                            title={collection.title}
+                            posters={collection.contentPosters.map(
+                              (poster) => poster.posterPath,
+                            )}
+                            saveCount={collection.saveCount || 0}
+                            isSaved={false}
+                            href={`/collections/${collection.collectionId}`}
+                            onSaveToggle={handleSaveToggle}
+                          />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
+                )}
+              </div>
+
+              {/* 내가 저장한 컬렉션 */}
+              <div className="mt-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
+                    내가 저장한 컬렉션
+                  </h1>
+                  {/* 네비게이션 버튼 */}
+                  <SwiperNavigation
+                    swiper={swiperInstance}
+                    isBeginning={isBeginning}
+                    isEnd={isEnd}
+                  />
+                </div>
+
+                {/* 로딩 상태 (첫 로드) */}
+                {collectionsLoading && collections.length === 0 && (
+                  <div className="flex h-32 items-center justify-center text-gray-500">
+                    컬렉션을 불러오는 중...
+                  </div>
+                )}
+
+                {/* 컬렉션이 없는 경우 */}
+                {!collectionsLoading &&
+                  collections.length === 0 &&
+                  !collectionsError &&
+                  user.isLoggedIn && (
+                    <div className="flex h-32 items-center justify-center text-gray-500">
+                      아직 저장한 컬렉션이 없습니다.
+                    </div>
+                  )}
+
+                {/* Swiper 컨테이너 - 모바일 오버플로우 방지 */}
+                {collections.length > 0 && !collectionsLoading && (
+                  <div className="relative -mx-6 px-6 md:mx-0 md:px-0">
+                    <Swiper
+                      modules={[Navigation]}
+                      spaceBetween={16}
+                      slidesPerView={2}
+                      onSwiper={handleSwiperInit}
+                      onSlideChange={handleSlideChange}
+                      navigation={{
+                        prevEl: ".swiper-button-prev",
+                        nextEl: ".swiper-button-next",
+                      }}
+                      breakpoints={{
+                        320: {
+                          slidesPerView: 1.2,
+                          spaceBetween: 12,
+                        },
+                        480: {
+                          slidesPerView: 1.5,
+                          spaceBetween: 12,
+                        },
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 14,
+                        },
+                        768: {
+                          slidesPerView: 2.5,
+                          spaceBetween: 16,
+                        },
+                        1024: {
+                          slidesPerView: 3,
+                          spaceBetween: 16,
+                        },
+                      }}
+                      className="w-full overflow-hidden pt-5"
+                    >
+                      {collections.map((collection) => (
+                        <SwiperSlide
+                          key={collection.collectionId}
+                          className="!h-auto"
+                        >
+                          <HotCollection
+                            collectionId={collection.collectionId}
+                            title={collection.title}
+                            posters={collection.contentPosters.map(
+                              (poster) => poster.posterPath,
+                            )}
+                            saveCount={collection.saveCount || 0}
+                            isSaved={false}
+                            href={`/collections/${collection.collectionId}`}
+                            onSaveToggle={handleSaveToggle}
+                          />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

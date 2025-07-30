@@ -21,6 +21,9 @@ const Layout = () => {
       }
 
       logout();
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } catch (error) {
       console.error("서버 로그아웃 API 실패:", error);
 
