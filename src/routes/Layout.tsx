@@ -5,7 +5,7 @@ import useAuthCheck from "@/hooks/useAuthCheck";
 import { clearTokens } from "@/apis/tokenApi";
 
 const Layout = () => {
-  const { user, accessToken, isLoading } = useAuthCheck();
+  const { user, accessToken, isLoading, logout } = useAuthCheck();
   const navigate = useNavigate();
 
   // 로그인 핸들러
@@ -16,16 +16,16 @@ const Layout = () => {
   // 로그아웃 핸들러
   const handleLogout = async () => {
     try {
-      // 액세스 토큰과 함께 로그아웃 API 호출
-      await clearTokens(accessToken || undefined);
+      if (accessToken) {
+        await clearTokens(accessToken);
+      }
 
-      // 로그아웃 후 홈페이지로 이동하면서 상태 초기화
-      window.location.href = "/";
+      logout();
     } catch (error) {
-      console.error("로그아웃 실패:", error);
+      console.error("서버 로그아웃 API 실패:", error);
 
-      // 에러가 발생해도 강제 로그아웃 진행
-      window.location.href = "/";
+      // 서버 API 실패해도 로컬 로그아웃은 진행
+      logout();
     }
   };
 

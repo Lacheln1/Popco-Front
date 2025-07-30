@@ -87,6 +87,15 @@ button {
   font-weight: 700 !important;
 }
 
+.pretendard {
+  font-family: var(--font-pretendard) !important;
+}
+
+.pretendard-bold {
+  font-family: var(--font-pretendard) !important;
+  font-weight: 700 !important;
+}
+
 .gmarket {
   font-family: var(--font-gmarket) !important;
 }

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Progress } from "antd";
 
-const TOTAL_QUESTIONS = 8;
+const TOTAL_QUESTIONS = 9;
 
 const TestLayout = () => {
   const [step, setStep] = useState(0);
