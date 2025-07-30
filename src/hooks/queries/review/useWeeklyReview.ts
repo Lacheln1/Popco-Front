@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchReviewWeekly } from "@/apis/review";
+import { fetchReviewWeekly } from "@/apis/reviewApi";
 import { ReviewProps } from "@/types/Reviews.types";
 
 export const useWeeklyReview = () => {
