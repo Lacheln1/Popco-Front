@@ -85,7 +85,7 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
 
           {!accessToken ? (
             <LoginBlur
-              className="md:min-h-[400px] md:w-3/5"
+              className="w-1/2 md:min-h-[400px] xl:w-3/5"
               text="내가 좋아할 거같은 영화를 추천받고 싶다면?"
               isReverse={true}
             />

@@ -22,9 +22,9 @@ const LoginBlur = ({ className = "", text = "", isReverse = false }: Props) => {
 
   return (
     <div
-      className={`relative flex min-h-[350px] w-full items-center justify-center rounded-lg text-base ${className}`}
+      className={`relative flex w-full items-center justify-center overflow-hidden rounded-lg text-base md:min-h-[350px] ${className}`}
     >
-      <div className="flex gap-5 blur-xl">
+      <div className="pointer-events-none flex cursor-no-drop gap-5 blur-lg">
         {displayData.map(({ id, title }) => (
           <Poster
             title={title}
@@ -36,7 +36,7 @@ const LoginBlur = ({ className = "", text = "", isReverse = false }: Props) => {
           />
         ))}
       </div>
-      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-4 whitespace-nowrap rounded-lg bg-white px-14 py-2 text-black">
+      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center whitespace-nowrap rounded-lg bg-white px-4 py-2 text-black md:flex-row md:gap-4 md:px-14">
         <div>{text}</div>
         <button
           onClick={() => navigate("/login")}
