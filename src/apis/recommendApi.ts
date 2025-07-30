@@ -70,7 +70,7 @@ export const fetchPopcorithm = async (
   token?: string,
 ): Promise<RecommendationItem[]> => {
   const { data } = await recommendInstance.get<PopcorithmResponse>(
-    `/recommends/popcorithms/users/${userId}/limits/${limit}`,
+    `/recommends/popcorithms/users/${userId}/limits/${limit}?user_id=${userId}`,
     {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
