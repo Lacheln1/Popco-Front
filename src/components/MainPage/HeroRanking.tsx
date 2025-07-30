@@ -9,8 +9,9 @@ import { Swiper as SwiperType } from "swiper";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { useContentsRanking } from "@/hooks/useContentsRanking";
+import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
 import { ContentCategory } from "@/types/Contents.types";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const HeroRanking = () => {
   const [viewMode, setViewMode] = useState<"swiper" | "desktop">("desktop");
@@ -99,7 +100,7 @@ const HeroRanking = () => {
             <div className="absolute inset-0 flex items-center justify-center gap-4 sm:gap-6 sm:pl-[7%] sm:pr-[17%] md:gap-14 md:py-10">
               <img
                 className="h-full rounded-md shadow-lg sm:h-[85%] md:h-[90%]"
-                src={`https://image.tmdb.org/t/p/original/${first.posterPath}`}
+                src={`${TMDB_IMAGE_BASE_URL}${first.posterPath}`}
                 alt={first.title ?? "포스터 이미지"}
               />
               <div className="max-w-full md:max-w-[510px]">
@@ -166,7 +167,7 @@ const HeroRanking = () => {
                     </span>
                     <Poster
                       title={title}
-                      posterUrl={`https://image.tmdb.org/t/p/original/${posterPath}`}
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
                       id={contentId}
                       likeState="neutral"
                       onLikeChange={() => {}}
@@ -187,7 +188,7 @@ const HeroRanking = () => {
                   </span>
                   <Poster
                     title={title}
-                    posterUrl={`https://image.tmdb.org/t/p/original/${posterPath}`}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
                     id={contentId}
                     likeState="neutral"
                     onLikeChange={() => {}}

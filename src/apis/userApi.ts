@@ -1,5 +1,4 @@
 import axios from "axios";
-import { profile } from "console";
 
 //백엔드 url 넣어야함
 const API_URL = "/api/client";
@@ -22,6 +21,25 @@ interface UpdateProfileParams {
   nickname: string;
   profileImageUrl: File;
 }
+
+interface UserDetailsParams {
+  nickname: string;
+  birthday: string; // "YYYY-MM-DD" 형식
+  gender: string;
+}
+
+export const updateUserDetails = async (
+  details: UserDetailsParams,
+  accessToken: string, // accessToken을 인자로 추가
+) => {
+  const response = await axios.post(`${API_URL}/users/details`, details, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
+    },
+    withCredentials: true,
+  });
+  return response.data;
+};
 
 export const getUserInfo = async () => {
   const response = await axios.get(`${API_URL}/users`);
@@ -67,7 +85,7 @@ export const checkEmail = async ({ email }: CheckEmailParams) => {
 
 export const getUserDetail = async (accessToken: string) => {
   try {
-    const response = await axios.get(`${API_URL}/users/detail`, {
+    const response = await axios.get(`${API_URL}/users/details`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -78,6 +96,24 @@ export const getUserDetail = async (accessToken: string) => {
     return response.data;
   } catch (error) {
     console.error("getUserDetail 실패:", error);
+    throw error;
+  }
+};
+
+export const getUserPersonas = async (accessToken: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/personas`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+
+    console.log("유저 페르소나 get", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.log("getPersonas실패", error);
     throw error;
   }
 };

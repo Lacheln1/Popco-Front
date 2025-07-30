@@ -21,7 +21,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "/detail/:movieId", element: <DetailPage /> },
+      { path: "/detail/:contentsType/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
       { path: "/collections", element: <CollectionPage /> },
       { path: "/analysis", element: <AnalysisPage /> },
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         locale={koKR}
         theme={{
           token: {
-            colorPrimary: "#ffd751",
+            colorPrimary: "#fa9a00ff",
           },
         }}
       >
