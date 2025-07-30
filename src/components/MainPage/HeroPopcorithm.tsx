@@ -7,6 +7,7 @@ import Poster from "../common/Poster";
 import "swiper/swiper-bundle.css";
 import { usePopcorithm } from "@/hooks/queries/contents/usePopcorithm";
 import { RecommendationItem } from "@/types/Recommend.types";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 interface Props {
   accessToken: string;
@@ -111,7 +112,7 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
                   >
                     <Poster
                       title={title}
-                      posterUrl={`https://image.tmdb.org/t/p/original${poster_path}`}
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
                       id={content_id}
                       likeState="neutral"
                       onLikeChange={() => {}}
