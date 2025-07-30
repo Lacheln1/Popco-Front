@@ -84,7 +84,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   };
 
   return (
-    <div className="pretendard">
+    <div className="pretendard relative sm:top-3 md:top-4">
       <div className="flex w-full flex-col justify-center gap-8 pl-6">
         {/* 사용자 프로필 */}
         <div className="relative flex items-center">
