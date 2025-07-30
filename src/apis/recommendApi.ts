@@ -1,4 +1,9 @@
 import axios from "axios";
+import recommendInstance from "./recommendInstance";
+import {
+  PopcorithmResponse,
+  RecommendationItem,
+} from "@/types/Recommend.types";
 
 interface FeedbackItem {
   content_id: number;
@@ -57,4 +62,19 @@ export const getOnboardingPersona = async (
     console.error("페르소나 온보딩 실패:", error);
     throw error;
   }
+};
+
+export const fetchPopcorithm = async (
+  userId: number,
+  limit: number,
+  token?: string,
+): Promise<RecommendationItem[]> => {
+  const { data } = await recommendInstance.get<PopcorithmResponse>(
+    `/recommends/popcorithms/users/${userId}/limits/${limit}`,
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  );
+
+  return data.recommendations;
 };
