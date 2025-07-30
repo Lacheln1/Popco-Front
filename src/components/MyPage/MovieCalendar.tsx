@@ -130,6 +130,7 @@ const MovieCalendar: React.FC = () => {
         locale="ko-KR"
         className="w-full border-none shadow-none"
         onActiveStartDateChange={handleActiveStartDateChange}
+        calendarType="gregory"
       />
 
       {/* 현재 로드된 월 정보 표시 (개발용) */}

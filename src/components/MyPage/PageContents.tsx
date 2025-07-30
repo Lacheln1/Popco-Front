@@ -5,15 +5,15 @@ const PageContents: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const tabTitles = ["Calendar", "Collection", "MY"];
   return (
-    <div>
+    <div className="pretendard">
       <div>
-        <div className="flex space-x-1 rounded-lg bg-gray-100 p-1">
+        <div className="flex space-x-2 rounded-lg">
           {tabTitles.map((title, i) => (
             <button
               key={i}
-              className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all ${
+              className={`pretendard-bold ml-2 w-24 rounded-t-[20px] bg-gray-100 px-4 py-2 text-sm transition-all md:w-36 md:text-xl ${
                 activeTab === i
-                  ? "bg-white text-gray-900 shadow-sm"
+                  ? "bg-popco-main text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
               } `}
               onClick={() => setActiveTab(i)}
@@ -22,10 +22,14 @@ const PageContents: React.FC = () => {
             </button>
           ))}
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div className="rounded-b-[8px] border border-gray-200 bg-white p-6">
           {activeTab === 0 && (
             <div>
+              <h1 className="gmarket-bold py-2 text-base md:text-2xl">
+                이 달엔 이런 작품을 봤어요
+              </h1>
               <MovieCalendar />
+              <div></div>
             </div>
           )}
 
