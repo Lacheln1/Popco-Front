@@ -1,12 +1,12 @@
 import SearchBar from "@/components/common/SearchBar";
-import HeroCarousel from "@/components/MainSection/HeroCarousel";
-import HeroCollection from "@/components/MainSection/HeroCollection";
-import HeroPersona from "@/components/MainSection/HeroPersona";
-import HeroPersonaBanner from "@/components/MainSection/HeroPersonaBanner";
-import HeroPopcorithm from "@/components/MainSection/HeroPopcorithm";
-import HeroRanking from "@/components/MainSection/HeroRanking";
-import HeroTop1 from "@/components/MainSection/HeroTop1";
-import HeroReview from "@/components/MainSection/HeroReview";
+import HeroCarousel from "@/components/MainPage/HeroCarousel";
+import HeroCollection from "@/components/MainPage/HeroCollection";
+import HeroPersona from "@/components/MainPage/HeroPersona";
+import HeroPersonaBanner from "@/components/MainPage/HeroPersonaBanner";
+import HeroPopcorithm from "@/components/MainPage/HeroPopcorithm";
+import HeroRanking from "@/components/MainPage/HeroRanking";
+import HeroTop1 from "@/components/MainPage/HeroTop1";
+import HeroReview from "@/components/MainPage/HeroReview";
 import useAuthCheck from "@/hooks/useAuthCheck";
 
 const MainPage = () => {

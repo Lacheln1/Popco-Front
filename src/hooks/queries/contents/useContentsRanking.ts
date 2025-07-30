@@ -1,4 +1,4 @@
-import { fetchContentsRanking } from "@/apis/contents";
+import { fetchContentsRanking } from "@/apis/contentsApi";
 import { ContentCategory, ContentItem } from "@/types/Contents.types";
 import { useQuery } from "@tanstack/react-query";
 
