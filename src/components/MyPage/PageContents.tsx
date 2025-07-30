@@ -12,6 +12,9 @@ import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import HotCollection from "../common/HotCollection"; // HotCollection import
+import LikeContents from "./LikeContents";
+import WantWatching from "./WantWatching";
+import MyPageChart from "./MyPageChart";
 
 interface Movie {
   date: string;
@@ -577,12 +580,30 @@ const PageContents: React.FC = () => {
 
           {activeTab === 2 && (
             <div>
-              <h3 className="mb-4 text-lg font-semibold">제목3</h3>
-              <p className="mb-2">세 번째 탭 내용 1</p>
-              <p className="mb-2">세 번째 탭 내용 2</p>
-              <p className="mb-2">세 번째 탭 내용 3</p>
-              <p className="mb-2">세 번째 탭 내용 4</p>
-              <p className="mb-2">세 번째 탭 내용 5</p>
+              <div>
+                <MyPageChart accessToken={accessToken} />
+              </div>
+              {/* 내가 보고싶어해요 */}
+              <div>
+                {accessToken ? (
+                  <WantWatching userId={user.userId} />
+                ) : (
+                  <div className="flex h-32 items-center justify-center text-gray-500">
+                    로그인이 필요합니다.
+                  </div>
+                )}
+              </div>
+
+              {/* 내가 좋아해요 */}
+              <div>
+                {accessToken ? (
+                  <LikeContents accessToken={accessToken} />
+                ) : (
+                  <div className="flex h-32 items-center justify-center text-gray-500">
+                    로그인이 필요합니다.
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
