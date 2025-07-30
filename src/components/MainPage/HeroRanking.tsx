@@ -108,7 +108,7 @@ const HeroRanking = () => {
                   <span className="text-5xl font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#fdedae] sm:text-7xl lg:text-8xl">
                     1
                   </span>
-                  <span className="gmarket text-lg text-white sm:text-3xl lg:text-4xl">
+                  <span className="gmarket text-lg text-white sm:text-3xl lg:text-[2rem]">
                     {first.title}
                   </span>
                 </div>

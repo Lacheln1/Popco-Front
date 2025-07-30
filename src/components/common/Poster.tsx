@@ -11,6 +11,7 @@ type PosterProps = {
   id: number;
   likeState: LikeState;
   onLikeChange: (newState: LikeState) => void;
+  disableHover?: boolean;
 };
 
 const Poster = ({
@@ -19,6 +20,7 @@ const Poster = ({
   id,
   likeState,
   onLikeChange,
+  disableHover,
 }: PosterProps) => {
   const navigator = useNavigate();
 
@@ -66,25 +68,27 @@ const Poster = ({
         />
 
         {/* PC 호버용 오버레이 */}
-        <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/40 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
-          {renderReactionButton(
-            "like",
-            isLiked,
-            (e) => toggleState(e, "liked"),
-            "h-[80px] w-[80px]",
-          )}
-          {renderReactionButton(
-            "hate",
-            isHated,
-            (e) => toggleState(e, "hated"),
-            "h-[80px] w-[80px]",
-          )}
+        {!disableHover && (
+          <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/40 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
+            {renderReactionButton(
+              "like",
+              isLiked,
+              (e) => toggleState(e, "liked"),
+              "h-[80px] w-[80px]",
+            )}
+            {renderReactionButton(
+              "hate",
+              isHated,
+              (e) => toggleState(e, "hated"),
+              "h-[80px] w-[80px]",
+            )}
 
-          <div className="absolute bottom-7 flex items-center gap-3 text-white">
-            <span>자세히 보기</span>
-            <HiCursorClick />
+            <div className="absolute bottom-7 flex items-center gap-3 text-white">
+              <span>자세히 보기</span>
+              <HiCursorClick />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* 모바일 하단 버튼 */}
