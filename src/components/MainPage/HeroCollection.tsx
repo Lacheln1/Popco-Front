@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import HotCollection from "../common/HotCollection";
 import { useWeeklyCollections } from "@/hooks/queries/collections/useWeeklyCollections";
 import { HotCollections } from "@/types/Collection.types";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const HeroCollection = () => {
   const { data, isLoading, isError } = useWeeklyCollections(3);
@@ -15,7 +16,7 @@ const HeroCollection = () => {
       posters: collection.contentPosters
         .slice(-4)
         .reverse()
-        .map((c) => `https://image.tmdb.org/t/p/original/${c.posterPath}`),
+        .map((c) => `${TMDB_IMAGE_BASE_URL}${c.posterPath}`),
       href: `/collection/${collection.collectionId}`,
       saveCount: collection.saveCount,
     }));
