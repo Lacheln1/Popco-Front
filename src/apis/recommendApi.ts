@@ -69,12 +69,18 @@ export const fetchPopcorithm = async (
   limit: number,
   token?: string,
 ): Promise<RecommendationItem[]> => {
-  const { data } = await recommendInstance.get<PopcorithmResponse>(
-    `/recommends/popcorithms/users/${userId}/limits/${limit}?user_id=${userId}`,
-    {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    },
-  );
-
-  return data.recommendations;
+  if (limit <= 0 || userId <= 0) {
+    throw new Error("유효하지 않은 userId|limit 입니다.");
+  }
+  try {
+    const endpoint = `/recommends/popcorithms/users/${userId}/limits/${limit}?user_id=${userId}`;
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const { data } = await recommendInstance.get<PopcorithmResponse>(endpoint, {
+      headers,
+    });
+    return data.recommendations;
+  } catch (error) {
+    console.error("fetchPopcorithm 실패:", error);
+    throw new Error("팝코리즘을 불러오는 데 실패했습니다.");
+  }
 };
