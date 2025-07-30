@@ -3,7 +3,10 @@ import MovieCalendar from "./MovieCalendar";
 import ReviewCard from "../common/ReviewCard";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { getMonthlyReviews } from "@/apis/userApi";
-import { fetchMyCollections } from "@/apis/collectionApi"; // 컬렉션 API import
+import {
+  fetchMyCollections,
+  fetchMyMarkedCollections,
+} from "@/apis/collectionApi"; // 컬렉션 API import
 import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -66,6 +69,14 @@ const PageContents: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(0);
   const [pageSize] = useState(20);
   const [hasMore, setHasMore] = useState(true);
+
+  // 저장한 컬렉션 관련 상태
+  const [markedCollections, setMarkedCollections] = useState<Collection[]>([]);
+  const [markedCollectionsLoading, setMarkedCollectionsLoading] =
+    useState(false);
+  const [markedCollectionsError, setMarkedCollectionsError] = useState<
+    string | null
+  >(null);
 
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
@@ -156,6 +167,31 @@ const PageContents: React.FC = () => {
     }
   };
 
+  // 저장한 컬렉션 목록 가져오기
+  const fetchMyMarkedCollectionsData = async () => {
+    if (!accessToken || !user.isLoggedIn || markedCollectionsLoading) {
+      return;
+    }
+
+    try {
+      setMarkedCollectionsLoading(true);
+      setMarkedCollectionsError(null);
+
+      console.log("저장한 컬렉션 API 요청");
+      const response = await fetchMyMarkedCollections(accessToken, 0, pageSize);
+      console.log("저장한 컬렉션 API 응답:", response);
+
+      if (response.code === 1073741824 && response.data) {
+        setMarkedCollections(response.data.collections);
+      }
+    } catch (err) {
+      console.error("저장한 컬렉션 조회 실패:", err);
+      setMarkedCollectionsError("저장한 컬렉션을 불러오는데 실패했습니다.");
+    } finally {
+      setMarkedCollectionsLoading(false);
+    }
+  };
+
   // 컬렉션 저장/취소 토글
   const handleSaveToggle = async (collectionId: number) => {
     try {
@@ -226,6 +262,7 @@ const PageContents: React.FC = () => {
       collections.length === 0
     ) {
       fetchMyCollectionsData(0, true);
+      fetchMyMarkedCollectionsData(); // 저장한 컬렉션도 함께 로드
     }
   }, [activeTab, accessToken, user.isLoggedIn]);
 
@@ -460,16 +497,16 @@ const PageContents: React.FC = () => {
                 </div>
 
                 {/* 로딩 상태 (첫 로드) */}
-                {collectionsLoading && collections.length === 0 && (
+                {markedCollectionsLoading && markedCollections.length === 0 && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
-                    컬렉션을 불러오는 중...
+                    저장한 컬렉션을 불러오는 중...
                   </div>
                 )}
 
                 {/* 컬렉션이 없는 경우 */}
-                {!collectionsLoading &&
-                  collections.length === 0 &&
-                  !collectionsError &&
+                {!markedCollectionsLoading &&
+                  markedCollections.length === 0 &&
+                  !markedCollectionsError &&
                   user.isLoggedIn && (
                     <div className="flex h-32 items-center justify-center text-gray-500">
                       아직 저장한 컬렉션이 없습니다.
@@ -477,7 +514,7 @@ const PageContents: React.FC = () => {
                   )}
 
                 {/* Swiper 컨테이너 - 모바일 오버플로우 방지 */}
-                {collections.length > 0 && !collectionsLoading && (
+                {markedCollections.length > 0 && !markedCollectionsLoading && (
                   <div className="relative -mx-6 px-6 md:mx-0 md:px-0">
                     <Swiper
                       modules={[Navigation]}
@@ -513,7 +550,7 @@ const PageContents: React.FC = () => {
                       }}
                       className="w-full overflow-hidden pt-5"
                     >
-                      {collections.map((collection) => (
+                      {markedCollections.map((collection) => (
                         <SwiperSlide
                           key={collection.collectionId}
                           className="!h-auto"
@@ -525,7 +562,7 @@ const PageContents: React.FC = () => {
                               (poster) => poster.posterPath,
                             )}
                             saveCount={collection.saveCount || 0}
-                            isSaved={false}
+                            isSaved={true} // 저장한 컬렉션이므로 true
                             href={`/collections/${collection.collectionId}`}
                             onSaveToggle={handleSaveToggle}
                           />
