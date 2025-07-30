@@ -27,6 +27,7 @@ const LoginBlur = ({ className = "", text = "", isReverse = false }: Props) => {
       <div className="pointer-events-none flex cursor-no-drop gap-5 blur-lg">
         {displayData.map(({ id, title }) => (
           <Poster
+            key={id}
             title={title}
             posterUrl={`images/poster/poster${id}.png`}
             id={id}
