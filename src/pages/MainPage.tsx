@@ -7,8 +7,11 @@ import HeroPopcorithm from "@/components/MainPage/HeroPopcorithm";
 import HeroRanking from "@/components/MainPage/HeroRanking";
 import HeroTop1 from "@/components/MainPage/HeroTop1";
 import HeroReview from "@/components/MainPage/HeroReview";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 const MainPage = () => {
+  const { user, accessToken } = useAuthCheck();
+
   return (
     <div className="flex flex-col gap-32 overflow-x-hidden pb-20 sm:gap-40 md:pb-32">
       <div className="flex flex-col gap-10 bg-gradient-to-b from-[#172039] to-[#FFFFFF] pt-32 sm:gap-20">
@@ -17,7 +20,7 @@ const MainPage = () => {
         <HeroRanking />
       </div>
       <HeroTop1 />
-      <HeroPopcorithm />
+      <HeroPopcorithm accessToken={accessToken ?? ""} userId={user.userId} />
       <HeroPersonaBanner />
       <HeroPersona />
       <HeroReview />

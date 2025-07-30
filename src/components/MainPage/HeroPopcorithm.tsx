@@ -5,22 +5,48 @@ import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import Poster from "../common/Poster";
 import "swiper/swiper-bundle.css";
+import { usePopcorithm } from "@/hooks/queries/contents/usePopcorithm";
+import { RecommendationItem } from "@/types/Recommend.types";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
-const HeroPopcorithm = () => {
+interface Props {
+  accessToken: string;
+  userId: number;
+}
+const HeroPopcorithm = ({ accessToken, userId }: Props) => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
 
-  const posterData = [
-    { id: 1, title: "케이팝 데몬 헌터스" },
-    { id: 2, title: "서초동" },
-    { id: 3, title: "쥬라기 월드 : 새로운 시작" },
-    { id: 4, title: "서초동" },
-    { id: 5, title: "다섯번째 포스터" },
-    { id: 6, title: "여섯번째 포스터" },
-  ];
+  const HERO_POPCORITHM_LIMIT = 10;
+  const { data, isLoading, isError, isSuccess } = usePopcorithm(
+    userId,
+    HERO_POPCORITHM_LIMIT,
+    accessToken,
+  );
+  if (isLoading) {
+    return (
+      <div className="py-20 text-center text-white">
+        <p>추천 콘텐츠를 불러오는 중입니다...</p>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="py-20 text-center text-red-600">
+        <p>추천 콘텐츠를 불러오는 데 실패했습니다.</p>
+      </div>
+    );
+  }
+  if (isSuccess && (!data || data.length === 0)) {
+    return (
+      <div className="py-20 text-center text-gray-400">
+        <p>😶 추천 콘텐츠가 아직 없습니다.</p>
+      </div>
+    );
+  }
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -78,20 +104,22 @@ const HeroPopcorithm = () => {
                 1920: { slidesPerView: 5 },
               }}
             >
-              {posterData.map(({ id, title }) => (
-                <SwiperSlide
-                  key={id}
-                  className="flex flex-col items-center justify-items-center"
-                >
-                  <Poster
-                    title={title}
-                    posterUrl="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
-                    id={id}
-                    likeState="neutral"
-                    onLikeChange={() => {}}
-                  />
-                </SwiperSlide>
-              ))}
+              {data?.map(
+                ({ content_id, title, poster_path }: RecommendationItem) => (
+                  <SwiperSlide
+                    key={content_id}
+                    className="flex flex-col items-center justify-items-center"
+                  >
+                    <Poster
+                      title={title}
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
+                      id={content_id}
+                      likeState="neutral"
+                      onLikeChange={() => {}}
+                    />
+                  </SwiperSlide>
+                ),
+              )}
             </Swiper>
           </div>
 
@@ -122,6 +150,3 @@ const HeroPopcorithm = () => {
 };
 
 export default HeroPopcorithm;
-
-//     bottom: 65%;
-// left: 15%;
