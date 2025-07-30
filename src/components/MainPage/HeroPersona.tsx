@@ -5,24 +5,52 @@ import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import Poster from "../common/Poster";
 import "swiper/swiper-bundle.css";
+import { useHeroPersona } from "@/hooks/queries/contents/useHeroPersona";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { PersonaRecommendation } from "@/types/Persona.types";
 
-const HeroPersona = () => {
+interface Props {
+  accessToken: string;
+  userId: number;
+}
+
+const HeroPersona = ({ accessToken, userId }: Props) => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+  const [contentType, setContentType] = useState<
+    "all" | "movie" | "tv" | undefined
+  >("all");
 
-  const posterData = [
-    { id: 1, title: "첫번째 포스터" },
-    { id: 2, title: "두번째 포스터" },
-    { id: 3, title: "세번째 포스터" },
-    { id: 4, title: "네번째 포스터" },
-    { id: 5, title: "다섯번째 포스터" },
-    { id: 6, title: "여섯번째 포스터" },
-    { id: 7, title: "일곱번째 포스터" },
-    { id: 8, title: "여덟번째 포스터" },
-  ];
+  const { data, isLoading, isError, isSuccess } = useHeroPersona(
+    userId,
+    accessToken,
+    contentType,
+  );
+
+  if (isLoading) {
+    return (
+      <div className="py-20 text-center text-white">
+        <p>추천 콘텐츠를 불러오는 중입니다...</p>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="py-20 text-center text-red-600">
+        <p>추천 콘텐츠를 불러오는 데 실패했습니다.</p>
+      </div>
+    );
+  }
+  if (isSuccess && (!data || data.length === 0)) {
+    return (
+      <div className="py-20 text-center text-gray-400">
+        <p>😶 추천 콘텐츠가 아직 없습니다.</p>
+      </div>
+    );
+  }
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -79,17 +107,19 @@ const HeroPersona = () => {
             },
           }}
         >
-          {posterData.map(({ id, title }) => (
-            <SwiperSlide key={id} className="flex justify-center">
-              <Poster
-                title={title}
-                posterUrl="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
-                id={id}
-                likeState="neutral"
-                onLikeChange={() => {}}
-              />
-            </SwiperSlide>
-          ))}
+          {data?.map(
+            ({ contentId, title, poster_path }: PersonaRecommendation) => (
+              <SwiperSlide key={contentId} className="flex justify-center">
+                <Poster
+                  title={title}
+                  posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
+                  id={contentId}
+                  likeState="neutral"
+                  onLikeChange={() => {}}
+                />
+              </SwiperSlide>
+            ),
+          )}
         </Swiper>
       </section>
     </div>
