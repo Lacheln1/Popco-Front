@@ -42,7 +42,7 @@ export const fetchHeroPersona = async (
   const queryParam =
     contentType && contentType !== "all" ? `?content_type=${contentType}` : "";
   const { data } = await recommendInstance.get<PersonaResponse>(
-    `/recommends/persona/users/${userId}/recommendations${queryParam}`,
+    `/recommends/personas/users/${userId}/recommendations${queryParam}?user_id=${userId}`,
     {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
