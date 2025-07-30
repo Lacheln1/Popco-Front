@@ -28,10 +28,6 @@ export interface CollectionResponse {
   data: CollectionProps[];
 }
 
-export interface HotCollections {
-  collectionId: number;
-  title: string;
-  posters: string[];
-  href: string;
+export interface HotCollections extends CollectionBase {
   saveCount: number;
 }
