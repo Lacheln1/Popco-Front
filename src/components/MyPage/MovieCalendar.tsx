@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./MovieCalendar.css";
-import useAuthCheck from "@/hooks/useAuthCheck";
-import { getMonthlyReviews } from "@/apis/userApi";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -14,73 +12,28 @@ interface Movie {
   poster: string;
 }
 
-// 간단한 달력 컴포넌트
-const MovieCalendar: React.FC = () => {
+interface MovieCalendarProps {
+  movies: Movie[];
+  loading: boolean;
+  currentMonth: string;
+  onMonthChange: (activeStartDate: Date | null) => void;
+}
+
+const MovieCalendar: React.FC<MovieCalendarProps> = ({
+  movies,
+  loading,
+  currentMonth,
+  onMonthChange,
+}) => {
   const [value, onChange] = useState<Value>(new Date());
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState<string>("");
 
-  const { accessToken, user } = useAuthCheck();
-
-  //YYYY-MM 형식으로 변환하기
-  const formatMonthForApi = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    return `${year}-${month}`;
-  };
-
-  const fetchMonthlyReviews = async (month: string) => {
-    if (!accessToken || !user.isLoggedIn) {
-      console.log("로그인이 필요합니다");
-      setMovies([]);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      console.log(`API 요청: /reviews/my/monthly?month=${month}`);
-      const response = await getMonthlyReviews({ month }, accessToken);
-      console.log("월별영화api응답==", response);
-
-      if (response.data) {
-        const movieData: Movie[] = response.data.map((review) => ({
-          date: review.createdAt.split("T")[0], // 2025-07-30T02:34:05.047Z → 2025-07-30
-          title: review.title,
-          poster: review.posterPath,
-        }));
-
-        setMovies(movieData);
-        console.log("변환된 영화 데이터:", movieData);
-      }
-    } catch (error) {
-      console.error("영화api요청 실패", error);
-      setMovies([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //컴포넌트 마운트 시 및 로그인 상태 변경 시 현재 월 데이터 가져오기
-  useEffect(() => {
-    const initialMonth = formatMonthForApi(new Date());
-    setCurrentMonth(initialMonth);
-    fetchMonthlyReviews(initialMonth);
-  }, [accessToken, user.isLoggedIn]);
-
-  //달력에서 월이 변경될 때마다 새로운 데이터 가져오기
+  // 달력에서 월이 변경될 때마다 부모 컴포넌트에 알림
   const handleActiveStartDateChange = ({
     activeStartDate,
   }: {
     activeStartDate: Date | null;
   }) => {
-    if (activeStartDate) {
-      const newMonth = formatMonthForApi(activeStartDate);
-      if (newMonth !== currentMonth) {
-        setCurrentMonth(newMonth);
-        fetchMonthlyReviews(newMonth);
-      }
-    }
+    onMonthChange(activeStartDate);
   };
 
   // 특정 날짜의 영화 찾기
