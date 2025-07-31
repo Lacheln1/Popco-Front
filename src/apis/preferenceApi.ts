@@ -4,15 +4,24 @@ export interface Movie {
   id: string;
   title: string;
   posterPath: string;
+  type: string;
 }
 
-export const getTestMovies = async (accessToken: string): Promise<Movie[]> => {
+interface ApiResponse {
+  data: {
+    contents: Movie[];
+  };
+}
+
+export const getTestMovies = async (
+  accessToken: string,
+): Promise<{ contents: Movie[] }> => {
   try {
-    const response = await axios.get<{ data: Movie[] }>(
-      "/api/client/contents/preferences", 
+    const response = await axios.get<ApiResponse>(
+      "/api/client/contents/preferences",
       {
         headers: {
-          Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 직접 추가
+          Authorization: `Bearer ${accessToken}`,
         },
         withCredentials: true,
       },

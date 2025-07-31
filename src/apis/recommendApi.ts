@@ -7,18 +7,19 @@ import {
   RecommendationItem,
 } from "@/types/Recommend.types";
 
+// --- API 요청(Request)을 위한 타입 정의 ---
 interface FeedbackItem {
   content_id: number;
   content_type: string;
 }
 
 interface InitialAnswers {
-  [key: string]: string; // 예: { "1": "3", "2": "1" } (질문ID: 답변ID)
+  [key: string]: string;
 }
 
 interface OnboardingRequest {
   feedback_items: FeedbackItem[];
-  reaction_type: "좋아요"; // 선호도 조사에서는 '좋아요'로 고정
+  reaction_type: "좋아요";
   initial_answers: InitialAnswers;
 }
 
@@ -49,8 +50,8 @@ export const getOnboardingPersona = async (
   accessToken: string,
 ): Promise<OnboardingResponse> => {
   try {
-    const response = await axios.post<{ data: OnboardingResponse }>(
-      "/api/client/recommend/persona/onboard",
+    const response = await axios.post<OnboardingResponse>( // ✅ 타입 추론을 위해 제네릭 위치 변경
+      "/api/client/recommends/personas/onboard",
       params,
       {
         headers: {
@@ -59,7 +60,9 @@ export const getOnboardingPersona = async (
         withCredentials: true,
       },
     );
-    return response.data.data;
+
+    // ✅ [핵심 수정] response.data.data가 아닌 response.data를 반환합니다.
+    return response.data;
   } catch (error) {
     console.error("페르소나 온보딩 실패:", error);
     throw error;

@@ -51,7 +51,7 @@ const cardImageRows = [
 ];
 
 const TestPage = () => {
-  const { accessToken } = useAuthCheck();
+  const { user, accessToken } = useAuthCheck();
   const navigate = useNavigate();
   const { message } = App.useApp();
   const { step, total: TOTAL_STEPS, setStep } = useOutletContext<any>();
@@ -60,82 +60,62 @@ const TestPage = () => {
   const [nickname, setNickname] = useState("");
   const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
   const [gender, setGender] = useState("");
-  const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
+  // ✅ [수정 1] selectedMovies가 ID 배열이 아닌, 영화 객체 배열을 저장하도록 변경합니다.
+  const [selectedMovies, setSelectedMovies] = useState<Movie[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: number]: number }>({});
+  const [savedUserId, setSavedUserId] = useState<number | null>(null);
+  // API 통신 및 데이터 로딩 State
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [fetchedQuizzes, setFetchedQuizzes] = useState<{
     [key: number]: QuestionData;
   }>({});
-  const [isQuizLoading, setIsQuizLoading] = useState(false);
-
-  // API 통신 및 데이터 로딩 State
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuizLoading, setIsQuizLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [personaResult, setPersonaResult] = useState<OnboardingResponse | null>(
     null,
   );
 
-  //사용자가 진단페이지 직접 못하게
+  // 사용자가 진단 페이지에 직접 URL로 접근하는 것을 방지
   useEffect(() => {
-    // accessToken이 있어야만 사용자 정보를 확인할 수 있습니다.
     if (accessToken) {
       const checkProfileStatus = async () => {
         try {
-          // 사용자 상세 정보를 불러옵니다.
           const userInfoResponse = await getUserDetail(accessToken);
-
-          // profileComplete가 true이면, 이미 진단을 완료한 사용자입니다.
-          if (userInfoResponse.data.profileComplete === true) {
+          if (userInfoResponse?.data?.profileComplete === true) {
             message.info(
               "이미 취향 진단을 완료했습니다. 메인 페이지로 이동합니다.",
             );
-            navigate("/"); // 메인 페이지로 리디렉션
+            navigate("/");
           }
-          // false인 경우, 이 페이지에 머무르며 테스트를 계속 진행합니다.
         } catch (error) {
           console.error("사용자 프로필 상태 확인 실패:", error);
-          message.error("사용자 정보 확인에 실패했습니다.");
         }
       };
-
       checkProfileStatus();
     }
-    // accessToken이 변경될 때마다 이 효과를 실행합니다.
   }, [accessToken, navigate, message]);
 
-  // 인트로 자동 넘김 및 영화 데이터 로딩
+  // 단계별 데이터 로딩 (영화, 퀴즈)
   useEffect(() => {
-    // 인트로 로직
     if (step === 0) {
       const timer = setTimeout(() => setStep(1), 1500);
       return () => clearTimeout(timer);
     }
+    if (!accessToken) return;
 
-    // 영화 데이터 로딩 로직
-    if (step === 4 && accessToken) {
+    if (step === 4 && movies.length === 0) {
       const fetchMovies = async () => {
-        if (movies.length > 0) return;
-
         setIsLoading(true);
         try {
           const responseData: any = await getTestMovies(accessToken);
-          console.log("API로부터 받은 영화 데이터:", responseData);
-
-          // ✅ 핵심 수정 부분!
-          // responseData 객체 안의 'contents' 배열이 있는지 확인합니다.
           if (responseData && Array.isArray(responseData.contents)) {
-            // 'contents' 배열을 movies state에 저장합니다.
             setMovies(responseData.contents);
           } else {
-            console.error(
-              "API 응답에 'contents' 배열이 없습니다:",
-              responseData,
-            );
             setMovies([]);
           }
         } catch (error) {
           message.error("영화 목록을 불러오는 데 실패했습니다.");
-          console.error(error);
           setMovies([]);
         } finally {
           setIsLoading(false);
@@ -143,21 +123,13 @@ const TestPage = () => {
       };
       fetchMovies();
     }
-    // 의존성 배열
-  }, [step, accessToken, movies.length, message]);
 
-  // 퀴즈 질문 데이터 로딩
-  useEffect(() => {
-    if (step < 5 || step > 9) return;
-    const questionNumber = step - 4;
-    if (fetchedQuizzes[questionNumber]) return;
-
-    // accessToken이 준비되었을 때만 API를 호출
-    if (accessToken) {
+    if (step >= 5 && step <= 9) {
+      const questionNumber = step - 4;
+      if (fetchedQuizzes[questionNumber]) return;
       const fetchQuiz = async () => {
         setIsQuizLoading(true);
         try {
-          // getQuizQuestion 호출 시 accessToken 전달
           const quizData = await getQuizQuestion(questionNumber, accessToken);
           setFetchedQuizzes((prev) => ({
             ...prev,
@@ -171,9 +143,9 @@ const TestPage = () => {
       };
       fetchQuiz();
     }
-  }, [step, fetchedQuizzes, message, accessToken]);
+  }, [step, accessToken, movies.length, fetchedQuizzes, message, setStep]);
 
-  // 최종 정보 제출 함수
+  // 최종 정보 제출 함수 (수정된 버전)
   const handleSubmit = async () => {
     if (!accessToken) {
       message.error("인증 정보가 없습니다. 다시 로그인해주세요.");
@@ -182,43 +154,178 @@ const TestPage = () => {
 
     setIsSubmitting(true);
     try {
-      // 1. 프로필 정보를 담은 객체 생성
-      const userDetails = {
-        nickname: nickname,
-        birthday: birthDate!.format("YYYY-MM-DD"),
-        gender: gender,
-      };
+      let userIdToUse = savedUserId;
 
-      // 2. 페르소나 분석에 필요한 정보 객체 생성
+      // 1. 저장된 userId가 없다면, 프로필 업데이트를 시도합니다.
+      if (!userIdToUse) {
+        const userDetails = {
+          nickname: nickname,
+          birthday: birthDate!.format("YYYY-MM-DD"),
+          gender: gender,
+        };
+
+        console.log("=== 프로필 업데이트 시도 ===");
+        console.log("업데이트할 사용자 정보:", userDetails);
+
+        const userDetailsResponse = await updateUserDetails(
+          userDetails,
+          accessToken,
+        );
+        console.log("프로필 업데이트 응답 전체:", userDetailsResponse);
+        console.log("응답 데이터:", userDetailsResponse.data);
+
+        const receivedUserId = userDetailsResponse.data?.userId;
+
+        if (receivedUserId) {
+          console.log("프로필 업데이트로 받은 userId:", receivedUserId);
+          setSavedUserId(receivedUserId);
+          userIdToUse = receivedUserId;
+        } else {
+          console.log(
+            "프로필 업데이트에서 userId를 받지 못함, 기존 user 정보 사용 시도",
+          );
+          console.log("기존 user 객체:", user);
+
+          if (user && user.userId > 0) {
+            userIdToUse = user.userId;
+            console.log("기존 user.userId 사용:", userIdToUse);
+          } else {
+            throw new Error(
+              "사용자 ID를 확인할 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요.",
+            );
+          }
+        }
+      }
+
+      // 2. 데이터 검증 및 변환
+      const validatedFeedbackItems = selectedMovies
+        .map((movie) => {
+          // content_id를 명시적으로 숫자로 변환
+          const contentId =
+            typeof movie.id === "string" ? parseInt(movie.id, 10) : movie.id;
+
+          // content_type 검증 및 기본값 설정
+          let contentType = movie.type;
+          if (
+            !contentType ||
+            (contentType !== "movie" && contentType !== "tv")
+          ) {
+            // 기본값으로 'movie' 설정 (또는 API 문서에 따라 조정)
+            contentType = "movie";
+            console.warn(
+              `Invalid content_type for movie ${movie.id}: ${movie.type}, using 'movie' as default`,
+            );
+          }
+
+          return {
+            content_id: contentId,
+            content_type: contentType,
+          };
+        })
+        .filter((item) => !isNaN(item.content_id)); // 유효하지 않은 ID 제거
+
+      // 3. initial_answers 검증
+      const validatedInitialAnswers = Object.entries(quizAnswers).reduce(
+        (acc, [questionId, optionId]) => {
+          const key = `Q${questionId}`;
+          const value = String.fromCharCode(64 + optionId); // 1->A, 2->B, 3->C, 4->D
+          acc[key] = value;
+          return acc;
+        },
+        {} as { [key: string]: string },
+      );
+
       const personaPayload = {
-        feedback_items: selectedMovies.map((id) => ({
-          content_id: Number(id),
-          content_type: "movie",
-        })),
+        user_id: userIdToUse,
+        feedback_items: validatedFeedbackItems,
         reaction_type: "좋아요" as const,
-        initial_answers: Object.entries(quizAnswers).reduce(
-          (acc, [key, value]) => {
-            acc[key] = String(value);
-            return acc;
-          },
-          {} as { [key: string]: string },
-        ),
+        initial_answers: validatedInitialAnswers,
       };
 
-      // 3. Promise.all을 사용해 두 API를 동시에 호출
-      const [_, personaResult] = await Promise.all([
-        updateUserDetails(userDetails, accessToken),
-        getOnboardingPersona(personaPayload, accessToken),
-      ]);
+      console.log("--- 최종 제출 직전 데이터 확인 ---");
+      console.log("사용자 ID:", userIdToUse);
+      console.log("선택된 영화 수:", selectedMovies.length);
+      console.log("검증된 피드백 아이템 수:", validatedFeedbackItems.length);
+      console.log("퀴즈 답변 수:", Object.keys(validatedInitialAnswers).length);
+      console.log(
+        "페르소나 분석 요청 데이터:",
+        JSON.stringify(personaPayload, null, 2),
+      );
+      console.log("---------------------------------");
 
-      // 4. 페르소나 분석 결과(personaResult)를 state에 저장
-      setPersonaResult(personaResult);
+      // 4. 기본 검증
+      if (!userIdToUse || userIdToUse <= 0) {
+        throw new Error("유효하지 않은 사용자 ID입니다.");
+      }
 
-      message.success("취향 분석이 완료되었습니다!");
-      setStep((prev: number) => prev + 1); // 결과 페이지로 이동
-    } catch (error) {
-      console.error("최종 정보 제출 실패:", error);
-      message.error("정보 저장 또는 분석에 실패했습니다. 다시 시도해주세요.");
+      if (validatedFeedbackItems.length === 0) {
+        throw new Error("선택된 컨텐츠가 없습니다.");
+      }
+
+      if (Object.keys(validatedInitialAnswers).length !== 5) {
+        throw new Error("모든 퀴즈 답변이 완료되지 않았습니다.");
+      }
+
+      // 5. 페르소나 분석 요청
+      console.log("=== 페르소나 분석 API 호출 시작 ===");
+
+      let personaAnalysisResult;
+      try {
+        personaAnalysisResult = await getOnboardingPersona(
+          personaPayload,
+          accessToken,
+        );
+        console.log("페르소나 분석 API 응답:", personaAnalysisResult);
+      } catch (apiError: any) {
+        console.error("=== 페르소나 분석 API 호출 실패 ===");
+        console.error("API 에러 객체:", apiError);
+
+        if (apiError.response) {
+          console.error("API 응답 상태:", apiError.response.status);
+          console.error("API 응답 데이터:", apiError.response.data);
+          console.error("API 응답 헤더:", apiError.response.headers);
+        }
+
+        // API 에러를 다시 throw해서 외부 catch에서 처리하도록 함
+        throw apiError;
+      }
+
+      if (personaAnalysisResult && personaAnalysisResult.main_persona) {
+        setPersonaResult(personaAnalysisResult);
+        message.success("취향 분석이 완료되었습니다!");
+        setStep((prev: number) => prev + 1);
+      } else {
+        // API 응답은 왔지만, 내용이 에러이거나 예상과 다른 경우
+        throw new Error(
+          (personaAnalysisResult as any)?.message ||
+            "페르소나 분석에 실패했습니다.",
+        );
+      }
+    } catch (error: any) {
+      console.error("--- 최종 정보 제출 실패: 상세 에러 로그 ---");
+      console.error("에러 객체 전체:", error);
+
+      if (error.response) {
+        console.error("서버 응답 데이터:", error.response.data);
+        console.error("서버 응답 상태 코드:", error.response.status);
+        console.error("서버 응답 헤더:", error.response.headers);
+
+        // 서버 에러 메시지 추출
+        const serverMessage =
+          error.response.data?.message ||
+          error.response.data?.error ||
+          `서버 오류 (${error.response.status})`;
+        message.error(serverMessage);
+      } else if (error.request) {
+        console.error("요청이 전송되었지만 응답을 받지 못함:", error.request);
+        message.error(
+          "서버와 통신할 수 없습니다. 네트워크 연결을 확인해주세요.",
+        );
+      } else {
+        console.error("요청 설정 중 에러:", error.message);
+        message.error(error.message || "요청을 보내는 중 문제가 발생했습니다.");
+      }
+      console.error("-----------------------------------------");
     } finally {
       setIsSubmitting(false);
     }
@@ -253,10 +360,24 @@ const TestPage = () => {
     setStep((prev: number) => Math.max(1, prev - 1));
   };
 
-  const handleToggleMovieSelect = (id: string) => {
-    setSelectedMovies((prev) =>
-      prev.includes(id) ? prev.filter((mId) => mId !== id) : [...prev, id],
-    );
+  // ✅ [수정 2] ID 문자열 대신 영화 객체 전체를 받아서 처리하도록 수정합니다.
+  const handleToggleMovieSelect = (movie: Movie) => {
+    setSelectedMovies((prevSelected) => {
+      // 이미 선택된 영화인지 ID를 기준으로 확인합니다.
+      const isAlreadySelected = prevSelected.some(
+        (selectedMovie) => selectedMovie.id === movie.id,
+      );
+
+      if (isAlreadySelected) {
+        // 이미 있으면, 해당 영화를 배열에서 제거합니다.
+        return prevSelected.filter(
+          (selectedMovie) => selectedMovie.id !== movie.id,
+        );
+      } else {
+        // 없으면, 기존 배열에 새로운 영화 객체를 추가합니다.
+        return [...prevSelected, movie];
+      }
+    });
   };
 
   const handleSelectAnswer = (questionId: number, optionId: number) => {
@@ -382,8 +503,8 @@ const TestPage = () => {
         return (
           <div className="flex h-full flex-col gap-4 py-4">
             <div className="px-4 text-center">
-              <h3 className={headingStyle}>어떤 컨텐츠를 재밌게 보셨나요?</h3>
-              <p className={paragraphStyle}>
+              <h3 className="font-bold ...">어떤 컨텐츠를 재밌게 보셨나요?</h3>
+              <p className="mt-4 ...">
                 마음에 드는 컨텐츠를 최소 3개이상 골라주세요.
                 <br />
                 많이 선택하실수록 취향 분석이 정교해져요.
@@ -403,10 +524,10 @@ const TestPage = () => {
                         id={String(movie.id)}
                         title={movie.title}
                         posterUrl={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
-                        isSelected={selectedMovies.includes(String(movie.id))}
-                        onToggleSelect={() =>
-                          handleToggleMovieSelect(String(movie.id))
-                        }
+                        isSelected={selectedMovies.some(
+                          (m) => m.id === movie.id,
+                        )}
+                        onToggleSelect={() => handleToggleMovieSelect(movie)}
                       />
                     );
                   })}
@@ -415,6 +536,7 @@ const TestPage = () => {
             )}
           </div>
         );
+
       case 5:
       case 6:
       case 7:
@@ -427,7 +549,9 @@ const TestPage = () => {
         if (isQuizLoading || !currentQuiz) {
           return (
             <div className="flex h-full items-center justify-center">
-              <Spin tip="질문을 불러오는 중..." />
+              <Spin tip="질문을 불러오는 중..." size="large">
+                <div className="p-8" />
+              </Spin>
             </div>
           );
         }
@@ -443,24 +567,22 @@ const TestPage = () => {
             }
           />
         );
-      default: // 최종 결과 페이지 (step 10)
+      default: // 최종 결과 페이지
         if (isSubmitting) {
           return (
             <div className="flex h-full flex-col items-center justify-center">
-              <Spin tip="취향을 분석하고 있어요..." size="large" />
+              <Spin tip="취향을 분석하고 있어요..." size="large">
+                <div className="p-8" />
+              </Spin>
             </div>
           );
         }
-
-        // personaResult state를 사용하여 결과 화면 렌더링
         return (
-          <div className="flex h-full flex-col items-center justify-center p-4 text-center text-black">
+          <div className={contentWrapperStyle}>
             {personaResult ? (
               <>
-                <h2 className="text-2xl font-bold leading-snug lg:text-3xl">
-                  당신의 캐릭터는?
-                </h2>
-                <p className="mt-2 text-sm text-gray-600 lg:text-base">
+                <h2 className="text-2xl font-bold ...">당신의 캐릭터는?</h2>
+                <p className="mt-2 text-sm ...">
                   선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
                 </p>
                 <img
@@ -469,21 +591,18 @@ const TestPage = () => {
                   className="my-6 h-48 w-48"
                 />
                 <p className="text-xl font-bold">
-                  {personaResult.main_persona}
+                  {personaResult.main_persona.replace(/_/g, " ")}
                 </p>
-
                 <div className="mt-8 flex w-full max-w-xs gap-4">
-                  {/* "취향 분석 보기" 버튼 */}
                   <button
                     onClick={() => navigate("/analysis")}
-                    className="text-popco-foot flex-1 rounded-full border border-[var(--color-popcoFootColor)] bg-white py-3 font-semibold transition-colors hover:bg-yellow-50"
+                    className="text-popco-foot ..."
                   >
                     취향 분석 보기
                   </button>
-                  {/* "POPCO 시작하기" 버튼 */}
                   <button
                     onClick={() => navigate("/")}
-                    className="bg-popco-foot flex-1 rounded-full py-3 font-semibold text-white transition-colors hover:brightness-95"
+                    className="bg-popco-foot ..."
                   >
                     POPCO 시작하기
                   </button>
