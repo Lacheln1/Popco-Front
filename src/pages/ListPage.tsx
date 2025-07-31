@@ -29,7 +29,7 @@ const ListPage = () => {
           fetchNextPage();
         }
       },
-      { threshold: 1 },
+      { threshold: 0.1 },
     );
 
     const target = observerRef.current;
@@ -38,7 +38,7 @@ const ListPage = () => {
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, sort]);
 
   const handleChange = (value: string) => {
     setSort(value);
