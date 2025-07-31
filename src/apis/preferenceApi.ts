@@ -4,6 +4,7 @@ export interface Movie {
   id: string;
   title: string;
   posterPath: string;
+  type: string; 
 }
 
 export const getTestMovies = async (accessToken: string): Promise<Movie[]> => {
