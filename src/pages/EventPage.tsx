@@ -1,75 +1,13 @@
-import { renderCount } from "@/components/EventPage/Countdown";
-import { useIsMediumUp } from "@/hooks/useMediaQuery";
-import clsx from "clsx";
 import React, { useState } from "react";
-import Countdown from "react-countdown";
+import { useIsMediumUp } from "@/hooks/useMediaQuery";
+import { PosterImage } from "@/components/EventPage/PosterImage";
+import { EventInfoCard } from "@/components/EventPage/EventInfoCard";
+import { renderCount } from "@/components/EventPage/Countdown";
 
 const image = {
   src: "https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
   alt: "F1 더 무비",
 };
-
-const resize = [0.895, 0.925, 0.96, 0.99];
-const translate = [
-  "scaleY(0.94) translate(-26.6em, -6.2em)",
-  "scaleY(0.965) translate(-17em, -4.2em)",
-  "scaleY(0.98) translate(-8em, -2.1em)",
-  "",
-];
-const marginLeft = ["35.2em", "10em", "-15.3em", "-40.4em"];
-const backgroundPosition = [".8em 0", ".6em 0", ".4em 0", ".1em 0"];
-
-const getShadowStyle = (idx: number): React.CSSProperties => ({
-  backgroundRepeat: "no-repeat",
-  backgroundImage:
-    "linear-gradient(120deg, transparent 42%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.35) 65%)," +
-    "linear-gradient(20deg, transparent 38%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.23) 55%, rgba(0,0,0,0.13) 75%)," +
-    "radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.15) 3%, transparent 40%)",
-  transform: "rotate(-8deg)",
-  backgroundSize: `100% ${82 + idx}%, 100% ${18 - idx}%, 100% 10%`,
-  backgroundPosition: `${backgroundPosition[idx]}, 0 100%, -3em ${80 + idx}%`,
-});
-
-const getImageStyle = (idx: number): React.CSSProperties => ({
-  borderImage: "linear-gradient(105deg, transparent .5%, #aaa .7%) 1",
-  transform: `perspective(20em) rotateY(1deg) rotateZ(-5deg) skewY(-2deg) skewX(-1deg) scaleX(${resize[idx]})`,
-});
-
-const getHighlightStyle = (idx: number): React.CSSProperties => ({
-  backgroundImage:
-    "linear-gradient(45deg, rgba(0,0,0,0.3), transparent 70%)," +
-    "linear-gradient(45deg, rgba(255,255,255,0) 60%, rgba(255,255,255,0.3) 80%)",
-  transform: `perspective(20em) rotateY(1deg) rotateZ(-5deg) skewY(-2deg) skewX(-1deg) scaleX(${resize[idx]})`,
-});
-
-const renderPoster = (idx: number) => (
-  <div
-    key={idx}
-    className="absolute bottom-[4.8em] left-[54%] z-0 flex w-[250px] justify-end"
-    style={{
-      marginLeft: marginLeft[idx],
-      transform: translate[idx] || undefined,
-    }}
-  >
-    {/* Shadow layer */}
-    <div
-      className="absolute left-0 top-[7%] z-[1] h-full w-[60%]"
-      style={getShadowStyle(idx)}
-    />
-    {/* Image */}
-    <img
-      src={image.src}
-      alt={image.alt}
-      className="relative z-[2] block h-full w-[60%] border-l-[0.2em] shadow-[0.1em_0.2em_0_-0.1em_#666] saturate-[90%]"
-      style={getImageStyle(idx)}
-    />
-    {/* Highlight layer */}
-    <div
-      className="absolute z-[3] h-full w-[60%]"
-      style={getHighlightStyle(idx)}
-    />
-  </div>
-);
 
 const EventPage = () => {
   const isMediumUp = useIsMediumUp();
@@ -78,7 +16,6 @@ const EventPage = () => {
 
   return (
     <div className="bg-[#eee]">
-      {/* 배경 */}
       <div
         className="relative mx-auto min-h-[330px] w-full"
         style={{
@@ -90,78 +27,12 @@ const EventPage = () => {
           backgroundPosition: "50% 108%",
         }}
       >
-        {/* 카드 */}
         <div className="relative mt-16 h-screen pt-20 md:mt-0">
-          <aside className="absolute left-1/2 top-[31%] z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-xl bg-white/80 px-4 py-8 shadow-xl backdrop-blur-md md:w-[800px] md:px-8">
-            <h3 className="gmarket md: mb-1 text-center text-xl font-medium tracking-tight text-gray-900 md:text-[1.75rem]">
-              {isButtonActive
-                ? "퀴즈 이벤트가 시작되었습니다!"
-                : "퀴즈 이벤트가 곧 시작됩니다!"}
-            </h3>
-            <Countdown
-              key={isButtonActive ? "started" : "waiting"}
-              date={new Date("2025-08-12T15:00:00")}
-              renderer={renderCount}
-              onComplete={() => setIsButtonActive(true)}
-            />
-            <div className="flex flex-col gap-2">
-              <div className="pretendard flex flex-row items-center gap-3">
-                <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
-                  이번주 작품
-                </span>
-                <span className="text-sm md:text-base">F1 더 무비</span>
-              </div>
-              <div className="pretendard flex items-center gap-3">
-                <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
-                  시작 시간
-                </span>
-                <span className="text-sm md:text-base">
-                  2025.08.12(화) 13:00
-                </span>
-              </div>
-              <div className="pretendard flex items-center gap-3">
-                <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
-                  대상
-                </span>
-                <span className="text-sm md:text-base">
-                  F1 더 무비를 본 모든 대상
-                </span>
-              </div>
-              <div className="pretendard flex items-center gap-3">
-                <span className="bg-footerBlue w-[90px] rounded-full py-1 text-center text-white">
-                  경품안내
-                </span>
-                <span className="text-sm md:text-base">
-                  CGV 5만원 상품권(1인)
-                </span>
-              </div>
-              <div className="pretendard flex flex-col items-baseline gap-3 md:flex-row">
-                <span className="bg-footerBlue hidden w-[90px] rounded-full py-1 text-center text-white md:block">
-                  참여방법
-                </span>
-                <span className="mt-3 text-center text-sm md:mt-0 md:text-left md:text-base">
-                  이 페이지에서 대기해 주세요.
-                  <br />
-                  이벤트 시간이 되면 자동으로 버튼이 활성화됩니다!
-                  <br /> 문제를 가장 빠르게 맞히면 선착순으로 다음 라운드에
-                  진출할 수 있어요!
-                </span>
-              </div>
-              <button
-                disabled={!isButtonActive}
-                className={clsx(
-                  "mt-4 w-fit self-center rounded-full px-14 py-3 shadow-md transition",
-                  isButtonActive
-                    ? "cursor-pointer bg-[#222] text-white hover:bg-black"
-                    : "cursor-not-allowed bg-gray-200 text-gray-400",
-                )}
-              >
-                {isButtonActive
-                  ? "퀴즈 풀기 시작!"
-                  : "아직 이벤트가 준비중입니다"}
-              </button>
-            </div>
-          </aside>
+          <EventInfoCard
+            isButtonActive={isButtonActive}
+            onCountdownEnd={() => setIsButtonActive(true)}
+            renderCount={renderCount}
+          />
           <img
             className="absolute left-1/2 top-[10%] w-32 -translate-x-1/2 -translate-y-1/4"
             src="images/popco/time-popco.png"
@@ -169,15 +40,14 @@ const EventPage = () => {
           />
         </div>
         <>
-          {/* PC */}
           <div className="hidden 2sm:block md:hidden">
-            {renderPoster(2)}
-            {renderPoster(1)}
+            <PosterImage idx={2} image={image} />
+            <PosterImage idx={1} image={image} />
           </div>
           <div className="hidden md:block">
-            {Array.from({ length: postersToRender }, (_, idx) =>
-              renderPoster(idx),
-            )}
+            {Array.from({ length: postersToRender }, (_, idx) => (
+              <PosterImage key={idx} idx={idx} image={image} />
+            ))}
           </div>
         </>
       </div>
