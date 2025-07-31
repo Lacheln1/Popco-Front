@@ -13,6 +13,9 @@ import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
 import AnalysisPage from "@/pages/AnalysisPage";
 import KakaoCallback from "@/pages/KakaoCallback";
+import MyPage from "@/pages/MyPage";
+import CollectionDetailPage from "@/pages/CollectionDetailPage";
+import CollectionCreatePage from "@/pages/CollectionCreatePage";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +26,10 @@ const router = createBrowserRouter([
       { path: "/detail/:contentsType/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
       { path: "/collections", element: <CollectionPage /> },
+      { path: "/collections/create", element: <CollectionCreatePage /> },
+      { path: "/collections/:collectionId", element: <CollectionDetailPage /> },
       { path: "/analysis", element: <AnalysisPage /> },
+      { path: "/mypage", element: <MyPage /> },
     ],
   },
   {

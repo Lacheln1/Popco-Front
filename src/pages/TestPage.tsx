@@ -35,20 +35,10 @@ import horrorPopcoCardUrl from "../assets/horror-popco-card.png";
 import retroPopcoCardUrl from "../assets/retro-popco-card.png";
 import imaginePopcoCardUrl from "../assets/imagine-popco-card.png";
 import movieSherlockCardUrl from "../assets/movie-sherlock-card.png";
-import babyactionhunter from "../assets/baby-action-hunter.svg";
-import actionhunter from "../assets/action-hunter.svg";
-import babycrypopco from "../assets/baby-cry-popco.svg";
-import crypopco from "../assets/cry-popco.svg";
-import babywarmpopco from "../assets/baby-warm-popco.svg";
-import warmpopco from "../assets/warm-popco.svg";
-import babyhorrorpopco from "../assets/baby-horror-popco.svg";
-import horrorpopco from "../assets/horror-popco.svg";
-import babyretropopco from "../assets/baby-retro-popco.svg";
-import retropopco from "../assets/retro-popco.svg";
-import babyimaginepopco from "../assets/baby-imagine-popco.svg";
-import imaginepopco from "../assets/imagine-popco.svg";
-import babymoviesherlock from "../assets/baby-movie-sherlock.svg";
-import moviesherlock from "../assets/movie-sherlock.svg";
+
+// 상수처리
+import { PERSONA_IMAGES } from "@/constants/persona";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const cardImageRows = [
   [actionHunterCardUrl, cryPopcoCardUrl, warmPopcoCardUrl],
@@ -59,23 +49,6 @@ const cardImageRows = [
     movieSherlockCardUrl,
   ],
 ];
-
-const personaImages: { [key: string]: string } = {
-  액션헌터: actionhunter,
-  무비셜록: moviesherlock,
-  시네파울보: crypopco,
-  온기수집가: warmpopco,
-  이세계유랑자: imaginepopco,
-  무서워도본다맨: horrorpopco,
-  레트로캡틴: retropopco,
-  아기_액션헌터: babyactionhunter,
-  아기_무비셜록: babymoviesherlock,
-  아기_시네파울보: babycrypopco,
-  아기_온기수집가: babywarmpopco,
-  아기_이세계유랑자: babyimaginepopco,
-  아기_무서워도본다맨: babyhorrorpopco,
-  아기_레트로캡틴: babyretropopco,
-};
 
 const TestPage = () => {
   const { user, accessToken } = useAuthCheck();
@@ -518,8 +491,7 @@ const TestPage = () => {
             </div>
           </div>
         );
-      case 4: {
-        const imageBaseUrl = "https://image.tmdb.org/t/p/w500";
+      case 4: // 영화 선택
         return (
           <div className="flex h-full flex-col gap-4 py-4">
             <div className="px-4 text-center">
@@ -537,17 +509,20 @@ const TestPage = () => {
             ) : (
               <div className="flex-1 overflow-y-auto px-4 pt-2">
                 <div className="grid grid-cols-3 gap-x-4 gap-y-6 lg:grid-cols-5">
-                  {movies.map((movie: any) => (
-                    <PosterInTest
-                      key={movie.id}
-                      id={String(movie.id)}
-                      title={movie.title}
-                      posterUrl={`${imageBaseUrl}${movie.posterPath}`}
-                      // ✅ [수정 3] isSelected 로직과 onToggleSelect에 전달하는 값을 수정합니다.
-                      isSelected={selectedMovies.some((m) => m.id === movie.id)}
-                      onToggleSelect={() => handleToggleMovieSelect(movie)}
-                    />
-                  ))}
+                  {movies.map((movie) => {
+                    return (
+                      <PosterInTest
+                        key={movie.id}
+                        id={String(movie.id)}
+                        title={movie.title}
+                        posterUrl={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
+                        isSelected={selectedMovies.includes(String(movie.id))}
+                        onToggleSelect={() =>
+                          handleToggleMovieSelect(String(movie.id))
+                        }
+                      />
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -603,7 +578,7 @@ const TestPage = () => {
                   선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
                 </p>
                 <img
-                  src={personaImages[personaResult.main_persona]}
+                  src={PERSONA_IMAGES[personaResult.main_persona]} // 매핑된 이미지
                   alt={personaResult.main_persona}
                   className="my-6 h-48 w-48"
                 />

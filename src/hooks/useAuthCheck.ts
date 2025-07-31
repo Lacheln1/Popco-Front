@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import { getUserDetail } from "@/apis/userApi";
@@ -33,8 +33,21 @@ const useAuthCheck = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 중복 실행 방지를 위한 ref
+  const isCheckingAuth = useRef(false);
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
+    // 이미 체크 중이거나 초기화 완료되었으면 실행하지 않음
+    if (isCheckingAuth.current || hasInitialized.current) {
+      return;
+    }
+
     const checkAuth = async () => {
+      // 중복 실행 방지 플래그 설정
+      if (isCheckingAuth.current) return;
+      isCheckingAuth.current = true;
+
       console.log("🔍 useAuthCheck 시작");
       const currentPath = location.pathname;
       const needsAuth = isProtectedRoute(currentPath);
@@ -72,7 +85,6 @@ const useAuthCheck = () => {
             isLoggedIn: false,
           });
           setAccessToken(null);
-          return;
         } else {
           console.log("2️⃣ result.data.accessToken:", result?.data?.accessToken);
           const token = result.data.accessToken;
@@ -135,12 +147,30 @@ const useAuthCheck = () => {
         setAccessToken(null);
       } finally {
         setIsLoading(false);
+        isCheckingAuth.current = false; // 플래그 해제
+        hasInitialized.current = true; // 초기화 완료 표시
         console.log("🔍 useAuthCheck 완료");
       }
     };
 
     checkAuth();
-  }, [navigate, location.pathname]); // location.pathname 의존성 추가
+  }, []); // 의존성 배열을 빈 배열로 변경하여 한 번만 실행
+
+  // 경로 변경 시에만 별도로 체크
+  useEffect(() => {
+    if (!hasInitialized.current) return;
+
+    const currentPath = location.pathname;
+    const needsAuth = isProtectedRoute(currentPath);
+
+    console.log("경로 변경됨:", currentPath, "인증 필요:", needsAuth);
+
+    // 인증이 필요한 페이지인데 로그인되지 않은 경우
+    if (needsAuth && !user.isLoggedIn && !isLoading) {
+      console.log("인증 필요한 페이지로 이동했는데 로그인되지 않음");
+      navigate("/login", { state: { from: currentPath } });
+    }
+  }, [location.pathname, user.isLoggedIn, isLoading, navigate]);
 
   const logout = () => {
     // 1. 로그아웃 플래그 설정 (다음 useAuthCheck 실행을 막음)
@@ -160,7 +190,10 @@ const useAuthCheck = () => {
     });
     setAccessToken(null);
 
-    // 4. 현재 경로 확인하여 로그인이 필요한 url에 있을 때만 홈으로 이동
+    // 4. 초기화 플래그 리셋
+    hasInitialized.current = false;
+
+    // 5. 현재 경로 확인하여 로그인이 필요한 url에 있을 때만 홈으로 이동
     const currentPath = location.pathname;
     const needsAuth = isProtectedRoute(currentPath);
 

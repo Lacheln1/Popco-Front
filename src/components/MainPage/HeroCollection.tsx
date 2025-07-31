@@ -17,7 +17,7 @@ const HeroCollection = () => {
         .slice(-4)
         .reverse()
         .map((c) => `${TMDB_IMAGE_BASE_URL}${c.posterPath}`),
-      href: `/collection/${collection.collectionId}`,
+      href: `/collections/${collection.collectionId}`,
       saveCount: collection.saveCount,
     }));
   }, [data]);
@@ -53,7 +53,7 @@ const HeroCollection = () => {
           </button>
         </div>
 
-        <div className="flex gap-5 px-4 pb-5 pt-12 md:p-0 lg:gap-12">
+        <div className="flex gap-3 px-4 pb-5 pt-12 sm:gap-6 md:gap-8 md:p-0 lg:gap-12">
           {isLoading ? (
             <div className="text-base text-gray-400">Loading...</div>
           ) : isError ? (
@@ -70,6 +70,7 @@ const HeroCollection = () => {
                   {...collection}
                   isSaved={savedMap[collection.collectionId] ?? false}
                   onSaveToggle={handleSaveToggle}
+                  size="small"
                 />
               </div>
             ))

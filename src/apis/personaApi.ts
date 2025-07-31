@@ -38,7 +38,10 @@ export const fetchHeroPersona = async (
   userId: number,
   token?: string,
   contentType?: "movie" | "tv" | "all",
-): Promise<PersonaRecommendation[]> => {
+): Promise<{
+  main_persona: string;
+  recommendations: PersonaRecommendation[];
+}> => {
   const queryParam =
     contentType && contentType !== "all" ? `?content_type=${contentType}` : "";
   const { data } = await recommendInstance.get<PersonaResponse>(
@@ -47,5 +50,8 @@ export const fetchHeroPersona = async (
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
   );
-  return data.recommendations;
+  return {
+    main_persona: data.main_persona,
+    recommendations: data.recommendations,
+  };
 };

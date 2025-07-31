@@ -1,4 +1,11 @@
 import axios from "axios";
+import recommendInstance from "./recommendInstance";
+import {
+  ContentBasedItem,
+  ContentBasedResponse,
+  PopcorithmResponse,
+  RecommendationItem,
+} from "@/types/Recommend.types";
 
 // --- API 요청(Request)을 위한 타입 정의 ---
 interface FeedbackItem {
@@ -80,5 +87,32 @@ export const fetchPopcorithm = async (
   } catch (error) {
     console.error("fetchPopcorithm 실패:", error);
     throw new Error("팝코리즘을 불러오는 데 실패했습니다.");
+  }
+};
+
+export const fetchBasedContent = async (
+  userId: number | null,
+  type: string,
+  token?: string,
+): Promise<ContentBasedItem[]> => {
+  try {
+    const endpoint = `/recommends/contents`;
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const body = {
+      user_id: userId,
+      type,
+    };
+    const { data } = await recommendInstance.post<ContentBasedResponse>(
+      endpoint,
+      body,
+      { headers },
+    );
+    return data.recommendations;
+  } catch (error) {
+    console.error("fetchBasedContent 실패:", error);
+    throw new Error("연관 작품을 불러오는 데 실패했습니다.");
   }
 };

@@ -8,6 +8,7 @@ import "swiper/swiper-bundle.css";
 import { useHeroPersona } from "@/hooks/queries/contents/useHeroPersona";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { PersonaRecommendation } from "@/types/Persona.types";
+import LoginBlur from "../common/LoginBlur";
 
 interface Props {
   accessToken: string;
@@ -26,6 +27,8 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
     accessToken,
     "all",
   );
+  const recommendData = data?.recommendations;
+  const persona = data?.main_persona ?? "나와 닮은 페르소나";
 
   if (isLoading) {
     return (
@@ -41,7 +44,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
       </div>
     );
   }
-  if (isSuccess && (!data || data.length === 0)) {
+  if (isSuccess && (!recommendData || recommendData.length === 0)) {
     return (
       <div className="py-20 text-center text-gray-400">
         <p>😶 추천 콘텐츠가 아직 없습니다.</p>
@@ -70,8 +73,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
         />
         <h3 className="gmarket ml-20 flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:ml-44 md:text-3xl">
           <span>
-            <span className="text-popcorn-box">'무서워도 본다맨'</span>{" "}
-            들이{" "}
+            <span className="text-popcorn-box">'{persona}'</span> 들이{" "}
           </span>
           많이 찾은 작품
         </h3>
@@ -84,40 +86,53 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
             isEnd={isEnd}
           />
         </div>
-        <Swiper
-          modules={[Navigation]}
-          spaceBetween={15}
-          onSwiper={handleSwiperInit}
-          onSlideChange={handleSlideChange}
-          breakpoints={{
-            0: {
-              slidesPerView: 2.5,
-            },
-            768: {
-              slidesPerView: 3.5,
-            },
-            1024: {
-              slidesPerView: 4.5,
-            },
-            1200: {
-              slidesPerView: 5,
-            },
-          }}
-        >
-          {data?.map(
-            ({ contentId, title, poster_path }: PersonaRecommendation) => (
-              <SwiperSlide key={contentId} className="flex justify-center">
-                <Poster
-                  title={title}
-                  posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                  id={contentId}
-                  likeState="neutral"
-                  onLikeChange={() => {}}
-                />
-              </SwiperSlide>
-            ),
-          )}
-        </Swiper>
+        {!accessToken ? (
+          <LoginBlur
+            text="나의 영화 취향 캐릭터가 궁금하다면 ?"
+            className="md:min-h-[400px]"
+          />
+        ) : (
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={15}
+            onSwiper={handleSwiperInit}
+            onSlideChange={handleSlideChange}
+            breakpoints={{
+              0: {
+                slidesPerView: 2.5,
+              },
+              768: {
+                slidesPerView: 3.5,
+              },
+              1024: {
+                slidesPerView: 4.5,
+              },
+              1200: {
+                slidesPerView: 5,
+              },
+            }}
+          >
+            {recommendData?.map(
+              (
+                content: PersonaRecommendation,
+              ) => (
+                <SwiperSlide
+                  key={content.contentId}
+                  className="flex justify-center"
+                >
+                  <Poster
+                    title={content.title}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                    id={content.contentId}
+                    contentType={content.type} 
+                    likeState="NEUTRAL"
+                    onLikeChange={() => {}}
+                  />
+                </SwiperSlide>
+              ),
+            )}
+          </Swiper>
+        )}
       </section>
     </div>
   );

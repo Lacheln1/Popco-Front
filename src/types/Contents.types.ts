@@ -10,3 +10,27 @@ export interface ContentItem {
 }
 
 export type ContentCategory = "all" | "movie" | "tv";
+
+export interface AllContentItem {
+  id: number;
+  type: ContentCategory;
+  title: string;
+  releaseDate: string;
+  posterPath: string;
+}
+
+export interface FetchAllContentsParams {
+  pageNumber?: number;
+  pageSize?: number;
+  sort?: string;
+}
+
+export interface FetchAllContentsResponse {
+  contents: AllContentItem[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  first: boolean;
+  last: boolean;
+}

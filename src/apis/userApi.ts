@@ -1,4 +1,6 @@
 import axios from "axios";
+
+//백엔드 url 넣어야함
 const API_URL = "/api/client";
 
 interface LoginParams {
@@ -15,10 +17,37 @@ interface CheckEmailParams {
   email: string;
 }
 
+interface UpdateProfileParams {
+  nickname: string;
+  profileImageUrl: File;
+}
+
 interface UserDetailsParams {
   nickname: string;
   birthday: string; // "YYYY-MM-DD" 형식
   gender: string;
+}
+
+interface MonthlyReviewsParams {
+  month: string; //YYYY-MM 형식
+}
+
+// 리뷰 응답 타입
+interface Review {
+  reviewId: number;
+  contentId: number;
+  contentType: string;
+  title: string;
+  posterPath: string;
+  score: number;
+  text: string;
+  createdAt: string;
+}
+interface MonthlyReviewsResponse {
+  code: number;
+  result: string;
+  message: string;
+  data: Review[];
 }
 
 export const updateUserDetails = async (
@@ -107,6 +136,50 @@ export const getUserPersonas = async (accessToken: string) => {
     return response.data;
   } catch (error) {
     console.log("getPersonas실패", error);
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (
+  { nickname, profileImageUrl }: UpdateProfileParams,
+  accessToken: string,
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("nickname", nickname);
+    formData.append("profileImageUrl", profileImageUrl);
+
+    const response = await axios.put(`${API_URL}/users/details`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+    console.log("프로필 업데이트 성공:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("updateUserProfile 실패:", error);
+    throw error;
+  }
+};
+
+export const getMonthlyReviews = async (
+  { month }: MonthlyReviewsParams,
+  accessToken: string,
+): Promise<MonthlyReviewsResponse> => {
+  try {
+    const response = await axios.get(`${API_URL}/reviews/my/monthly`, {
+      params: { month },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+
+    console.log(`월별 리뷰 조회 성공 (${month}):`, response.data);
+    return response.data;
+  } catch (error) {
+    console.error("getMonthlyReviews 실패:", error);
     throw error;
   }
 };

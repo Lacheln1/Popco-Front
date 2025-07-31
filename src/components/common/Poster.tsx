@@ -3,43 +3,47 @@ import HatePopcorn from "@/components/popcorn/HatePopcorn";
 import { HiCursorClick } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
-type LikeState = "liked" | "hated" | "neutral";
+type LikeState = "LIKE" | "DISLIKE" | "NEUTRAL";
 
 type PosterProps = {
   title: string;
   posterUrl: string;
   id: number;
+  contentType: string;
   likeState: LikeState;
   onLikeChange: (newState: LikeState) => void;
+  disableHover?: boolean;
 };
 
 const Poster = ({
   title,
   posterUrl,
   id,
+  contentType, 
   likeState,
   onLikeChange,
+  disableHover,
 }: PosterProps) => {
   const navigator = useNavigate();
 
-  const handlePosterClick = () => navigator(`/detail/${id}`);
+  const handlePosterClick = () => navigator(`/detail/${contentType}/${id}`);
 
   const toggleState = (e: React.MouseEvent, target: LikeState) => {
     e.stopPropagation();
-    onLikeChange(likeState === target ? "neutral" : target);
+    onLikeChange(likeState === target ? "NEUTRAL" : target);
   };
 
-  const isLiked = likeState === "liked";
-  const isHated = likeState === "hated";
+  const isLiked = likeState === "LIKE";
+  const isHated = likeState === "DISLIKE";
 
   const renderReactionButton = (
-    type: "like" | "hate",
+    type: "LIKE" | "DISLIKE",
     isSelected: boolean,
     onClick: (e: React.MouseEvent) => void,
     sizeClass: string,
   ) => {
-    const Component = type === "like" ? LikePopcorn : HatePopcorn;
-    const shouldDim = likeState !== "neutral" && !isSelected;
+    const Component = type === "LIKE" ? LikePopcorn : HatePopcorn;
+    const shouldDim = likeState !== "NEUTRAL" && !isSelected;
 
     return (
       <div
@@ -63,28 +67,32 @@ const Poster = ({
           className="relative aspect-[7/10] w-full rounded-md object-cover"
           src={posterUrl}
           alt="poster"
+          onError={(e) =>
+            (e.currentTarget.src = "/images/popco/default_poster.png")
+          }
         />
-
         {/* PC 호버용 오버레이 */}
-        <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/40 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
-          {renderReactionButton(
-            "like",
-            isLiked,
-            (e) => toggleState(e, "liked"),
-            "h-[80px] w-[80px]",
-          )}
-          {renderReactionButton(
-            "hate",
-            isHated,
-            (e) => toggleState(e, "hated"),
-            "h-[80px] w-[80px]",
-          )}
+        {!disableHover && (
+          <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/40 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
+            {renderReactionButton(
+              "LIKE",
+              isLiked,
+              (e) => toggleState(e, "LIKE"),
+              "h-[80px] w-[80px]",
+            )}
+            {renderReactionButton(
+              "DISLIKE",
+              isHated,
+              (e) => toggleState(e, "DISLIKE"),
+              "h-[80px] w-[80px]",
+            )}
 
-          <div className="absolute bottom-7 flex items-center gap-3 text-white">
-            <span>자세히 보기</span>
-            <HiCursorClick />
+            <div className="absolute bottom-7 flex items-center gap-3 text-white">
+              <span>자세히 보기</span>
+              <HiCursorClick />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* 모바일 하단 버튼 */}
@@ -94,15 +102,15 @@ const Poster = ({
         </div>
         <div className="flex w-1/2 items-center justify-end gap-2 sm:hidden">
           {renderReactionButton(
-            "like",
+            "LIKE",
             isLiked,
-            (e) => toggleState(e, "liked"),
+            (e) => toggleState(e, "LIKE"),
             "w-[8vw]",
           )}
           {renderReactionButton(
-            "hate",
+            "DISLIKE",
             isHated,
-            (e) => toggleState(e, "hated"),
+            (e) => toggleState(e, "DISLIKE"),
             "w-[8vw]",
           )}
         </div>
