@@ -1,22 +1,24 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchAllContents } from "@/apis/contentsApi";
-import { AllContentItem, FetchAllContentsParams } from "@/types/Contents.types";
-import { useQuery } from "@tanstack/react-query";
+import { FetchAllContentsParams } from "@/types/Contents.types";
 
 export const useAllContents = ({
-  pageNumber,
   pageSize,
   sort,
-}: FetchAllContentsParams) => {
-  return useQuery({
-    queryKey: ["allContents", sort, pageNumber],
-    queryFn: () =>
+}: Omit<FetchAllContentsParams, "pageNumber">) => {
+  return useInfiniteQuery({
+    queryKey: ["allContents", sort],
+    queryFn: ({ pageParam = 0 }) =>
       fetchAllContents({
-        pageNumber,
+        pageNumber: pageParam,
         pageSize,
         sort,
       }),
-    placeholderData: (previousData) => previousData,
-    staleTime: 1000 * 60 * 60 * 1,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.last ? undefined : allPages.length;
+    },
+    initialPageParam: 0,
+    staleTime: 1000 * 60 * 60,
     gcTime: 1000 * 60 * 60 * 2,
     retry: 1,
   });

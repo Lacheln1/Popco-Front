@@ -1,8 +1,8 @@
 import {
-  AllContentItem,
   ContentCategory,
   ContentItem,
   FetchAllContentsParams,
+  FetchAllContentsResponse,
 } from "@/types/Contents.types";
 import axiosInstance from "./axiosInstance";
 
@@ -19,13 +19,13 @@ export const fetchAllContents = async ({
   pageNumber = 0,
   pageSize,
   sort = "recent",
-}: FetchAllContentsParams): Promise<AllContentItem[]> => {
+}: FetchAllContentsParams): Promise<FetchAllContentsResponse> => {
   const { data } = await axiosInstance.get(`/contents`, {
     params: {
-      page: pageNumber,
-      size: pageSize,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
       sort,
     },
   });
-  return data.data.contents;
+  return data.data;
 };

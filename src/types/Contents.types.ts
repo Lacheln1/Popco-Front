@@ -25,11 +25,12 @@ export interface FetchAllContentsParams {
   sort?: string;
 }
 
-export interface GetAllContentsResponse {
-  code: number;
-  result: "SUCCESS" | "FAILURE" | string;
-  message: string;
-  data: {
-    contents: ContentItem[];
-  };
+export interface FetchAllContentsResponse {
+  contents: AllContentItem[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  first: boolean;
+  last: boolean;
 }
