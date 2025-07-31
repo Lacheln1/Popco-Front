@@ -24,7 +24,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
-  const [imageLoadError, setImageLoadError] = useState(false);
   const [errorUrls, setErrorUrls] = useState<Set<string>>(new Set());
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const [newNickname, setNewNickname] = useState(nickname);
@@ -43,7 +42,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
   // profileImageUrl이 변경될 때 에러 상태 초기화
   React.useEffect(() => {
-    setImageLoadError(false);
     // 새로운 URL이면 에러 목록에서 제거
     if (profileImageUrl) {
       setErrorUrls((prev) => {
@@ -70,13 +68,11 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
     console.log("이미지 로드 실패:", imgSrc);
     setErrorUrls((prev) => new Set([...prev, imgSrc]));
-    setImageLoadError(true);
   };
 
   // 이미지 로드 성공 처리
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const imgSrc = event.currentTarget.src;
-    setImageLoadError(false);
     // 성공한 URL은 에러 목록에서 제거
     setErrorUrls((prev) => {
       const newSet = new Set(prev);
