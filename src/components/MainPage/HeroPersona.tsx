@@ -8,6 +8,7 @@ import "swiper/swiper-bundle.css";
 import { useHeroPersona } from "@/hooks/queries/contents/useHeroPersona";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { PersonaRecommendation } from "@/types/Persona.types";
+import LoginBlur from "../common/LoginBlur";
 
 interface Props {
   accessToken: string;
@@ -84,40 +85,47 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
             isEnd={isEnd}
           />
         </div>
-        <Swiper
-          modules={[Navigation]}
-          spaceBetween={15}
-          onSwiper={handleSwiperInit}
-          onSlideChange={handleSlideChange}
-          breakpoints={{
-            0: {
-              slidesPerView: 2.5,
-            },
-            768: {
-              slidesPerView: 3.5,
-            },
-            1024: {
-              slidesPerView: 4.5,
-            },
-            1200: {
-              slidesPerView: 5,
-            },
-          }}
-        >
-          {data?.map(
-            ({ contentId, title, poster_path }: PersonaRecommendation) => (
-              <SwiperSlide key={contentId} className="flex justify-center">
-                <Poster
-                  title={title}
-                  posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                  id={contentId}
-                  likeState="NEUTRAL"
-                  onLikeChange={() => {}}
-                />
-              </SwiperSlide>
-            ),
-          )}
-        </Swiper>
+        {!accessToken ? (
+          <LoginBlur
+            text="나의 영화 취향 캐릭터가 궁금하다면 ?"
+            className="md:min-h-[400px]"
+          />
+        ) : (
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={15}
+            onSwiper={handleSwiperInit}
+            onSlideChange={handleSlideChange}
+            breakpoints={{
+              0: {
+                slidesPerView: 2.5,
+              },
+              768: {
+                slidesPerView: 3.5,
+              },
+              1024: {
+                slidesPerView: 4.5,
+              },
+              1200: {
+                slidesPerView: 5,
+              },
+            }}
+          >
+            {data?.map(
+              ({ contentId, title, poster_path }: PersonaRecommendation) => (
+                <SwiperSlide key={contentId} className="flex justify-center">
+                  <Poster
+                    title={title}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
+                    id={contentId}
+                    likeState="NEUTRAL"
+                    onLikeChange={() => {}}
+                  />
+                </SwiperSlide>
+              ),
+            )}
+          </Swiper>
+        )}
       </section>
     </div>
   );

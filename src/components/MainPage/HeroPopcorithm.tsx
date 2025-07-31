@@ -8,6 +8,7 @@ import "swiper/swiper-bundle.css";
 import { usePopcorithm } from "@/hooks/queries/contents/usePopcorithm";
 import { RecommendationItem } from "@/types/Recommend.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import LoginBlur from "../common/LoginBlur";
 
 interface Props {
   accessToken: string;
@@ -64,6 +65,7 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
       <h3 className="gmarket m-auto px-3 text-xl leading-snug sm:text-2xl md:px-6 md:text-[28px] lg:px-0 xl:w-[1200px]">
         POP코리즘
       </h3>
+
       <section
         className="relative overflow-hidden"
         style={{
@@ -80,49 +82,58 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
               View all +
             </button>
           </div>
-          <div className="w-full md:w-3/5">
-            <div className="mb-3 flex justify-end px-8">
-              <SwiperNavigation
-                swiper={swiperInstance}
-                isBeginning={isBeginning}
-                isEnd={isEnd}
-              />
+          {!accessToken ? (
+            <LoginBlur
+              className="w-1/2 md:min-h-[400px] xl:w-3/5"
+              text="내가 좋아할 거같은 영화를 추천받고 싶다면?"
+              isReverse={true}
+            />
+          ) : (
+            <div className="w-full md:w-3/5">
+              <div className="mb-3 flex justify-end px-8">
+                <SwiperNavigation
+                  swiper={swiperInstance}
+                  isBeginning={isBeginning}
+                  isEnd={isEnd}
+                />
+              </div>
+              <Swiper
+                modules={[Navigation]}
+                slidesPerView={2}
+                onSwiper={handleSwiperInit}
+                onSlideChange={handleSlideChange}
+                className="pb-6"
+                breakpoints={{
+                  0: { slidesPerView: 2.3 },
+                  638: { slidesPerView: 3 },
+                  768: { slidesPerView: 2 },
+                  1024: { slidesPerView: 2.5 },
+                  1280: { slidesPerView: 3.5 },
+                  1440: { slidesPerView: 4 },
+                  1920: { slidesPerView: 5 },
+                }}
+              >
+                {data?.map(
+                  ({ content_id, title, poster_path }: RecommendationItem) => (
+                    <SwiperSlide
+                      key={content_id}
+                      className="flex flex-col items-center justify-items-center"
+                    >
+                      <Poster
+                        title={title}
+                        posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
+                        id={content_id}
+                        likeState="NEUTRAL"
+                        onLikeChange={() => {}}
+                      />
+                    </SwiperSlide>
+                  ),
+                )}
+              </Swiper>
             </div>
-            <Swiper
-              modules={[Navigation]}
-              slidesPerView={2}
-              onSwiper={handleSwiperInit}
-              onSlideChange={handleSlideChange}
-              className="pb-6"
-              breakpoints={{
-                0: { slidesPerView: 2.3 },
-                638: { slidesPerView: 3 },
-                768: { slidesPerView: 2 },
-                1024: { slidesPerView: 2.5 },
-                1280: { slidesPerView: 3.5 },
-                1440: { slidesPerView: 4 },
-                1920: { slidesPerView: 5 },
-              }}
-            >
-              {data?.map(
-                ({ content_id, title, poster_path }: RecommendationItem) => (
-                  <SwiperSlide
-                    key={content_id}
-                    className="flex flex-col items-center justify-items-center"
-                  >
-                    <Poster
-                      title={title}
-                      posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                      id={content_id}
-                      likeState="NEUTRAL"
-                      onLikeChange={() => {}}
-                    />
-                  </SwiperSlide>
-                ),
-              )}
-            </Swiper>
-          </div>
+          )}
 
+          {/* 데코 이미지 */}
           <img
             className="absolute left-[5%] w-[80px] mix-blend-screen sm:bottom-[8%] sm:left-[3%] sm:w-[100px] md:w-[120px] lg:left-[5%] lg:w-[150px]"
             src="/images/components/glossy_popcorn.png"
