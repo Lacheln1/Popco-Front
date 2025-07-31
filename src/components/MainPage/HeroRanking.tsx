@@ -9,10 +9,15 @@ import { Swiper as SwiperType } from "swiper";
 import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { useContentsRanking } from "@/hooks/useContentsRanking";
+import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
 import { ContentCategory } from "@/types/Contents.types";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
-const HeroRanking = () => {
+interface HeroRankingProps {
+  onTop1Change: (type: ContentCategory, title: string) => void;
+}
+
+const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
   const [viewMode, setViewMode] = useState<"swiper" | "desktop">("desktop");
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
@@ -34,17 +39,6 @@ const HeroRanking = () => {
     }),
   );
 
-  const handleSwiperInit = (swiper: SwiperType) => {
-    setSwiperInstance(swiper);
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
-  };
-
-  const handleSlideChange = (swiper: SwiperType) => {
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
-  };
-
   useEffect(() => {
     const checkView = () => {
       const width = window.innerWidth;
@@ -60,6 +54,13 @@ const HeroRanking = () => {
   }, []);
 
   const { data = [], isLoading } = useContentsRanking(selected);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      onTop1Change(selected, data[0].title);
+    }
+  }, [data, selected, onTop1Change]);
+
   if (!Array.isArray(data)) {
     console.error("HeroRanking Error: data is not an array", data);
     return <div>데이터가 없습니다.</div>;
@@ -68,6 +69,17 @@ const HeroRanking = () => {
   const first = data[0];
   const contentsRank = data.slice(1);
   if (isLoading) <div>Loading</div>;
+
+  const handleSwiperInit = (swiper: SwiperType) => {
+    setSwiperInstance(swiper);
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
+  const handleSlideChange = (swiper: SwiperType) => {
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-0">
@@ -99,7 +111,7 @@ const HeroRanking = () => {
             <div className="absolute inset-0 flex items-center justify-center gap-4 sm:gap-6 sm:pl-[7%] sm:pr-[17%] md:gap-14 md:py-10">
               <img
                 className="h-full rounded-md shadow-lg sm:h-[85%] md:h-[90%]"
-                src={`https://image.tmdb.org/t/p/original/${first.posterPath}`}
+                src={`${TMDB_IMAGE_BASE_URL}${first.posterPath}`}
                 alt={first.title ?? "포스터 이미지"}
               />
               <div className="max-w-full md:max-w-[510px]">
@@ -107,7 +119,7 @@ const HeroRanking = () => {
                   <span className="text-5xl font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#fdedae] sm:text-7xl lg:text-8xl">
                     1
                   </span>
-                  <span className="gmarket text-lg text-white sm:text-3xl lg:text-4xl">
+                  <span className="gmarket text-lg text-white sm:text-3xl lg:text-[2rem]">
                     {first.title}
                   </span>
                 </div>
@@ -166,9 +178,9 @@ const HeroRanking = () => {
                     </span>
                     <Poster
                       title={title}
-                      posterUrl={`https://image.tmdb.org/t/p/original/${posterPath}`}
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
                       id={contentId}
-                      likeState="neutral"
+                      likeState="NEUTRAL"
                       onLikeChange={() => {}}
                     />
                   </SwiperSlide>
@@ -187,9 +199,9 @@ const HeroRanking = () => {
                   </span>
                   <Poster
                     title={title}
-                    posterUrl={`https://image.tmdb.org/t/p/original/${posterPath}`}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
                     id={contentId}
-                    likeState="neutral"
+                    likeState="NEUTRAL"
                     onLikeChange={() => {}}
                   />
                 </li>

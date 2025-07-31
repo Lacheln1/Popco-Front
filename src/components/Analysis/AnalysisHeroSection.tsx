@@ -1,7 +1,28 @@
-const AnalysisHeroSection = () => {
+interface AnalysisHeroSectionProps {
+  mainPersonaImgPath: string;
+  mainPersonaName: string;
+  mainPersonaPercent: number;
+  //myPersonaDescription 두개로 나뉘어지는거 개발 완료되면 추가해야함
+  myPersonaImgPath: string; // 왼쪽 역할 이미지
+  myPersonaName: string; //왼쪽 역할 설명
+  subPersonaImgPath: string;
+  subPersonaName: string;
+  subPersonaPercent: number;
+}
+
+const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
+  mainPersonaImgPath,
+  mainPersonaName,
+  mainPersonaPercent,
+  myPersonaImgPath,
+  myPersonaName,
+  subPersonaImgPath,
+  subPersonaName,
+  subPersonaPercent,
+}) => {
   return (
     <div className="pretendard">
-      <div className="relative h-[380px] overflow-hidden md:h-[445px] lg:h-[480px]">
+      <div className="relative h-[400px] overflow-hidden md:h-[445px] lg:h-[500px]">
         <div
           className="bg-footerBlue absolute inset-0"
           style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 80%)" }} //왼쪽 상단을 기준으로(x,y), 오른쪽 상단(x,y), 오른쪽 하단, 왼쪽 하단
@@ -40,16 +61,16 @@ const AnalysisHeroSection = () => {
                 />
               </div>
               <img
-                src="/images/persona/애기액션헌터.png"
+                src={`${mainPersonaImgPath}`}
                 alt="캐릭터이미지"
-                className="s h-[150px] w-[150px] translate-y-5 object-cover md:h-[200px] md:w-[200px] md:pt-10 lg:h-[220px] lg:w-[220px]"
+                className="s h-[150px] w-[150px] translate-y-7 object-cover md:mt-5 md:h-[200px] md:w-[200px] lg:h-[220px] lg:w-[220px]"
               />
             </div>
           </div>
         </div>
       </div>
       <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-4xl lg:mt-0">
-        애기 액션 헌터
+        {mainPersonaName}
       </div>
 
       <div className="flex justify-around">
@@ -57,37 +78,47 @@ const AnalysisHeroSection = () => {
           <div>
             <div className="flex justify-center">
               <img
-                src="/images/persona/애기액션헌터.png"
+                src={`${myPersonaImgPath}`}
                 alt="액션 헌터"
                 className="h-16 w-16"
               />
             </div>
             <span className="text-sm md:text-lg lg:text-xl xl:text-2xl">
-              액션 헌터
+              {myPersonaName}
             </span>
           </div>
           <div className="mx-2 flex h-4 flex-1 overflow-hidden rounded-full bg-gray-200">
-            <div className="h-full bg-red-400" style={{ width: "52%" }}></div>
-            <div className="h-full bg-blue-400" style={{ width: "48%" }}></div>
+            <div
+              className="h-full bg-red-400"
+              style={{ width: `${mainPersonaPercent}%` }}
+            ></div>
+            <div
+              className="h-full bg-blue-400"
+              style={{ width: `${subPersonaPercent}%` }}
+            ></div>
           </div>
           <div className="">
             <div className="flex justify-center">
               <img
-                src="/images/persona/무비셜록-아기.svg"
+                src={`${subPersonaImgPath}`}
                 alt="온기 수집가"
                 className="h-16 w-16"
               />
             </div>
             <span className="text-sm md:text-lg lg:text-xl xl:text-2xl">
-              온기 수집가
+              {subPersonaName}
             </span>
           </div>
         </div>
       </div>
       <div className="flex justify-center">
         <div className="relative -top-5 flex w-full justify-around px-3 md:max-w-[700px] md:px-1 lg:max-w-[1200px]">
-          <div className="md:text-lg lg:text-xl xl:text-2xl">52%</div>
-          <div className="md:text-lg lg:text-xl xl:text-2xl">48%</div>
+          <div className="md:text-lg lg:text-xl xl:text-2xl">
+            {mainPersonaPercent}%
+          </div>
+          <div className="md:text-lg lg:text-xl xl:text-2xl">
+            {subPersonaPercent}%
+          </div>
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
 import AnalysisPage from "@/pages/AnalysisPage";
 import KakaoCallback from "@/pages/KakaoCallback";
+import MyPage from "@/pages/MyPage";
 
 const router = createBrowserRouter([
   {
@@ -21,11 +22,12 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "/detail/:movieId", element: <DetailPage /> },
+      { path: "/detail/:contentsType/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
       { path: "/event", element: <EventPage /> },
       { path: "/collections", element: <CollectionPage /> },
       { path: "/analysis", element: <AnalysisPage /> },
+      { path: "/mypage", element: <MyPage /> },
     ],
   },
   {
@@ -52,7 +54,7 @@ const router = createBrowserRouter([
         locale={koKR}
         theme={{
           token: {
-            colorPrimary: "#ffd751",
+            colorPrimary: "#fa9a00ff",
           },
         }}
       >
