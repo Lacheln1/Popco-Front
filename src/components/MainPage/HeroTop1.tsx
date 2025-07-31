@@ -4,25 +4,29 @@ import { Navigation } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import Poster from "../common/Poster";
-import "swiper/swiper-bundle.css";
+import { ContentCategory } from "@/types/Contents.types";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { useStoryBasedRecommendations } from "@/hooks/queries/contents/useStoryBasedRecommendations";
 
-const HeroTop1 = () => {
+interface Props {
+  accessToken: string;
+  userId: number;
+  type: ContentCategory;
+  title: string;
+}
+
+const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
 
-  const posterData = [
-    { id: 1, title: "첫번째 포스터" },
-    { id: 2, title: "두번째 포스터" },
-    { id: 3, title: "세번째 포스터" },
-    { id: 4, title: "네번째 포스터" },
-    { id: 5, title: "다섯번째 포스터" },
-    { id: 6, title: "여섯번째 포스터" },
-    { id: 7, title: "일곱번째 포스터" },
-    { id: 8, title: "여덟번째 포스터" },
-  ];
+  const { data = [], isLoading } = useStoryBasedRecommendations(
+    userId === 0 ? null : userId,
+    type,
+    accessToken,
+  );
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -39,7 +43,7 @@ const HeroTop1 = () => {
     <div className="m-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-0">
       <h3 className="gmarket flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:text-[28px]">
         <span className="whitespace-nowrap">
-          TOP 1 <strong className="text-popcorn-box">'F1 더 무비'</strong>와
+          TOP 1 <strong className="text-popcorn-box">'{title}'</strong>와
         </span>
         <span>비슷한 작품이에요</span>
       </h3>
@@ -51,38 +55,42 @@ const HeroTop1 = () => {
             isEnd={isEnd}
           />
         </div>
-        <Swiper
-          modules={[Navigation]}
-          spaceBetween={15}
-          onSwiper={handleSwiperInit}
-          onSlideChange={handleSlideChange}
-          breakpoints={{
-            0: {
-              slidesPerView: 2.5,
-            },
-            768: {
-              slidesPerView: 3.5,
-            },
-            1024: {
-              slidesPerView: 4.5,
-            },
-            1200: {
-              slidesPerView: 5,
-            },
-          }}
-        >
-          {posterData.map(({ id, title }) => (
-            <SwiperSlide key={id} className="flex justify-center">
-              <Poster
-                title={title}
-                posterUrl="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
-                id={id}
-                likeState="neutral"
-                onLikeChange={() => {}}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        {isLoading ? (
+          <div className="text-center text-white">로딩 중...</div>
+        ) : (
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={15}
+            onSwiper={handleSwiperInit}
+            onSlideChange={handleSlideChange}
+            breakpoints={{
+              0: {
+                slidesPerView: 2.5,
+              },
+              768: {
+                slidesPerView: 3.5,
+              },
+              1024: {
+                slidesPerView: 4.5,
+              },
+              1200: {
+                slidesPerView: 5,
+              },
+            }}
+          >
+            {data.map(({ content_id, title, poster_path, user_reaction }) => (
+              <SwiperSlide key={content_id} className="flex justify-center">
+                <Poster
+                  title={title}
+                  posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
+                  id={content_id}
+                  likeState={user_reaction ? user_reaction : "NEUTRAL"}
+                  onLikeChange={() => {}}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </section>
     </div>
   );

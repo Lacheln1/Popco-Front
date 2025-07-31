@@ -82,7 +82,6 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
               View all +
             </button>
           </div>
-
           {!accessToken ? (
             <LoginBlur
               className="w-1/2 md:min-h-[400px] xl:w-3/5"
@@ -124,7 +123,7 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
                         title={title}
                         posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
                         id={content_id}
-                        likeState="neutral"
+                        likeState="NEUTRAL"
                         onLikeChange={() => {}}
                       />
                     </SwiperSlide>
