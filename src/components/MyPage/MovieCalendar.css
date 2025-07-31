@@ -1,0 +1,95 @@
+/* MovieCalendar.css */
+
+.react-calendar {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+}
+
+/* 날짜 칸 기본 스타일 */
+.react-calendar__tile {
+  height: 100px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: none; /* 기본 테두리 제거 */
+  border-right: 1px solid #e5e7eb; /* 오른쪽에만 테두리 */
+  border-bottom: 1px solid #e5e7eb; /* 아래쪽에만 테두리 */
+}
+
+/* 마지막 열(토요일)은 오른쪽 테두리 제거 */
+.react-calendar__tile:nth-child(7n) {
+  border-right: none;
+}
+
+/* 마지막 행은 아래쪽 테두리 제거 - 동적으로 계산 */
+.react-calendar__month-view__days > button:nth-last-child(-n + 7) {
+  border-bottom: none;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #f3f4f6;
+}
+
+.react-calendar__tile--now {
+  background: #dbeafe;
+}
+
+.react-calendar__tile--active {
+  background: #ffffff3a;
+  color: white;
+}
+
+/* 요일 헤더 스타일 */
+.react-calendar__month-view__weekdays {
+  border-bottom: 1px solid #e5e7eb; /* 요일과 날짜 사이 구분선 */
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 8px;
+  border-right: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.react-calendar__month-view__weekdays__weekday:last-child {
+  border-right: none;
+}
+
+/* 요일별 색상 설정 */
+/* 일요일 (첫 번째 열) - 빨간색 */
+.react-calendar__month-view__weekdays__weekday:nth-child(1) abbr,
+.react-calendar__month-view__days__day--weekend:first-child {
+  color: #dc2626 !important;
+}
+
+/* 토요일 (마지막 열) - 파란색 */
+.react-calendar__month-view__weekdays__weekday:nth-child(7) abbr,
+.react-calendar__month-view__days__day--weekend:last-child {
+  color: #2563eb !important;
+}
+
+/* 토요일과 일요일에 해당하는 날짜들 */
+.react-calendar__month-view__days__day:nth-child(7n) {
+  color: #2563eb; /* 토요일 */
+}
+
+.react-calendar__month-view__days__day:nth-child(7n + 1) {
+  color: #dc2626; /* 일요일 */
+}
+
+/* 활성화된 상태일 때도 색상 유지 */
+.react-calendar__tile--active.react-calendar__month-view__days__day:nth-child(
+    7n
+  ) {
+  color: white;
+}
+
+.react-calendar__tile--active.react-calendar__month-view__days__day:nth-child(
+    7n + 1
+  ) {
+  color: white;
+}

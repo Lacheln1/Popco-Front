@@ -13,6 +13,7 @@ import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
 import AnalysisPage from "@/pages/AnalysisPage";
 import KakaoCallback from "@/pages/KakaoCallback";
+import MyPage from "@/pages/MyPage";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
       { path: "/list", element: <ListPage /> },
       { path: "/collections", element: <CollectionPage /> },
       { path: "/analysis", element: <AnalysisPage /> },
+      { path: "/mypage", element: <MyPage /> },
     ],
   },
   {

@@ -22,7 +22,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
 }) => {
   return (
     <div className="pretendard">
-      <div className="relative h-[380px] overflow-hidden md:h-[445px] lg:h-[480px]">
+      <div className="relative h-[400px] overflow-hidden md:h-[445px] lg:h-[500px]">
         <div
           className="bg-footerBlue absolute inset-0"
           style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 80%)" }} //왼쪽 상단을 기준으로(x,y), 오른쪽 상단(x,y), 오른쪽 하단, 왼쪽 하단
@@ -63,7 +63,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
               <img
                 src={`${mainPersonaImgPath}`}
                 alt="캐릭터이미지"
-                className="s h-[150px] w-[150px] translate-y-5 object-cover md:h-[200px] md:w-[200px] md:pt-10 lg:h-[220px] lg:w-[220px]"
+                className="s h-[150px] w-[150px] translate-y-7 object-cover md:mt-5 md:h-[200px] md:w-[200px] lg:h-[220px] lg:w-[220px]"
               />
             </div>
           </div>
