@@ -22,7 +22,6 @@ interface MovieCalendarProps {
 const MovieCalendar: React.FC<MovieCalendarProps> = ({
   movies,
   loading,
-  currentMonth,
   onMonthChange,
 }) => {
   const [value, onChange] = useState<Value>(new Date());

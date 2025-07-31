@@ -207,20 +207,6 @@ const PageContents: React.FC = () => {
     }
   };
 
-  // 더 보기 버튼 클릭
-  const handleLoadMore = () => {
-    if (!collectionsLoading && hasMore) {
-      fetchMyCollectionsData(pageNumber + 1, false);
-    }
-  };
-
-  // 새로고침
-  const handleRefresh = () => {
-    setPageNumber(0);
-    setHasMore(true);
-    fetchMyCollectionsData(0, true);
-  };
-
   const handleSwiperInit = (swiper: SwiperType) => {
     console.log("Swiper 초기화됨:", swiper);
     setSwiperInstance(swiper);

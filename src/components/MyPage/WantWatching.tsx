@@ -5,7 +5,6 @@ import "swiper/swiper-bundle.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { fetchWishlist } from "@/apis/contentsApi";
-import MyPageChart from "./MyPageChart";
 
 interface WishlistItem {
   wishlistId: number;
