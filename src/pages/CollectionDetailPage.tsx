@@ -106,7 +106,7 @@ const CollectionDetailPage: React.FC = () => {
   );
 
   const handleAddContent = useCallback(
-    (newContent: { id: number; title: string; posterUrl: string }) => {
+   (newContent: { id: number; title: string; posterUrl: string; type: string }) => {
       if (collection.contents.some((c) => c.id === newContent.id)) {
         message.warning("이미 컬렉션에 추가된 작품입니다.");
         return;

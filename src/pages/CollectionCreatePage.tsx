@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { App, Input, Button, ConfigProvider } from "antd";
+import { App, Input, ConfigProvider } from "antd";
 import { useNavigate } from "react-router-dom";
 
 // Layout 및 재사용 컴포넌트
@@ -14,6 +14,7 @@ interface Content {
   id: number;
   title: string;
   posterUrl: string;
+  type: string;
 }
 
 const CollectionCreatePage: React.FC = () => {
@@ -69,7 +70,7 @@ const CollectionCreatePage: React.FC = () => {
 
   // --- Render ---
   const primaryHeaderButtonClass =
-    "flex w-20 mb-10 justify-center rounded-full border border-solid border-white bg-transparent px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:w-28 md:px-5 md:text-sm whitespace-nowrap";
+    "flex w-24 justify-center rounded-full border border-solid border-white bg-transparent px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:w-28 md:px-5 md:text-sm whitespace-nowrap";
 
   return (
     <>
@@ -114,11 +115,6 @@ const CollectionCreatePage: React.FC = () => {
                   colorPrimary: "#172036", // 테마 색상 통일
                   colorBorder: "#d9d9d9",
                   borderRadius: 6,
-                },
-                components: {
-                  Input: {
-                    // antd 컴포넌트 세부 스타일 조정
-                  },
                 },
               }}
             >
@@ -188,7 +184,9 @@ const CollectionCreatePage: React.FC = () => {
             </div>
           </div>
         }
-      ></PageLayout>
+      >
+        {/* PageLayout의 children 영역 */}
+      </PageLayout>
       <SearchContentModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
