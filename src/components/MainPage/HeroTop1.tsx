@@ -90,7 +90,7 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
                     title={content.title}
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
                     id={content.content_id}
-                    contentType={type} 
+                    contentType={content.content_type}
                     likeState={
                       content.user_reaction ? content.user_reaction : "NEUTRAL"
                     }

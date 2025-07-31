@@ -77,24 +77,27 @@ const useAuthCheck = () => {
                 profileComplete: isProfileComplete,
               });
 
-              if (!isProfileComplete && currentPath !== "/test") {
-                message.info("취향 진단을 먼저 완료해주세요.");
-                navigate("/test");
-              }
+              // ✅ 임시 비활성화: 백엔드 오류로 취향 진단 페이지로 강제 이동하는 로직을 주석 처리합니다.
+              // if (!isProfileComplete && currentPath !== "/test") {
+              //   message.info("취향 진단을 먼저 완료해주세요.");
+              //   navigate("/test");
+              // }
             } else { // 신규 사용자
               setUser(prev => ({ ...prev, isLoggedIn: true, profileComplete: false }));
-              if (currentPath !== "/test") {
-                message.info("환영합니다! 취향 진단을 먼저 진행해주세요.");
-                navigate("/test");
-              }
+              // ✅ 임시 비활성화: 백엔드 오류로 취향 진단 페이지로 강제 이동하는 로직을 주석 처리합니다.
+              // if (currentPath !== "/test") {
+              //   message.info("환영합니다! 취향 진단을 먼저 진행해주세요.");
+              //   navigate("/test");
+              // }
             }
           } catch (userError) { // 신규 사용자
             console.error("사용자 정보 가져오기 실패 (신규 사용자일 수 있음):", userError);
             setUser(prev => ({ ...prev, isLoggedIn: true, profileComplete: false }));
-            if (currentPath !== "/test") {
-              message.info("환영합니다! 취향 진단을 먼저 진행해주세요.");
-              navigate("/test");
-            }
+            // ✅ 임시 비활성화: 백엔드 오류로 취향 진단 페이지로 강제 이동하는 로직을 주석 처리합니다.
+            // if (currentPath !== "/test") {
+            //   message.info("환영합니다! 취향 진단을 먼저 진행해주세요.");
+            //   navigate("/test");
+            // }
           }
         } else {
           throw new Error("유효한 accessToken을 받지 못했습니다.");

@@ -1,15 +1,16 @@
+import React from "react";
+
 interface MovieInfoProps {
   movie: {
     genres: string[];
-    ott: string[];
+    ott: { name: string; logo: string }[];
     runtime: string;
     synopsis: string;
   };
-  ottLogos: { [key: string]: string };
   isDesktop?: boolean;
 }
 
-const MovieInfo: React.FC<MovieInfoProps> = ({ movie, ottLogos }) => (
+const MovieInfo: React.FC<MovieInfoProps> = ({ movie }) => (
   <div className="space-y-4 text-sm text-gray-800 md:text-base">
     <div className="flex w-full">
       <div className="w-1/2 md:w-auto">
@@ -22,12 +23,12 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, ottLogos }) => (
     <div className="flex">
       <p className="w-24 shrink-0 font-semibold md:w-28">관람가능 OTT</p>
       <div className="flex items-center gap-2">
-        {movie.ott.map((o) => (
+        {movie.ott.map((provider) => (
           <img
-            key={o}
-            src={ottLogos[o]}
-            alt={o}
-            className="h-6 w-6 rounded-md"
+            key={provider.name}
+            src={provider.logo}
+            alt={provider.name}
+            className="h-6 w-6 rounded-md object-cover"
           />
         ))}
       </div>

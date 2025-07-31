@@ -19,7 +19,7 @@ const Poster = ({
   title,
   posterUrl,
   id,
-  contentType, 
+  contentType,
   likeState,
   onLikeChange,
   disableHover,
