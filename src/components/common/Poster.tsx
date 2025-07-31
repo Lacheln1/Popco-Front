@@ -65,8 +65,10 @@ const Poster = ({
           className="relative aspect-[7/10] w-full rounded-md object-cover"
           src={posterUrl}
           alt="poster"
+          onError={(e) =>
+            (e.currentTarget.src = "/images/popco/default_poster.png")
+          }
         />
-
         {/* PC 호버용 오버레이 */}
         {!disableHover && (
           <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/40 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
