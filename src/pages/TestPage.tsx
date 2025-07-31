@@ -290,18 +290,15 @@ const TestPage = () => {
         throw apiError;
       }
 
-      if (personaAnalysisResult && personaAnalysisResult.result === "SUCCESS") {
-        console.log("페르소나 분석 성공!");
+      if (personaAnalysisResult && personaAnalysisResult.main_persona) {
         setPersonaResult(personaAnalysisResult);
         message.success("취향 분석이 완료되었습니다!");
         setStep((prev: number) => prev + 1);
       } else {
-        console.error(
-          "페르소나 분석 결과가 SUCCESS가 아님:",
-          personaAnalysisResult,
-        );
+        // API 응답은 왔지만, 내용이 에러이거나 예상과 다른 경우
         throw new Error(
-          personaAnalysisResult?.message || "페르소나 분석에 실패했습니다.",
+          (personaAnalysisResult as any)?.message ||
+            "페르소나 분석에 실패했습니다.",
         );
       }
     } catch (error: any) {
