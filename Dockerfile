@@ -4,6 +4,7 @@ FROM node:20-alpine AS builder
 # 환경변수 직접 설정
 ENV VITE_BACK_URL=http://popco.site/api/client
 ENV VITE_KAKAO_LOGIN_URL=https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=354171ed3ab4147d99c70b0378da02da&redirect_uri=http://popco.site/auth/kakao/login
+ENV VITE_RECOMMEND_URL=http://3.37.182.52:8000
 
 # 작업 디렉토리 설정
 WORKDIR /app

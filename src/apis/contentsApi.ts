@@ -1,4 +1,9 @@
-import { ContentCategory, ContentItem } from "@/types/Contents.types";
+import {
+  ContentCategory,
+  ContentItem,
+  FetchAllContentsParams,
+  FetchAllContentsResponse,
+} from "@/types/Contents.types";
 import axiosInstance from "./axiosInstance";
 import axios from "axios";
 
@@ -86,4 +91,20 @@ export const fetchWishlist = async (
     console.error("위시리스트 조회 실패", error);
     throw error;
   }
+};
+
+// 전체 컨텐츠 조회
+export const fetchAllContents = async ({
+  pageNumber = 0,
+  pageSize,
+  sort = "recent",
+}: FetchAllContentsParams): Promise<FetchAllContentsResponse> => {
+  const { data } = await axiosInstance.get(`/contents`, {
+    params: {
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      sort,
+    },
+  });
+  return data.data;
 };
