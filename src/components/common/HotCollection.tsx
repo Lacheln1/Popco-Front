@@ -7,7 +7,8 @@ import { CollectionBase } from "@/types/Collection.types";
 export interface HotCollectionProps extends CollectionBase {
   saveCount: number;
   isSaved: boolean;
-  onSaveToggle: (collectionId: number) => void; // 인자를 collectionId만 받도록 통일
+  onSaveToggle: (collectionId: number) => void;
+  size?: 'large' | 'small';
 }
 
 const HotCollection: React.FC<HotCollectionProps> = React.memo(
@@ -19,11 +20,12 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
     isSaved,
     href,
     onSaveToggle,
+    size = 'large',
   }) => {
     const handleSaveToggle = (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      onSaveToggle(collectionId); // collectionId만 전달
+      onSaveToggle(collectionId);
     };
 
     const displayPosters = Array.from(
@@ -31,8 +33,27 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
       (_, index) => posters[index] || null,
     );
 
+    const sizeStyles = {
+      large: {
+        container: "w-[180px] shrink-0 md:w-[220px]",
+        badgeContainer: "absolute -top-4 right-2 h-12 w-12 drop-shadow-md md:-top-5 md:h-[54px] md:w-[54px]",
+        badgeText: "text-sm font-bold md:text-base",
+        title: "line-clamp-2 pl-1 text-base font-bold text-gray-800 transition-colors group-hover:text-black",
+        saveIcon: "h-6 w-6",
+      },
+      small: {
+        container: "w-[110px] shrink-0 sm:w-[150px] lg:w-[200px]",
+        badgeContainer: "absolute -top-3 right-1 h-10 w-10 drop-shadow-md md:-top-5 md:right-2 md:h-[54px] md:w-[54px]",
+        badgeText: "text-xs font-bold md:text-base",
+        title: "line-clamp-2 pl-1 text-sm font-bold text-gray-800 transition-colors group-hover:text-black md:text-base",
+        saveIcon: "h-5 w-5 md:h-6 md:w-6",
+      }
+    };
+
+    const currentStyles = sizeStyles[size];
+
     return (
-      <div className="w-[180px] shrink-0 md:w-[235px]">
+      <div className={currentStyles.container}>
         <Link
           to={href}
           className="group relative block aspect-square w-full rounded-xl bg-zinc-200 p-1.5 shadow-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-xl md:rounded-2xl md:p-2"
@@ -57,14 +78,14 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
             ))}
           </div>
 
-          <div className="absolute -top-4 right-2 h-12 w-12 drop-shadow-md md:-top-5 md:h-[54px] md:w-[54px]">
+          <div className={currentStyles.badgeContainer}>
             <img
               src={FullSaveIcon}
               alt="Save count badge"
               className="h-full w-full"
             />
             <div className="absolute inset-0 flex items-center justify-center pb-1 md:pb-2">
-              <span className="text-sunglasses-red text-sm font-bold md:text-base">
+              <span className={`text-sunglasses-red ${currentStyles.badgeText}`}>
                 {saveCount > 999 ? "999+" : saveCount}
               </span>
             </div>
@@ -73,7 +94,7 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
 
         <div className="mt-3 flex items-start justify-between gap-2">
           <Link to={href} className="group min-w-0 flex-1">
-            <h3 className="line-clamp-2 pl-1 text-base font-bold text-gray-800 transition-colors group-hover:text-black">
+            <h3 className={currentStyles.title}>
               {title}
             </h3>
           </Link>
@@ -87,7 +108,7 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
             <img
               src={isSaved ? FullSaveIcon : EmptySaveIcon}
               alt={isSaved ? "찜 된 상태" : "찜 안 된 상태"}
-              className="h-6 w-6"
+              className={currentStyles.saveIcon}
             />
           </button>
         </div>
