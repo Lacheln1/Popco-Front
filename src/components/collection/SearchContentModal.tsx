@@ -7,6 +7,7 @@ interface Content {
   id: number;
   title: string;
   posterUrl: string;
+  type: string;
 }
 
 interface SearchContentModalProps {
@@ -26,6 +27,7 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
     id: 700 + i,
     title: `검색된 영화 ${i + 1}`,
     posterUrl: `https://picsum.photos/seed/s${i}/200/300`,
+    type: "movie",
   }));
 
   // 아이콘 버튼 스타일
