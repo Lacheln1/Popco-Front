@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 // --- 타입 임포트 ---
-import { ContentsDetail, Crew, Cast } from "@/types/Contents.types";
+import { ContentsDetail, Crew } from "@/types/Contents.types";
 
 // --- 훅 임포트 ---
 import { useContentsDetail } from "@/hooks/useContentsDetail";
