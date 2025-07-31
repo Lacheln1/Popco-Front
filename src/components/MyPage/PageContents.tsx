@@ -155,10 +155,6 @@ const PageContents: React.FC = () => {
         } else {
           setCollections((prev) => [...prev, ...newCollections]);
         }
-
-        // 더 이상 데이터가 없으면 hasMore를 false로 설정
-        setHasMore(newCollections.length === pageSize);
-        setPageNumber(page);
       }
     } catch (err) {
       console.error("컬렉션 조회 실패:", err);
