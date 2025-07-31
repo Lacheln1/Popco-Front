@@ -143,6 +143,7 @@ const CollectionDetailPage: React.FC = () => {
   }, [modal, message]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     setIsLoading(true);
     setIsEditing(false);
     setCollection(dummyCollectionData);
@@ -325,6 +326,7 @@ const CollectionDetailPage: React.FC = () => {
                     key={content.id}
                     id={content.id}
                     title={content.title}
+                    contentType={content.type}
                     posterUrl={content.posterUrl}
                     likeState={likeStates[content.id] || "neutral"}
                     onLikeChange={handleLikeChange}

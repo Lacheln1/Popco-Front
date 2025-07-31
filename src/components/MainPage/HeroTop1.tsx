@@ -78,17 +78,27 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
               },
             }}
           >
-            {data.map(({ content_id, title, poster_path, user_reaction }) => (
-              <SwiperSlide key={content_id} className="flex justify-center">
-                <Poster
-                  title={title}
-                  posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                  id={content_id}
-                  likeState={user_reaction ? user_reaction : "NEUTRAL"}
-                  onLikeChange={() => {}}
-                />
-              </SwiperSlide>
-            ))}
+            {data.map(
+              (
+                content, //전체 항목을 'content'로
+              ) => (
+                <SwiperSlide
+                  key={content.content_id}
+                  className="flex justify-center"
+                >
+                  <Poster
+                    title={content.title}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                    id={content.content_id}
+                    contentType={content.type} 
+                    likeState={
+                      content.user_reaction ? content.user_reaction : "NEUTRAL"
+                    }
+                    onLikeChange={() => {}}
+                  />
+                </SwiperSlide>
+              ),
+            )}
           </Swiper>
         )}
       </section>

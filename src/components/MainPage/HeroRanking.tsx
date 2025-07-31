@@ -171,15 +171,19 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                   },
                 }}
               >
-                {contentsRank.map(({ contentId, title, rank, posterPath }) => (
-                  <SwiperSlide key={contentId} className="relative my-2 ml-7">
+                {contentsRank.map((content) => (
+                  <SwiperSlide
+                    key={content.contentId}
+                    className="relative my-2 ml-7"
+                  >
                     <span className="absolute -left-7 -top-4 z-10 text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:2px_#0f1525]">
-                      {rank}
+                      {content.rank}
                     </span>
                     <Poster
-                      title={title}
-                      posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
-                      id={contentId}
+                      title={content.title}
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+                      id={content.contentId}
+                      contentType={content.type}
                       likeState="NEUTRAL"
                       onLikeChange={() => {}}
                     />
@@ -189,23 +193,28 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
             </>
           ) : (
             <ul className="ml-9 mt-12 grid grid-cols-2 justify-items-center gap-4 sm:mt-6 sm:flex sm:justify-between sm:gap-6">
-              {contentsRank.map(({ contentId, title, rank, posterPath }) => (
-                <li
-                  key={contentId}
-                  className="relative flex-col items-center *:flex"
-                >
-                  <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
-                    {rank}
-                  </span>
-                  <Poster
-                    title={title}
-                    posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
-                    id={contentId}
-                    likeState="NEUTRAL"
-                    onLikeChange={() => {}}
-                  />
-                </li>
-              ))}
+              {contentsRank.map(
+                (
+                  content, 
+                ) => (
+                  <li
+                    key={content.contentId} 
+                    className="relative flex-col items-center *:flex"
+                  >
+                    <span className="absolute ...">
+                      {content.rank} 
+                    </span>
+                    <Poster
+                      title={content.title} 
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`} 
+                      id={content.contentId} 
+                      contentType={content.type} 
+                      likeState="NEUTRAL"
+                      onLikeChange={() => {}}
+                    />
+                  </li>
+                ),
+              )}
             </ul>
           )}
         </>

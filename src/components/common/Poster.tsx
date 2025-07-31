@@ -9,6 +9,7 @@ type PosterProps = {
   title: string;
   posterUrl: string;
   id: number;
+  contentType: string;
   likeState: LikeState;
   onLikeChange: (newState: LikeState) => void;
   disableHover?: boolean;
@@ -18,13 +19,14 @@ const Poster = ({
   title,
   posterUrl,
   id,
+  contentType, 
   likeState,
   onLikeChange,
   disableHover,
 }: PosterProps) => {
   const navigator = useNavigate();
 
-  const handlePosterClick = () => navigator(`/detail/${id}`);
+  const handlePosterClick = () => navigator(`/detail/${contentType}/${id}`);
 
   const toggleState = (e: React.MouseEvent, target: LikeState) => {
     e.stopPropagation();

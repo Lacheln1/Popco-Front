@@ -113,12 +113,18 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
             }}
           >
             {recommendData?.map(
-              ({ contentId, title, poster_path }: PersonaRecommendation) => (
-                <SwiperSlide key={contentId} className="flex justify-center">
+              (
+                content: PersonaRecommendation,
+              ) => (
+                <SwiperSlide
+                  key={content.contentId}
+                  className="flex justify-center"
+                >
                   <Poster
-                    title={title}
-                    posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                    id={contentId}
+                    title={content.title}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                    id={content.contentId}
+                    contentType={content.type} 
                     likeState="NEUTRAL"
                     onLikeChange={() => {}}
                   />

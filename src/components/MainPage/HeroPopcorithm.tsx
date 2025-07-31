@@ -115,22 +115,21 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
                   1920: { slidesPerView: 5 },
                 }}
               >
-                {data?.map(
-                  ({ content_id, title, poster_path }: RecommendationItem) => (
-                    <SwiperSlide
-                      key={content_id}
-                      className="flex flex-col items-center justify-items-center"
-                    >
-                      <Poster
-                        title={title}
-                        posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                        id={content_id}
-                        likeState="NEUTRAL"
-                        onLikeChange={() => {}}
-                      />
-                    </SwiperSlide>
-                  ),
-                )}
+                {data?.map((content: RecommendationItem) => (
+                  <SwiperSlide
+                    key={content.content_id}
+                    className="flex flex-col items-center justify-items-center"
+                  >
+                    <Poster
+                      title={content.title}
+                      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                      id={content.content_id}
+                      contentType={content.type}
+                      likeState="NEUTRAL"
+                      onLikeChange={() => {}}
+                    />
+                  </SwiperSlide>
+                ))}
               </Swiper>
             </div>
           )}

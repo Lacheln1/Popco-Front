@@ -77,6 +77,7 @@ const ListPage = () => {
             key={id}
             id={id}
             title={title}
+            contentType={content.type}
             posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
             likeState="NEUTRAL"
             onLikeChange={() => {}}
