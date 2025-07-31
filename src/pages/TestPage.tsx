@@ -35,20 +35,10 @@ import horrorPopcoCardUrl from "../assets/horror-popco-card.png";
 import retroPopcoCardUrl from "../assets/retro-popco-card.png";
 import imaginePopcoCardUrl from "../assets/imagine-popco-card.png";
 import movieSherlockCardUrl from "../assets/movie-sherlock-card.png";
-import babyactionhunter from "../assets/baby-action-hunter.svg";
-import actionhunter from "../assets/action-hunter.svg";
-import babycrypopco from "../assets/baby-cry-popco.svg";
-import crypopco from "../assets/cry-popco.svg";
-import babywarmpopco from "../assets/baby-warm-popco.svg";
-import warmpopco from "../assets/warm-popco.svg";
-import babyhorrorpopco from "../assets/baby-horror-popco.svg";
-import horrorpopco from "../assets/horror-popco.svg";
-import babyretropopco from "../assets/baby-retro-popco.svg";
-import retropopco from "../assets/retro-popco.svg";
-import babyimaginepopco from "../assets/baby-imagine-popco.svg";
-import imaginepopco from "../assets/imagine-popco.svg";
-import babymoviesherlock from "../assets/baby-movie-sherlock.svg";
-import moviesherlock from "../assets/movie-sherlock.svg";
+
+// 상수처리
+import { PERSONA_IMAGES } from "@/constants/persona";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const cardImageRows = [
   [actionHunterCardUrl, cryPopcoCardUrl, warmPopcoCardUrl],
@@ -59,23 +49,6 @@ const cardImageRows = [
     movieSherlockCardUrl,
   ],
 ];
-
-const personaImages: { [key: string]: string } = {
-  "아기 액션 헌터": babyactionhunter,
-  "액션 헌터": actionhunter,
-  "아기 시네파 울보": babycrypopco,
-  "시네파 울보": crypopco,
-  "아기 따끈 감성파": babywarmpopco,
-  "따끈 감성파": warmpopco,
-  "아기 호러 수집가": babyhorrorpopco,
-  "호러 수집가": horrorpopco,
-  "아기 레트로 탐험가": babyretropopco,
-  "레트로 탐험가": retropopco,
-  "아기 상상가": babyimaginepopco,
-  상상가: imaginepopco,
-  "아기 무비 셜록": babymoviesherlock,
-  "무비 셜록": moviesherlock,
-};
 
 const TestPage = () => {
   const { accessToken } = useAuthCheck();
@@ -406,7 +379,6 @@ const TestPage = () => {
           </div>
         );
       case 4: // 영화 선택
-        const imageBaseUrl = "https://image.tmdb.org/t/p/w500";
         return (
           <div className="flex h-full flex-col gap-4 py-4">
             <div className="px-4 text-center">
@@ -430,7 +402,7 @@ const TestPage = () => {
                         key={movie.id}
                         id={String(movie.id)}
                         title={movie.title}
-                        posterUrl={`${imageBaseUrl}${movie.posterPath}`}
+                        posterUrl={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
                         isSelected={selectedMovies.includes(String(movie.id))}
                         onToggleSelect={() =>
                           handleToggleMovieSelect(String(movie.id))
@@ -492,7 +464,7 @@ const TestPage = () => {
                   선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
                 </p>
                 <img
-                  src={personaImages[personaResult.main_persona]} // 매핑된 이미지
+                  src={PERSONA_IMAGES[personaResult.main_persona]} // 매핑된 이미지
                   alt={personaResult.main_persona}
                   className="my-6 h-48 w-48"
                 />
