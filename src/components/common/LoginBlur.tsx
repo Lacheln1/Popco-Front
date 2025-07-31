@@ -41,10 +41,10 @@ const LoginBlur = ({ className = "", text = "", isReverse = false }: Props) => {
         <div>{text}</div>
         <button
           onClick={() => navigate("/login")}
-          className="flex items-center gap-2"
+          className="group flex items-center gap-2 font-bold transition-all duration-300"
         >
           <span>로그인</span>
-          <IoMdArrowForward />
+          <IoMdArrowForward className="transform transition-transform duration-300 group-hover:translate-x-1" />
         </button>
       </div>
     </div>
