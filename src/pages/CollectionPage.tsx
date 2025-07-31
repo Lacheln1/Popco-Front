@@ -29,7 +29,7 @@ const mockHotCollections = [
     ],
     saveCount: 128,
     isSaved: false,
-    href: "/collection/101",
+    href: "/collections/101",
     onSaveToggle: () => {},
   },
   {
@@ -43,7 +43,7 @@ const mockHotCollections = [
     ],
     saveCount: 99,
     isSaved: true,
-    href: "/collection/102",
+    href: "/collections/102",
     onSaveToggle: () => {},
   },
   {
@@ -55,7 +55,7 @@ const mockHotCollections = [
     ],
     saveCount: 77,
     isSaved: false,
-    href: "/collection/103",
+    href: "/collections/103",
     onSaveToggle: () => {},
   },
   {

@@ -41,7 +41,7 @@ const mockCollections: CollectionData[] = [
     ],
     totalCount: 12,
     isSaved: false,
-    href: "/collection/1",
+    href: "/collections/1",
   },
   {
     collectionId: 2,

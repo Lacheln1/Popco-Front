@@ -96,6 +96,7 @@ export default function DetailPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const checkAuth = async () => {
       const isValid = await validateAndRefreshTokens();
       if (!isValid) {
