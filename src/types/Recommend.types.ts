@@ -2,7 +2,7 @@ import { ContentCategory } from "./Contents.types";
 
 export interface RecommendationItem {
   content_id: number;
-  type: "movie" | "tv";
+  type: ContentCategory;
   title: string;
   score: number;
   poster_path: string;
