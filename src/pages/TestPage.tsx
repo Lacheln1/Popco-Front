@@ -365,11 +365,22 @@ const TestPage = () => {
 
   // ✅ [수정 2] ID 문자열 대신 영화 객체 전체를 받아서 처리하도록 수정합니다.
   const handleToggleMovieSelect = (movie: Movie) => {
-    setSelectedMovies((prev) =>
-      prev.some((m) => m.id === movie.id)
-        ? prev.filter((m) => m.id !== movie.id)
-        : [...prev, movie],
-    );
+    setSelectedMovies((prevSelected) => {
+      // 이미 선택된 영화인지 ID를 기준으로 확인합니다.
+      const isAlreadySelected = prevSelected.some(
+        (selectedMovie) => selectedMovie.id === movie.id,
+      );
+
+      if (isAlreadySelected) {
+        // 이미 있으면, 해당 영화를 배열에서 제거합니다.
+        return prevSelected.filter(
+          (selectedMovie) => selectedMovie.id !== movie.id,
+        );
+      } else {
+        // 없으면, 기존 배열에 새로운 영화 객체를 추가합니다.
+        return [...prevSelected, movie];
+      }
+    });
   };
 
   const handleSelectAnswer = (questionId: number, optionId: number) => {
@@ -516,10 +527,10 @@ const TestPage = () => {
                         id={String(movie.id)}
                         title={movie.title}
                         posterUrl={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
-                        isSelected={selectedMovies.includes(String(movie.id))}
-                        onToggleSelect={() =>
-                          handleToggleMovieSelect(String(movie.id))
-                        }
+                        isSelected={selectedMovies.some(
+                          (m) => m.id === movie.id,
+                        )}
+                        onToggleSelect={() => handleToggleMovieSelect(movie)}
                       />
                     );
                   })}
@@ -528,7 +539,7 @@ const TestPage = () => {
             )}
           </div>
         );
-      }
+
       case 5:
       case 6:
       case 7:
