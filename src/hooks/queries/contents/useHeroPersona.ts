@@ -7,7 +7,13 @@ export const useHeroPersona = (
   token?: string,
   contentType: "movie" | "tv" | "all" = "all",
 ) => {
-  return useQuery<PersonaRecommendation[], Error>({
+  return useQuery<
+    {
+      main_persona: string;
+      recommendations: PersonaRecommendation[];
+    },
+    Error
+  >({
     queryKey: ["heroPersona", userId, contentType],
     queryFn: () => fetchHeroPersona(userId, token, contentType),
     staleTime: 1000 * 60 * 60 * 6,
