@@ -132,28 +132,28 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
           label: "리뷰 개수",
           data: data,
           backgroundColor: [
-            "rgba(255, 99, 132, 0.6)",
-            "rgba(255, 159, 64, 0.6)",
-            "rgba(255, 205, 86, 0.6)",
-            "rgba(75, 192, 192, 0.6)",
-            "rgba(54, 162, 235, 0.6)",
-            "rgba(153, 102, 255, 0.6)",
-            "rgba(201, 203, 207, 0.6)",
-            "rgba(255, 99, 132, 0.6)",
-            "rgba(255, 159, 64, 0.6)",
-            "rgba(255, 205, 86, 0.6)",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
           ],
           borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(255, 159, 64, 1)",
-            "rgba(255, 205, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(153, 102, 255, 1)",
-            "rgba(201, 203, 207, 1)",
-            "rgba(255, 99, 132, 1)",
-            "rgba(255, 159, 64, 1)",
-            "rgba(255, 205, 86, 1)",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
+            "#ffd751",
           ],
           borderWidth: 1,
         },
@@ -267,24 +267,23 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
         </div>
       )}
 
-      {/* 통계 정보 */}
+      {/* 통계 정보 - 세련된 색상 조합 */}
       <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-lg bg-green-50 p-4 text-center">
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-center">
           <div className="text-sm text-gray-600">총 리뷰 수</div>
-          <div className="text-xl font-bold text-green-600">
+          <div className="text-xl font-bold text-yellow-600">
             {scoreData.totalCount}개
           </div>
         </div>
-        <div className="rounded-lg bg-blue-50 p-4 text-center">
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-center">
           <div className="text-sm text-gray-600">평균 평점</div>
-          <div className="text-xl font-bold text-blue-600">
+          <div className="text-xl font-bold text-yellow-600">
             {scoreData.averageScore.toFixed(1)}점
           </div>
         </div>
-
-        <div className="rounded-lg bg-purple-50 p-4 text-center">
+        <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 text-center">
           <div className="text-sm text-gray-600">최다 평점</div>
-          <div className="text-xl font-bold text-purple-600">
+          <div className="text-xl font-bold text-yellow-600">
             {scoreData.mostFrequentScore}점
           </div>
         </div>
