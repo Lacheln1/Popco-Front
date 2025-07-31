@@ -69,9 +69,7 @@ const PageContents: React.FC = () => {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [collectionsError, setCollectionsError] = useState<string | null>(null);
-  const [pageNumber, setPageNumber] = useState(0);
   const [pageSize] = useState(20);
-  const [hasMore, setHasMore] = useState(true);
 
   // 저장한 컬렉션 관련 상태
   const [markedCollections, setMarkedCollections] = useState<Collection[]>([]);
