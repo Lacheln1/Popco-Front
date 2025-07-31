@@ -3,7 +3,7 @@ import React from "react";
 interface PageLayoutProps {
   header: React.ReactNode;
   floatingBoxContent: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const PageLayout: React.FC<PageLayoutProps> = ({
