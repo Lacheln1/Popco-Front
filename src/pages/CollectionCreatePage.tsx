@@ -188,8 +188,7 @@ const CollectionCreatePage: React.FC = () => {
             </div>
           </div>
         }
-      />
-
+      ></PageLayout>
       <SearchContentModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}

@@ -9,11 +9,11 @@ interface Props {
 }
 
 const posterData = [
-  { id: 1, title: "..." },
-  { id: 2, title: "..." },
-  { id: 3, title: "..." },
-  { id: 4, title: "..." },
-  { id: 5, title: "..." },
+  { id: 1, title: "...", type: "movie" },
+  { id: 2, title: "...", type: "movie" },
+  { id: 3, title: "...", type: "movie" },
+  { id: 4, title: "...", type: "movie" },
+  { id: 5, title: "...", type: "movie" },
 ];
 
 const LoginBlur = ({ className = "", text = "", isReverse = false }: Props) => {

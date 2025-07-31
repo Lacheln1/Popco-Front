@@ -31,10 +31,11 @@ const dummyCollectionData = {
     id: 500 + i,
     title: `영화 제목 ${i + 1}`,
     posterUrl: `https://picsum.photos/seed/${i + 1}/200/300`,
+    type: "movie",
   })),
 };
 
-type LikeStates = { [key: number]: "liked" | "hated" | "neutral" };
+type LikeStates = { [key: number]: "LIKE" | "DISLIKE" | "NEUTRAL" };
 
 // 현재 로그인한 사용자를 다른 사람(999)으로 가정
 const LOGGED_IN_USER_ID = 99;
@@ -69,7 +70,7 @@ const CollectionDetailPage: React.FC = () => {
   }, [collection, message]);
 
   const handleLikeChange = useCallback(
-    (contentId: number, newState: "liked" | "hated" | "neutral") => {
+    (contentId: number, newState: "LIKE" | "DISLIKE" | "NEUTRAL") => {
       setLikeStates((prev) => ({ ...prev, [contentId]: newState }));
     },
     [],
@@ -328,8 +329,10 @@ const CollectionDetailPage: React.FC = () => {
                     title={content.title}
                     contentType={content.type}
                     posterUrl={content.posterUrl}
-                    likeState={likeStates[content.id] || "neutral"}
-                    onLikeChange={handleLikeChange}
+                    likeState={likeStates[content.id] || "NEUTRAL"}
+                    onLikeChange={(newState) =>
+                      handleLikeChange(content.id, newState)
+                    }
                   />
                 ),
               )}

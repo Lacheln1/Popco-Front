@@ -201,7 +201,7 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                     key={content.contentId} 
                     className="relative flex-col items-center *:flex"
                   >
-                    <span className="absolute ...">
+                    <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
                       {content.rank} 
                     </span>
                     <Poster
