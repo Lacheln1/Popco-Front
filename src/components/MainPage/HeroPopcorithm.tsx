@@ -78,9 +78,11 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
             <p className="text-left text-xl font-semibold">
               고객님을 위한 <br /> 맞춤 추천 작품을 <br /> 확인해 보세요 !
             </p>
-            <button className="gmarket rounded-full border border-solid border-white px-7 py-3 font-semibold transition hover:bg-white hover:text-black">
-              View all +
-            </button>
+            {userId > 0 && (
+              <button className="gmarket rounded-full border border-solid border-white px-7 py-3 font-semibold transition hover:bg-white hover:text-black">
+                View all +
+              </button>
+            )}
           </div>
           {!accessToken ? (
             <LoginBlur
