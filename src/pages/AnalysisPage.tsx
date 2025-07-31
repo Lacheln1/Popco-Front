@@ -163,7 +163,7 @@ const AnalysisPage = () => {
   }
 
   // userData가 null일 때
-  if (!userData || !dashBoardData) {
+  if (!userData || !dashBoardData || !accessToken) {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
@@ -194,6 +194,8 @@ const AnalysisPage = () => {
       <RoleDashBoard
         genderPercent={dashBoardData.genderPercent}
         agePercent={dashBoardData.agePercent}
+        userId={user.userId}
+        personaName={userData.myPersonaName}
       />
       <MyWatchingStyleBoard />
       <LikeContentSection />
