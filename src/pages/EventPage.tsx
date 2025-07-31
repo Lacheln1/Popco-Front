@@ -1,6 +1,7 @@
 import { renderCount } from "@/components/EventPage/Countdown";
 import { useIsMediumUp } from "@/hooks/useMediaQuery";
-import React from "react";
+import clsx from "clsx";
+import React, { useState } from "react";
 import Countdown from "react-countdown";
 
 const image = {
@@ -73,6 +74,7 @@ const renderPoster = (idx: number) => (
 const EventPage = () => {
   const isMediumUp = useIsMediumUp();
   const postersToRender = isMediumUp ? 4 : 1;
+  const [isButtonActive, setIsButtonActive] = useState(false);
 
   return (
     <div className="bg-[#eee]">
@@ -89,14 +91,18 @@ const EventPage = () => {
         }}
       >
         {/* 카드 */}
-        <div className="relative mt-10 h-screen pt-20 md:mt-0">
-          <aside className="absolute left-1/2 top-1/3 z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-xl bg-white/80 px-4 py-8 shadow-xl backdrop-blur-md md:h-[450px] md:w-[800px] md:px-8">
+        <div className="relative mt-16 h-screen pt-20 md:mt-0">
+          <aside className="absolute left-1/2 top-[31%] z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-xl bg-white/80 px-4 py-8 shadow-xl backdrop-blur-md md:w-[800px] md:px-8">
             <h3 className="gmarket md: mb-1 text-center text-xl font-medium tracking-tight text-gray-900 md:text-[1.75rem]">
-              퀴즈 이벤트가 곧 시작됩니다!
+              {isButtonActive
+                ? "퀴즈 이벤트가 시작되었습니다!"
+                : "퀴즈 이벤트가 곧 시작됩니다!"}
             </h3>
             <Countdown
+              key={isButtonActive ? "started" : "waiting"}
               date={new Date("2025-08-12T15:00:00")}
               renderer={renderCount}
+              onComplete={() => setIsButtonActive(true)}
             />
             <div className="flex flex-col gap-2">
               <div className="pretendard flex flex-row items-center gap-3">
@@ -141,18 +147,33 @@ const EventPage = () => {
                   진출할 수 있어요!
                 </span>
               </div>
+              <button
+                disabled={!isButtonActive}
+                className={clsx(
+                  "mt-4 w-fit self-center rounded-full px-14 py-3 shadow-md transition",
+                  isButtonActive
+                    ? "cursor-pointer bg-[#222] text-white hover:bg-black"
+                    : "cursor-not-allowed bg-gray-200 text-gray-400",
+                )}
+              >
+                {isButtonActive
+                  ? "퀴즈 풀기 시작!"
+                  : "아직 이벤트가 준비중입니다"}
+              </button>
             </div>
           </aside>
           <img
-            className="absolute left-1/2 top-[15%] w-32 -translate-x-1/2 -translate-y-1/4"
+            className="absolute left-1/2 top-[10%] w-32 -translate-x-1/2 -translate-y-1/4"
             src="images/popco/time-popco.png"
             alt="popco"
           />
         </div>
         <>
-          {/* 모바일 */}
-          <div className="block md:hidden">{renderPoster(0)}</div>
           {/* PC */}
+          <div className="hidden 2sm:block md:hidden">
+            {renderPoster(2)}
+            {renderPoster(1)}
+          </div>
           <div className="hidden md:block">
             {Array.from({ length: postersToRender }, (_, idx) =>
               renderPoster(idx),

@@ -13,9 +13,7 @@ export const renderCount = ({
   seconds,
   completed,
 }: CountdownRendererProps) => {
-  if (completed) {
-    return <span>퀴즈가 이미 진행중입니다.</span>;
-  } else {
+  if (!completed) {
     const format = (num: number) => String(num).padStart(2, "0");
     return (
       <div className="mb-8 flex gap-2">
