@@ -23,7 +23,7 @@ const ListPage = () => {
     console.log(`정렬 ${value}`);
   };
 
-return (
+  return (
     <PageLayout
       header={
         <SectionHeader
@@ -58,7 +58,7 @@ return (
             title={title}
             posterUrl="https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg"
             key={id}
-            likeState="neutral"
+            likeState="NEUTRAL"
             onLikeChange={() => {}}
           />
         ))}
