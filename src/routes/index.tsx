@@ -23,8 +23,8 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "/detail/:contentsType/:movieId", element: <DetailPage /> },
       { path: "/list", element: <ListPage /> },
+      { path: "/detail/:type/:id", element: <DetailPage /> },
       { path: "/collections", element: <CollectionPage /> },
       { path: "/collections/create", element: <CollectionCreatePage /> },
       { path: "/collections/:collectionId", element: <CollectionDetailPage /> },

@@ -3,6 +3,7 @@ import {
   ContentItem,
   FetchAllContentsParams,
   FetchAllContentsResponse,
+  ContentsDetail,
 } from "@/types/Contents.types";
 import axiosInstance from "./axiosInstance";
 import axios from "axios";
@@ -106,5 +107,14 @@ export const fetchAllContents = async ({
       sort,
     },
   });
+  return data.data;
+};
+
+// 콘텐츠 상세 정보 조회
+export const getContentsDetail = async (
+  id: string,
+  type: string,
+): Promise<ContentsDetail> => {
+  const { data } = await axiosInstance.get(`/contents/ids/${id}/types/${type}`);
   return data.data;
 };
