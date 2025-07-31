@@ -93,7 +93,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
               src={
                 previewUrl ||
                 currentProfileImage ||
-                "/images/mypage/testProfileImg.png"
+                "https://popco-bucket.s3.ap-northeast-2.amazonaws.com/5ce940cd-4cd0-442b-afb0-077054a2af1f_popco.png"
               }
               alt="사용자프로필"
               className="h-[45px] w-[45px] cursor-pointer overflow-hidden rounded-full object-cover"
