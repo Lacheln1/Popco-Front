@@ -21,10 +21,10 @@ const MyStyleSection: React.FC<MyStyleSectionProps> = ({
           <span className="">{myPersonaTags}</span>
         </div>
         <div className="flex w-full justify-center gap-6 pt-4 md:text-xl">
-          {myPersonaGenres.map((data) => (
+          {myPersonaGenres.slice(0, 4).map((data) => (
             <div
               key={data}
-              className="bg-popco-main flex h-8 w-16 items-center justify-center rounded-lg md:w-24 lg:h-10 lg:w-28"
+              className="bg-popco-main flex h-8 w-20 items-center justify-center rounded-lg md:w-28 lg:h-10 lg:w-28"
             >
               #{data}
             </div>
