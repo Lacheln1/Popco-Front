@@ -114,7 +114,7 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
                       title={title}
                       posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
                       id={content_id}
-                      likeState="neutral"
+                      likeState="NEUTRAL"
                       onLikeChange={() => {}}
                     />
                   </SwiperSlide>
