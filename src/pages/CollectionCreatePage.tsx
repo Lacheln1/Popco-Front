@@ -39,12 +39,15 @@ const CollectionCreatePage: React.FC = () => {
     [contents, message],
   );
 
-  const handleRemoveContent = useCallback((contentIdToRemove: number) => {
-    setContents((prev) =>
-      prev.filter((content) => content.id !== contentIdToRemove),
-    );
-    message.error("작품을 컬렉션에서 삭제했습니다.");
-  }, [message]);
+  const handleRemoveContent = useCallback(
+    (contentIdToRemove: number) => {
+      setContents((prev) =>
+        prev.filter((content) => content.id !== contentIdToRemove),
+      );
+      message.error("작품을 컬렉션에서 삭제했습니다.");
+    },
+    [message],
+  );
 
   const handleSaveCollection = useCallback(() => {
     // 버튼 클릭 시 유효성 검사
@@ -59,13 +62,14 @@ const CollectionCreatePage: React.FC = () => {
 
     console.log("Saving Collection:", { title, description, contents });
     message.success("컬렉션이 성공적으로 생성되었습니다!");
-    
-    const newCollectionId = 999; // 임시 ID (API 응답값으로 대체 필요)
-    navigate(`/collections/${newCollectionId}`); 
+
+    const newCollectionId = Math.floor(Math.random() * 1000); // 임시 ID
+    navigate(`/collections/${newCollectionId}`);
   }, [title, description, contents, message, navigate]);
 
   // --- Render ---
-  const primaryHeaderButtonClass = "flex w-28 justify-center rounded-full border border-solid border-white bg-transparent px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:px-5 md:text-sm whitespace-nowrap";
+  const primaryHeaderButtonClass =
+    "flex w-20 mb-10 justify-center rounded-full border border-solid border-white bg-transparent px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:w-28 md:px-5 md:text-sm whitespace-nowrap";
 
   return (
     <>
@@ -76,14 +80,14 @@ const CollectionCreatePage: React.FC = () => {
 
             <div className="absolute inset-0 z-10 mx-auto flex w-full max-w-[1200px] items-center px-4 sm:px-8">
               <div className="flex w-full items-center justify-between">
-                
                 {/* 왼쪽: 제목과 설명 */}
                 <div className="flex flex-col gap-2">
                   <h1 className="gmarket-medium text-xl font-bold text-white md:text-2xl">
                     컬렉션 만들기
                   </h1>
                   <p className="gmarket-medium text-xs text-gray-300 md:text-base">
-                    보고 싶은 콘텐츠, 추천하고 싶은 시리즈, 그리고 나만의 테마까지 OTT 컬렉션을 만들어 공유해보세요.
+                    보고 싶은 콘텐츠, 추천하고 싶은 시리즈, 그리고 나만의
+                    테마까지 OTT 컬렉션을 만들어 공유해보세요.
                   </p>
                 </div>
 
@@ -97,7 +101,6 @@ const CollectionCreatePage: React.FC = () => {
                     컬렉션 등록
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
@@ -108,13 +111,23 @@ const CollectionCreatePage: React.FC = () => {
             <ConfigProvider
               theme={{
                 token: {
-                  colorPrimary: "#d9d9d9",
+                  colorPrimary: "#172036", // 테마 색상 통일
+                  colorBorder: "#d9d9d9",
+                  borderRadius: 6,
+                },
+                components: {
+                  Input: {
+                    // antd 컴포넌트 세부 스타일 조정
+                  },
                 },
               }}
             >
               <div className="flex flex-col gap-6">
                 <div>
-                  <label htmlFor="collection-title" className="mb-2 block font-semibold">
+                  <label
+                    htmlFor="collection-title"
+                    className="mb-2 block font-semibold"
+                  >
                     컬렉션 제목 <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -128,7 +141,10 @@ const CollectionCreatePage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="collection-description" className="mb-2 block font-semibold">
+                  <label
+                    htmlFor="collection-description"
+                    className="mb-2 block font-semibold"
+                  >
                     컬렉션 소개 (선택)
                   </label>
                   <Input.TextArea
@@ -151,9 +167,12 @@ const CollectionCreatePage: React.FC = () => {
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold">
                   작품 추가 <span className="text-red-500">*</span>
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    (최소 3개)
+                  </span>
                 </h3>
               </div>
-              <div className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                 {contents.map((content) => (
                   <EditablePoster
                     key={content.id}
@@ -161,6 +180,7 @@ const CollectionCreatePage: React.FC = () => {
                     title={content.title}
                     posterUrl={content.posterUrl}
                     onRemove={handleRemoveContent}
+                    isEditing={true}
                   />
                 ))}
                 <AddContentCard onClick={() => setIsSearchModalOpen(true)} />
@@ -169,11 +189,12 @@ const CollectionCreatePage: React.FC = () => {
           </div>
         }
       />
-      
+
       <SearchContentModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
         onAddContent={handleAddContent}
+        existingContentIds={contents.map((c) => c.id)}
       />
     </>
   );

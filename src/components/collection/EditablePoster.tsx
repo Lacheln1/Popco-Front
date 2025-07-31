@@ -6,6 +6,7 @@ type EditablePosterProps = {
   title: string;
   posterUrl: string;
   onRemove: (id: number) => void;
+  isEditing: boolean; // 수정 모드 여부를 받는 prop
 };
 
 const EditablePoster: React.FC<EditablePosterProps> = ({
@@ -13,6 +14,7 @@ const EditablePoster: React.FC<EditablePosterProps> = ({
   title,
   posterUrl,
   onRemove,
+  isEditing, 
 }) => {
   const handleRemoveClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -22,22 +24,26 @@ const EditablePoster: React.FC<EditablePosterProps> = ({
 
   return (
     <div className="group flex w-[35vw] min-w-[100px] max-w-[210px] flex-col gap-1 md:w-[210px]">
-      
       <div className="relative w-full cursor-pointer">
-        
         <img
           className="relative aspect-[7/10] w-full rounded-md object-cover"
           src={posterUrl}
           alt={title}
         />
 
-        <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/60 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
+        <div
+          className={`absolute inset-0 flex items-center justify-center gap-4 rounded-md bg-black/60 p-2 backdrop-blur-sm transition-opacity duration-300 ${
+            isEditing
+              ? "opacity-100"
+              : "opacity-0 group-hover:opacity-100"
+          }`}
+        >
           <button
             onClick={handleRemoveClick}
             className="flex flex-col items-center gap-1 rounded-full p-2 text-center text-sm font-semibold text-white transition-transform hover:scale-110"
             aria-label={`${title} 삭제`}
           >
-            <IoTrashBin size={48} /> 
+            <IoTrashBin size={48} />
             <span>삭제</span>
           </button>
         </div>

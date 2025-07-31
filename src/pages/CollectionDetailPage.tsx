@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { App, Spin, Avatar, Modal, Input, ConfigProvider } from "antd";
+import { App, Spin, Avatar, Input } from "antd";
 
 // Layout 및 공용 컴포넌트
 import PageLayout from "@/layout/PageLayout";
@@ -8,6 +8,7 @@ import SectionHeader from "@/components/common/SectionHeader";
 import Poster from "@/components/common/Poster";
 import AddContentCard from "@/components/collection/AddContentCard";
 import EditablePoster from "@/components/collection/EditablePoster";
+import SearchContentModal from "@/components/collection/SearchContentModal";
 
 // Assets
 import FullSaveIcon from "@/assets/full-save.svg";
@@ -17,7 +18,7 @@ import EmptySaveIcon from "@/assets/empty-save.svg";
 const dummyCollectionData = {
   collectionId: 1,
   user: {
-    id: 101,
+    id: 101, // 컬렉션 소유자 ID
     nickname: "영화광",
     profileImageUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
   },
@@ -32,14 +33,11 @@ const dummyCollectionData = {
     posterUrl: `https://picsum.photos/seed/${i + 1}/200/300`,
   })),
 };
-const dummySearchResults = Array.from({ length: 5 }, (_, i) => ({
-  id: 700 + i,
-  title: `검색된 영화 ${i + 1}`,
-  posterUrl: `https://picsum.photos/seed/s${i}/200/300`,
-}));
 
 type LikeStates = { [key: number]: "liked" | "hated" | "neutral" };
-const LOGGED_IN_USER_ID = 101;
+
+// 현재 로그인한 사용자를 다른 사람(999)으로 가정
+const LOGGED_IN_USER_ID = 99;
 
 const CollectionDetailPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
@@ -49,7 +47,6 @@ const CollectionDetailPage: React.FC = () => {
   const [collection, setCollection] = useState(dummyCollectionData);
   const [isLoading, setIsLoading] = useState(true);
   const [likeStates, setLikeStates] = useState<LikeStates>({});
-  const [isHoveringSave, setIsHoveringSave] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [editedTitle, setEditedTitle] = useState(collection.title);
@@ -59,7 +56,7 @@ const CollectionDetailPage: React.FC = () => {
 
   const isOwner = collection?.user?.id === LOGGED_IN_USER_ID;
 
-  // --- Handlers (useCallback으로 최적화) ---
+  // --- Handlers ---
   const handleSaveToggle = useCallback(() => {
     if (!collection) return;
     const newIsSaved = !collection.isSaved;
@@ -160,8 +157,6 @@ const CollectionDetailPage: React.FC = () => {
     "flex w-20 md:w-28 justify-center rounded-full border border-solid border-white bg-transparent px-2 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:px-5 md:text-sm";
   const secondaryHeaderButtonClass =
     "flex w-20 md:w-28 justify-center rounded-full border border-gray-300 bg-white px-2 py-2 text-xs font-medium text-footerBlue transition-colors hover:bg-gray-200 md:px-5 md:text-sm";
-  const primaryAddButtonClass =
-    "rounded-md bg-[#172036] px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-[#172036]/80";
 
   if (isLoading) {
     return (
@@ -174,9 +169,6 @@ const CollectionDetailPage: React.FC = () => {
   if (!collection) {
     return <div>컬렉션 정보를 찾을 수 없습니다.</div>;
   }
-
-  const saveIconSrc =
-    isHoveringSave || collection.isSaved ? FullSaveIcon : EmptySaveIcon;
 
   return (
     <>
@@ -198,31 +190,47 @@ const CollectionDetailPage: React.FC = () => {
                   </div>
                   {isEditing ? (
                     <div className="flex flex-col gap-2 pr-4">
-                      <Input
-                        value={editedTitle}
-                        onChange={(e) => setEditedTitle(e.target.value)}
-                        placeholder="컬렉션 제목"
-                        styles={{
-                          input: {
-                            backgroundColor: "transparent",
-                            boxShadow: "none",
-                          },
-                        }}
-                        className="border-0 border-b border-gray-500 bg-transparent text-base text-white shadow-none placeholder:text-gray-400 focus:border-white md:text-2xl"
-                      />
-                      <Input.TextArea
-                        value={editedDescription}
-                        onChange={(e) => setEditedDescription(e.target.value)}
-                        placeholder="컬렉션에 대한 설명을 입력하세요."
-                        autoSize={{ minRows: 2, maxRows: 3 }}
-                        styles={{
-                          textarea: {
-                            backgroundColor: "transparent",
-                            boxShadow: "none",
-                          },
-                        }}
-                        className="border-0 border-b border-gray-500 bg-transparent text-xs text-gray-300 shadow-none placeholder:text-gray-400 focus:border-white md:text-base"
-                      />
+                      <div className="relative w-full">
+                        <Input
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          placeholder="컬렉션 제목"
+                          variant="borderless"
+                          maxLength={15}
+                          styles={{
+                            input: {
+                              backgroundColor: "transparent",
+                              boxShadow: "none",
+                              padding: "4px 0px",
+                            },
+                          }}
+                          className="bg-transparent pr-12 text-base text-white shadow-none placeholder:text-gray-400 focus:ring-0 md:text-2xl"
+                        />
+                        <span className="pointer-events-none absolute bottom-1 right-2 text-xs text-white/70 md:bottom-2">
+                          {editedTitle.length}/15
+                        </span>
+                      </div>
+                      <div className="relative w-full">
+                        <Input.TextArea
+                          value={editedDescription}
+                          onChange={(e) => setEditedDescription(e.target.value)}
+                          placeholder="컬렉션에 대한 설명을 입력하세요."
+                          autoSize={{ minRows: 2, maxRows: 3 }}
+                          variant="borderless"
+                          maxLength={50}
+                          styles={{
+                            textarea: {
+                              backgroundColor: "transparent",
+                              boxShadow: "none",
+                              padding: "4px 0px",
+                            },
+                          }}
+                          className="bg-transparent pr-12 text-xs text-gray-300 shadow-none placeholder:text-gray-400 focus:ring-0 md:text-base"
+                        />
+                        <span className="pointer-events-none absolute bottom-2 right-2 text-xs text-white/70">
+                          {editedDescription.length}/50
+                        </span>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
@@ -236,6 +244,7 @@ const CollectionDetailPage: React.FC = () => {
                   )}
                 </div>
                 <div className="flex min-h-[120px] flex-shrink-0 items-center justify-end md:min-h-[140px]">
+                  {/* 소유자일 경우 수정/삭제 버튼 표시 */}
                   {isOwner && (
                     <div className="flex flex-col items-end gap-2">
                       {isEditing ? (
@@ -275,14 +284,29 @@ const CollectionDetailPage: React.FC = () => {
                       )}
                     </div>
                   )}
+                  {/* ✅ 소유자가 아닐 경우 저장 버튼 표시 */}
+                  {!isOwner && (
+                    <button
+                      type="button"
+                      onClick={handleSaveToggle}
+                      className="mt-14 flex items-center justify-center gap-1 rounded-full border border-solid border-white bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20 md:gap-2 md:px-4 md:py-2 md:text-sm"
+                    >
+                      <img
+                        src={collection.isSaved ? FullSaveIcon : EmptySaveIcon}
+                        alt="Save"
+                        className="h-4 w-4 md:h-5 md:w-5"
+                      />
+                      <span>{collection.saveCount}</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         }
         floatingBoxContent={
-          <div className="px-4 py-12 md:px-12">
-            <div className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
+          <div className="px-8 py-12 md:px-24">
+            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
               {isEditing && (
                 <AddContentCard onClick={() => setIsSearchModalOpen(true)} />
               )}
@@ -294,6 +318,7 @@ const CollectionDetailPage: React.FC = () => {
                     title={content.title}
                     posterUrl={content.posterUrl}
                     onRemove={handleRemoveContent}
+                    isEditing={isEditing}
                   />
                 ) : (
                   <Poster
@@ -313,51 +338,12 @@ const CollectionDetailPage: React.FC = () => {
         {/* Children Area */}
       </PageLayout>
 
-      <Modal
-        title="컬렉션에 작품 추가"
-        open={isSearchModalOpen}
-        onCancel={() => setIsSearchModalOpen(false)}
-        footer={null}
-        width={800}
-      >
-        <div className="flex flex-col gap-4 py-4">
-          <ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: "#d9d9d9",
-              },
-            }}
-          >
-            <Input.Search
-              placeholder="영화, 드라마 제목을 검색하세요"
-              size="large"
-              enterButton
-            />
-          </ConfigProvider>
-          <div className="flex h-[400px] flex-col gap-3 overflow-y-auto pr-2">
-            {dummySearchResults.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 rounded-lg p-2 hover:bg-gray-100"
-              >
-                <img
-                  src={item.posterUrl}
-                  alt={item.title}
-                  className="h-16 w-11 rounded object-cover"
-                />
-                <span className="flex-1 font-semibold">{item.title}</span>
-                <button
-                  type="button"
-                  onClick={() => handleAddContent(item)}
-                  className={primaryAddButtonClass}
-                >
-                  추가
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Modal>
+      <SearchContentModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        onAddContent={handleAddContent}
+        existingContentIds={collection.contents.map((c) => c.id)}
+      />
     </>
   );
 };
