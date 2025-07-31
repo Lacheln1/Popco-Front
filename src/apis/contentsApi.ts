@@ -1,4 +1,9 @@
-import { ContentCategory, ContentItem } from "@/types/Contents.types";
+import {
+  AllContentItem,
+  ContentCategory,
+  ContentItem,
+  FetchAllContentsParams,
+} from "@/types/Contents.types";
 import axiosInstance from "./axiosInstance";
 
 // 주간 랭킹
@@ -7,4 +12,20 @@ export const fetchContentsRanking = async (
 ): Promise<ContentItem[]> => {
   const { data } = await axiosInstance.get(`/contents/popular/types/${type}`);
   return data.data;
+};
+
+// 전체 컨텐츠 조회
+export const fetchAllContents = async ({
+  pageNumber = 0,
+  pageSize,
+  sort = "recent",
+}: FetchAllContentsParams): Promise<AllContentItem[]> => {
+  const { data } = await axiosInstance.get(`/contents`, {
+    params: {
+      page: pageNumber,
+      size: pageSize,
+      sort,
+    },
+  });
+  return data.data.contents;
 };
