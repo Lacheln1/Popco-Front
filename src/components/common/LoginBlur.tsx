@@ -31,7 +31,7 @@ const LoginBlur = ({ className = "", text = "", isReverse = false }: Props) => {
             title={title}
             posterUrl={`images/poster/poster${id}.png`}
             id={id}
-            likeState="neutral"
+            likeState="NEUTRAL"
             onLikeChange={() => {}}
             disableHover={true}
           />
