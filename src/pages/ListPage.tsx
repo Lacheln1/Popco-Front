@@ -13,7 +13,7 @@ const ListPage = () => {
   const [sort, setSort] = useState("recent");
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useAllContents({ pageSize: 20, sort });
+    useAllContents({ pageSize: 30, sort });
 
   const allContents: AllContentItem[] =
     data?.pages.flatMap((page) => page.contents) ?? [];
@@ -29,7 +29,7 @@ const ListPage = () => {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0 },
     );
 
     const target = observerRef.current;
@@ -71,7 +71,7 @@ const ListPage = () => {
         />
       </div>
 
-      <div className="flex flex-wrap place-content-center gap-9">
+      <div className="flex flex-wrap place-content-center gap-7">
         {allContents.map(({ id, title, posterPath }) => (
           <Poster
             key={id}
