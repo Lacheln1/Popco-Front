@@ -14,6 +14,7 @@ interface Content {
   id: number;
   title: string;
   posterUrl: string;
+  // ✅ 1. SearchContentModal에서 전달하는 데이터와 타입을 맞추기 위해 'type'을 추가합니다.
   type: string;
 }
 
@@ -74,6 +75,7 @@ const CollectionCreatePage: React.FC = () => {
 
   return (
     <>
+      {/* ✅ 2. PageLayout을 여는 태그와 닫는 태그로 감싸줍니다. */}
       <PageLayout
         header={
           <div className="relative">

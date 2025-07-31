@@ -37,7 +37,7 @@ const dummyCollectionData = {
 
 type LikeStates = { [key: number]: "LIKE" | "DISLIKE" | "NEUTRAL" };
 
-// 현재 로그인한 사용자를 다른 사람(999)으로 가정
+// 현재 로그인한 사용자를 다른 사람(99)으로 가정
 const LOGGED_IN_USER_ID = 99;
 
 const CollectionDetailPage: React.FC = () => {
@@ -106,7 +106,7 @@ const CollectionDetailPage: React.FC = () => {
   );
 
   const handleAddContent = useCallback(
-   (newContent: { id: number; title: string; posterUrl: string; type: string }) => {
+    (newContent: { id: number; title: string; posterUrl: string; type: string }) => {
       if (collection.contents.some((c) => c.id === newContent.id)) {
         message.warning("이미 컬렉션에 추가된 작품입니다.");
         return;
@@ -246,58 +246,24 @@ const CollectionDetailPage: React.FC = () => {
                   )}
                 </div>
                 <div className="flex min-h-[120px] flex-shrink-0 items-center justify-end md:min-h-[140px]">
-                  {/* 소유자일 경우 수정/삭제 버튼 표시 */}
                   {isOwner && (
                     <div className="flex flex-col items-end gap-2">
                       {isEditing ? (
                         <>
-                          <button
-                            type="button"
-                            onClick={handleEditClick}
-                            className={primaryHeaderButtonClass}
-                          >
-                            수정 완료
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setIsEditing(false)}
-                            className={secondaryHeaderButtonClass}
-                          >
-                            수정 취소
-                          </button>
+                          <button type="button" onClick={handleEditClick} className={primaryHeaderButtonClass}>수정 완료</button>
+                          <button type="button" onClick={() => setIsEditing(false)} className={secondaryHeaderButtonClass}>수정 취소</button>
                         </>
                       ) : (
                         <>
-                          <button
-                            type="button"
-                            onClick={handleEditClick}
-                            className={primaryHeaderButtonClass}
-                          >
-                            컬렉션 수정
-                          </button>
-                          <button
-                            type="button"
-                            onClick={showDeleteConfirm}
-                            className={secondaryHeaderButtonClass}
-                          >
-                            컬렉션 삭제
-                          </button>
+                          <button type="button" onClick={handleEditClick} className={primaryHeaderButtonClass}>컬렉션 수정</button>
+                          <button type="button" onClick={showDeleteConfirm} className={secondaryHeaderButtonClass}>컬렉션 삭제</button>
                         </>
                       )}
                     </div>
                   )}
-                  {/* ✅ 소유자가 아닐 경우 저장 버튼 표시 */}
                   {!isOwner && (
-                    <button
-                      type="button"
-                      onClick={handleSaveToggle}
-                      className="mt-14 flex items-center justify-center gap-1 rounded-full border border-solid border-white bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20 md:gap-2 md:px-4 md:py-2 md:text-sm"
-                    >
-                      <img
-                        src={collection.isSaved ? FullSaveIcon : EmptySaveIcon}
-                        alt="Save"
-                        className="h-4 w-4 md:h-5 md:w-5"
-                      />
+                    <button type="button" onClick={handleSaveToggle} className="mt-14 flex items-center justify-center gap-1 rounded-full border border-solid border-white bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20 md:gap-2 md:px-4 md:py-2 md:text-sm">
+                      <img src={collection.isSaved ? FullSaveIcon : EmptySaveIcon} alt="Save" className="h-4 w-4 md:h-5 md:w-5" />
                       <span>{collection.saveCount}</span>
                     </button>
                   )}
@@ -314,14 +280,7 @@ const CollectionDetailPage: React.FC = () => {
               )}
               {collection.contents.map((content) =>
                 isEditing ? (
-                  <EditablePoster
-                    key={content.id}
-                    id={content.id}
-                    title={content.title}
-                    posterUrl={content.posterUrl}
-                    onRemove={handleRemoveContent}
-                    isEditing={isEditing}
-                  />
+                  <EditablePoster key={content.id} id={content.id} title={content.title} posterUrl={content.posterUrl} onRemove={handleRemoveContent} isEditing={isEditing} />
                 ) : (
                   <Poster
                     key={content.id}
@@ -330,9 +289,7 @@ const CollectionDetailPage: React.FC = () => {
                     contentType={content.type}
                     posterUrl={content.posterUrl}
                     likeState={likeStates[content.id] || "NEUTRAL"}
-                    onLikeChange={(newState) =>
-                      handleLikeChange(content.id, newState)
-                    }
+                    onLikeChange={(newState) => handleLikeChange(content.id, newState)}
                   />
                 ),
               )}
@@ -340,7 +297,7 @@ const CollectionDetailPage: React.FC = () => {
           </div>
         }
       >
-        {/* Children Area */}
+        {/* PageLayout의 children 영역 */}
       </PageLayout>
 
       <SearchContentModal
