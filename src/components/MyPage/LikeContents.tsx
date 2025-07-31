@@ -151,10 +151,6 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
                         src={`https://image.tmdb.org/t/p/original/${content.posterPath}`}
                         alt={content.title}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = "/default-poster.jpg";
-                        }}
                       />
                     </div>
                     <div className="p-3">

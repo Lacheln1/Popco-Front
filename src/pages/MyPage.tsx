@@ -4,7 +4,7 @@ import PageContents from "@/components/MyPage/PageContents";
 import UserInfoSection from "@/components/MyPage/UserInfoSection";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import PageLayout from "@/layout/PageLayout";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 const MyPage: React.FC = () => {
   const { accessToken, user } = useAuthCheck();
@@ -13,36 +13,48 @@ const MyPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!accessToken) {
-        console.log("accessToken이 없습니다");
-        return;
-      }
+  // 사용자 데이터를 가져오는 함수를 useCallback으로 최적화
+  const fetchUserData = useCallback(async () => {
+    if (!accessToken) {
+      console.log("accessToken이 없습니다");
+      return;
+    }
 
-      try {
-        setLoading(true);
-        setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-        // 사용자 상세 정보 가져오기
-        const userDetailResponse = await getUserDetail(accessToken);
-        console.log("사용자 상세 정보:", userDetailResponse);
-        setUserData(userDetailResponse);
+      // 사용자 상세 정보 가져오기
+      const userDetailResponse = await getUserDetail(accessToken);
+      console.log("사용자 상세 정보:", userDetailResponse);
+      setUserData(userDetailResponse);
 
-        // 사용자 페르소나 정보 가져오기
-        const userPersonaResponse = await getUserPersonas(accessToken);
-        console.log("사용자 페르소나 정보:", userPersonaResponse);
-        setUserPersonaData(userPersonaResponse);
-      } catch (err) {
-        console.error("사용자 정보 조회 실패:", err);
-        setError("사용자 정보를 불러오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
+      // 사용자 페르소나 정보 가져오기
+      const userPersonaResponse = await getUserPersonas(accessToken);
+      console.log("사용자 페르소나 정보:", userPersonaResponse);
+      setUserPersonaData(userPersonaResponse);
+    } catch (err) {
+      console.error("사용자 정보 조회 실패:", err);
+      setError("사용자 정보를 불러오는데 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   }, [accessToken]);
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
+
+  // 프로필 업데이트 후 호출될 콜백 함수
+  const handleProfileUpdate = useCallback(
+    async (signal: string) => {
+      if (signal === "refresh") {
+        // 서버에서 최신 사용자 데이터 다시 가져오기
+        await fetchUserData();
+      }
+    },
+    [fetchUserData],
+  );
 
   // 로딩 상태
   if (loading) {
@@ -80,6 +92,9 @@ const MyPage: React.FC = () => {
             currentPersona={
               userPersonaData?.data.myPersonaName || "페르소나 없음"
             }
+            profileImageUrl={userData?.profileImageUrl}
+            personaImageUrl={userPersonaData?.data.mainPersonaImgPath}
+            onProfileUpdate={handleProfileUpdate}
           />
         }
       >
