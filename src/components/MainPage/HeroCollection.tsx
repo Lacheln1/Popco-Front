@@ -17,7 +17,7 @@ const HeroCollection = () => {
         .slice(-4)
         .reverse()
         .map((c) => `${TMDB_IMAGE_BASE_URL}${c.posterPath}`),
-      href: `/collection/${collection.collectionId}`,
+      href: `/collections/${collection.collectionId}`,
       saveCount: collection.saveCount,
     }));
   }, [data]);

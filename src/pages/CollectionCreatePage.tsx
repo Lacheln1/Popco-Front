@@ -152,11 +152,6 @@ const CollectionCreatePage: React.FC = () => {
                 <h3 className="text-lg font-semibold">
                   작품 추가 <span className="text-red-500">*</span>
                 </h3>
-                {contents.length < 3 && (
-                  <span className="text-sm text-red-500">
-                    {3 - contents.length}개 더 추가해주세요.
-                  </span>
-                )}
               </div>
               <div className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
                 {contents.map((content) => (
