@@ -1,8 +1,16 @@
 import React from "react";
-import GenderChart from "./GenderChart";
 import AgeChart from "./AgeChart";
+import GenderChart from "./GenderChart";
 
-const RoleDashBoard: React.FC = () => {
+interface RoleDashBoardProps {
+  genderPercent: number[];
+  agePercent: number[];
+}
+
+const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
+  genderPercent,
+  agePercent,
+}) => {
   const movieList = [
     { rank: 1, title: "견우와직녀", image: "/images/testMovie.svg" },
     { rank: 1, title: "견우와직녀", image: "/images/testMovie.svg" },
@@ -27,13 +35,13 @@ const RoleDashBoard: React.FC = () => {
           <div className="flex flex-col items-center text-center">
             <span className="text-2xl">성별</span>
             <div>
-              <GenderChart />
+              <GenderChart genderPercent={genderPercent} />
             </div>
           </div>
           <div className="flex flex-col items-center text-center">
             <span className="text-2xl">연령대</span>
             <div>
-              <AgeChart />
+              <AgeChart agePercent={agePercent} />
             </div>
           </div>
         </div>

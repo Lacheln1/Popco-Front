@@ -1,4 +1,4 @@
-import { getUserPersonas } from "@/apis/userApi";
+import { getRoleDashBoardData, getUserPersonas } from "@/apis/userApi";
 import AnalysisHeroSection from "@/components/Analysis/AnalysisHeroSection";
 import LikeContentSection from "@/components/Analysis/LikeContentsSection";
 import MyStyleSection from "@/components/Analysis/MyStyleSection";
@@ -21,8 +21,21 @@ interface UserPersonaData {
   subPersonaPercent: number;
 }
 
+interface RoleDashBoardData {
+  genderPercent: number[];
+  agePercent: number[];
+  ratingPercent: number[];
+  eventPercent: number[];
+  eventCount: number;
+  reviewPercent: number[];
+  myLikePercent: number[];
+}
+
 const AnalysisPage = () => {
   const [userData, setUserData] = useState<UserPersonaData | null>(null);
+  const [dashBoardData, setDashBoardData] = useState<RoleDashBoardData | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { accessToken, isLoading: authLoading, user } = useAuthCheck();
@@ -72,12 +85,20 @@ const AnalysisPage = () => {
         hasFetched.current = true;
 
         const response = await getUserPersonas(accessToken);
-        if (!response || !response.data) {
+        const dashboardResponse = await getRoleDashBoardData(accessToken);
+        if (
+          !response ||
+          !response.data ||
+          !dashboardResponse ||
+          !dashboardResponse.data
+        ) {
           throw new Error("유효하지 않은 응답 데이터");
         }
         console.log("API 응답:", response);
         setUserData(response.data);
+        setDashBoardData(dashboardResponse.data);
         console.log("userdata 설정 후:", response.data);
+        console.log("대쉬보드 설정 후:", dashboardResponse.data);
       } catch (error) {
         console.error("페르소나 데이터 가져오기 실패:", error);
         setError("데이터를 불러오는데 실패했습니다.");
@@ -142,7 +163,7 @@ const AnalysisPage = () => {
   }
 
   // userData가 null일 때
-  if (!userData) {
+  if (!userData || !dashBoardData) {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
@@ -170,7 +191,10 @@ const AnalysisPage = () => {
         myPersonaDescription={userData.myPersonaDescription}
         myPersonaGenres={userData.myPersonaGenres}
       />
-      <RoleDashBoard />
+      <RoleDashBoard
+        genderPercent={dashBoardData.genderPercent}
+        agePercent={dashBoardData.agePercent}
+      />
       <MyWatchingStyleBoard />
       <LikeContentSection />
     </main>
