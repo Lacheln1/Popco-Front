@@ -56,7 +56,7 @@ export const fetchMyReview = async (
 interface PostReviewRequest {
   score: number;
   text: string;
-  status: "COMMON" | "SPOILER";
+  status: "COMMON" | "SPOILER" | "BLIND";
 }
 
 export const postReview = async (
@@ -81,6 +81,23 @@ export const deleteReview = async (reviewId: number, token?: string) => {
   const res = await axiosInstance.delete(`/reviews/${reviewId}`, {
     headers: {
       Authorization: token ? `Bearer ${token}` : "",
+    },
+  });
+  return res.data;
+};
+
+export const putReview = async (
+  reviewId: number,
+  data: {
+    score: number;
+    text: string;
+    status: "COMMON" | "SPOILER" | "BLIND";
+  },
+  token: string,
+) => {
+  const res = await axiosInstance.put(`/reviews/${reviewId}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
   });
   return res.data;
