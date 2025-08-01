@@ -1,9 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { App } from "antd";
+import { jwtDecode } from "jwt-decode";
 import { validateAndRefreshTokens, clearTokens } from "@/apis/tokenApi";
 import { getUserDetail } from "@/apis/userApi";
 
+// 사용자 정보 인터페이스
 interface User {
   userId: number;
   email: string;
@@ -13,6 +15,12 @@ interface User {
   profileComplete: boolean;
 }
 
+// JWT 페이로드 인터페이스
+interface JwtPayload {
+  sub: string;
+}
+
+// 인증이 필요한 페이지 경로 목록
 const PROTECTED_ROUTES = ["/analysis", "/mypage"];
 const isProtectedRoute = (pathname: string): boolean => {
   return PROTECTED_ROUTES.some(
@@ -24,6 +32,7 @@ const useAuthCheck = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { message } = App.useApp();
+
   const [user, setUser] = useState<User>({
     userId: 0,
     email: "",
@@ -34,109 +43,129 @@ const useAuthCheck = () => {
   });
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const hasChecked = useRef(false);
 
   useEffect(() => {
-    // 이미 검사를 실행했다면, 즉시 함수를 종료하여 중복 실행을 막음
-    if (hasChecked.current) return;
-
     const checkAuth = async () => {
-      // 검사를 시작했음을 기록
-      hasChecked.current = true;
-      
+      // --- 1. 수동 로그아웃 확인 ---
+      if (sessionStorage.getItem("manualLogout") === "true") {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      // --- 2. 임시 상태 확인 ---
+      const profileJustCompleted = sessionStorage.getItem("profileJustCompleted");
+      const profileCompletedAtLogin = localStorage.getItem("profileComplete");
       const currentPath = location.pathname;
       const needsAuth = isProtectedRoute(currentPath);
 
       try {
-        setIsLoading(true);
-        const result = await validateAndRefreshTokens();
+        // --- 3. 토큰 확인 및 갱신 ---
+        let token = localStorage.getItem("accessToken");
 
-        if (result.result === "INVALID_REFRESH_TOKEN") {
-          if (needsAuth) {
-            alert("로그인이 필요한 페이지입니다. 로그인 해주세요.");
-            navigate("/login", { state: { from: currentPath } });
+        if (!token) {
+          const result = await validateAndRefreshTokens();
+          if (result.result === "INVALID_REFRESH_TOKEN") {
+            if (needsAuth) navigate("/login", { state: { from: currentPath } });
+            return;
           }
-          return;
+          token = result.data?.accessToken;
+          if (token) localStorage.setItem("accessToken", token);
         }
 
-        const token = result.data.accessToken;
-        setAccessToken(token);
-
         if (token) {
+          // 토큰 만료 시간 확인 및 필요시 갱신
+          const decodedForExp = jwtDecode<{ exp?: number }>(token);
+          if (decodedForExp.exp && decodedForExp.exp < Date.now() / 1000) {
+            localStorage.removeItem("accessToken");
+            const refreshResult = await validateAndRefreshTokens();
+            token = refreshResult.data?.accessToken;
+            if (token) localStorage.setItem("accessToken", token);
+            else throw new Error("토큰 갱신 실패");
+          }
+
+          setAccessToken(token);
+          const decoded = jwtDecode<JwtPayload>(token);
+          const userIdFromToken = Number(decoded.sub);
+          if (!userIdFromToken || isNaN(userIdFromToken)) throw new Error("토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.");
+          
+          // --- 4. 초기 상태 설정 및 리디렉션 ---
+          const isProfileComplete = 
+              profileCompletedAtLogin === "true" || 
+              profileJustCompleted === "true";
+
+          setUser(prev => ({
+            ...prev, 
+            userId: userIdFromToken, 
+            isLoggedIn: true,
+            profileComplete: isProfileComplete
+          }));
+          
+          if (isProfileComplete && currentPath === "/test") {
+            message.info("이미 취향 진단을 완료했습니다.");
+            navigate("/");
+          } else if (!isProfileComplete && currentPath !== "/test") {
+            message.info("취향 진단을 먼저 완료해주세요.");
+            navigate("/test");
+          }
+
+          // --- 5. 최종 사용자 정보 동기화 ---
           try {
             const userInfo = await getUserDetail(token);
-            
             if (userInfo && userInfo.data) {
-              const isProfileComplete = userInfo.data.profileComplete;
-              setUser({
-                userId: userInfo.data.userId || 0,
+              setUser(prev => ({ 
+                ...prev, 
                 email: userInfo.data.email || "",
                 nickname: userInfo.data.nickname || "",
                 profileImageUrl: userInfo.data.profileImageUrl || "",
-                isLoggedIn: true,
-                profileComplete: isProfileComplete,
-              });
-
-              // ✅ 임시 비활성화: 백엔드 오류로 취향 진단 페이지로 강제 이동하는 로직을 주석 처리합니다.
-              // if (!isProfileComplete && currentPath !== "/test") {
-              //   message.info("취향 진단을 먼저 완료해주세요.");
-              //   navigate("/test");
-              // }
-            } else { // 신규 사용자
-              setUser(prev => ({ ...prev, isLoggedIn: true, profileComplete: false }));
-              // ✅ 임시 비활성화: 백엔드 오류로 취향 진단 페이지로 강제 이동하는 로직을 주석 처리합니다.
-              // if (currentPath !== "/test") {
-              //   message.info("환영합니다! 취향 진단을 먼저 진행해주세요.");
-              //   navigate("/test");
-              // }
+                profileComplete: userInfo.data.profileComplete 
+              }));
+              
+              if(userInfo.data.profileComplete) {
+                localStorage.removeItem("profileComplete");
+                sessionStorage.removeItem("profileJustCompleted");
+              }
             }
-          } catch (userError) { // 신규 사용자
-            console.error("사용자 정보 가져오기 실패 (신규 사용자일 수 있음):", userError);
-            setUser(prev => ({ ...prev, isLoggedIn: true, profileComplete: false }));
-            // ✅ 임시 비활성화: 백엔드 오류로 취향 진단 페이지로 강제 이동하는 로직을 주석 처리합니다.
-            // if (currentPath !== "/test") {
-            //   message.info("환영합니다! 취향 진단을 먼저 진행해주세요.");
-            //   navigate("/test");
-            // }
+          } catch (userDetailError) {
+              console.warn("사용자 상세 정보 가져오기 실패 (네트워크 등):", userDetailError);
           }
         } else {
-          throw new Error("유효한 accessToken을 받지 못했습니다.");
+          if (needsAuth) navigate("/login", { state: { from: currentPath } });
         }
       } catch (error) {
-        console.error("❌ 토큰 확인 실패:", error);
-        if (needsAuth) {
-          navigate("/login", { state: { from: currentPath } });
-        }
+        console.error("❌ 인증 체크 중 예상치 못한 오류:", error);
+        localStorage.removeItem("accessToken");
+        if (needsAuth) navigate("/login", { state: { from: currentPath } });
       } finally {
         setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, [navigate, location.pathname, message]);
+  }, [location.pathname, navigate, message]);
+
 
   const logout = async () => {
-    // 서버에 로그아웃 요청을 보내 HttpOnly 쿠키를 삭제
-    await clearTokens();
+    try {
+      // 서버에 로그아웃 요청 (토큰 무효화 등)
+      await clearTokens();
+    } catch (error) {
+      console.error("서버 로그아웃 실패:", error);
+    } finally {
+      // 클라이언트 측의 모든 인증 정보 제거
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("profileComplete");
+      sessionStorage.removeItem("profileJustCompleted");
+      
+      sessionStorage.setItem("manualLogout", "true");
 
-    // 클라이언트 상태를 초기화
-    setUser({
-      userId: 0,
-      email: "",
-      nickname: "",
-      profileImageUrl: "",
-      isLoggedIn: false,
-      profileComplete: false,
-    });
-    setAccessToken(null);
-    
-    // 다음 인증 검사가 정상적으로 실행되도록 ref를 초기화
-    hasChecked.current = false;
+      message.success("로그아웃되었습니다.");
 
-    // 로그인이 필요한 페이지에 있었다면 메인으로 이동
-    const currentPath = location.pathname;
-    if (isProtectedRoute(currentPath)) {
-      navigate("/");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 500); 
     }
   };
 

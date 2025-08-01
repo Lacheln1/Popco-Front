@@ -60,7 +60,6 @@ const TestPage = () => {
   const [nickname, setNickname] = useState("");
   const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
   const [gender, setGender] = useState("");
-  // ✅ [수정 1] selectedMovies가 ID 배열이 아닌, 영화 객체 배열을 저장하도록 변경합니다.
   const [selectedMovies, setSelectedMovies] = useState<Movie[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: number]: number }>({});
   const [savedUserId, setSavedUserId] = useState<number | null>(null);
@@ -75,26 +74,6 @@ const TestPage = () => {
   const [personaResult, setPersonaResult] = useState<OnboardingResponse | null>(
     null,
   );
-
-  // 사용자가 진단 페이지에 직접 URL로 접근하는 것을 방지
-  useEffect(() => {
-    if (accessToken) {
-      const checkProfileStatus = async () => {
-        try {
-          const userInfoResponse = await getUserDetail(accessToken);
-          if (userInfoResponse?.data?.profileComplete === true) {
-            message.info(
-              "이미 취향 진단을 완료했습니다. 메인 페이지로 이동합니다.",
-            );
-            navigate("/");
-          }
-        } catch (error) {
-          console.error("사용자 프로필 상태 확인 실패:", error);
-        }
-      };
-      checkProfileStatus();
-    }
-  }, [accessToken, navigate, message]);
 
   // 단계별 데이터 로딩 (영화, 퀴즈)
   useEffect(() => {
@@ -145,187 +124,61 @@ const TestPage = () => {
     }
   }, [step, accessToken, movies.length, fetchedQuizzes, message, setStep]);
 
-  // 최종 정보 제출 함수 (수정된 버전)
+  // 최종 정보 제출 함수
   const handleSubmit = async () => {
-    if (!accessToken) {
-      message.error("인증 정보가 없습니다. 다시 로그인해주세요.");
+    if (!accessToken || !user || user.userId === 0) {
+      message.error(
+        "사용자 정보가 올바르지 않습니다. 잠시 후 다시 시도해주세요.",
+      );
       return;
     }
 
     setIsSubmitting(true);
     try {
-      let userIdToUse = savedUserId;
-
-      // 1. 저장된 userId가 없다면, 프로필 업데이트를 시도합니다.
-      if (!userIdToUse) {
-        const userDetails = {
-          nickname: nickname,
-          birthday: birthDate!.format("YYYY-MM-DD"),
-          gender: gender,
-        };
-
-        console.log("=== 프로필 업데이트 시도 ===");
-        console.log("업데이트할 사용자 정보:", userDetails);
-
-        const userDetailsResponse = await updateUserDetails(
-          userDetails,
-          accessToken,
-        );
-        console.log("프로필 업데이트 응답 전체:", userDetailsResponse);
-        console.log("응답 데이터:", userDetailsResponse.data);
-
-        const receivedUserId = userDetailsResponse.data?.userId;
-
-        if (receivedUserId) {
-          console.log("프로필 업데이트로 받은 userId:", receivedUserId);
-          setSavedUserId(receivedUserId);
-          userIdToUse = receivedUserId;
-        } else {
-          console.log(
-            "프로필 업데이트에서 userId를 받지 못함, 기존 user 정보 사용 시도",
-          );
-          console.log("기존 user 객체:", user);
-
-          if (user && user.userId > 0) {
-            userIdToUse = user.userId;
-            console.log("기존 user.userId 사용:", userIdToUse);
-          } else {
-            throw new Error(
-              "사용자 ID를 확인할 수 없습니다. 페이지를 새로고침 후 다시 시도해주세요.",
-            );
-          }
-        }
-      }
-
-      // 2. 데이터 검증 및 변환
-      const validatedFeedbackItems = selectedMovies
-        .map((movie) => {
-          // content_id를 명시적으로 숫자로 변환
-          const contentId =
-            typeof movie.id === "string" ? parseInt(movie.id, 10) : movie.id;
-
-          // content_type 검증 및 기본값 설정
-          let contentType = movie.type;
-          if (
-            !contentType ||
-            (contentType !== "movie" && contentType !== "tv")
-          ) {
-            // 기본값으로 'movie' 설정 (또는 API 문서에 따라 조정)
-            contentType = "movie";
-            console.warn(
-              `Invalid content_type for movie ${movie.id}: ${movie.type}, using 'movie' as default`,
-            );
-          }
-
-          return {
-            content_id: contentId,
-            content_type: contentType,
-          };
-        })
-        .filter((item) => !isNaN(item.content_id)); // 유효하지 않은 ID 제거
-
-      // 3. initial_answers 검증
-      const validatedInitialAnswers = Object.entries(quizAnswers).reduce(
-        (acc, [questionId, optionId]) => {
-          const key = `Q${questionId}`;
-          const value = String.fromCharCode(64 + optionId); // 1->A, 2->B, 3->C, 4->D
-          acc[key] = value;
-          return acc;
-        },
-        {} as { [key: string]: string },
-      );
-
+      const userDetails = {
+        nickname: nickname,
+        birthday: birthDate!.format("YYYY-MM-DD"),
+        gender: gender,
+      };
       const personaPayload = {
-        user_id: userIdToUse,
-        feedback_items: validatedFeedbackItems,
+        user_id: user.userId,
+        feedback_items: selectedMovies.map((movie) => ({
+          content_id: movie.id,
+          content_type: movie.type,
+        })),
         reaction_type: "좋아요" as const,
-        initial_answers: validatedInitialAnswers,
+        initial_answers: Object.entries(quizAnswers).reduce(
+          (acc, [questionId, optionId]) => {
+            acc[questionId] = String(optionId);
+            return acc;
+          },
+          {} as { [key: string]: string },
+        ),
       };
 
-      console.log("--- 최종 제출 직전 데이터 확인 ---");
-      console.log("사용자 ID:", userIdToUse);
-      console.log("선택된 영화 수:", selectedMovies.length);
-      console.log("검증된 피드백 아이템 수:", validatedFeedbackItems.length);
-      console.log("퀴즈 답변 수:", Object.keys(validatedInitialAnswers).length);
-      console.log(
-        "페르소나 분석 요청 데이터:",
-        JSON.stringify(personaPayload, null, 2),
-      );
-      console.log("---------------------------------");
+      const [_, personaAnalysisResult] = await Promise.all([
+        updateUserDetails(userDetails, accessToken),
+        getOnboardingPersona(personaPayload, accessToken),
+      ]);
 
-      // 4. 기본 검증
-      if (!userIdToUse || userIdToUse <= 0) {
-        throw new Error("유효하지 않은 사용자 ID입니다.");
-      }
-
-      if (validatedFeedbackItems.length === 0) {
-        throw new Error("선택된 컨텐츠가 없습니다.");
-      }
-
-      if (Object.keys(validatedInitialAnswers).length !== 5) {
-        throw new Error("모든 퀴즈 답변이 완료되지 않았습니다.");
-      }
-
-      // 5. 페르소나 분석 요청
-      console.log("=== 페르소나 분석 API 호출 시작 ===");
-
-      let personaAnalysisResult;
-      try {
-        personaAnalysisResult = await getOnboardingPersona(
-          personaPayload,
-          accessToken,
-        );
-        console.log("페르소나 분석 API 응답:", personaAnalysisResult);
-      } catch (apiError: any) {
-        console.error("=== 페르소나 분석 API 호출 실패 ===");
-        console.error("API 에러 객체:", apiError);
-
-        if (apiError.response) {
-          console.error("API 응답 상태:", apiError.response.status);
-          console.error("API 응답 데이터:", apiError.response.data);
-          console.error("API 응답 헤더:", apiError.response.headers);
-        }
-
-        // API 에러를 다시 throw해서 외부 catch에서 처리하도록 함
-        throw apiError;
-      }
+      console.log("페르소나 분석 직후 API 응답:", personaAnalysisResult);
 
       if (personaAnalysisResult && personaAnalysisResult.main_persona) {
         setPersonaResult(personaAnalysisResult);
         message.success("취향 분석이 완료되었습니다!");
+
+        sessionStorage.setItem("profileJustCompleted", "true");
+
         setStep((prev: number) => prev + 1);
       } else {
-        // API 응답은 왔지만, 내용이 에러이거나 예상과 다른 경우
         throw new Error(
           (personaAnalysisResult as any)?.message ||
             "페르소나 분석에 실패했습니다.",
         );
       }
     } catch (error: any) {
-      console.error("--- 최종 정보 제출 실패: 상세 에러 로그 ---");
-      console.error("에러 객체 전체:", error);
-
-      if (error.response) {
-        console.error("서버 응답 데이터:", error.response.data);
-        console.error("서버 응답 상태 코드:", error.response.status);
-        console.error("서버 응답 헤더:", error.response.headers);
-
-        // 서버 에러 메시지 추출
-        const serverMessage =
-          error.response.data?.message ||
-          error.response.data?.error ||
-          `서버 오류 (${error.response.status})`;
-        message.error(serverMessage);
-      } else if (error.request) {
-        console.error("요청이 전송되었지만 응답을 받지 못함:", error.request);
-        message.error(
-          "서버와 통신할 수 없습니다. 네트워크 연결을 확인해주세요.",
-        );
-      } else {
-        console.error("요청 설정 중 에러:", error.message);
-        message.error(error.message || "요청을 보내는 중 문제가 발생했습니다.");
-      }
-      console.error("-----------------------------------------");
+      console.error("최종 정보 제출 실패:", error);
+      message.error(error.message || "정보 저장 또는 분석에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -360,7 +213,6 @@ const TestPage = () => {
     setStep((prev: number) => Math.max(1, prev - 1));
   };
 
-  // ✅ [수정 2] ID 문자열 대신 영화 객체 전체를 받아서 처리하도록 수정합니다.
   const handleToggleMovieSelect = (movie: Movie) => {
     setSelectedMovies((prevSelected) => {
       // 이미 선택된 영화인지 ID를 기준으로 확인합니다.
@@ -578,31 +430,34 @@ const TestPage = () => {
           );
         }
         return (
-          <div className={contentWrapperStyle}>
+          <div className="flex h-full flex-col items-center justify-center p-4 text-center text-black">
             {personaResult ? (
               <>
-                <h2 className="text-2xl font-bold ...">당신의 캐릭터는?</h2>
-                <p className="mt-2 text-sm ...">
+                <h2 className="text-2xl font-bold leading-snug lg:text-3xl">
+                  당신의 캐릭터는?
+                </h2>
+                <p className="mt-2 text-sm text-gray-600 lg:text-base">
                   선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
                 </p>
                 <img
-                  src={PERSONA_IMAGES[personaResult.main_persona]} // 매핑된 이미지
+                  src={PERSONA_IMAGES[personaResult.main_persona]}
                   alt={personaResult.main_persona}
                   className="my-6 h-48 w-48"
                 />
                 <p className="text-xl font-bold">
                   {personaResult.main_persona.replace(/_/g, " ")}
                 </p>
+
                 <div className="mt-8 flex w-full max-w-xs gap-4">
                   <button
                     onClick={() => navigate("/analysis")}
-                    className="text-popco-foot ..."
+                    className="text-popco-foot flex-1 rounded-full border border-[var(--color-popcoFootColor)] bg-white py-3 font-semibold transition-colors hover:bg-yellow-50"
                   >
                     취향 분석 보기
                   </button>
                   <button
                     onClick={() => navigate("/")}
-                    className="bg-popco-foot ..."
+                    className="bg-popco-foot flex-1 rounded-full py-3 font-semibold text-white transition-colors hover:brightness-95"
                   >
                     POPCO 시작하기
                   </button>
