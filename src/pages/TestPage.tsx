@@ -6,7 +6,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import { Input, App, DatePicker, Radio, Spin } from "antd";
 
 // API 함수 import
-import { updateUserDetails, getUserDetail } from "@/apis/userApi";
+import { updateUserDetails } from "@/apis/userApi";
 import { getTestMovies, type Movie } from "@/apis/preferenceApi";
 import { getQuizQuestion, type QuestionData } from "@/apis/personaApi";
 import {
@@ -62,7 +62,6 @@ const TestPage = () => {
   const [gender, setGender] = useState("");
   const [selectedMovies, setSelectedMovies] = useState<Movie[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: number]: number }>({});
-  const [savedUserId, setSavedUserId] = useState<number | null>(null);
   // API 통신 및 데이터 로딩 State
   const [movies, setMovies] = useState<Movie[]>([]);
   const [fetchedQuizzes, setFetchedQuizzes] = useState<{
@@ -143,7 +142,7 @@ const TestPage = () => {
       const personaPayload = {
         user_id: user.userId,
         feedback_items: selectedMovies.map((movie) => ({
-          content_id: movie.id,
+          content_id: Number(movie.id),
           content_type: movie.type,
         })),
         reaction_type: "좋아요" as const,
