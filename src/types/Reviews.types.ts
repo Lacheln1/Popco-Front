@@ -10,8 +10,9 @@ export type ReviewModalProps = {
   author?: string;
   likeCount?: number;
   isLiked?: boolean;
-  accessToken?: string;
+  token?: string;
   refetchMyReview?: () => void;
+  reviewId: number;
 };
 
 export type ReviewProps = {

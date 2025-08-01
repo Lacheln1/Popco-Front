@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import reviewIconUrl from "@/assets/review.png";
 import emptyPlusIconUrl from "@/assets/empty-plus.png";
 import fullPlusIconUrl from "@/assets/full-plus.png";
@@ -34,18 +34,21 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const { id, type = "" } = useParams();
   const contentId = id ? Number(id) : undefined;
 
-  const { data, isLoading, isError } = useMyReview(
+  const { data, isLoading, isError, refetch } = useMyReview(
     contentId,
     type,
     token ?? undefined,
   );
+  useEffect(() => {
+    refetch();
+  }, [data]);
+
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isAddToCollectionModalOpen, setIsAddToCollectionModalOpen] =
     useState(false);
 
   if (isLoading || isError || !data) return null;
   const { existUserReview, myReview } = data;
-
   const handleReviewClick = () => {
     if (!token) {
       message.info("로그인 먼저 진행해주세요!", 1.5);
@@ -106,6 +109,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         author="나"
         likeCount={0}
         isLiked={false}
+        token={token ?? ""}
+        refetchMyReview={refetch}
+        reviewId={myReview?.reviewId ?? 0}
       />
 
       <AddToCollectionModal
