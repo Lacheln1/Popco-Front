@@ -76,3 +76,12 @@ export const postReview = async (
   );
   return response.data;
 };
+
+export const deleteReview = async (reviewId: number, token?: string) => {
+  const res = await axiosInstance.delete(`/reviews/${reviewId}`, {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  });
+  return res.data;
+};

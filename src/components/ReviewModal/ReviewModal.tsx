@@ -1,11 +1,4 @@
-import {
-  Modal,
-  Input,
-  Avatar,
-  Checkbox,
-  Button,
-  message as antdMessage,
-} from "antd";
+import { Modal, Input, Avatar, Checkbox, Button } from "antd";
 import { CheckboxProps } from "antd/lib";
 import { UserOutlined } from "@ant-design/icons";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
@@ -13,7 +6,8 @@ import { useEffect, useState } from "react";
 import PopcornRating from "../common/PopcornRating";
 import { ReviewModalProps } from "@/types/Reviews.types";
 import { useParams } from "react-router-dom";
-import { postReview } from "@/apis/reviewApi";
+import { deleteReview, postReview } from "@/apis/reviewApi";
+import { App } from "antd";
 
 const ReviewModal = ({
   isModalOpen,
@@ -27,16 +21,19 @@ const ReviewModal = ({
   author = "익명",
   likeCount = 0,
   isLiked = false,
-  accessToken,
+  token,
   refetchMyReview,
+  reviewId,
 }: ReviewModalProps) => {
   const { TextArea } = Input;
   const { id, type } = useParams();
-
+  const contentId = Number(id);
   const [review, setReview] = useState("");
   const [score, setScore] = useState(popcorn ?? 0);
   const [isSpoiler, setIsSpoiler] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { message } = App.useApp();
 
   useEffect(() => {
     setReview(isWriting ? "" : reviewDetail);
@@ -51,7 +48,6 @@ const ReviewModal = ({
 
   const handleOk = async () => {
     if (!isWriting || !review.trim() || !id || !type) return;
-
     setIsSubmitting(true);
     try {
       await postReview(
@@ -62,16 +58,35 @@ const ReviewModal = ({
           text: review.trim(),
           status: isSpoiler ? "SPOILER" : "COMMON",
         },
-        accessToken,
+        token,
       );
-      antdMessage.success("리뷰가 등록되었습니다!");
-      setIsModalOpen(false);
       refetchMyReview?.();
+      message.success("리뷰가 등록되었습니다!");
+      setIsModalOpen(false);
     } catch (err) {
-      antdMessage.error("리뷰 등록에 실패했습니다.");
+      message.error("리뷰 등록에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDelete = async () => {
+    if (!reviewId || !token) return;
+    setIsSubmitting(true);
+    try {
+      await deleteReview(reviewId, token);
+      message.success("리뷰가 삭제되었습니다.");
+      refetchMyReview?.();
+      setIsModalOpen(false);
+    } catch (err) {
+      message.error("리뷰 삭제에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRatingChange = (newRating: number) => {
+    setScore(newRating);
   };
 
   const renderReviewContent = () =>
@@ -152,7 +167,7 @@ const ReviewModal = ({
         <>
           <Button
             className="rounded-3xl px-10 py-5 text-base"
-            onClick={handleCancel}
+            onClick={handleDelete}
           >
             삭제
           </Button>
@@ -202,10 +217,15 @@ const ReviewModal = ({
         <div className="flex flex-col gap-2 self-center">
           <div className="text-xl font-semibold">{contentsTitle}</div>
           {isWriting ? (
-            <PopcornRating readonly={false} initialRating={0} />
+            <PopcornRating
+              readonly={false}
+              initialRating={score}
+              onRatingChange={handleRatingChange}
+            />
           ) : (
             <PopcornRating readonly={true} initialRating={popcorn} />
           )}
+          ㄱ
         </div>
       </div>
 
