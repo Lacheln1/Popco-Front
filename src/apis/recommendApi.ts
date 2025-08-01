@@ -3,6 +3,8 @@ import recommendInstance from "./recommendInstance";
 import {
   ContentBasedItem,
   ContentBasedResponse,
+  ContentFeedbackItem,
+  ContentFeedbackResponse,
   PopcorithmResponse,
   RecommendationItem,
 } from "@/types/Recommend.types";
@@ -114,5 +116,39 @@ export const fetchBasedContent = async (
   } catch (error) {
     console.error("fetchBasedContent 실패:", error);
     throw new Error("연관 작품을 불러오는 데 실패했습니다.");
+  }
+};
+
+// 좋아요 싫어요 버튼 반영
+export const fetchLikedFeedback = async (
+  user_id: number | null,
+  content_id: number,
+  content_type: string,
+  reaction_type: string,
+  score?: number | null,
+  token?: string,
+): Promise<ContentFeedbackItem[]> => {
+  try {
+    const endpoint = `/recommends/personas/feedback`;
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const body = {
+      user_id,
+      content_id,
+      content_type,
+      reaction_type,
+      ...(score != null ? { score } : {}),
+    };
+    const { data } = await recommendInstance.post<ContentFeedbackResponse>(
+      endpoint,
+      body,
+      { headers },
+    );
+    return data.recommendations;
+  } catch (error) {
+    console.error("fetchLikedFeedback 실패:", error);
+    throw new Error("좋아요 반영 실패");
   }
 };

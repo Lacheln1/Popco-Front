@@ -81,3 +81,5 @@ export interface WatchProvider {
   logoPath: string | null;
   link: string | null;
 }
+
+export type ReactionType = "LIKE" | "DISLIKE" | "NEUTRAL";

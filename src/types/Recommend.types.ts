@@ -21,9 +21,29 @@ export interface ContentBasedItem {
   content_type: ContentCategory;
   title: string;
   poster_path: string;
-  user_reaction: "LIKE" | "DISLIKE" | null;
+  user_reaction: "LIKE" | "DISLIKE" | "NEUTRAL";
 }
 
 export interface ContentBasedResponse {
   recommendations: ContentBasedItem[];
+}
+
+export interface ContentFeedbackItem {
+  contentId: number;
+  title: string;
+  genres: string[];
+  type: string;
+  poster_path: string;
+  predicted_rating: number;
+  persona_genre_match: boolean;
+}
+
+export interface ContentFeedbackResponse {
+  message: string;
+  recommendations: ContentFeedbackItem[];
+  main_persona: string;
+  sub_persona: string;
+  all_personas_scores: {
+    [key: string]: number;
+  };
 }
