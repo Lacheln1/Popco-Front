@@ -56,12 +56,12 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
             <span>이번달 시청 컨텐츠</span>
             <div>
               <AverageDoubleDonutChart
-                customerScore={3}
-                averageScore={5}
-                maxScore={10}
+                customerScore={reviewPercent[0]}
+                averageScore={reviewPercent[1]}
+                maxScore={reviewPercent[2]}
               />
               <div className="flex justify-center">
-                <span>4회</span>
+                <span>{reviewPercent[0]}개</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-[#FD6B94]"></div>
@@ -95,18 +95,18 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
             <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8 lg:h-9 xl:h-10">
               <div
                 className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
-                style={{ width: "67%" }}
+                style={{ width: `${myLikePercent[0]}%` }}
               >
                 <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                  67%
+                  {`${myLikePercent[0]}%`}
                 </span>
               </div>
               <div
                 className="relative flex items-center justify-center bg-yellow-200 font-medium text-gray-700"
-                style={{ width: "33%" }}
+                style={{ width: `${myLikePercent[1]}%` }}
               >
                 <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                  33%
+                  {`${myLikePercent[1]}%`}
                 </span>
               </div>
             </div>
