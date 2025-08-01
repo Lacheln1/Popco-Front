@@ -92,7 +92,7 @@ const MyPage: React.FC = () => {
             currentPersona={
               userPersonaData?.data.myPersonaName || "페르소나 없음"
             }
-            profileImageUrl={userData?.profileImageUrl}
+            profileImageUrl={userData?.data.profileImageUrl}
             personaImageUrl={userPersonaData?.data.mainPersonaImgPath}
             onProfileUpdate={handleProfileUpdate}
           />
