@@ -9,6 +9,7 @@ import { useHeroPersona } from "@/hooks/queries/contents/useHeroPersona";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import LoginBlur from "../common/LoginBlur";
+import { PERSONA_IMAGES } from "@/constants/persona";
 
 interface Props {
   accessToken: string;
@@ -66,11 +67,19 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
   return (
     <div className="md:px- m-auto w-full max-w-[1200px] px-3 sm:px-0">
       <div className="relative flex items-center">
-        <img
-          className="absolute left-0 w-24 translate-x-0 md:w-48"
-          src="/images/persona/무비셜록-아기.svg"
-          alt="아기 무비셜록"
-        />
+        {PERSONA_IMAGES[`${persona}`] ? (
+          <img
+            className="absolute left-0 w-24 translate-x-0 md:w-48"
+            src={PERSONA_IMAGES[`${persona}`]}
+            alt={persona}
+          />
+        ) : (
+          <img
+            className="absolute left-0 w-24 translate-x-0 md:w-48"
+            src={PERSONA_IMAGES["무비 셜록"]}
+            alt={persona}
+          />
+        )}
         <h3 className="gmarket ml-20 flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:ml-44 md:text-3xl">
           <span>
             <span className="text-popcorn-box">'{persona}'</span> 들이{" "}
@@ -112,25 +121,21 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
               },
             }}
           >
-            {recommendData?.map(
-              (
-                content: PersonaRecommendation,
-              ) => (
-                <SwiperSlide
-                  key={content.contentId}
-                  className="flex justify-center"
-                >
-                  <Poster
-                    title={content.title}
-                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
-                    id={content.contentId}
-                    contentType={content.type} 
-                    likeState="NEUTRAL"
-                    onLikeChange={() => {}}
-                  />
-                </SwiperSlide>
-              ),
-            )}
+            {recommendData?.map((content: PersonaRecommendation) => (
+              <SwiperSlide
+                key={content.contentId}
+                className="flex justify-center"
+              >
+                <Poster
+                  title={content.title}
+                  posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                  id={content.contentId}
+                  contentType={content.type}
+                  likeState="NEUTRAL"
+                  onLikeChange={() => {}}
+                />
+              </SwiperSlide>
+            ))}
           </Swiper>
         )}
       </section>
