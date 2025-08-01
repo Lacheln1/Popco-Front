@@ -123,7 +123,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
     <div className="pretendard relative sm:top-3 md:top-4">
       <div className="md:g flex w-full flex-col justify-center gap-4 pl-6 md:flex-row md:justify-start md:gap-40">
         {/* 사용자 프로필 */}
-        <div className="relative flex items-center">
+        <div className="relative flex items-center md:ml-8">
           <div className="relative">
             <img
               src={
@@ -183,11 +183,11 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
         {/* 중간 선 */}
         <div className="flex items-center">
-          <div className="hidden md:inline md:h-12 md:w-px md:bg-gray-600" />
+          <div className="hidden md:inline md:h-14 md:w-px md:bg-gray-500" />
         </div>
 
         {/* 페르소나 정보 */}
-        <div className="flex items-center md:right-52">
+        <div className="flex items-center justify-start md:right-52 md:-translate-x-24">
           <div>
             <img
               src={
