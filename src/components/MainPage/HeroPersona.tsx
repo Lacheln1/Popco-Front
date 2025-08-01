@@ -76,7 +76,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
         ) : (
           <img
             className="absolute left-0 w-24 translate-x-0 md:w-48"
-            src={PERSONA_IMAGES["무비 셜록"]}
+            src={PERSONA_IMAGES["무비셜록"]}
             alt={persona}
           />
         )}
