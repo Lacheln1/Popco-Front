@@ -203,8 +203,13 @@ const AnalysisPage = () => {
         eventCount={dashBoardData.eventCount}
         reviewPercent={dashBoardData.reviewPercent}
         myLikePercent={dashBoardData.myLikePercent}
+        personaName={userData.myPersonaName}
       />
-      <LikeContentSection />
+      <LikeContentSection
+        userId={user.userId}
+        personaName={userData.myPersonaName}
+        accessToken={accessToken}
+      />
     </main>
   );
 };

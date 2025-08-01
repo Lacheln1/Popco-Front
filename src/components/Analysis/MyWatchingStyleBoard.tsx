@@ -7,6 +7,7 @@ interface MyWatchingStyleBoardProps {
   eventCount: number;
   reviewPercent: number[];
   myLikePercent: number[];
+  personaName: string;
 }
 
 const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
@@ -15,6 +16,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
   eventCount,
   reviewPercent,
   myLikePercent,
+  personaName,
 }) => {
   return (
     <div className="flex flex-col items-center px-3 md:px-8">
@@ -63,9 +65,9 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
               <div className="flex justify-center">
                 <span>{reviewPercent[0]}개</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="mt-4 flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-[#FD6B94]"></div>
-                <span>액션 헌터 평균</span>
+                <span>{personaName} 평균</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-[#3BA8F0]"></div>
