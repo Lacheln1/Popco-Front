@@ -1,7 +1,21 @@
 import React from "react";
 import AverageDoubleDonutChart from "./AverageDoubleDonutChart";
 
-const MyWatchingStyleBoard: React.FC = () => {
+interface MyWatchingStyleBoardProps {
+  ratingPercent: number[];
+  eventPercent: number[];
+  eventCount: number;
+  reviewPercent: number[];
+  myLikePercent: number[];
+}
+
+const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
+  ratingPercent,
+  eventPercent,
+  eventCount,
+  reviewPercent,
+  myLikePercent,
+}) => {
   return (
     <div className="flex flex-col items-center px-3 md:px-8">
       <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
@@ -13,28 +27,30 @@ const MyWatchingStyleBoard: React.FC = () => {
         className="pretendard flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="flex md:text-2xl">
+        <div className="flex sm:gap-10 sm:text-2xl lg:gap-32">
           <div className="flex flex-col items-center">
             <span>평균 별점</span>
             <div>
               <AverageDoubleDonutChart
-                customerScore={3}
-                averageScore={5}
-                maxScore={10}
+                customerScore={ratingPercent[0]}
+                averageScore={ratingPercent[1]}
+                maxScore={5}
               />
             </div>
-            <span>3점</span>
+            <span>{ratingPercent[0]}/5 점</span>
           </div>
           <div className="flex flex-col items-center">
             <span>이벤트 참여 수</span>
             <div>
               <AverageDoubleDonutChart
-                customerScore={3}
-                averageScore={5}
-                maxScore={10}
+                customerScore={eventPercent[0]}
+                averageScore={eventPercent[1]}
+                maxScore={eventCount}
               />
             </div>
-            <span>4회</span>
+            <span>
+              {eventPercent[0]}/{eventCount} 회
+            </span>
           </div>
           <div className="flex flex-col items-center">
             <span>이번달 시청 컨텐츠</span>

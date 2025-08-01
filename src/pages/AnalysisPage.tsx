@@ -197,7 +197,13 @@ const AnalysisPage = () => {
         userId={user.userId}
         personaName={userData.myPersonaName}
       />
-      <MyWatchingStyleBoard />
+      <MyWatchingStyleBoard
+        ratingPercent={dashBoardData.ratingPercent}
+        eventPercent={dashBoardData.eventPercent}
+        eventCount={dashBoardData.eventCount}
+        reviewPercent={dashBoardData.reviewPercent}
+        myLikePercent={dashBoardData.myLikePercent}
+      />
       <LikeContentSection />
     </main>
   );
