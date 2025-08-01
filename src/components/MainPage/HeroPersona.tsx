@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
@@ -10,6 +10,8 @@ import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import LoginBlur from "../common/LoginBlur";
 import { PERSONA_IMAGES } from "@/constants/persona";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
+import { ReactionType } from "@/types/Contents.types";
 
 interface Props {
   accessToken: string;
@@ -31,6 +33,28 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
   const recommendData = data?.recommendations;
   const persona = data?.main_persona ?? "나와 닮은 페르소나";
 
+  const contentList = useMemo(
+    () =>
+      recommendData?.map((item) => ({
+        id: item.contentId,
+        reaction: "NEUTRAL" as ReactionType,
+      })) ?? [],
+    [recommendData],
+  );
+
+  const { reactionMap, handleReaction } = useContentReaction({
+    userId,
+    accessToken,
+    contentList,
+  });
+
+  useEffect(() => {
+    if (swiperInstance) {
+      setIsBeginning(swiperInstance.isBeginning);
+      setIsEnd(swiperInstance.isEnd);
+    }
+  }, [swiperInstance]);
+
   if (isLoading) {
     return (
       <div className="py-20 text-center text-white">
@@ -38,6 +62,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
       </div>
     );
   }
+
   if (isError) {
     return (
       <div className="py-20 text-center text-red-600">
@@ -45,6 +70,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
       </div>
     );
   }
+
   if (isSuccess && (!recommendData || recommendData.length === 0)) {
     return (
       <div className="py-20 text-center text-gray-400">
@@ -67,19 +93,11 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
   return (
     <div className="md:px- m-auto w-full max-w-[1200px] px-3 sm:px-0">
       <div className="relative flex items-center">
-        {PERSONA_IMAGES[`${persona}`] ? (
-          <img
-            className="absolute left-0 w-24 translate-x-0 md:w-48"
-            src={PERSONA_IMAGES[`${persona}`]}
-            alt={persona}
-          />
-        ) : (
-          <img
-            className="absolute left-0 w-24 translate-x-0 md:w-48"
-            src={PERSONA_IMAGES["무비셜록"]}
-            alt={persona}
-          />
-        )}
+        <img
+          className="absolute left-0 w-24 translate-x-0 md:w-48"
+          src={PERSONA_IMAGES[persona] ?? PERSONA_IMAGES["무비셜록"]}
+          alt={persona}
+        />
         <h3 className="gmarket ml-20 flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:ml-44 md:text-3xl">
           <span>
             <span className="text-popcorn-box">'{persona}'</span> 들이{" "}
@@ -87,6 +105,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
           많이 찾은 작품
         </h3>
       </div>
+
       <section>
         <div className="mb-4 flex justify-end">
           <SwiperNavigation
@@ -95,6 +114,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
             isEnd={isEnd}
           />
         </div>
+
         {!accessToken ? (
           <LoginBlur
             text="나의 영화 취향 캐릭터가 궁금하다면 ?"
@@ -131,8 +151,10 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
                   posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
                   id={content.contentId}
                   contentType={content.type}
-                  likeState="NEUTRAL"
-                  onLikeChange={() => {}}
+                  likeState={reactionMap[content.contentId]}
+                  onLikeChange={(newState) =>
+                    handleReaction(content.contentId, newState, content.type)
+                  }
                 />
               </SwiperSlide>
             ))}

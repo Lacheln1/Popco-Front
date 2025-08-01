@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSendContentFeedback } from "@/hooks/queries/contents/useSendContentFeedback";
 import { ReactionType } from "@/types/Contents.types";
@@ -22,16 +22,20 @@ export const useContentReaction = ({
   const [reactionMap, setReactionMap] = useState<Record<number, ReactionType>>(
     {},
   );
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    const initialMap = contentList.reduce(
-      (acc, cur) => {
-        acc[cur.id] = cur.reaction ?? "NEUTRAL";
-        return acc;
-      },
-      {} as Record<number, ReactionType>,
-    );
-    setReactionMap(initialMap);
+    if (!initializedRef.current && contentList.length > 0) {
+      const initialMap = contentList.reduce(
+        (acc, cur) => {
+          acc[cur.id] = cur.reaction ?? "NEUTRAL";
+          return acc;
+        },
+        {} as Record<number, ReactionType>,
+      );
+      setReactionMap(initialMap);
+      initializedRef.current = true;
+    }
   }, [contentList]);
 
   const handleReaction = (
