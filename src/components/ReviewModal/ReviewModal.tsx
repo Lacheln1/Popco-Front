@@ -1,10 +1,19 @@
-import { Modal, Input, Avatar, Checkbox, Button } from "antd";
+import {
+  Modal,
+  Input,
+  Avatar,
+  Checkbox,
+  Button,
+  message as antdMessage,
+} from "antd";
 import { CheckboxProps } from "antd/lib";
 import { UserOutlined } from "@ant-design/icons";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import PopcornRating from "../common/PopcornRating";
 import { ReviewModalProps } from "@/types/Reviews.types";
+import { useParams } from "react-router-dom";
+import { postReview } from "@/apis/reviewApi";
 
 const ReviewModal = ({
   isModalOpen,
@@ -18,18 +27,52 @@ const ReviewModal = ({
   author = "익명",
   likeCount = 0,
   isLiked = false,
+  accessToken,
+  refetchMyReview,
 }: ReviewModalProps) => {
   const { TextArea } = Input;
+  const { id, type } = useParams();
+
   const [review, setReview] = useState("");
+  const [score, setScore] = useState(popcorn ?? 0);
+  const [isSpoiler, setIsSpoiler] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setReview(isWriting ? "" : reviewDetail);
-  }, [isWriting, reviewDetail]);
+    setScore(popcorn ?? 0);
+  }, [isWriting, reviewDetail, popcorn]);
 
   const handleCancel = () => setIsModalOpen(false);
-  const handleOk = () => setIsModalOpen(false);
-  const handleSpoilerChange: CheckboxProps["onChange"] = (e) =>
-    console.log(`스포일러 포함: ${e.target.checked}`);
+
+  const handleSpoilerChange: CheckboxProps["onChange"] = (e) => {
+    setIsSpoiler(e.target.checked);
+  };
+
+  const handleOk = async () => {
+    if (!isWriting || !review.trim() || !id || !type) return;
+
+    setIsSubmitting(true);
+    try {
+      await postReview(
+        Number(id),
+        type,
+        {
+          score,
+          text: review.trim(),
+          status: isSpoiler ? "SPOILER" : "COMMON",
+        },
+        accessToken,
+      );
+      antdMessage.success("리뷰가 등록되었습니다!");
+      setIsModalOpen(false);
+      refetchMyReview?.();
+    } catch (err) {
+      antdMessage.error("리뷰 등록에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const renderReviewContent = () =>
     isWriting ? (
