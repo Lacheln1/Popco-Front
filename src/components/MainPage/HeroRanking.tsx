@@ -12,6 +12,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
 import { ContentCategory } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { useNavigate } from "react-router-dom";
 
 interface HeroRankingProps {
   onTop1Change: (type: ContentCategory, title: string) => void;
@@ -25,6 +26,7 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
   const [selected, setSelected] = useState<ContentCategory>("all");
+  const navigate = useNavigate();
 
   const categoryMap = {
     all: "전체",
@@ -139,7 +141,12 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                   {first.overview}
                 </p>
 
-                <button className="bg-popco-hair hover:bg-popco-main mt-2 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-black sm:text-base">
+                <button
+                  onClick={() =>
+                    navigate(`/detail/${first.type}/${first.contentId}`)
+                  }
+                  className="bg-popco-hair hover:bg-popco-main mt-2 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-black sm:text-base"
+                >
                   <LuEye className="text-base sm:text-lg" />
                   <span>view more</span>
                 </button>
@@ -193,28 +200,24 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
             </>
           ) : (
             <ul className="ml-9 mt-12 grid grid-cols-2 justify-items-center gap-4 sm:mt-6 sm:flex sm:justify-between sm:gap-6">
-              {contentsRank.map(
-                (
-                  content, 
-                ) => (
-                  <li
-                    key={content.contentId} 
-                    className="relative flex-col items-center *:flex"
-                  >
-                    <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
-                      {content.rank} 
-                    </span>
-                    <Poster
-                      title={content.title} 
-                      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`} 
-                      id={content.contentId} 
-                      contentType={content.type} 
-                      likeState="NEUTRAL"
-                      onLikeChange={() => {}}
-                    />
-                  </li>
-                ),
-              )}
+              {contentsRank.map((content) => (
+                <li
+                  key={content.contentId}
+                  className="relative flex-col items-center *:flex"
+                >
+                  <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
+                    {content.rank}
+                  </span>
+                  <Poster
+                    title={content.title}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+                    id={content.contentId}
+                    contentType={content.type}
+                    likeState="NEUTRAL"
+                    onLikeChange={() => {}}
+                  />
+                </li>
+              ))}
             </ul>
           )}
         </>
