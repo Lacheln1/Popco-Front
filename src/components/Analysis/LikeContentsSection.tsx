@@ -60,7 +60,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
       setError(null);
 
       // contentType을 "all"로 먼저 시도해보기
-      const response = await fetchHeroPersona(userId, accessToken, "all");
+      const response = await fetchHeroPersona(userId, accessToken, contentType);
 
       // 만약 "all"로도 데이터가 없다면 contentType 파라미터 없이 시도
       if (!response.recommendations || response.recommendations.length === 0) {

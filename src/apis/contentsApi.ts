@@ -7,7 +7,6 @@ import {
 } from "@/types/Contents.types";
 import axiosInstance from "./axiosInstance";
 import axios from "axios";
-import { RecommendationItem } from "@/types/Recommend.types";
 
 const RECOMMEND_URL = import.meta.env.VITE_RECOMMEND_URL;
 const API_URL = "/api/client";
@@ -49,6 +48,17 @@ interface WishlistResponse {
   message: string;
   data: WishlistItem[];
 }
+
+interface RecommendationItem {
+  contentId: number;
+  title: string;
+  genres: string[];
+  type: string;
+  poster_path: string;
+  predicted_rating: number;
+  persona_genre_match: boolean | null;
+}
+
 // API 응답 타입
 interface RecommendationResponse {
   message: string;
