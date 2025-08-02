@@ -144,7 +144,7 @@ const WantWatching: React.FC<WantWatchingProps> = ({ userId }) => {
                   <div className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
-                        src={item.contentPosterUrl}
+                        src={`https://image.tmdb.org/t/p/original${item.contentPosterUrl}`}
                         alt={item.contentTitle}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
