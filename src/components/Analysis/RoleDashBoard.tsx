@@ -13,8 +13,8 @@ const RoleDashBoard: React.FC = () => {
   return (
     <div className="flex flex-col items-center px-3 md:px-8">
       <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
-        <div className="gmarket-medium text-xl text-white md:text-3xl">
-          <span>나와 같은&nbsp;</span>
+        <div className="gmarket-medium flex items-center justify-center pt-2 text-xl text-white md:text-3xl">
+          <span className="items-center">나와 같은&nbsp;</span>
           <span className="gmarket-bold">액션 헌터</span>
           <span>&nbsp;들은?</span>
         </div>
@@ -40,19 +40,19 @@ const RoleDashBoard: React.FC = () => {
         <div className="mt-4 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-36 lg:gap-24">
           {/* 선호영화 */}
           <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-            <span className="sm:text-3xl lg:text-4xl">선호영화</span>
+            <span className="sm:text-3xl">선호영화</span>
             {/* 컨텐츠 */}
-            <div className="mt-2 rounded-xl bg-white sm:mt-4">
+            <div className="mt-2 rounded-xl bg-white sm:mt-7">
               {movieList.map((movie, index) => (
                 <div
                   key={index}
-                  className="flex w-40 items-center justify-center gap-1 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80 lg:text-3xl"
+                  className="mx-1 flex w-40 items-center justify-center gap-3 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80"
                 >
                   <span className="gmarket-bold">{movie.rank}</span>
                   <img
                     src={movie.image}
                     alt=""
-                    className="w-6 object-contain lg:w-10"
+                    className="w-6 object-contain lg:w-8"
                   />
                   <span>{movie.title}</span>
                 </div>
@@ -61,19 +61,19 @@ const RoleDashBoard: React.FC = () => {
           </div>
           {/* 선호 시리즈 */}
           <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-            <span className="sm:text-3xl lg:text-4xl">선호 시리즈</span>
+            <span className="sm:text-3xl">선호 시리즈</span>
             {/* 컨텐츠 */}
-            <div className="mt-2 rounded-xl bg-white sm:mt-4">
+            <div className="mt-2 rounded-xl bg-white sm:mt-7">
               {movieList.map((movie, index) => (
                 <div
                   key={index}
-                  className="flex w-40 items-center justify-center gap-1 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80 lg:text-3xl"
+                  className="mx-1 flex w-40 items-center justify-center gap-3 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80"
                 >
                   <span className="gmarket-bold">{movie.rank}</span>
                   <img
                     src={movie.image}
                     alt=""
-                    className="w-6 object-contain lg:w-10"
+                    className="w-6 object-contain lg:w-8"
                   />
                   <span>{movie.title}</span>
                 </div>
