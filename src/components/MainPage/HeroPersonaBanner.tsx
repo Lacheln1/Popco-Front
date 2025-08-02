@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 const HeroPersonaBanner = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center overflow-x-hidden px-3 md:min-h-[450px] md:flex-row md:px-6 xl:px-0">
@@ -19,7 +22,10 @@ const HeroPersonaBanner = () => {
             나와 닮은 페르소나를 가진 사람들이 즐긴 작품 추천까지
             <br /> 캐릭터와 함께 새로운 작품 세계를 즐겨보세요
           </div>
-          <button className="bg-popco-foot w-fit rounded-full px-7 py-4 text-base text-white">
+          <button
+            onClick={() => navigate("/analysis")}
+            className="bg-popco-foot w-fit rounded-full px-7 py-4 text-base text-white"
+          >
             내 페르소나 구경하기
           </button>
         </div>
@@ -43,7 +49,7 @@ const HeroPersonaBanner = () => {
       </div>
       {/* 모바일 위치 */}
       <img
-        className="2sm:block absolute top-0 z-[-1] hidden w-[40vw] -translate-x-[25%] blur-sm md:hidden"
+        className="absolute top-0 z-[-1] hidden w-[40vw] -translate-x-[25%] blur-sm 2sm:block md:hidden"
         src="/images/main/persona1.svg"
         alt="character-1"
       />
@@ -68,7 +74,7 @@ const HeroPersonaBanner = () => {
         alt="character-end"
       />
       <img
-        className="3xl:block absolute hidden md:-right-[10%] md:bottom-0"
+        className="absolute hidden md:-right-[10%] md:bottom-0 3xl:block"
         src="/images/main/persona2.svg"
         alt="character-end"
       />
