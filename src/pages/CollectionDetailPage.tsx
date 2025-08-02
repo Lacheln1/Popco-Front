@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { App, Spin, Avatar, Input } from "antd";
 
 // Layout 및 공용 컴포넌트
@@ -14,152 +14,107 @@ import SearchContentModal from "@/components/collection/SearchContentModal";
 import FullSaveIcon from "@/assets/full-save.svg";
 import EmptySaveIcon from "@/assets/empty-save.svg";
 
-// --- API 연동 전 사용할 더미 데이터 ---
-const dummyCollectionData = {
-  collectionId: 1,
-  user: {
-    id: 101, // 컬렉션 소유자 ID
-    nickname: "영화광",
-    profileImageUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-  },
-  title: "주말 정주행 시리즈 모음",
-  description:
-    "정주행하다 밤샘할지도 몰라요. 한번 시작하면 멈출 수 없는 시리즈들만 모아봤습니다.",
-  saveCount: 129,
-  isSaved: true,
-  contents: Array.from({ length: 12 }, (_, i) => ({
-    id: 500 + i,
-    title: `영화 제목 ${i + 1}`,
-    posterUrl: `https://picsum.photos/seed/${i + 1}/200/300`,
-    type: "movie",
-  })),
-};
+// Hooks
+import useAuthCheck from "@/hooks/useAuthCheck";
+import {
+  useFetchCollectionById,
+  useUpdateCollection,
+  useDeleteCollection,
+  useToggleMarkCollection,
+} from "@/hooks/useCollections";
 
-type LikeStates = { [key: number]: "LIKE" | "DISLIKE" | "NEUTRAL" };
+// Types
+import { CollectionProps } from "@/types/Collection.types";
 
-// 현재 로그인한 사용자를 다른 사람(99)으로 가정
-const LOGGED_IN_USER_ID = 99;
+const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 const CollectionDetailPage: React.FC = () => {
   const { collectionId } = useParams<{ collectionId: string }>();
+  const navigate = useNavigate();
   const { message, modal } = App.useApp();
 
-  // --- States ---
-  const [collection, setCollection] = useState(dummyCollectionData);
-  const [isLoading, setIsLoading] = useState(true);
-  const [likeStates, setLikeStates] = useState<LikeStates>({});
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [editedTitle, setEditedTitle] = useState(collection.title);
-  const [editedDescription, setEditedDescription] = useState(
-    collection.description,
+  // --- Hooks ---
+  const { user, accessToken } = useAuthCheck();
+  const {
+    data: collection,
+    isLoading,
+    isError,
+  } = useFetchCollectionById(collectionId, accessToken);
+  const { mutate: updateCollection, isLoading: isUpdating } =
+    useUpdateCollection(collectionId!);
+  const { mutate: deleteCollection, isLoading: isDeleting } =
+    useDeleteCollection();
+  const { mutate: toggleMark, isLoading: isMarking } = useToggleMarkCollection(
+    collectionId!,
   );
 
-  const isOwner = collection?.user?.id === LOGGED_IN_USER_ID;
+  // --- UI 상태 관리 ---
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
+
+  useEffect(() => {
+    if (collection) {
+      setEditedTitle(collection.title);
+      setEditedDescription(collection.description);
+    }
+  }, [collection]);
+
+  const isOwner = collection?.userId === user.userId && user.isLoggedIn;
 
   // --- Handlers ---
   const handleSaveToggle = useCallback(() => {
-    if (!collection) return;
-    const newIsSaved = !collection.isSaved;
-    setCollection((prev) => ({
-      ...prev!,
-      isSaved: newIsSaved,
-      saveCount: newIsSaved ? prev!.saveCount + 1 : prev!.saveCount - 1,
-    }));
-    message.success(newIsSaved ? "컬렉션에 저장했어요." : "저장을 취소했어요.");
-  }, [collection, message]);
-
-  const handleLikeChange = useCallback(
-    (contentId: number, newState: "LIKE" | "DISLIKE" | "NEUTRAL") => {
-      setLikeStates((prev) => ({ ...prev, [contentId]: newState }));
-    },
-    [],
-  );
-
-  const handleEditClick = useCallback(() => {
-    if (isEditing) {
-      setCollection((prev) => ({
-        ...prev!,
-        title: editedTitle,
-        description: editedDescription,
-      }));
-      message.success("컬렉션이 저장되었습니다.");
-      setIsEditing(false);
-    } else {
-      setEditedTitle(collection.title);
-      setEditedDescription(collection.description);
-      setIsEditing(true);
+    if (!user.isLoggedIn) {
+      message.warning("로그인이 필요한 기능입니다.");
+      navigate("/login");
+      return;
     }
-  }, [isEditing, editedTitle, editedDescription, collection, message]);
+    toggleMark({
+      collectionId: collectionId!,
+      accessToken: accessToken!,
+    });
+  }, [
+    user.isLoggedIn,
+    accessToken,
+    collectionId,
+    toggleMark,
+    navigate,
+    message,
+  ]);
 
-  const handleRemoveContent = useCallback(
-    (contentIdToRemove: number) => {
-      setCollection((prev) => ({
-        ...prev!,
-        contents: prev!.contents.filter(
-          (content) => content.id !== contentIdToRemove,
-        ),
-      }));
-      message.error("작품을 컬렉션에서 삭제했습니다.");
-    },
-    [message],
-  );
-
-  const handleAddContent = useCallback(
-    (newContent: { id: number; title: string; posterUrl: string; type: string }) => {
-      if (collection.contents.some((c) => c.id === newContent.id)) {
-        message.warning("이미 컬렉션에 추가된 작품입니다.");
-        return;
-      }
-      setCollection((prev) => ({
-        ...prev!,
-        contents: [...prev!.contents, newContent],
-      }));
-      message.success(`'${newContent.title}'을(를) 컬렉션에 추가했습니다.`);
-    },
-    [collection.contents, message],
-  );
+  const handleEditSave = useCallback(() => {
+    if (!accessToken) return;
+    updateCollection({
+      collectionId: collectionId!,
+      title: editedTitle,
+      description: editedDescription,
+      accessToken,
+    });
+    setIsEditing(false);
+  }, [
+    collectionId,
+    editedTitle,
+    editedDescription,
+    accessToken,
+    updateCollection,
+  ]);
 
   const showDeleteConfirm = useCallback(() => {
-    const primaryModalButtonClass =
-      "rounded-md bg-[#172036] px-4 py-1.5 text-sm text-white transition-colors hover:bg-[#172036]/80";
-    const secondaryModalButtonClass =
-      "rounded-md bg-white px-4 py-1.5 text-sm text-gray-700 border border-gray-300 transition-colors hover:bg-gray-100";
-
     modal.confirm({
       title: "정말 컬렉션을 삭제하시겠어요?",
       content: "삭제한 컬렉션은 다시 복구할 수 없습니다.",
       okText: "삭제",
       cancelText: "취소",
-      okButtonProps: {
-        className: primaryModalButtonClass
-          .replace("bg-[#172036]", "bg-red-600")
-          .replace("hover:bg-[#172036]/80", "hover:bg-red-700"),
-      },
-      cancelButtonProps: { className: secondaryModalButtonClass },
-      onOk() {
-        message.success("컬렉션이 삭제되었습니다.");
+      okButtonProps: { danger: true },
+      onOk: () => {
+        if (!accessToken) return;
+        deleteCollection({ collectionId: collectionId!, accessToken });
       },
     });
-  }, [modal, message]);
+  }, [modal, collectionId, accessToken, deleteCollection]);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    setIsLoading(true);
-    setIsEditing(false);
-    setCollection(dummyCollectionData);
-    setEditedTitle(dummyCollectionData.title);
-    setEditedDescription(dummyCollectionData.description);
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, [collectionId]);
-
-  // --- Render ---
-  const primaryHeaderButtonClass =
-    "flex w-20 md:w-28 justify-center rounded-full border border-solid border-white bg-transparent px-2 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:px-5 md:text-sm";
-  const secondaryHeaderButtonClass =
-    "flex w-20 md:w-28 justify-center rounded-full border border-gray-300 bg-white px-2 py-2 text-xs font-medium text-footerBlue transition-colors hover:bg-gray-200 md:px-5 md:text-sm";
-
+  // --- 로딩 및 에러 처리 ---
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -168,9 +123,17 @@ const CollectionDetailPage: React.FC = () => {
     );
   }
 
-  if (!collection) {
+  if (isError || !collection) {
     return <div>컬렉션 정보를 찾을 수 없습니다.</div>;
   }
+
+  console.log("서버에서 받은 최신 데이터:", collection);
+
+  // --- Render ---
+  const primaryHeaderButtonClass =
+    "flex w-20 md:w-28 justify-center rounded-full border border-solid border-white bg-transparent px-2 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:px-5 md:text-sm disabled:opacity-50";
+  const secondaryHeaderButtonClass =
+    "flex w-20 md:w-28 justify-center rounded-full border border-gray-300 bg-white px-2 py-2 text-xs font-medium text-footerBlue transition-colors hover:bg-gray-200 md:px-5 md:text-sm disabled:opacity-50";
 
   return (
     <>
@@ -183,56 +146,16 @@ const CollectionDetailPage: React.FC = () => {
                 <div className="flex min-h-[120px] flex-1 flex-col justify-center md:min-h-[140px]">
                   <div className="mb-2 flex items-center gap-3">
                     <Avatar
-                      src={collection.user.profileImageUrl}
+                      src={collection.userProfileImageUrl}
                       size={{ xs: 25, sm: 28, md: 30 }}
                     />
                     <span className="gmarket-medium text-xs text-white">
-                      {collection.user.nickname}
+                      {collection.userNickname}
                     </span>
                   </div>
                   {isEditing ? (
                     <div className="flex flex-col gap-2 pr-4">
-                      <div className="relative w-full">
-                        <Input
-                          value={editedTitle}
-                          onChange={(e) => setEditedTitle(e.target.value)}
-                          placeholder="컬렉션 제목"
-                          variant="borderless"
-                          maxLength={15}
-                          styles={{
-                            input: {
-                              backgroundColor: "transparent",
-                              boxShadow: "none",
-                              padding: "4px 0px",
-                            },
-                          }}
-                          className="bg-transparent pr-12 text-base text-white shadow-none placeholder:text-gray-400 focus:ring-0 md:text-2xl"
-                        />
-                        <span className="pointer-events-none absolute bottom-1 right-2 text-xs text-white/70 md:bottom-2">
-                          {editedTitle.length}/15
-                        </span>
-                      </div>
-                      <div className="relative w-full">
-                        <Input.TextArea
-                          value={editedDescription}
-                          onChange={(e) => setEditedDescription(e.target.value)}
-                          placeholder="컬렉션에 대한 설명을 입력하세요."
-                          autoSize={{ minRows: 2, maxRows: 3 }}
-                          variant="borderless"
-                          maxLength={50}
-                          styles={{
-                            textarea: {
-                              backgroundColor: "transparent",
-                              boxShadow: "none",
-                              padding: "4px 0px",
-                            },
-                          }}
-                          className="bg-transparent pr-12 text-xs text-gray-300 shadow-none placeholder:text-gray-400 focus:ring-0 md:text-base"
-                        />
-                        <span className="pointer-events-none absolute bottom-2 right-2 text-xs text-white/70">
-                          {editedDescription.length}/50
-                        </span>
-                      </div>
+                      {/* 제목, 설명 수정 Input UI */}
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2">
@@ -246,24 +169,58 @@ const CollectionDetailPage: React.FC = () => {
                   )}
                 </div>
                 <div className="flex min-h-[120px] flex-shrink-0 items-center justify-end md:min-h-[140px]">
-                  {isOwner && (
+                  {isOwner ? (
                     <div className="flex flex-col items-end gap-2">
                       {isEditing ? (
                         <>
-                          <button type="button" onClick={handleEditClick} className={primaryHeaderButtonClass}>수정 완료</button>
-                          <button type="button" onClick={() => setIsEditing(false)} className={secondaryHeaderButtonClass}>수정 취소</button>
+                          <button
+                            type="button"
+                            onClick={handleEditSave}
+                            className={primaryHeaderButtonClass}
+                            disabled={isUpdating}
+                          >
+                            {isUpdating ? "저장 중..." : "저장 완료"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditing(false)}
+                            className={secondaryHeaderButtonClass}
+                          >
+                            수정 취소
+                          </button>
                         </>
                       ) : (
                         <>
-                          <button type="button" onClick={handleEditClick} className={primaryHeaderButtonClass}>컬렉션 수정</button>
-                          <button type="button" onClick={showDeleteConfirm} className={secondaryHeaderButtonClass}>컬렉션 삭제</button>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditing(true)}
+                            className={primaryHeaderButtonClass}
+                          >
+                            컬렉션 수정
+                          </button>
+                          <button
+                            type="button"
+                            onClick={showDeleteConfirm}
+                            className={secondaryHeaderButtonClass}
+                            disabled={isDeleting}
+                          >
+                            컬렉션 삭제
+                          </button>
                         </>
                       )}
                     </div>
-                  )}
-                  {!isOwner && (
-                    <button type="button" onClick={handleSaveToggle} className="mt-14 flex items-center justify-center gap-1 rounded-full border border-solid border-white bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20 md:gap-2 md:px-4 md:py-2 md:text-sm">
-                      <img src={collection.isSaved ? FullSaveIcon : EmptySaveIcon} alt="Save" className="h-4 w-4 md:h-5 md:w-5" />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSaveToggle}
+                      className="mt-14 flex items-center justify-center gap-1 rounded-full border border-solid border-white bg-transparent px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/20 md:gap-2 md:px-4 md:py-2 md:text-sm"
+                      disabled={isMarking}
+                    >
+                      <img
+                        src={collection.isMarked ? FullSaveIcon : EmptySaveIcon}
+                        alt="Save"
+                        className="h-4 w-4 md:h-5 md:w-5"
+                      />
                       <span>{collection.saveCount}</span>
                     </button>
                   )}
@@ -275,21 +232,30 @@ const CollectionDetailPage: React.FC = () => {
         floatingBoxContent={
           <div className="px-8 py-12 md:px-24">
             <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-              {isEditing && (
+              {isOwner && isEditing && (
                 <AddContentCard onClick={() => setIsSearchModalOpen(true)} />
               )}
-              {collection.contents.map((content) =>
-                isEditing ? (
-                  <EditablePoster key={content.id} id={content.id} title={content.title} posterUrl={content.posterUrl} onRemove={handleRemoveContent} isEditing={isEditing} />
+              {collection.contentPosters.map((content) =>
+                isEditing && isOwner ? (
+                  <EditablePoster
+                    key={content.contentId}
+                    id={content.contentId}
+                    title={content.title}
+                    posterUrl={`${IMAGE_BASE_URL}${content.posterPath}`}
+                    onRemove={() => {
+                      /* TODO: 컨텐츠 삭제 Mutation 구현 */
+                    }}
+                    isEditing={isEditing}
+                  />
                 ) : (
                   <Poster
-                    key={content.id}
-                    id={content.id}
+                    key={content.contentId}
+                    id={content.contentId}
                     title={content.title}
-                    contentType={content.type}
-                    posterUrl={content.posterUrl}
-                    likeState={likeStates[content.id] || "NEUTRAL"}
-                    onLikeChange={(newState) => handleLikeChange(content.id, newState)}
+                    contentType={content.contentType}
+                    posterUrl={`${IMAGE_BASE_URL}${content.posterPath}`}
+                    likeState={"NEUTRAL"} // TODO: 좋아요 기능 구현
+                    onLikeChange={() => {}}
                   />
                 ),
               )}
@@ -303,8 +269,10 @@ const CollectionDetailPage: React.FC = () => {
       <SearchContentModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
-        onAddContent={handleAddContent}
-        existingContentIds={collection.contents.map((c) => c.id)}
+        onAddContent={() => {
+          /* TODO: 컨텐츠 추가 Mutation 구현 */
+        }}
+        existingContentIds={collection.contentPosters.map((c) => c.contentId)}
       />
     </>
   );
