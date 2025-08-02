@@ -3,9 +3,11 @@ import HotCollection from "../common/HotCollection";
 import { useWeeklyCollections } from "@/hooks/queries/collections/useWeeklyCollections";
 import { HotCollections } from "@/types/Collection.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { useNavigate } from "react-router-dom";
 
 const HeroCollection = () => {
   const { data, isLoading, isError } = useWeeklyCollections(3);
+  const navigate = useNavigate();
 
   // 변환된 데이터를 캐싱 (메모이제이션)
   const hotCollections: HotCollections[] = useMemo(() => {
@@ -48,7 +50,10 @@ const HeroCollection = () => {
             <br />
             POPCO에서 당신만의 OTT 컬렉션을 만들어 공유해보세요.
           </div>
-          <button className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block">
+          <button
+            onClick={() => navigate("/collections")}
+            className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block"
+          >
             View more +
           </button>
         </div>
@@ -77,7 +82,10 @@ const HeroCollection = () => {
           )}
         </div>
 
-        <button className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden">
+        <button
+          onClick={() => navigate("/collections")}
+          className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden"
+        >
           View more +
         </button>
       </div>
