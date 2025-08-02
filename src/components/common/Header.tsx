@@ -201,7 +201,7 @@ const Header: React.FC<HeaderProps> = ({
                         className="w-full px-4 py-2 text-left text-gray-700 transition-colors duration-150 first:rounded-t-lg hover:bg-gray-50"
                         onClick={handleMyActivity}
                       >
-                        내활동
+                        내 활동
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left text-gray-700 transition-colors duration-150 last:rounded-b-lg hover:bg-gray-50"
