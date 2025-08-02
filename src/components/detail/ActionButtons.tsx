@@ -34,26 +34,26 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const { id, type = "" } = useParams();
   const contentId = id ? Number(id) : undefined;
 
-  const { data, isLoading, isError, refetch } = useMyReview(
+  const { data, isLoading, isFetching, isError, refetch } = useMyReview(
     contentId,
     type,
     token ?? undefined,
   );
-  useEffect(() => {
-    refetch();
-  }, [data]);
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isAddToCollectionModalOpen, setIsAddToCollectionModalOpen] =
     useState(false);
 
-  if (isLoading || isError || !data) return null;
+  if (isLoading || isFetching || isError || !data) return null;
   const { existUserReview, myReview } = data;
-  const handleReviewClick = () => {
+  const reviewButtonLabel = existUserReview ? "리뷰 수정" : "리뷰 쓰기";
+
+  const handleReviewClick = async () => {
     if (!token) {
       message.info("로그인 먼저 진행해주세요!", 1.5);
       return;
     }
+    await refetch();
     setIsReviewModalOpen(true);
   };
   return (
@@ -68,7 +68,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         >
           <img src={reviewIconUrl} alt="리뷰 쓰기" className={iconSize} />
           <span className={`${textSize} font-semibold`}>
-            {existUserReview ? "리뷰 수정" : "리뷰 쓰기"}
+            {reviewButtonLabel}
           </span>
         </button>
 
@@ -107,7 +107,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         popcorn={myReview?.score ?? 0}
         reviewDetail={myReview?.text ?? ""}
         author="나"
-        likeCount={0}
+        likeCount={myReview?.likeCount}
         isLiked={false}
         token={token ?? ""}
         refetchMyReview={refetch}

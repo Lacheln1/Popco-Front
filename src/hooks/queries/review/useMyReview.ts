@@ -11,5 +11,6 @@ export const useMyReview = (
     queryFn: () => fetchMyReview(contentId!, type, token),
     staleTime: 0,
     refetchOnWindowFocus: true,
+    enabled: !!token && !!contentId,
   });
 };

@@ -38,6 +38,7 @@ export interface MyReview {
   score: number;
   text: string;
   createdAt: string;
+  likeCount: number;
 }
 
 export interface MyReviewResponse {
