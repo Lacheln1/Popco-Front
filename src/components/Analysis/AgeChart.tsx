@@ -18,7 +18,11 @@ ChartJS.register(
   Legend,
 );
 
-const AgeChart = ({ agePercent }) => {
+interface AgeChartProps {
+  agePercent: number[];
+}
+
+const AgeChart = ({ agePercent }: AgeChartProps) => {
   // 컴포넌트 내부에서 정의해야 props 사용 가능
   const isSmallScreen = window.innerWidth < 640;
 
