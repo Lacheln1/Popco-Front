@@ -127,3 +127,92 @@ export const deleteCollection = async (params: {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 };
+
+// 컨텐츠 검색 (GET /search/contents/advanced)
+export const searchContents = async (keyword: string, page: number = 0) => {
+  if (!keyword.trim()) {
+    return null;
+  }
+  try {
+    // axios.get()의 응답 전체를 response 변수에 받도록 수정합니다.
+    const response = await axiosInstance.get(`/search/contents/advanced`, {
+      params: {
+        keyword,
+        page,
+        size: 20,
+      },
+    });
+
+    // --- 디버깅을 위한 핵심 코드 ---
+    // 서버가 프론트엔드에 실제로 보내준 전체 응답 데이터를 확인합니다.
+    console.log("Raw API response from server:", response.data);
+
+    // response.data 안에 또 다른 data 필드가 있는지 확인하고 반환합니다.
+    return response.data.data;
+  } catch (error) {
+    // API 호출 자체에 실패했는지 확인하기 위해 에러 로그를 추가합니다.
+    console.error("API call failed:", error);
+    return null; // 에러 발생 시 null 반환
+  }
+};
+
+// 컬렉션 생성 (POST /collections)
+export const createCollection = async (params: {
+  title: string;
+  description: string;
+  // contentIds 파라미터 제거
+  accessToken: string;
+}) => {
+  const { title, description, accessToken } = params;
+  const { data } = await axiosInstance.post(
+    `/collections`,
+    { title, description }, // contentIds 제거
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data.data; 
+};
+
+// 컬렉션에 콘텐츠 추가 (POST /collections/{collectionId}/contents)
+export const addContentToCollection = async (params: {
+  collectionId: string;
+  contentId: number;
+  contentType: string; // contentType 추가
+  accessToken: string;
+}) => {
+  const { collectionId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.post(
+    `/collections/${collectionId}/contents`,
+    { contentId, contentType }, // 요청 본문에 contentType 추가
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data;
+};
+
+// 컬렉션에서 콘텐츠 제거 (DELETE /collections/{collectionId}/contents/{contentId})
+export const removeContentFromCollection = async (params: {
+  collectionId: string;
+  contentId: number;
+  contentType: string; // contentType 추가
+  accessToken: string;
+}) => {
+  const { collectionId, contentId, contentType, accessToken } = params;
+  await axiosInstance.delete(
+    `/collections/${collectionId}/contents/${contentId}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { contentType }, // contentType을 쿼리 파라미터로 전달
+    },
+  );
+};
+
+// 컬렉션의 모든 컨텐츠 조회 (GET /collections/{collectionId}/contents/all)
+export const fetchCollectionContentsAll = async (collectionId: string) => {
+  const { data } = await axiosInstance.get(`/collections/${collectionId}/contents/all`);
+  return data.data; // data: [...] 배열 반환
+};
+
+// 컬렉션의 컨텐츠 개수 조회 (GET /collections/{collectionId}/contents/count)
+export const fetchCollectionContentCount = async (collectionId: string) => {
+  const { data } = await axiosInstance.get(`/collections/${collectionId}/contents/count`);
+  return data.data; // data: number 반환
+};

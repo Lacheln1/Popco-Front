@@ -158,7 +158,7 @@ const CollectionPage: React.FC = () => {
                     title={collection.title}
                     description={collection.description}
                     posters={collection.contentPosters
-                      .slice(0, 4)
+                      .slice(0, 6)
                       .map((p) => `${IMAGE_BASE_URL}${p.posterPath}`)}
                     totalCount={collection.contentCount}
                     isSaved={collection.isMarked}

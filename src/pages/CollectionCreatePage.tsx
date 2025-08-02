@@ -1,6 +1,8 @@
-import React, { useState, useCallback } from "react";
-import { App, Input, ConfigProvider } from "antd";
+import React, { useState, useCallback, useEffect } from "react";
+import { App, Input, ConfigProvider, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
+import useAuthCheck from "@/hooks/useAuthCheck";
+import { useCreateCollection } from "@/hooks/useCollections";
 
 // Layout 및 재사용 컴포넌트
 import PageLayout from "@/layout/PageLayout";
@@ -20,6 +22,8 @@ interface Content {
 const CollectionCreatePage: React.FC = () => {
   const { message } = App.useApp();
   const navigate = useNavigate();
+  const { user, accessToken, isLoading: isAuthLoading } = useAuthCheck();
+  const { mutate: createCollection, isPending: isCreating } = useCreateCollection();
 
   // --- States ---
   const [title, setTitle] = useState("");
@@ -27,7 +31,15 @@ const CollectionCreatePage: React.FC = () => {
   const [contents, setContents] = useState<Content[]>([]);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  // --- Handlers (useCallback으로 최적화) ---
+  // --- 로그인 가드 ---
+  useEffect(() => {
+    if (!isAuthLoading && !user.isLoggedIn) {
+      message.error("로그인이 필요한 페이지입니다.");
+      navigate("/login");
+    }
+  }, [isAuthLoading, user.isLoggedIn, navigate, message]);
+
+  // --- Handlers ---
   const handleAddContent = useCallback(
     (newContent: Content) => {
       if (contents.some((c) => c.id === newContent.id)) {
@@ -50,8 +62,9 @@ const CollectionCreatePage: React.FC = () => {
     [message],
   );
 
-  const handleSaveCollection = useCallback(() => {
-    // 버튼 클릭 시 유효성 검사
+const handleSaveCollection = useCallback(() => {
+    if (isCreating) return;
+
     if (!title.trim()) {
       message.error("컬렉션 제목을 반드시 입력해야 합니다.");
       return;
@@ -61,16 +74,33 @@ const CollectionCreatePage: React.FC = () => {
       return;
     }
 
-    console.log("Saving Collection:", { title, description, contents });
-    message.success("컬렉션이 성공적으로 생성되었습니다!");
-
-    const newCollectionId = Math.floor(Math.random() * 1000); // 임시 ID
-    navigate(`/collections/${newCollectionId}`);
-  }, [title, description, contents, message, navigate]);
+    // API 호출 시, 이제 contentIds 대신 contents 배열 전체를 넘겨줍니다.
+    createCollection({
+      title,
+      description,
+      contents, // contentIds 대신 contents 배열 전달
+      accessToken: accessToken!,
+    });
+    
+}, [title, description, contents, accessToken, createCollection, isCreating]);
 
   // --- Render ---
   const primaryHeaderButtonClass =
-    "flex w-24 justify-center rounded-full border border-solid border-white bg-transparent px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:w-28 md:px-5 md:text-sm whitespace-nowrap";
+    "flex w-24 justify-center items-center rounded-full border border-solid border-white bg-transparent px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/20 md:w-28 md:px-5 md:text-sm whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed";
+
+  // 인증 정보 로딩 중이거나 로그아웃 상태일 때 빈 화면 대신 로딩 화면 표시
+  if (isAuthLoading || !user.isLoggedIn) {
+    return (
+      <PageLayout
+        header={<SectionHeader title="컬렉션 만들기" description="나만의 컬렉션을 만들어 공유해보세요." />}
+        floatingBoxContent={
+            <div className="flex h-[50vh] w-full items-center justify-center">
+                <Spin size="large" />
+            </div>
+        }
+      />
+    );
+  }
 
   return (
     <>
@@ -78,10 +108,8 @@ const CollectionCreatePage: React.FC = () => {
         header={
           <div className="relative">
             <SectionHeader title="" description="" />
-
             <div className="absolute inset-0 z-10 mx-auto flex w-full max-w-[1200px] items-center px-4 sm:px-8">
               <div className="flex w-full items-center justify-between">
-                {/* 왼쪽: 제목과 설명 */}
                 <div className="flex flex-col gap-2">
                   <h1 className="gmarket-medium text-xl font-bold text-white md:text-2xl">
                     컬렉션 만들기
@@ -91,15 +119,14 @@ const CollectionCreatePage: React.FC = () => {
                     테마까지 OTT 컬렉션을 만들어 공유해보세요.
                   </p>
                 </div>
-
-                {/* 오른쪽: 등록 버튼 */}
                 <div className="flex-shrink-0">
                   <button
                     type="button"
                     onClick={handleSaveCollection}
                     className={primaryHeaderButtonClass}
+                    disabled={isCreating}
                   >
-                    컬렉션 등록
+                    {isCreating ? <Spin size="small" /> : "컬렉션 등록"}
                   </button>
                 </div>
               </div>
@@ -112,7 +139,7 @@ const CollectionCreatePage: React.FC = () => {
             <ConfigProvider
               theme={{
                 token: {
-                  colorPrimary: "#172036", // 테마 색상 통일
+                  colorPrimary: "#172036",
                   colorBorder: "#d9d9d9",
                   borderRadius: 6,
                 },
@@ -120,10 +147,7 @@ const CollectionCreatePage: React.FC = () => {
             >
               <div className="flex flex-col gap-6">
                 <div>
-                  <label
-                    htmlFor="collection-title"
-                    className="mb-2 block font-semibold"
-                  >
+                  <label htmlFor="collection-title" className="mb-2 block font-semibold">
                     컬렉션 제목 <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -137,10 +161,7 @@ const CollectionCreatePage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="collection-description"
-                    className="mb-2 block font-semibold"
-                  >
+                  <label htmlFor="collection-description" className="mb-2 block font-semibold">
                     컬렉션 소개 (선택)
                   </label>
                   <Input.TextArea
@@ -185,7 +206,7 @@ const CollectionCreatePage: React.FC = () => {
           </div>
         }
       >
-        {/* PageLayout의 children 영역 */}
+        {/* children */}
       </PageLayout>
       <SearchContentModal
         isOpen={isSearchModalOpen}
