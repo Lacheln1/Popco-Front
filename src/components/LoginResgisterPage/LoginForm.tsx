@@ -14,42 +14,43 @@ import { App } from "antd";
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { message } = App.useApp();
 
   const handleSubmit = async (e: React.FormEvent) => {
+    sessionStorage.removeItem("manualLogout");
     e.preventDefault();
+    if (isLoading) return;
 
     let hasError = false;
-
     if (!email) {
       setEmailError("이메일을 입력해주세요.");
       hasError = true;
-    } else {
-      setEmailError("");
-    }
-
+    } else setEmailError("");
     if (!password) {
       setPasswordError("비밀번호를 입력해주세요.");
       hasError = true;
-    } else {
-      setPasswordError("");
-    }
-
+    } else setPasswordError("");
     if (hasError) return;
 
+    setIsLoading(true);
     try {
       const result = await loginUser({ email, password });
 
       if (result.data) {
-        console.log(result.data);
+        const { userId, jwtResponseDto, profileComplete } = result.data;
+        const accessToken = jwtResponseDto.accessToken;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("userId", String(userId));
+        localStorage.setItem("profileComplete", String(profileComplete));
         sessionStorage.removeItem("isLoggedOut");
-        // 선호도 진단 진행 여부 확인
-        if (!result.data.profileComplete) {
+
+        if (!profileComplete) {
           message.info("선호도 진단 테스트부터 진행해주세요!", 1.5, () =>
             navigate("/test"),
           );
@@ -62,6 +63,8 @@ const LoginForm: React.FC = () => {
     } catch (error) {
       console.error("로그인 오류", error);
       message.error("로그인에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,9 +93,7 @@ const LoginForm: React.FC = () => {
                 setEmail(e.target.value);
                 if (e.target.value) setEmailError("");
               }}
-              className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
-                emailError ? "border-2 border-red-400" : ""
-              }`}
+              className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${emailError ? "border-2 border-red-400" : ""}`}
             />
           </motion.div>
           {emailError && (
@@ -105,7 +106,6 @@ const LoginForm: React.FC = () => {
             </motion.p>
           )}
         </motion.div>
-
         <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
           <label className="mb-2 ml-4 block text-xs text-black md:text-base">
             비밀번호
@@ -122,9 +122,7 @@ const LoginForm: React.FC = () => {
                 setPassword(e.target.value);
                 if (e.target.value) setPasswordError("");
               }}
-              className={`w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
-                passwordError ? "border-2 border-red-500" : ""
-              }`}
+              className={`w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${passwordError ? "border-2 border-red-500" : ""}`}
             />
           </motion.div>
           {passwordError && (
@@ -137,18 +135,18 @@ const LoginForm: React.FC = () => {
             </motion.p>
           )}
         </motion.div>
-
         <motion.div
           className="w-full max-w-[500px] pt-3 md:pt-4"
           variants={itemVariants}
         >
           <motion.button
             type="submit"
-            className="bg-popco-main pretendard w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 md:py-4"
+            disabled={isLoading}
+            className="bg-popco-main pretendard w-full rounded-[400px] px-4 py-3 text-xl font-medium text-black transition-colors hover:bg-yellow-400 disabled:cursor-not-allowed disabled:bg-gray-300 md:py-4"
             variants={buttonVariants}
             whileTap="tap"
           >
-            로그인
+            {isLoading ? "로그인 중..." : "로그인"}
           </motion.button>
         </motion.div>
       </motion.form>

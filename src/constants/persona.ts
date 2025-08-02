@@ -12,7 +12,6 @@ import babyimaginepopco from "../assets/baby-imagine-popco.svg";
 import imaginepopco from "../assets/imagine-popco.svg";
 import babymoviesherlock from "../assets/baby-movie-sherlock.svg";
 import moviesherlock from "../assets/movie-sherlock.svg";
-
 export const PERSONA_IMAGES: { [key: string]: string } = {
   "아기 액션헌터": babyactionhunter,
   액션헌터: actionhunter,

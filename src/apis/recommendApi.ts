@@ -20,6 +20,7 @@ interface InitialAnswers {
 }
 
 interface OnboardingRequest {
+  user_id: number; // 추가: user_id도 포함
   feedback_items: FeedbackItem[];
   reaction_type: "좋아요";
   initial_answers: InitialAnswers;
@@ -52,18 +53,69 @@ export const getOnboardingPersona = async (
   accessToken: string,
 ): Promise<OnboardingResponse> => {
   try {
-    const response = await axios.post<OnboardingResponse>( // ✅ 타입 추론을 위해 제네릭 위치 변경
-      "/api/client/recommends/personas/onboard",
+    console.log("🔍 온보딩 요청 디버그:", {
+      url: "/client/recommends/personas/onboard",
+      params,
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const response = await recommendInstance.post<OnboardingResponse>(
+      "/recommends/personas/onboard",
       params,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       },
     );
 
-    // ✅ [핵심 수정] response.data.data가 아닌 response.data를 반환합니다.
+    console.log("✅ 온보딩 응답:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ 페르소나 온보딩 실패 상세:", {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      baseURL: error.config?.baseURL,
+      headers: error.config?.headers,
+    });
+    throw error;
+  }
+};
+
+export const getOnboardingPersonaAlternative = async (
+  params: OnboardingRequest,
+  accessToken: string,
+): Promise<OnboardingResponse> => {
+  try {
+    // 환경변수에서 API Base URL을 가져옵니다
+    const baseURL =
+      import.meta.env.VITE_API_BASE_URL ||
+      process.env.REACT_APP_API_BASE_URL ||
+      "http://localhost:8080";
+
+    console.log("🔍 온보딩 요청 (대안) 디버그:", {
+      baseURL,
+      url: `${baseURL}/api/client/recommends/personas/onboard`,
+      params,
+    });
+
+    const response = await axios.post<OnboardingResponse>(
+      `${baseURL}/api/client/recommends/personas/onboard`,
+      params,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      },
+    );
+
     return response.data;
   } catch (error) {
     console.error("페르소나 온보딩 실패:", error);
