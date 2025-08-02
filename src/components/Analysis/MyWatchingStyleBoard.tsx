@@ -1,7 +1,23 @@
 import React from "react";
 import AverageDoubleDonutChart from "./AverageDoubleDonutChart";
 
-const MyWatchingStyleBoard: React.FC = () => {
+interface MyWatchingStyleBoardProps {
+  ratingPercent: number[];
+  eventPercent: number[];
+  eventCount: number;
+  reviewPercent: number[];
+  myLikePercent: number[];
+  personaName: string;
+}
+
+const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
+  ratingPercent,
+  eventPercent,
+  eventCount,
+  reviewPercent,
+  myLikePercent,
+  personaName,
+}) => {
   return (
     <div className="flex flex-col items-center px-3 md:px-8">
       <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
@@ -13,43 +29,45 @@ const MyWatchingStyleBoard: React.FC = () => {
         className="pretendard flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="flex md:text-2xl">
+        <div className="flex sm:gap-10 sm:text-2xl lg:gap-32">
           <div className="flex flex-col items-center">
             <span>평균 별점</span>
             <div>
               <AverageDoubleDonutChart
-                customerScore={3}
-                averageScore={5}
-                maxScore={10}
+                customerScore={ratingPercent[0]}
+                averageScore={ratingPercent[1]}
+                maxScore={5}
               />
             </div>
-            <span>3점</span>
+            <span>{ratingPercent[0]}/5 점</span>
           </div>
           <div className="flex flex-col items-center">
             <span>이벤트 참여 수</span>
             <div>
               <AverageDoubleDonutChart
-                customerScore={3}
-                averageScore={5}
-                maxScore={10}
+                customerScore={eventPercent[0]}
+                averageScore={eventPercent[1]}
+                maxScore={eventCount}
               />
             </div>
-            <span>4회</span>
+            <span>
+              {eventPercent[0]}/{eventCount} 회
+            </span>
           </div>
           <div className="flex flex-col items-center">
             <span>이번달 시청 컨텐츠</span>
             <div>
               <AverageDoubleDonutChart
-                customerScore={3}
-                averageScore={5}
-                maxScore={10}
+                customerScore={reviewPercent[0]}
+                averageScore={reviewPercent[1]}
+                maxScore={reviewPercent[2]}
               />
               <div className="flex justify-center">
-                <span>4회</span>
+                <span>{reviewPercent[0]}개</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="mt-4 flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-[#FD6B94]"></div>
-                <span>액션 헌터 평균</span>
+                <span>{personaName} 평균</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-[#3BA8F0]"></div>
@@ -79,18 +97,18 @@ const MyWatchingStyleBoard: React.FC = () => {
             <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8 lg:h-9 xl:h-10">
               <div
                 className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
-                style={{ width: "67%" }}
+                style={{ width: `${myLikePercent[0]}%` }}
               >
                 <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                  67%
+                  {`${myLikePercent[0]}%`}
                 </span>
               </div>
               <div
                 className="relative flex items-center justify-center bg-yellow-200 font-medium text-gray-700"
-                style={{ width: "33%" }}
+                style={{ width: `${myLikePercent[1]}%` }}
               >
                 <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
-                  33%
+                  {`${myLikePercent[1]}%`}
                 </span>
               </div>
             </div>

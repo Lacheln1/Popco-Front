@@ -8,7 +8,7 @@ export interface HotCollectionProps extends CollectionBase {
   saveCount: number;
   isSaved: boolean;
   onSaveToggle: (collectionId: number) => void;
-  size?: 'large' | 'small';
+  size?: "large" | "small";
 }
 
 const HotCollection: React.FC<HotCollectionProps> = React.memo(
@@ -20,7 +20,7 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
     isSaved,
     href,
     onSaveToggle,
-    size = 'large',
+    size = "large",
   }) => {
     const handleSaveToggle = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -36,18 +36,22 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
     const sizeStyles = {
       large: {
         container: "w-[180px] shrink-0 md:w-[220px]",
-        badgeContainer: "absolute -top-4 right-2 h-12 w-12 drop-shadow-md md:-top-5 md:h-[54px] md:w-[54px]",
+        badgeContainer:
+          "absolute -top-4 right-2 h-12 w-12 drop-shadow-md md:-top-5 md:h-[54px] md:w-[54px]",
         badgeText: "text-sm font-bold md:text-base",
-        title: "line-clamp-2 pl-1 text-base font-bold text-gray-800 transition-colors group-hover:text-black",
+        title:
+          "line-clamp-2 pl-1 text-base font-bold text-gray-800 transition-colors group-hover:text-black",
         saveIcon: "h-6 w-6",
       },
       small: {
         container: "w-[110px] shrink-0 sm:w-[150px] lg:w-[200px]",
-        badgeContainer: "absolute -top-3 right-1 h-10 w-10 drop-shadow-md md:-top-5 md:right-2 md:h-[54px] md:w-[54px]",
+        badgeContainer:
+          "absolute -top-3 right-1 h-10 w-10 drop-shadow-md md:-top-5 md:right-2 md:h-[54px] md:w-[54px]",
         badgeText: "text-xs font-bold md:text-base",
-        title: "line-clamp-2 pl-1 text-sm font-bold text-gray-800 transition-colors group-hover:text-black md:text-base",
+        title:
+          "line-clamp-2 pl-1 text-sm font-bold text-gray-800 transition-colors group-hover:text-black md:text-base",
         saveIcon: "h-5 w-5 md:h-6 md:w-6",
-      }
+      },
     };
 
     const currentStyles = sizeStyles[size];
@@ -66,7 +70,7 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
               >
                 {posterUrl ? (
                   <img
-                    src={posterUrl}
+                    src={`https://image.tmdb.org/t/p/original${posterUrl}`}
                     alt={`${title} poster ${index + 1}`}
                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                     loading="lazy"
@@ -85,7 +89,9 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
               className="h-full w-full"
             />
             <div className="absolute inset-0 flex items-center justify-center pb-1 md:pb-2">
-              <span className={`text-sunglasses-red ${currentStyles.badgeText}`}>
+              <span
+                className={`text-sunglasses-red ${currentStyles.badgeText}`}
+              >
                 {saveCount > 999 ? "999+" : saveCount}
               </span>
             </div>
@@ -94,9 +100,7 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
 
         <div className="mt-3 flex items-start justify-between gap-2">
           <Link to={href} className="group min-w-0 flex-1">
-            <h3 className={currentStyles.title}>
-              {title}
-            </h3>
+            <h3 className={currentStyles.title}>{title}</h3>
           </Link>
 
           <button
