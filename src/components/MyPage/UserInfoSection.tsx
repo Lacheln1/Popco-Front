@@ -293,6 +293,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
                   className="pretendard-bold border-b border-gray-300 bg-transparent px-1 py-1 text-lg outline-none focus:border-black"
                   placeholder="닉네임을 입력하세요"
                   autoFocus
+                  maxLength={5}
                 />
                 <button
                   onClick={handleSaveNickname}

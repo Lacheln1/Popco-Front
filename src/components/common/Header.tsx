@@ -128,8 +128,8 @@ const Header: React.FC<HeaderProps> = ({
       <div
         className={`gmarket transition-all duration-300 ${
           isScrolled
-            ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/70 px-6 sm:px-8 lg:px-10"
-            : "max-w-auto mx-auto bg-white/80 px-4 text-lg sm:px-6 md:bg-white/50 lg:px-12"
+            ? "mx-auto mt-5 max-w-6xl rounded-[60px] bg-white/70 px-6 sm:px-8 md:max-w-[750px] lg:px-10"
+            : "mx-auto w-full bg-white/80 px-4 text-lg sm:px-6 md:bg-white/50 lg:px-12"
         }`}
         style={
           isScrolled
@@ -162,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({
                   <Link
                     to={item.path}
                     className={`flex min-w-[90px] items-center justify-center rounded-full px-4 pt-1 font-medium text-black transition-all duration-300 hover:bg-gray-100 hover:!text-black ${
-                      isScrolled ? "h-8 text-base" : "h-10 text-lg"
+                      isScrolled ? "h-8 text-base" : "h-10 text-base"
                     } ${
                       isActiveItem(item.path)
                         ? "bg-sidelogo-blueGray text-white hover:bg-gray-700"
