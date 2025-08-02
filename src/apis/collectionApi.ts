@@ -8,12 +8,15 @@ const API_URL = "/api/client";
 export const fetchCollections = async (
   pageNumber: number = 0,
   pageSize: number = 10,
+  accessToken?: string | null, // accessToken 파라미터 추가
 ): Promise<CollectionProps[]> => {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
   const { data } = await axiosInstance.get<CollectionResponse>("/collections", {
     params: {
       pageNumber,
       pageSize,
     },
+    headers, // 헤더 추가
   });
   return data.data;
 };
@@ -35,12 +38,15 @@ export const fetchCollectionById = async (params: {
   return response.data;
 };
 
-// 주간 리뷰
+// 주간 인기 컬렉션
 export const fetchCollectionsWeekly = async (
   limit: number,
+  accessToken?: string | null, // accessToken 파라미터 추가
 ): Promise<CollectionProps[]> => {
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
   const { data } = await axiosInstance.get<CollectionResponse>(
     `/collections/popular/weekly?limit=${limit}`,
+    { headers }, // 헤더 추가
   );
   return data.data;
 };

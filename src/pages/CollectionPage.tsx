@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
 import { Navigation } from "swiper/modules";
 import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -13,6 +14,7 @@ import SectionHeader from "@/components/common/SectionHeader";
 import HotCollection from "@/components/common/HotCollection";
 import NewCollection from "@/components/common/NewCollection";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
+import Spinner from "@/components/common/Spinner"; 
 import useAuthCheck from "@/hooks/useAuthCheck";
 import {
   useFetchCollections,
@@ -26,14 +28,15 @@ const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 const CollectionPage: React.FC = () => {
   const { user, accessToken } = useAuthCheck();
-
+  const navigate = useNavigate();
   // --- Swiper 상태 관리 ---
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const { isBeginning, isEnd } = useSwiperResize(swiper);
 
   // --- 데이터 페칭 ---
   // 1. HOT 컬렉션 데이터 (주간 인기)
-  const { data: hotCollections, isLoading: isLoadingHot } = useFetchCollectionsWeekly(10);
+  const { data: hotCollections, isLoading: isLoadingHot } =
+    useFetchCollectionsWeekly(10, accessToken);
 
   // 2. NEW 컬렉션 데이터 (최신순, 무한 스크롤)
   const {
@@ -42,7 +45,7 @@ const CollectionPage: React.FC = () => {
     hasNextPage,
     isLoading: isLoadingNew,
     isFetchingNextPage,
-  } = useFetchCollections(10);
+  } = useFetchCollections(10, accessToken);
 
   // 3. 컬렉션 저장(마크) 토글 뮤테이션
   const { mutate: toggleMark } = useToggleMarkCollection();
@@ -67,7 +70,10 @@ const CollectionPage: React.FC = () => {
         alert("로그인이 필요한 기능입니다.");
         return;
       }
-      toggleMark({ collectionId: String(collectionId), accessToken: accessToken! });
+      toggleMark({
+        collectionId: String(collectionId),
+        accessToken: accessToken!,
+      });
     },
     [user.isLoggedIn, accessToken, toggleMark],
   );
@@ -114,7 +120,9 @@ const CollectionPage: React.FC = () => {
                       saveCount={collection.saveCount}
                       isSaved={collection.isMarked}
                       href={`/collections/${collection.collectionId}`}
-                      onSaveToggle={() => handleSaveToggle(collection.collectionId)}
+                      onSaveToggle={() =>
+                        handleSaveToggle(collection.collectionId)
+                      }
                     />
                   </SwiperSlide>
                 ))}
@@ -129,7 +137,8 @@ const CollectionPage: React.FC = () => {
           <h2 className="text-xl font-bold sm:text-2xl">NEW</h2>
           <button
             type="button"
-            className="rounded-3xl bg-[var(--color-popco-hair-color)] px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
+            onClick={() => navigate("/collections/create")}
+            className="rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
           >
             컬렉션 만들기
           </button>
@@ -154,7 +163,9 @@ const CollectionPage: React.FC = () => {
                     totalCount={collection.contentCount}
                     isSaved={collection.isMarked}
                     href={`/collections/${collection.collectionId}`}
-                    onSaveToggle={() => handleSaveToggle(collection.collectionId)}
+                    onSaveToggle={() =>
+                      handleSaveToggle(collection.collectionId)
+                    }
                   />
                 ))}
               </React.Fragment>
@@ -165,7 +176,8 @@ const CollectionPage: React.FC = () => {
         {/* 무한 스크롤 감지를 위한 요소 */}
         <div ref={ref} style={{ height: "50px" }} />
 
-        {isFetchingNextPage && <div className="text-center">더 많은 컬렉션 불러오는 중...</div>}
+       {/* 로딩 텍스트를 Spinner 컴포넌트로 교체 */}
+        {isFetchingNextPage && <Spinner />}
       </section>
     </PageLayout>
   );
