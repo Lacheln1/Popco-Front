@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import reviewIconUrl from "@/assets/review.png";
 import emptyPlusIconUrl from "@/assets/empty-plus.png";
 import fullPlusIconUrl from "@/assets/full-plus.png";
