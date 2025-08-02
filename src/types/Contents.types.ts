@@ -7,6 +7,7 @@ export interface ContentItem {
   posterPath: string;
   reviewRatingAvg: number | null;
   genres: string;
+  userReaction: "LIKE" | "DISLIKE" | "NEUTRAL";
 }
 
 export type ContentCategory = "all" | "movie" | "tv";

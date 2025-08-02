@@ -51,8 +51,18 @@ interface WishlistResponse {
 // 주간 랭킹
 export const fetchContentsRanking = async (
   type: ContentCategory,
+  token?: string,
 ): Promise<ContentItem[]> => {
-  const { data } = await axiosInstance.get(`/contents/popular/types/${type}`);
+  console.log(type, token);
+
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+  const { data } = await axiosInstance.get(`/contents/popular/types/${type}`, {
+    headers,
+  });
+  console.log("주간 랭킹", data);
   return data.data;
 };
 

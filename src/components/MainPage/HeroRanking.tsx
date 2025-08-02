@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
@@ -10,15 +10,24 @@ import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
-import { ContentCategory } from "@/types/Contents.types";
+import { ContentCategory, ReactionType } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useNavigate } from "react-router-dom";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 
 interface HeroRankingProps {
   onTop1Change: (type: ContentCategory, title: string) => void;
+  accessToken: string;
+  userId: number;
+  type: ContentCategory;
 }
 
-const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
+const HeroRanking = ({
+  accessToken,
+  userId,
+  type,
+  onTop1Change,
+}: HeroRankingProps) => {
   const [viewMode, setViewMode] = useState<"swiper" | "desktop">("desktop");
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
@@ -41,6 +50,8 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
     }),
   );
 
+  const { data = [], isLoading } = useContentsRanking(selected, accessToken);
+
   useEffect(() => {
     const checkView = () => {
       const width = window.innerWidth;
@@ -55,22 +66,37 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
     return () => window.removeEventListener("resize", checkView);
   }, []);
 
-  const { data = [], isLoading } = useContentsRanking(selected);
-
   useEffect(() => {
     if (data && data.length > 0) {
       onTop1Change(selected, data[0].title);
     }
   }, [data, selected, onTop1Change]);
 
-  if (!Array.isArray(data)) {
-    console.error("HeroRanking Error: data is not an array", data);
-    return <div>데이터가 없습니다.</div>;
-  }
-
+  // 1등 / 나머지 등수
   const first = data[0];
   const contentsRank = data.slice(1);
   if (isLoading) <div>Loading</div>;
+
+  const contentList = useMemo(
+    () =>
+      data?.map((item) => ({
+        id: item.contentId,
+        reaction: item.userReaction as ReactionType,
+      })) ?? [],
+    [data],
+  );
+
+  const { reactionMap, handleReaction } = useContentReaction({
+    userId,
+    accessToken,
+    contentList,
+    invalidateQueryKey: ["contentsRanking", userId, type],
+  });
+
+  if (!Array.isArray(data)) {
+    console.error("HeroRanking Error", data);
+    return <div>데이터가 없습니다.</div>;
+  }
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -191,8 +217,14 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                       posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
                       id={content.contentId}
                       contentType={content.type}
-                      likeState="NEUTRAL"
-                      onLikeChange={() => {}}
+                      likeState={reactionMap[content.contentId]}
+                      onLikeChange={(newState) =>
+                        handleReaction(
+                          content.contentId,
+                          newState,
+                          content.type,
+                        )
+                      }
                     />
                   </SwiperSlide>
                 ))}
@@ -213,8 +245,10 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
                     id={content.contentId}
                     contentType={content.type}
-                    likeState="NEUTRAL"
-                    onLikeChange={() => {}}
+                    likeState={reactionMap[content.contentId]}
+                    onLikeChange={(newState) =>
+                      handleReaction(content.contentId, newState, content.type)
+                    }
                   />
                 </li>
               ))}
