@@ -75,14 +75,7 @@ const AgeChart = ({ agePercent }: AgeChartProps) => {
     datasets: [
       {
         label: "",
-        data: [
-          agePercent[0],
-          agePercent[1],
-          agePercent[2],
-          agePercent[3],
-          agePercent[4],
-          agePercent[5],
-        ],
+        data: labels.map((_, index) => agePercent[index] ?? 0),
         backgroundColor: [
           "rgba(255, 99, 132, 0.3)",
           "rgba(255, 159, 64, 0.3)",
