@@ -94,7 +94,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
                 />
               </div>
             </div>
-            <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8 lg:h-9 xl:h-10">
+            <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8">
               <div
                 className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
                 style={{ width: `${myLikePercent[0]}%` }}
