@@ -8,7 +8,7 @@ export const useMyReview = (
 ) => {
   return useQuery({
     queryKey: ["myReview", contentId, type],
-    queryFn: () => fetchMyReview(contentId!, type, token),
+    queryFn: () => fetchMyReview(contentId, type, token),
     staleTime: 0,
     refetchOnWindowFocus: true,
     enabled: !!token && !!contentId,

@@ -93,6 +93,9 @@ const ReviewModal = ({
     try {
       await deleteReview(reviewId, token);
       message.success("리뷰가 삭제되었습니다.");
+      await queryClient.invalidateQueries({
+        queryKey: ["myReview", contentId, type],
+      });
       refetchMyReview?.();
       setIsModalOpen(false);
     } catch (err) {
