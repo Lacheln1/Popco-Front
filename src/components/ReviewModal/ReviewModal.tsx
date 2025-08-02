@@ -33,7 +33,6 @@ const ReviewModal = ({
   const [review, setReview] = useState("");
   const [score, setScore] = useState(popcorn ?? 0);
   const [isSpoiler, setIsSpoiler] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -52,7 +51,6 @@ const ReviewModal = ({
 
   const handleOk = async () => {
     if (!review.trim() || !id || !type || !token) return;
-    setIsSubmitting(true);
 
     const reviewData = {
       score,
@@ -82,14 +80,11 @@ const ReviewModal = ({
       message.error(
         isWriting || isEditing ? "리뷰 등록/수정에 실패했습니다." : "오류 발생",
       );
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
     if (!reviewId || !token) return;
-    setIsSubmitting(true);
     try {
       await deleteReview(reviewId, token);
       message.success("리뷰가 삭제되었습니다.");
@@ -97,8 +92,6 @@ const ReviewModal = ({
       setIsModalOpen(false);
     } catch (err) {
       message.error("리뷰 삭제에 실패했습니다.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
