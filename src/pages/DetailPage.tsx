@@ -19,6 +19,8 @@ import ActionButtons from "@/components/detail/ActionButtons";
 import ReviewSection from "@/components/detail/ReviewSection";
 import CollectionSection from "@/components/detail/CollectionSection";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
+import useAuthCheck from "@/hooks/useAuthCheck";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 // ======================================================================
 // 1. UI와 스크롤 로직을 담당할 별도 컴포넌트 생성
@@ -55,9 +57,9 @@ const DetailContents = ({
   const bannerOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const bannerScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
   const bannerY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const { accessToken } = useAuthCheck();
 
   // API 데이터를 UI에 맞게 가공
-  const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/original";
   const bannerUrl = `${TMDB_IMAGE_BASE_URL}${contents.backdropPath}`;
   const posterUrl = `${TMDB_IMAGE_BASE_URL}${contents.posterPath}`;
 
@@ -120,6 +122,9 @@ const DetailContents = ({
               isWished={isWished}
               onWishClick={handleWishClick}
               isDesktop
+              token={accessToken}
+              movieTitle={contents?.title}
+              moviePoster={`${TMDB_IMAGE_BASE_URL}${contents.posterPath}`}
             />
           </div>
           <div className="flex flex-row items-center gap-12">
@@ -180,6 +185,9 @@ const DetailContents = ({
                 <ActionButtons
                   isWished={isWished}
                   onWishClick={handleWishClick}
+                  token={accessToken}
+                  movieTitle={contents.title}
+                  moviePoster={`${TMDB_IMAGE_BASE_URL}${contents.posterPath}`}
                 />
               </div>
             </div>
