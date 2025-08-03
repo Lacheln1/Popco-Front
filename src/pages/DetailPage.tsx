@@ -27,6 +27,8 @@ import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 // ======================================================================
 interface DetailContentsProps {
   contents: ContentsDetail;
+  contentId: number;
+  contentType: string;
   myCurrentRating: number;
   setMyCurrentRating: (rating: number) => void;
   isWished: boolean;
@@ -39,6 +41,8 @@ interface DetailContentsProps {
 
 const DetailContents = ({
   contents,
+  contentId, // props 받기
+  contentType, // props 받기
   myCurrentRating,
   setMyCurrentRating,
   isWished,
@@ -215,10 +219,11 @@ const DetailContents = ({
           <ReviewSection />
         </div>
 
-        {/*-- 컬렉션 섹션 (새로 추가) --- */}
+        {/*-- 컬렉션 섹션 --- */}
         <hr className="my-12 border-t border-gray-200" />
         <div className="px-4 lg:px-0">
-          <CollectionSection />
+          {/* contents 객체에서 contentId와 contentType을 props로 전달. */}
+          <CollectionSection contentId={contentId} contentType={contentType} />
         </div>
       </div>
     </div>
@@ -229,7 +234,8 @@ const DetailContents = ({
 // 2. 메인 페이지 컴포넌트: 데이터 로딩과 상태 관리만 담당
 // ======================================================================
 export default function DetailPage() {
-  const { contents, loading, error } = useContentsDetail();
+  const { contents, loading, error, contentId, contentType } =
+    useContentsDetail();
 
   const [isWished, setIsWished] = useState(false);
   const [myCurrentRating, setMyCurrentRating] = useState(0);
@@ -246,7 +252,6 @@ export default function DetailPage() {
       }
     };
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleLikeClick = () => {
@@ -284,6 +289,8 @@ export default function DetailPage() {
   return (
     <DetailContents
       contents={contents}
+      contentId={Number(contentId)}
+      contentType={contentType}
       myCurrentRating={myCurrentRating}
       setMyCurrentRating={setMyCurrentRating}
       isWished={isWished}

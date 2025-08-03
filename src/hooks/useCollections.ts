@@ -13,10 +13,12 @@ import {
   fetchCollectionsWeekly,
   createCollection,
   addContentToCollection,
-  addContentToCollectionBatch, // 새로 추가
+  addContentToCollectionBatch,
   removeContentFromCollection,
+  fetchRelatedCollections,
   fetchCollectionContentsAll,
   fetchCollectionContentCount,
+  fetchMyCollections,
 } from "@/apis/collectionApi";
 import { useNavigate } from "react-router-dom";
 import { App } from "antd";
@@ -87,6 +89,30 @@ export const useFetchCollectionContentCount = (
   });
 };
 
+/**
+ * 특정 콘텐츠와 관련된 컬렉션 목록을 조회하는 훅
+ */
+export const useFetchRelatedCollections = (params: {
+  contentId: number | undefined;
+  contentType: string | undefined;
+  sortType: "popular" | "latest";
+  accessToken?: string | null;
+}) => {
+  const { contentId, contentType, sortType, accessToken } = params;
+  return useQuery({
+    queryKey: ["collections", "related", contentId, sortType, !!accessToken],
+    queryFn: () =>
+      fetchRelatedCollections({
+        contentId: contentId!,
+        contentType: contentType!,
+        sortType,
+        accessToken,
+      }),
+    // contentId와 contentType이 모두 있을 때만 쿼리를 실행
+    enabled: !!contentId && !!contentType,
+  });
+};
+
 // 컬렉션 저장(마크) 상태 변경을 위한 훅
 export const useToggleMarkCollection = () => {
   const queryClient = useQueryClient();
@@ -100,13 +126,12 @@ export const useToggleMarkCollection = () => {
       } else {
         message.success("컬렉션 저장이 취소되었습니다.");
       }
-
-      // 이제 이 invalidateQueries는 수정된 queryKey를 올바르게 찾아낼 것입니다.
       return queryClient.invalidateQueries({
         predicate: (query) =>
           query.queryKey[0] === "collections" &&
           (query.queryKey[1] === "list" ||
             query.queryKey[1] === "weekly" ||
+            query.queryKey[1] === "related" || // 관련 컬렉션 캐시도 무효화
             (query.queryKey[1] === "detail" &&
               query.queryKey[2] === variables.collectionId)),
       });
@@ -253,4 +278,32 @@ export const useManageCollectionContents = (collectionId: string) => {
     removeContent: removeContent.mutate,
     isRemoving: removeContent.isPending,
   };
+};
+
+// 내 컬렉션 목록 조회를 위한 훅
+export const useFetchMyCollections = (accessToken?: string | null) => {
+  return useQuery({
+    queryKey: ["collections", "my", accessToken],
+    queryFn: () => fetchMyCollections(accessToken!),
+    enabled: !!accessToken,
+  });
+};
+
+// 컬렉션에 콘텐츠 '하나'를 추가하는 뮤테이션 훅
+export const useAddContentToCollection = () => {
+  const queryClient = useQueryClient();
+  const { message } = App.useApp();
+
+  return useMutation({
+    mutationFn: addContentToCollection,
+    onSuccess: (data, variables) => {
+      message.success("컬렉션에 작품을 추가했습니다.");
+      queryClient.invalidateQueries({ queryKey: ["collections"] });
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error.response?.data?.message || "작품 추가에 실패했습니다.";
+      message.error(errorMessage);
+    },
+  });
 };

@@ -51,24 +51,6 @@ export const fetchCollectionsWeekly = async (
   return data.data;
 };
 
-// 내 컬렉션 목록 조회
-export const fetchMyCollections = async (
-  accessToken: string,
-  pageNumber: number = 0,
-  pageSize: number = 20,
-) => {
-  const response = await axios.get(`${API_URL}/collections/my`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    params: {
-      pageNumber,
-      pageSize,
-    },
-  });
-  return response.data;
-};
-
 // 내가 마크한 컬렉션 목록
 export const fetchMyMarkedCollections = async (
   accessToken: string,
@@ -185,13 +167,17 @@ export const removeContentFromCollection = async (params: {
 
 // 컬렉션의 모든 컨텐츠 조회 (GET /collections/{collectionId}/contents/all)
 export const fetchCollectionContentsAll = async (collectionId: string) => {
-  const { data } = await axiosInstance.get(`/collections/${collectionId}/contents/all`);
+  const { data } = await axiosInstance.get(
+    `/collections/${collectionId}/contents/all`,
+  );
   return data.data; // data: [...] 배열 반환
 };
 
 // 컬렉션의 컨텐츠 개수 조회 (GET /collections/{collectionId}/contents/count)
 export const fetchCollectionContentCount = async (collectionId: string) => {
-  const { data } = await axiosInstance.get(`/collections/${collectionId}/contents/count`);
+  const { data } = await axiosInstance.get(
+    `/collections/${collectionId}/contents/count`,
+  );
   return data.data; // data: number 반환
 };
 
@@ -220,8 +206,59 @@ export const addContentToCollectionBatch = async (params: {
   const { collectionId, contents, accessToken } = params;
   const { data } = await axiosInstance.post(
     `/collections/${collectionId}/contents/batch`,
-    { contents }, // API 명세에 따라 { contents: [...] } 형태로 전송
+    { contents },
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
   return data;
+};
+
+/**
+ * 특정 콘텐츠가 포함된 컬렉션 목록을 조회
+ * @param params contentId, contentType, sortType 등
+ */
+export const fetchRelatedCollections = async (params: {
+  contentId: number;
+  contentType: string;
+  sortType: "popular" | "latest";
+  pageNumber?: number;
+  pageSize?: number;
+  accessToken?: string | null;
+}) => {
+  const {
+    contentId,
+    contentType,
+    sortType,
+    pageNumber = 0,
+    pageSize = 20,
+    accessToken,
+  } = params;
+
+  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+
+  const { data } = await axiosInstance.get(
+    `/collections/content/${contentId}`,
+    {
+      params: {
+        contentType,
+        sortType,
+        pageNumber,
+        pageSize,
+      },
+      headers,
+    },
+  );
+
+  return data.data;
+};
+
+// 내 컬렉션 목록 조회 (GET /collections/my)
+export const fetchMyCollections = async (accessToken: string) => {
+  const { data } = await axiosInstance.get(`/collections/my`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    params: {
+      pageNumber: 0,
+      pageSize: 100, // 모달에 표시할 최대 컬렉션 개수
+    },
+  });
+  return data.data;
 };

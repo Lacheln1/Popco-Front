@@ -44,9 +44,21 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [isAddToCollectionModalOpen, setIsAddToCollectionModalOpen] =
     useState(false);
 
-  if (isLoading || isFetching || isError || !data) return null;
-  const { existUserReview, myReview } = data;
-  const reviewButtonLabel = existUserReview ? "리뷰 수정" : "리뷰 쓰기";
+  const handleWishClick = () => {
+    if (!token) {
+      message.info("로그인 먼저 진행해주세요!", 1.5);
+      return;
+    }
+    onWishClick();
+  };
+
+  const handleCollectionClick = () => {
+    if (!token) {
+      message.info("로그인 먼저 진행해주세요!", 1.5);
+      return;
+    }
+    setIsAddToCollectionModalOpen(true);
+  };
 
   const handleReviewClick = async () => {
     if (!token) {
@@ -56,6 +68,11 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     await refetch();
     setIsReviewModalOpen(true);
   };
+
+  if (isLoading || isFetching || isError || !data) return null;
+  const { existUserReview, myReview } = data;
+  const reviewButtonLabel = existUserReview ? "리뷰 수정" : "리뷰 쓰기";
+
   return (
     <>
       <div
@@ -74,7 +91,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
         <button
           type="button"
-          onClick={onWishClick}
+          onClick={handleWishClick}
           className={`flex flex-col items-center ${gap} hover:opacity-80`}
         >
           <img
@@ -88,7 +105,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         <button
           type="button"
           className={`flex flex-col items-center ${gap} hover:opacity-80`}
-          onClick={() => setIsAddToCollectionModalOpen(true)}
+          onClick={handleCollectionClick}
         >
           <img src={folderIconUrl} alt="콜렉션 추가" className={iconSize} />
           <span className={`${textSize} font-semibold`}>콜렉션 추가</span>
@@ -114,13 +131,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         reviewId={myReview?.reviewId ?? 0}
       />
 
+      {/* 모달에 실제 콘텐츠 정보를 전달합니다. */}
       <AddToCollectionModal
         isOpen={isAddToCollectionModalOpen}
         onClose={() => setIsAddToCollectionModalOpen(false)}
         contentToAdd={{
-          id: 456,
-          title: "F1 더 무비",
-          posterUrl: "bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
+          id: contentId!,
+          type: type,
+          title: movieTitle,
         }}
       />
     </>
