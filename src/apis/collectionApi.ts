@@ -1,6 +1,7 @@
 import { CollectionProps, CollectionResponse } from "@/types/Collection.types";
 import axiosInstance from "./axiosInstance";
 import axios from "axios";
+import { SearchResult } from "@/types/Search.types";
 
 const API_URL = "/api/client";
 
@@ -111,24 +112,26 @@ export const deleteCollection = async (params: {
 };
 
 // 컨텐츠 검색 (GET /search/contents/advanced)
-export const searchContents = async (keyword: string, page: number = 0) => {
-  if (!keyword.trim()) {
-    return null;
-  }
+export const searchContents = async (
+  keyword: string,
+  page: number = 0,
+  size: number = 20,
+): Promise<SearchResult[]> => {
+  if (!keyword.trim()) return [];
   try {
     // axios.get()의 응답 전체를 response 변수에 받도록 수정합니다.
     const response = await axiosInstance.get(`/search/contents/advanced`, {
       params: {
         keyword,
-        page,
-        size: 20,
+        "pageable.page": page,
+        "pageable.size": size,
       },
     });
 
     // response.data 안에 또 다른 data 필드가 있는지 확인하고 반환합니다.
-    return response.data.data;
+    return response.data?.data?.content ?? [];
   } catch (error) {
-    return null; // 에러 발생 시 null 반환
+    return [];
   }
 };
 
