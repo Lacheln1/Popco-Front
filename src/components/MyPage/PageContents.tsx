@@ -72,7 +72,6 @@ const PageContents: React.FC = () => {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [collectionsError, setCollectionsError] = useState<string | null>(null);
-  const [pageSize] = useState(20);
 
   // 저장한 컬렉션 관련 상태
   const [markedCollections, setMarkedCollections] = useState<Collection[]>([]);
@@ -92,6 +91,7 @@ const PageContents: React.FC = () => {
   const tabTitles = ["Calendar", "Collection", "MY"];
 
   const { message } = App.useApp();
+
   const navigate = useNavigate();
 
   // YYYY-MM 형식으로 변환하기
@@ -140,7 +140,7 @@ const PageContents: React.FC = () => {
   };
 
   // 컬렉션 목록 가져오기
-  const fetchMyCollectionsData = async (page = 0, reset = false) => {
+  const fetchMyCollectionsData = async (reset = false) => {
     if (!accessToken || !user.isLoggedIn || collectionsLoading) {
       return;
     }
@@ -149,12 +149,12 @@ const PageContents: React.FC = () => {
       setCollectionsLoading(true);
       setCollectionsError(null);
 
-      console.log(`컬렉션 API 요청: page=${page}, pageSize=${pageSize}`);
-      const response = await fetchMyCollections(accessToken, page, pageSize);
+      const response = await fetchMyCollections(accessToken);
       console.log("컬렉션 API 응답:", response);
 
-      if (response.code === 200 && response.data) {
-        const newCollections = response.data.collections;
+      // 변경된 응답 구조에 맞게 수정
+      if (response && response.collections) {
+        const newCollections = response.collections;
 
         if (reset) {
           setCollections(newCollections);
@@ -181,7 +181,7 @@ const PageContents: React.FC = () => {
       setMarkedCollectionsError(null);
 
       console.log("저장한 컬렉션 API 요청");
-      const response = await fetchMyMarkedCollections(accessToken, 0, pageSize);
+      const response = await fetchMyMarkedCollections(accessToken);
       console.log("저장한 컬렉션 API 응답:", response.data);
 
       if (response.code === 200 && response.data) {
@@ -250,7 +250,7 @@ const PageContents: React.FC = () => {
       user.isLoggedIn &&
       collections.length === 0
     ) {
-      fetchMyCollectionsData(0, true);
+      fetchMyCollectionsData(true); // reset을 true로 변경
       fetchMyMarkedCollectionsData(); // 저장한 컬렉션도 함께 로드
     }
   }, [activeTab, accessToken, user.isLoggedIn]);
@@ -368,6 +368,11 @@ const PageContents: React.FC = () => {
                             reviewData={convertToReviewData(movie)}
                             contentId={movie.contentId}
                             contentType={movie.contentType}
+                            onReport={() => {
+                              message.error(
+                                "자신이 작성한 리뷰는 신고할 수 없습니다!",
+                              );
+                            }}
                           />
                         </SwiperSlide>
                       ))}
