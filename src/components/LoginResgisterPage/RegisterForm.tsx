@@ -8,6 +8,7 @@ import {
 } from "@/components/LoginResgisterPage/Animation";
 import { checkEmail, registerUser } from "@/apis/userApi";
 import { useNavigate } from "react-router-dom";
+import { App } from "antd";
 
 const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ const RegisterForm: React.FC = () => {
   const [checkEmailValue, setCheckEmailValue] = useState(false); // 이메일 중복 체크
 
   const navigate = useNavigate();
+  const { message } = App.useApp();
 
   useEffect(() => {
     const resetCheckEmailValue = () => {
@@ -64,7 +66,7 @@ const RegisterForm: React.FC = () => {
     }
 
     if (!checkEmailValue) {
-      alert("이메일 중복확인을 해주세요.");
+      message.error("이메일 중복확인을 해주세요.");
       hasError = true;
     } else {
       setCheckEmailValue(true);
@@ -76,16 +78,20 @@ const RegisterForm: React.FC = () => {
       const result = await registerUser({ email, password });
 
       if (result.code == "200") {
-        alert("회원가입이 완료되었습니다. 가입 한 계정으로 로그인 해주세요.");
+        message.success(
+          "회원가입이 완료되었습니다. 가입 한 계정으로 로그인 해주세요.",
+        );
         navigate("/login");
       }
 
       if (result.code == "409") {
-        alert("이미 가입된 회원입니다");
+        message.error("이미 가입된 회원입니다");
         navigate("/login");
       }
     } catch (error) {
       console.log("회원가입 실패", error);
+      message.error("회원가입에 실패했습니다. 관리자에게 문의하세요.");
+      return;
     }
   };
 
@@ -94,20 +100,22 @@ const RegisterForm: React.FC = () => {
     e.preventDefault();
 
     if (!email) {
-      alert("이메일을 입력해주세요.");
+      message.success("이메일을 입력해주세요.");
       return;
     }
 
     try {
       const result = await checkEmail({ email });
       if (result.data) {
-        alert("이미 존재하는 이메일입니다");
+        message.error("이미 존재하는 이메일입니다");
       } else {
-        alert("사용 가능한 이메일 입니다!");
+        message.success("사용 가능한 이메일 입니다!");
         setCheckEmailValue(true);
       }
     } catch (error) {
       console.log("이메일 중복 확인 중 오류!", error);
+      message.error("이메일 중복 확인에 실패했습니다. 관리자에게 문의하세요.");
+      return;
     }
   };
   return (
