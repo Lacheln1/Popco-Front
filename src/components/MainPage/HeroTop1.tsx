@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import Poster from "../common/Poster";
-import { ContentCategory } from "@/types/Contents.types";
+import { ContentCategory, ReactionType } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useStoryBasedRecommendations } from "@/hooks/queries/contents/useStoryBasedRecommendations";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 
 interface Props {
   accessToken: string;
@@ -27,6 +28,21 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
     type,
     accessToken,
   );
+  // useMemo를 통해 contentList 생성 (data가 있을 때만)
+  const contentList = useMemo(
+    () =>
+      data.map((item) => ({
+        id: item.content_id,
+        reaction: item.user_reaction as ReactionType,
+      })),
+    [data],
+  );
+  // useContentReaction은 data가 준비된 이후에 실행
+  const { reactionMap, handleReaction } = useContentReaction({
+    userId,
+    accessToken,
+    contentList,
+  });
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -78,27 +94,27 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
               },
             }}
           >
-            {data.map(
-              (
-                content, //전체 항목을 'content'로
-              ) => (
-                <SwiperSlide
-                  key={content.content_id}
-                  className="flex justify-center"
-                >
-                  <Poster
-                    title={content.title}
-                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
-                    id={content.content_id}
-                    contentType={content.content_type}
-                    likeState={
-                      content.user_reaction ? content.user_reaction : "NEUTRAL"
-                    }
-                    onLikeChange={() => {}}
-                  />
-                </SwiperSlide>
-              ),
-            )}
+            {data.map((content) => (
+              <SwiperSlide
+                key={content.content_id}
+                className="flex justify-center"
+              >
+                <Poster
+                  title={content.title}
+                  posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                  id={content.content_id}
+                  contentType={content.content_type}
+                  likeState={reactionMap[content.content_id] ?? "NEUTRAL"}
+                  onLikeChange={(newState) =>
+                    handleReaction(
+                      content.content_id,
+                      newState,
+                      content.content_type,
+                    )
+                  }
+                />
+              </SwiperSlide>
+            ))}
           </Swiper>
         )}
       </section>

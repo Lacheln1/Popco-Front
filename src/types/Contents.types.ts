@@ -7,6 +7,7 @@ export interface ContentItem {
   posterPath: string;
   reviewRatingAvg: number | null;
   genres: string;
+  userReaction: "LIKE" | "DISLIKE" | "NEUTRAL";
 }
 
 export type ContentCategory = "all" | "movie" | "tv";
@@ -81,3 +82,5 @@ export interface WatchProvider {
   logoPath: string | null;
   link: string | null;
 }
+
+export type ReactionType = "LIKE" | "DISLIKE" | "NEUTRAL";
