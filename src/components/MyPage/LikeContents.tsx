@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { fetchLikeContents } from "@/apis/contentsApi";
 import Spinner from "./../common/Spinner";
+import { useNavigate } from "react-router-dom";
 
 interface LikeContent {
   contentId: number;
@@ -35,6 +36,8 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
   const [likeContents, setLikeContents] = useState<LikeContent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -147,7 +150,14 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
             >
               {likeContents.map((content) => (
                 <SwiperSlide key={content.contentId} className="!h-auto">
-                  <div className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div
+                    className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+                    onClick={() =>
+                      navigate(
+                        `/detail/${content.contentType}/${content.contentId}`,
+                      )
+                    }
+                  >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
                         src={`https://image.tmdb.org/t/p/original/${content.posterPath}`}
