@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSendContentFeedback } from "@/hooks/queries/contents/useSendContentFeedback";
 import { ReactionType } from "@/types/Contents.types";
 
@@ -6,7 +6,6 @@ interface UseContentReactionOptions {
   userId: number;
   accessToken: string;
   contentList: { id: number; reaction?: ReactionType }[];
-  invalidateQueryKey?: unknown[];
 }
 
 export const useContentReaction = ({
