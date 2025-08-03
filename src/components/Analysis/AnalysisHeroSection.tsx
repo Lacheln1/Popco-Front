@@ -61,7 +61,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
                 />
               </div>
               <img
-                src={`${mainPersonaImgPath}`}
+                src={`${myPersonaImgPath}`}
                 alt="캐릭터이미지"
                 className="s h-[150px] w-[150px] translate-y-7 object-cover md:mt-5 md:h-[200px] md:w-[200px] lg:h-[220px] lg:w-[220px]"
               />
@@ -70,7 +70,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
         </div>
       </div>
       <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-4xl lg:mt-0">
-        {mainPersonaName}
+        {myPersonaName}
       </div>
 
       <div className="flex justify-around">
@@ -78,13 +78,13 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
           <div>
             <div className="flex justify-center">
               <img
-                src={`${myPersonaImgPath}`}
+                src={`${mainPersonaImgPath}`}
                 alt="액션 헌터"
                 className="h-16 w-16"
               />
             </div>
             <span className="text-sm md:text-lg lg:text-xl xl:text-2xl">
-              {myPersonaName}
+              {mainPersonaName}
             </span>
           </div>
           <div className="mx-2 flex h-4 flex-1 overflow-hidden rounded-full bg-gray-200">
