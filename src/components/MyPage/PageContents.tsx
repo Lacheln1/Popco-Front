@@ -176,9 +176,9 @@ const PageContents: React.FC = () => {
 
       console.log("저장한 컬렉션 API 요청");
       const response = await fetchMyMarkedCollections(accessToken, 0, pageSize);
-      console.log("저장한 컬렉션 API 응답:", response);
+      console.log("저장한 컬렉션 API 응답:", response.data);
 
-      if (response.code === 1073741824 && response.data) {
+      if (response.code === 200 && response.data) {
         setMarkedCollections(response.data.collections);
       }
     } catch (err) {
@@ -334,7 +334,7 @@ const PageContents: React.FC = () => {
                       }}
                       breakpoints={{
                         320: {
-                          slidesPerView: 2,
+                          slidesPerView: 1.45,
                           spaceBetween: 12,
                         },
                         480: {
@@ -420,11 +420,11 @@ const PageContents: React.FC = () => {
                       }}
                       breakpoints={{
                         320: {
-                          slidesPerView: 1.2,
+                          slidesPerView: 1.45,
                           spaceBetween: 12,
                         },
                         480: {
-                          slidesPerView: 1.5,
+                          slidesPerView: 2,
                           spaceBetween: 12,
                         },
                         640: {
@@ -432,11 +432,11 @@ const PageContents: React.FC = () => {
                           spaceBetween: 14,
                         },
                         768: {
-                          slidesPerView: 2.5,
+                          slidesPerView: 3,
                           spaceBetween: 16,
                         },
                         1024: {
-                          slidesPerView: 3,
+                          slidesPerView: 4.7,
                           spaceBetween: 16,
                         },
                       }}
@@ -511,11 +511,11 @@ const PageContents: React.FC = () => {
                       }}
                       breakpoints={{
                         320: {
-                          slidesPerView: 1.2,
+                          slidesPerView: 1.6,
                           spaceBetween: 12,
                         },
                         480: {
-                          slidesPerView: 1.5,
+                          slidesPerView: 2,
                           spaceBetween: 12,
                         },
                         640: {
@@ -523,11 +523,11 @@ const PageContents: React.FC = () => {
                           spaceBetween: 14,
                         },
                         768: {
-                          slidesPerView: 2.5,
+                          slidesPerView: 3,
                           spaceBetween: 16,
                         },
                         1024: {
-                          slidesPerView: 3,
+                          slidesPerView: 4.7,
                           spaceBetween: 16,
                         },
                       }}
