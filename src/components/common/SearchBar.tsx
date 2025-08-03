@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, KeyboardEvent, ChangeEvent } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 import { AutoResult, SearchBarProps } from "@/types/Search.types";
+import { Radio } from "antd";
 
 const SearchBar = <T,>({
   placeholder = "검색어를 입력 해 주세요.",
@@ -11,6 +12,7 @@ const SearchBar = <T,>({
   className,
 }: SearchBarProps<T>) => {
   const [searchValue, setSearchValue] = useState("");
+  const [searchType, setSearchType] = useState<"keyword" | "actors">("keyword");
   const [suggestions, setSuggestions] = useState<AutoResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -34,7 +36,9 @@ const SearchBar = <T,>({
       value: (result as any).title,
       label: (
         <div className="py-1">
-          <div className="mb-[2px] font-bold">{(result as any).title}</div>
+          <div className="mb-[2px] font-bold">
+            {(result as any).title ?? (result as any).value}
+          </div>
         </div>
       ),
       data: result,
@@ -46,10 +50,18 @@ const SearchBar = <T,>({
     onSearch(searchValue, results as unknown as T[]);
   }, [results, searchValue, showSuggestions, onSearch]);
 
+  const triggerSearch = (value: string) => {
+    if (searchType === "keyword") {
+      handleSearch({ keyword: value });
+    } else {
+      handleSearch({ actors: [value] });
+    }
+  };
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-    handleSearch(value);
+    triggerSearch(value);
   };
 
   const handleSelect = (option: AutoResult) => {
@@ -87,6 +99,17 @@ const SearchBar = <T,>({
 
   return (
     <div className="flex justify-center px-4 pt-8">
+      <Radio.Group
+        className="mb-2"
+        value={searchType}
+        onChange={(e) => setSearchType(e.target.value)}
+        optionType="button"
+        buttonStyle="solid"
+      >
+        <Radio.Button value="keyword">작품 키워드</Radio.Button>
+        <Radio.Button value="actors">배우 이름</Radio.Button>
+      </Radio.Group>
+      {/* 검색 입력창 */}
       <div className="relative w-full max-w-[700px]">
         <div className="relative flex h-10 min-w-80 items-center rounded-full border border-[#ededed] bg-white shadow-[0px_10px_15px_#0000000d] sm:h-16">
           <input
@@ -112,7 +135,7 @@ const SearchBar = <T,>({
             )}
           </button>
         </div>
-
+        {/* 자동완성 드롭다운 */}
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}

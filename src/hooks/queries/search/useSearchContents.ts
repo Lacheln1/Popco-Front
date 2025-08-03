@@ -6,19 +6,23 @@ export const useSearchContents = ({
   keyword,
   actors,
   size,
-}: SearchContentsParams) => {
+}: Omit<SearchContentsParams, "pageNumber">) => {
   return useInfiniteQuery({
     queryKey: ["searchContents", keyword, actors],
-    queryFn: ({ pageParam = 0 }: { pageParam?: number }) =>
+    queryFn: ({ pageParam = 0 }) =>
       fetchSearchContents({
         keyword,
         actors,
         page: pageParam,
         size,
       }),
-    getNextPageParam: (lastPage, allPages) =>
-      (lastPage as { last: boolean }).last ? undefined : allPages.length,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.last ? undefined : allPages.length;
+    },
     initialPageParam: 0,
     enabled: !!(keyword?.trim() || (actors?.length ?? 0) > 0),
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 2,
+    retry: 1,
   });
 };

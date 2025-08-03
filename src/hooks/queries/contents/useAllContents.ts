@@ -18,7 +18,7 @@ export const useAllContents = ({
       return lastPage.last ? undefined : allPages.length;
     },
     initialPageParam: 0,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 30,
     gcTime: 1000 * 60 * 60 * 2,
     retry: 1,
   });
