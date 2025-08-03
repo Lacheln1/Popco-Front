@@ -71,18 +71,19 @@ const ListPage = () => {
         />
       </div>
 
-      <div className="flex flex-wrap place-content-center gap-7">
-        {allContents.map(({ id, title, posterPath }) => (
-          <Poster
-            key={id}
-            id={id}
-            title={title}
-            posterUrl={`${TMDB_IMAGE_BASE_URL}${posterPath}`}
-            likeState="NEUTRAL"
-            onLikeChange={() => {}}
-          />
-        ))}
-      </div>
+<div className="flex flex-wrap place-content-center gap-9">
+  {allContents.map((content) => ( 
+    <Poster
+      key={content.id}
+      id={content.id}
+      title={content.title}
+      contentType={content.type} 
+      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+      likeState="NEUTRAL"
+      onLikeChange={() => {}}
+    />
+  ))}
+</div>
 
       {hasNextPage && <div ref={observerRef} className="h-10" />}
     </PageLayout>

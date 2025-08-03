@@ -294,7 +294,7 @@ const PageContents: React.FC = () => {
               {/* 리뷰 카드 Swiper 섹션 */}
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h1 className="gmarket-bold py-2 text-base">
+                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
                     이달엔 이런 리뷰를 남겼어요
                   </h1>
                   {/* 네비게이션 버튼 */}

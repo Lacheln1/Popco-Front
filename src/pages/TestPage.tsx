@@ -6,7 +6,7 @@ import dayjs, { type Dayjs } from "dayjs";
 import { Input, App, DatePicker, Radio, Spin } from "antd";
 
 // API 함수 import
-import { updateUserDetails, getUserDetail } from "@/apis/userApi";
+import { updateUserDetails } from "@/apis/userApi";
 import { getTestMovies, type Movie } from "@/apis/preferenceApi";
 import { getQuizQuestion, type QuestionData } from "@/apis/personaApi";
 import {
@@ -35,20 +35,10 @@ import horrorPopcoCardUrl from "../assets/horror-popco-card.png";
 import retroPopcoCardUrl from "../assets/retro-popco-card.png";
 import imaginePopcoCardUrl from "../assets/imagine-popco-card.png";
 import movieSherlockCardUrl from "../assets/movie-sherlock-card.png";
-import babyactionhunter from "../assets/baby-action-hunter.svg";
-import actionhunter from "../assets/action-hunter.svg";
-import babycrypopco from "../assets/baby-cry-popco.svg";
-import crypopco from "../assets/cry-popco.svg";
-import babywarmpopco from "../assets/baby-warm-popco.svg";
-import warmpopco from "../assets/warm-popco.svg";
-import babyhorrorpopco from "../assets/baby-horror-popco.svg";
-import horrorpopco from "../assets/horror-popco.svg";
-import babyretropopco from "../assets/baby-retro-popco.svg";
-import retropopco from "../assets/retro-popco.svg";
-import babyimaginepopco from "../assets/baby-imagine-popco.svg";
-import imaginepopco from "../assets/imagine-popco.svg";
-import babymoviesherlock from "../assets/baby-movie-sherlock.svg";
-import moviesherlock from "../assets/movie-sherlock.svg";
+
+// 상수처리
+import { PERSONA_IMAGES } from "@/constants/persona";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const cardImageRows = [
   [actionHunterCardUrl, cryPopcoCardUrl, warmPopcoCardUrl],
@@ -60,25 +50,8 @@ const cardImageRows = [
   ],
 ];
 
-const personaImages: { [key: string]: string } = {
-  "아기 액션 헌터": babyactionhunter,
-  "액션 헌터": actionhunter,
-  "아기 시네파 울보": babycrypopco,
-  "시네파 울보": crypopco,
-  "아기 따끈 감성파": babywarmpopco,
-  "따끈 감성파": warmpopco,
-  "아기 호러 수집가": babyhorrorpopco,
-  "호러 수집가": horrorpopco,
-  "아기 레트로 탐험가": babyretropopco,
-  "레트로 탐험가": retropopco,
-  "아기 상상가": babyimaginepopco,
-  상상가: imaginepopco,
-  "아기 무비 셜록": babymoviesherlock,
-  "무비 셜록": moviesherlock,
-};
-
 const TestPage = () => {
-  const { accessToken } = useAuthCheck();
+  const { user, accessToken } = useAuthCheck();
   const navigate = useNavigate();
   const { message } = App.useApp();
   const { step, total: TOTAL_STEPS, setStep } = useOutletContext<any>();
@@ -87,82 +60,40 @@ const TestPage = () => {
   const [nickname, setNickname] = useState("");
   const [birthDate, setBirthDate] = useState<Dayjs | null>(null);
   const [gender, setGender] = useState("");
-  const [selectedMovies, setSelectedMovies] = useState<string[]>([]);
+  const [selectedMovies, setSelectedMovies] = useState<Movie[]>([]);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: number]: number }>({});
+  // API 통신 및 데이터 로딩 State
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [fetchedQuizzes, setFetchedQuizzes] = useState<{
     [key: number]: QuestionData;
   }>({});
-  const [isQuizLoading, setIsQuizLoading] = useState(false);
-
-  // API 통신 및 데이터 로딩 State
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuizLoading, setIsQuizLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [personaResult, setPersonaResult] = useState<OnboardingResponse | null>(
     null,
   );
 
-  //사용자가 진단페이지 직접 못하게
+  // 단계별 데이터 로딩 (영화, 퀴즈)
   useEffect(() => {
-    // accessToken이 있어야만 사용자 정보를 확인할 수 있습니다.
-    if (accessToken) {
-      const checkProfileStatus = async () => {
-        try {
-          // 사용자 상세 정보를 불러옵니다.
-          const userInfoResponse = await getUserDetail(accessToken);
-
-          // profileComplete가 true이면, 이미 진단을 완료한 사용자입니다.
-          if (userInfoResponse.data.profileComplete === true) {
-            message.info(
-              "이미 취향 진단을 완료했습니다. 메인 페이지로 이동합니다.",
-            );
-            navigate("/"); // 메인 페이지로 리디렉션
-          }
-          // false인 경우, 이 페이지에 머무르며 테스트를 계속 진행합니다.
-        } catch (error) {
-          console.error("사용자 프로필 상태 확인 실패:", error);
-          message.error("사용자 정보 확인에 실패했습니다.");
-        }
-      };
-
-      checkProfileStatus();
-    }
-    // accessToken이 변경될 때마다 이 효과를 실행합니다.
-  }, [accessToken, navigate, message]);
-
-  // 인트로 자동 넘김 및 영화 데이터 로딩
-  useEffect(() => {
-    // 인트로 로직
     if (step === 0) {
       const timer = setTimeout(() => setStep(1), 1500);
       return () => clearTimeout(timer);
     }
+    if (!accessToken) return;
 
-    // 영화 데이터 로딩 로직
-    if (step === 4 && accessToken) {
+    if (step === 4 && movies.length === 0) {
       const fetchMovies = async () => {
-        if (movies.length > 0) return;
-
         setIsLoading(true);
         try {
           const responseData: any = await getTestMovies(accessToken);
-          console.log("API로부터 받은 영화 데이터:", responseData);
-
-          // ✅ 핵심 수정 부분!
-          // responseData 객체 안의 'contents' 배열이 있는지 확인합니다.
           if (responseData && Array.isArray(responseData.contents)) {
-            // 'contents' 배열을 movies state에 저장합니다.
             setMovies(responseData.contents);
           } else {
-            console.error(
-              "API 응답에 'contents' 배열이 없습니다:",
-              responseData,
-            );
             setMovies([]);
           }
         } catch (error) {
           message.error("영화 목록을 불러오는 데 실패했습니다.");
-          console.error(error);
           setMovies([]);
         } finally {
           setIsLoading(false);
@@ -170,21 +101,13 @@ const TestPage = () => {
       };
       fetchMovies();
     }
-    // 의존성 배열
-  }, [step, accessToken, movies.length, message]);
 
-  // 퀴즈 질문 데이터 로딩
-  useEffect(() => {
-    if (step < 5 || step > 9) return;
-    const questionNumber = step - 4;
-    if (fetchedQuizzes[questionNumber]) return;
-
-    // accessToken이 준비되었을 때만 API를 호출
-    if (accessToken) {
+    if (step >= 5 && step <= 9) {
+      const questionNumber = step - 4;
+      if (fetchedQuizzes[questionNumber]) return;
       const fetchQuiz = async () => {
         setIsQuizLoading(true);
         try {
-          // getQuizQuestion 호출 시 accessToken 전달
           const quizData = await getQuizQuestion(questionNumber, accessToken);
           setFetchedQuizzes((prev) => ({
             ...prev,
@@ -198,54 +121,63 @@ const TestPage = () => {
       };
       fetchQuiz();
     }
-  }, [step, fetchedQuizzes, message, accessToken]);
+  }, [step, accessToken, movies.length, fetchedQuizzes, message, setStep]);
 
   // 최종 정보 제출 함수
   const handleSubmit = async () => {
-    if (!accessToken) {
-      message.error("인증 정보가 없습니다. 다시 로그인해주세요.");
+    if (!accessToken || !user || user.userId === 0) {
+      message.error(
+        "사용자 정보가 올바르지 않습니다. 잠시 후 다시 시도해주세요.",
+      );
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // 1. 프로필 정보를 담은 객체 생성
       const userDetails = {
         nickname: nickname,
         birthday: birthDate!.format("YYYY-MM-DD"),
         gender: gender,
       };
-
-      // 2. 페르소나 분석에 필요한 정보 객체 생성
       const personaPayload = {
-        feedback_items: selectedMovies.map((id) => ({
-          content_id: Number(id),
-          content_type: "movie",
+        user_id: user.userId,
+        feedback_items: selectedMovies.map((movie) => ({
+          content_id: Number(movie.id),
+          content_type: movie.type,
         })),
         reaction_type: "좋아요" as const,
         initial_answers: Object.entries(quizAnswers).reduce(
-          (acc, [key, value]) => {
-            acc[key] = String(value);
+          (acc, [questionId, optionId]) => {
+            acc[questionId] = String(optionId);
             return acc;
           },
           {} as { [key: string]: string },
         ),
       };
 
-      // 3. Promise.all을 사용해 두 API를 동시에 호출
-      const [_, personaResult] = await Promise.all([
+      const [_, personaAnalysisResult] = await Promise.all([
         updateUserDetails(userDetails, accessToken),
         getOnboardingPersona(personaPayload, accessToken),
       ]);
 
-      // 4. 페르소나 분석 결과(personaResult)를 state에 저장
-      setPersonaResult(personaResult);
+      console.log("페르소나 분석 직후 API 응답:", personaAnalysisResult);
 
-      message.success("취향 분석이 완료되었습니다!");
-      setStep((prev: number) => prev + 1); // 결과 페이지로 이동
-    } catch (error) {
+      if (personaAnalysisResult && personaAnalysisResult.main_persona) {
+        setPersonaResult(personaAnalysisResult);
+        message.success("취향 분석이 완료되었습니다!");
+
+        sessionStorage.setItem("profileJustCompleted", "true");
+
+        setStep((prev: number) => prev + 1);
+      } else {
+        throw new Error(
+          (personaAnalysisResult as any)?.message ||
+            "페르소나 분석에 실패했습니다.",
+        );
+      }
+    } catch (error: any) {
       console.error("최종 정보 제출 실패:", error);
-      message.error("정보 저장 또는 분석에 실패했습니다. 다시 시도해주세요.");
+      message.error(error.message || "정보 저장 또는 분석에 실패했습니다.");
     } finally {
       setIsSubmitting(false);
     }
@@ -280,10 +212,23 @@ const TestPage = () => {
     setStep((prev: number) => Math.max(1, prev - 1));
   };
 
-  const handleToggleMovieSelect = (id: string) => {
-    setSelectedMovies((prev) =>
-      prev.includes(id) ? prev.filter((mId) => mId !== id) : [...prev, id],
-    );
+  const handleToggleMovieSelect = (movie: Movie) => {
+    setSelectedMovies((prevSelected) => {
+      // 이미 선택된 영화인지 ID를 기준으로 확인합니다.
+      const isAlreadySelected = prevSelected.some(
+        (selectedMovie) => selectedMovie.id === movie.id,
+      );
+
+      if (isAlreadySelected) {
+        // 이미 있으면, 해당 영화를 배열에서 제거합니다.
+        return prevSelected.filter(
+          (selectedMovie) => selectedMovie.id !== movie.id,
+        );
+      } else {
+        // 없으면, 기존 배열에 새로운 영화 객체를 추가합니다.
+        return [...prevSelected, movie];
+      }
+    });
   };
 
   const handleSelectAnswer = (questionId: number, optionId: number) => {
@@ -406,12 +351,11 @@ const TestPage = () => {
           </div>
         );
       case 4: // 영화 선택
-        const imageBaseUrl = "https://image.tmdb.org/t/p/w500";
         return (
           <div className="flex h-full flex-col gap-4 py-4">
             <div className="px-4 text-center">
-              <h3 className={headingStyle}>어떤 컨텐츠를 재밌게 보셨나요?</h3>
-              <p className={paragraphStyle}>
+              <h3 className="font-bold ...">어떤 컨텐츠를 재밌게 보셨나요?</h3>
+              <p className="mt-4 ...">
                 마음에 드는 컨텐츠를 최소 3개이상 골라주세요.
                 <br />
                 많이 선택하실수록 취향 분석이 정교해져요.
@@ -430,11 +374,11 @@ const TestPage = () => {
                         key={movie.id}
                         id={String(movie.id)}
                         title={movie.title}
-                        posterUrl={`${imageBaseUrl}${movie.posterPath}`}
-                        isSelected={selectedMovies.includes(String(movie.id))}
-                        onToggleSelect={() =>
-                          handleToggleMovieSelect(String(movie.id))
-                        }
+                        posterUrl={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
+                        isSelected={selectedMovies.some(
+                          (m) => m.id === movie.id,
+                        )}
+                        onToggleSelect={() => handleToggleMovieSelect(movie)}
                       />
                     );
                   })}
@@ -443,6 +387,7 @@ const TestPage = () => {
             )}
           </div>
         );
+
       case 5:
       case 6:
       case 7:
@@ -455,7 +400,9 @@ const TestPage = () => {
         if (isQuizLoading || !currentQuiz) {
           return (
             <div className="flex h-full items-center justify-center">
-              <Spin tip="질문을 불러오는 중..." />
+              <Spin tip="질문을 불러오는 중..." size="large">
+                <div className="p-8" />
+              </Spin>
             </div>
           );
         }
@@ -471,16 +418,16 @@ const TestPage = () => {
             }
           />
         );
-      default: // 최종 결과 페이지 (step 10)
+      default: // 최종 결과 페이지
         if (isSubmitting) {
           return (
             <div className="flex h-full flex-col items-center justify-center">
-              <Spin tip="취향을 분석하고 있어요..." size="large" />
+              <Spin tip="취향을 분석하고 있어요..." size="large">
+                <div className="p-8" />
+              </Spin>
             </div>
           );
         }
-
-        // personaResult state를 사용하여 결과 화면 렌더링
         return (
           <div className="flex h-full flex-col items-center justify-center p-4 text-center text-black">
             {personaResult ? (
@@ -492,23 +439,21 @@ const TestPage = () => {
                   선택한 취향을 바탕으로 사용자님의 캐릭터를 찾았어요!
                 </p>
                 <img
-                  src={personaImages[personaResult.main_persona]} // 매핑된 이미지
+                  src={PERSONA_IMAGES[personaResult.main_persona]}
                   alt={personaResult.main_persona}
                   className="my-6 h-48 w-48"
                 />
                 <p className="text-xl font-bold">
-                  {personaResult.main_persona}
+                  {personaResult.main_persona.replace(/_/g, " ")}
                 </p>
 
                 <div className="mt-8 flex w-full max-w-xs gap-4">
-                  {/* "취향 분석 보기" 버튼 */}
                   <button
                     onClick={() => navigate("/analysis")}
                     className="text-popco-foot flex-1 rounded-full border border-[var(--color-popcoFootColor)] bg-white py-3 font-semibold transition-colors hover:bg-yellow-50"
                   >
                     취향 분석 보기
                   </button>
-                  {/* "POPCO 시작하기" 버튼 */}
                   <button
                     onClick={() => navigate("/")}
                     className="bg-popco-foot flex-1 rounded-full py-3 font-semibold text-white transition-colors hover:brightness-95"

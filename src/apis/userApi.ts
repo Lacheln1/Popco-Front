@@ -183,3 +183,21 @@ export const getMonthlyReviews = async (
     throw error;
   }
 };
+
+export const getRoleDashBoardData = async (accessToken: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/personas/analysis`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+
+    console.log("roleDashboardData get", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.log("getDashboardData실패", error);
+    throw error;
+  }
+};

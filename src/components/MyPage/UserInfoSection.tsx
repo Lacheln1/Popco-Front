@@ -2,11 +2,14 @@ import useAuthCheck from "@/hooks/useAuthCheck";
 import React, { useRef, useState } from "react";
 import { App } from "antd";
 import { updateUserProfile } from "@/apis/userApi";
+
 interface UserInfoSectionProps {
   nickname: string;
   email: string;
   currentPersona: string;
   profileImageUrl?: string;
+  personaImageUrl?: string;
+  onProfileUpdate?: (newImageUrl: string) => void;
 }
 
 const UserInfoSection: React.FC<UserInfoSectionProps> = ({
@@ -14,19 +17,138 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   email,
   currentPersona,
   profileImageUrl,
+  personaImageUrl,
+  onProfileUpdate,
 }) => {
   const { accessToken } = useAuthCheck();
   const [isLoading, setIsLoading] = useState(false);
-  const [currentProfileImage, setCurrentProfileImage] = useState<string>(
-    profileImageUrl || "",
-  );
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [errorUrls, setErrorUrls] = useState<Set<string>>(new Set());
+  const [isEditingNickname, setIsEditingNickname] = useState(false);
+  const [newNickname, setNewNickname] = useState(nickname);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { message } = App.useApp();
 
-  //파일 선택
+  // 기본 이미지 URL
+  const DEFAULT_PROFILE_IMAGE =
+    "https://popco-bucket.s3.ap-northeast-2.amazonaws.com/5ce940cd-4cd0-442b-afb0-077054a2af1f_popco.png";
+
+  // nickname prop이 변경될 때 로컬 상태 업데이트
+  React.useEffect(() => {
+    setNewNickname(nickname);
+  }, [nickname]);
+
+  // profileImageUrl이 변경될 때 에러 상태 초기화
+  React.useEffect(() => {
+    if (profileImageUrl) {
+      setErrorUrls((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(profileImageUrl);
+        return newSet;
+      });
+    }
+  }, [profileImageUrl]);
+
+  // 이미지 로드 에러 처리
+  const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const imgSrc = event.currentTarget.src;
+    if (errorUrls.has(imgSrc) || imgSrc === DEFAULT_PROFILE_IMAGE) {
+      return;
+    }
+    console.log("이미지 로드 실패:", imgSrc);
+    setErrorUrls((prev) => new Set([...prev, imgSrc]));
+  };
+
+  // 이미지 로드 성공 처리
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const imgSrc = event.currentTarget.src;
+    setErrorUrls((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(imgSrc);
+      return newSet;
+    });
+  };
+
+  // 닉네임 편집 시작
+  const handleStartEditNickname = () => {
+    setIsEditingNickname(true);
+    setNewNickname(nickname);
+  };
+
+  // 닉네임 편집 취소
+  const handleCancelEditNickname = () => {
+    setIsEditingNickname(false);
+    setNewNickname(nickname);
+  };
+
+  // 닉네임 변경 저장
+  const handleSaveNickname = async () => {
+    if (!accessToken) {
+      message.error("로그인이 필요합니다");
+      return;
+    }
+
+    if (!newNickname.trim()) {
+      message.error("닉네임을 입력해주세요.");
+      return;
+    }
+
+    if (newNickname.trim() === nickname) {
+      setIsEditingNickname(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const dummyFile = new File([""], "dummy.txt", { type: "text/plain" });
+      const response = await updateUserProfile(
+        { nickname: newNickname.trim(), profileImageUrl: dummyFile },
+        accessToken,
+      );
+
+      console.log("닉네임 업데이트 성공:", response);
+
+      if (response.code === 200 && response.result === "SUCCESS") {
+        setIsEditingNickname(false);
+        message.success("닉네임이 성공적으로 변경되었습니다.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      } else {
+        throw new Error("닉네임 변경 응답이 올바르지 않습니다.");
+      }
+    } catch (error) {
+      console.error("닉네임 변경 오류:", error);
+      message.error("닉네임 변경에 실패했습니다.");
+      setNewNickname(nickname);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Enter 키로 닉네임 저장
+  const handleNicknameKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSaveNickname();
+    } else if (event.key === "Escape") {
+      handleCancelEditNickname();
+    }
+  };
+
+  const getDisplayImageUrl = () => {
+    if (previewUrl) {
+      return previewUrl;
+    }
+    if (profileImageUrl && !errorUrls.has(profileImageUrl)) {
+      return profileImageUrl;
+    }
+    return DEFAULT_PROFILE_IMAGE;
+  };
+
+  // 파일 선택
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -39,9 +161,9 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
         message.error("파일 크기는 5MB 이하여야 합니다.");
         return;
       }
+
       setSelectedImage(file);
 
-      //사진 미리보기
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target?.result as string);
@@ -50,7 +172,16 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
     }
   };
 
-  //이미지 업로드 및 프로필 업데이트
+  // 미리보기 취소
+  const handleCancelPreview = () => {
+    setSelectedImage(null);
+    setPreviewUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // 이미지 업로드 및 프로필 업데이트
   const handleUpdateProfile = async () => {
     if (!accessToken) {
       message.error("로그인이 필요합니다");
@@ -69,15 +200,25 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
         { nickname: nickname, profileImageUrl: selectedImage },
         accessToken,
       );
+
       console.log("프로필 업데이트 성공:", response);
 
-      setCurrentProfileImage(previewUrl);
-      setSelectedImage(null);
-      setPreviewUrl("");
+      if (response.code === 200 && response.result === "SUCCESS") {
+        onProfileUpdate?.("refresh");
+        setSelectedImage(null);
+        setPreviewUrl("");
 
-      message.success("프로필이 성공적으로 업데이트되었습니다.");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+
+        message.success("프로필 이미지가 성공적으로 업데이트되었습니다.");
+      } else {
+        throw new Error("업데이트 응답이 올바르지 않습니다.");
+      }
     } catch (error) {
       console.error("프로필 업데이트 오류:", error);
+      message.error("프로필 업데이트에 실패했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -85,19 +226,17 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
   return (
     <div className="pretendard relative sm:top-3 md:top-4">
-      <div className="flex w-full flex-col justify-center gap-8 pl-6">
+      <div className="relative flex w-full flex-col gap-6 px-6 md:flex-row md:items-center md:gap-0">
         {/* 사용자 프로필 */}
-        <div className="relative flex items-center">
+        <div className="flex items-center md:ml-4 md:justify-center">
           <div className="relative">
             <img
-              src={
-                previewUrl ||
-                currentProfileImage ||
-                "https://popco-bucket.s3.ap-northeast-2.amazonaws.com/5ce940cd-4cd0-442b-afb0-077054a2af1f_popco.png"
-              }
+              src={getDisplayImageUrl()}
               alt="사용자프로필"
               className="h-[45px] w-[45px] cursor-pointer overflow-hidden rounded-full object-cover"
               onClick={() => fileInputRef.current?.click()}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
             />
             {/* 이미지 변경 아이콘 */}
             <div
@@ -120,27 +259,70 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
             </div>
           </div>
           <div className="flex flex-col pl-5">
-            <span className="pretendard-bold text-lg">{nickname}</span>
+            {isEditingNickname ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={newNickname}
+                  onChange={(e) => setNewNickname(e.target.value)}
+                  onKeyDown={handleNicknameKeyPress}
+                  className="pretendard-bold border-b border-gray-300 bg-transparent px-1 py-1 text-lg outline-none focus:border-black"
+                  placeholder="닉네임을 입력하세요"
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveNickname}
+                  disabled={isLoading}
+                  className="rounded bg-black px-2 py-1 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+                >
+                  저장
+                </button>
+                <button
+                  onClick={handleCancelEditNickname}
+                  disabled={isLoading}
+                  className="rounded bg-gray-500 px-2 py-1 text-sm text-white hover:bg-gray-600 disabled:opacity-50"
+                >
+                  취소
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="pretendard-bold text-lg">{nickname}</span>
+                <button
+                  onClick={handleStartEditNickname}
+                  className="text-sm text-gray-500 hover:text-black"
+                  title="닉네임 수정"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
             <span className="text-base">{email}</span>
           </div>
+        </div>
 
-          {/* 선택된 이미지가 있을 때 업데이트 버튼 표시 */}
-          {selectedImage && (
-            <button
-              onClick={handleUpdateProfile}
-              disabled={isLoading}
-              className="ml-4 rounded-lg bg-black px-4 py-2 text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLoading ? "업데이트 중..." : "프로필 변경"}
-            </button>
-          )}
+        {/* 중간선 */}
+        <div className="hidden justify-center md:absolute md:left-1/2 md:top-1/2 md:inline-block md:-translate-x-1/2 md:-translate-y-1/2">
+          <div className="h-px w-32 bg-gray-300 md:h-14 md:w-px" />
         </div>
 
         {/* 페르소나 정보 */}
-        <div className="flex items-center">
+        <div className="flex items-center md:absolute md:left-1/2 md:top-1/2 md:ml-8 md:-translate-y-1/2 md:justify-center">
           <div>
             <img
-              src="/images/mypage/testProfileImg.png"
+              src={personaImageUrl || DEFAULT_PROFILE_IMAGE}
               alt="페르소나사진"
               className="h-[45px] w-[45px] overflow-hidden rounded-xl object-cover"
             />
@@ -150,6 +332,26 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
             <span className="text-base">{currentPersona}</span>
           </div>
         </div>
+
+        {/* 선택된 이미지가 있을 때 업데이트/취소 버튼 표시 */}
+        {selectedImage && (
+          <div className="flex justify-center gap-2 md:absolute md:bottom-4 md:left-1/2 md:-translate-x-1/2">
+            <button
+              onClick={handleUpdateProfile}
+              disabled={isLoading}
+              className="rounded-lg bg-black px-4 py-2 text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoading ? "업데이트 중..." : "프로필 변경"}
+            </button>
+            <button
+              onClick={handleCancelPreview}
+              disabled={isLoading}
+              className="rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              취소
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 파일 입력 (숨김) */}

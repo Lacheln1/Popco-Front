@@ -10,7 +10,7 @@ const HeroReview = () => {
   const { data = [], isLoading, isError } = useWeeklyReview();
 
   useEffect(() => {
-    if (!data || data.length === 0) return;
+    if (!data || data?.length === 0) return;
 
     wrapperRefs.current.forEach((wrapper, index) => {
       const section = sectionRefs.current[index];
@@ -94,14 +94,14 @@ const HeroReview = () => {
       )}
 
       {/* 데이터는 왔지만 없음 */}
-      {!isLoading && !isError && data.length === 0 && (
+      {!isLoading && !isError && data?.length === 0 && (
         <div className="py-10 text-center text-white">
           이번 주 리뷰 데이터가 아직 없습니다.
         </div>
       )}
 
       {/* 정상 렌더링 */}
-      {!isLoading && !isError && data.length > 0 && (
+      {!isLoading && !isError && data?.length > 0 && (
         <>
           {renderCardRow(0, topRowData)}
           {renderCardRow(1, bottomRowData)}

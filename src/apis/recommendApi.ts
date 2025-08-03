@@ -3,22 +3,26 @@ import recommendInstance from "./recommendInstance";
 import {
   ContentBasedItem,
   ContentBasedResponse,
+  ContentFeedbackItem,
+  ContentFeedbackResponse,
   PopcorithmResponse,
   RecommendationItem,
 } from "@/types/Recommend.types";
 
+// --- API 요청(Request)을 위한 타입 정의 ---
 interface FeedbackItem {
   content_id: number;
   content_type: string;
 }
 
 interface InitialAnswers {
-  [key: string]: string; // 예: { "1": "3", "2": "1" } (질문ID: 답변ID)
+  [key: string]: string;
 }
 
 interface OnboardingRequest {
+  user_id: number; // 추가: user_id도 포함
   feedback_items: FeedbackItem[];
-  reaction_type: "좋아요"; // 선호도 조사에서는 '좋아요'로 고정
+  reaction_type: "좋아요";
   initial_answers: InitialAnswers;
 }
 
@@ -49,17 +53,70 @@ export const getOnboardingPersona = async (
   accessToken: string,
 ): Promise<OnboardingResponse> => {
   try {
-    const response = await axios.post<{ data: OnboardingResponse }>(
-      "/api/client/recommend/persona/onboard",
+    console.log("🔍 온보딩 요청 디버그:", {
+      url: "/client/recommends/personas/onboard",
+      params,
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const response = await recommendInstance.post<OnboardingResponse>(
+      "/recommends/personas/onboard",
       params,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       },
     );
-    return response.data.data;
+
+    console.log("✅ 온보딩 응답:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ 페르소나 온보딩 실패 상세:", {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      baseURL: error.config?.baseURL,
+      headers: error.config?.headers,
+    });
+    throw error;
+  }
+};
+
+export const getOnboardingPersonaAlternative = async (
+  params: OnboardingRequest,
+  accessToken: string,
+): Promise<OnboardingResponse> => {
+  try {
+    // 환경변수에서 API Base URL을 가져옵니다
+    const baseURL =
+      import.meta.env.VITE_API_BASE_URL ||
+      process.env.REACT_APP_API_BASE_URL ||
+      "http://localhost:8080";
+
+    console.log("🔍 온보딩 요청 (대안) 디버그:", {
+      baseURL,
+      url: `${baseURL}/api/client/recommends/personas/onboard`,
+      params,
+    });
+
+    const response = await axios.post<OnboardingResponse>(
+      `${baseURL}/api/client/recommends/personas/onboard`,
+      params,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      },
+    );
+
+    return response.data;
   } catch (error) {
     console.error("페르소나 온보딩 실패:", error);
     throw error;
@@ -111,5 +168,39 @@ export const fetchBasedContent = async (
   } catch (error) {
     console.error("fetchBasedContent 실패:", error);
     throw new Error("연관 작품을 불러오는 데 실패했습니다.");
+  }
+};
+
+// 좋아요 싫어요 버튼 반영
+export const fetchLikedFeedback = async (
+  user_id: number,
+  content_id: number,
+  content_type: string,
+  reaction_type: string,
+  score?: number | null,
+  token?: string,
+): Promise<ContentFeedbackItem[]> => {
+  try {
+    const endpoint = `/recommends/personas/feedback`;
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const body = {
+      user_id,
+      content_id,
+      content_type,
+      reaction_type,
+      ...(score != null ? { score } : {}),
+    };
+    const { data } = await recommendInstance.post<ContentFeedbackResponse>(
+      endpoint,
+      body,
+      { headers },
+    );
+    return data.recommendations;
+  } catch (error) {
+    console.error("fetchLikedFeedback 실패:", error);
+    throw new Error("좋아요 반영 실패");
   }
 };

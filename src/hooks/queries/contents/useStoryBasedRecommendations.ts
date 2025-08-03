@@ -11,8 +11,9 @@ export const useStoryBasedRecommendations = (
   return useQuery<ContentBasedItem[]>({
     queryKey: ["storyBasedRecommendations", userId, type],
     queryFn: () => fetchBasedContent(userId, type, token),
-    staleTime: 1000 * 60 * 60 * 12,
-    gcTime: 1000 * 60 * 60 * 13,
+    staleTime: 0, // 항상 stale 처리
+    refetchOnMount: true, // 컴포넌트가 다시 마운트될 때 refetch
+    refetchOnWindowFocus: false,
     retry: 1,
   });
 };

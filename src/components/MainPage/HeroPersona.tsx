@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
@@ -9,6 +9,9 @@ import { useHeroPersona } from "@/hooks/queries/contents/useHeroPersona";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import LoginBlur from "../common/LoginBlur";
+import { PERSONA_IMAGES } from "@/constants/persona";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
+import { ReactionType } from "@/types/Contents.types";
 
 interface Props {
   accessToken: string;
@@ -30,6 +33,28 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
   const recommendData = data?.recommendations;
   const persona = data?.main_persona ?? "나와 닮은 페르소나";
 
+  const contentList = useMemo(
+    () =>
+      recommendData?.map((item) => ({
+        id: item.contentId,
+        reaction: "NEUTRAL" as ReactionType,
+      })) ?? [],
+    [recommendData],
+  );
+
+  const { reactionMap, handleReaction } = useContentReaction({
+    userId,
+    accessToken,
+    contentList,
+  });
+
+  useEffect(() => {
+    if (swiperInstance) {
+      setIsBeginning(swiperInstance.isBeginning);
+      setIsEnd(swiperInstance.isEnd);
+    }
+  }, [swiperInstance]);
+
   if (isLoading) {
     return (
       <div className="py-20 text-center text-white">
@@ -37,6 +62,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
       </div>
     );
   }
+
   if (isError) {
     return (
       <div className="py-20 text-center text-red-600">
@@ -44,6 +70,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
       </div>
     );
   }
+
   if (isSuccess && (!recommendData || recommendData.length === 0)) {
     return (
       <div className="py-20 text-center text-gray-400">
@@ -68,8 +95,8 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
       <div className="relative flex items-center">
         <img
           className="absolute left-0 w-24 translate-x-0 md:w-48"
-          src="/images/persona/무비셜록-아기.svg"
-          alt="아기 무비셜록"
+          src={PERSONA_IMAGES[persona] ?? PERSONA_IMAGES["무비셜록"]}
+          alt={persona}
         />
         <h3 className="gmarket ml-20 flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:ml-44 md:text-3xl">
           <span>
@@ -78,6 +105,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
           많이 찾은 작품
         </h3>
       </div>
+
       <section>
         <div className="mb-4 flex justify-end">
           <SwiperNavigation
@@ -86,6 +114,7 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
             isEnd={isEnd}
           />
         </div>
+
         {!accessToken ? (
           <LoginBlur
             text="나의 영화 취향 캐릭터가 궁금하다면 ?"
@@ -112,19 +141,23 @@ const HeroPersona = ({ accessToken, userId }: Props) => {
               },
             }}
           >
-            {recommendData?.map(
-              ({ contentId, title, poster_path }: PersonaRecommendation) => (
-                <SwiperSlide key={contentId} className="flex justify-center">
-                  <Poster
-                    title={title}
-                    posterUrl={`${TMDB_IMAGE_BASE_URL}${poster_path}`}
-                    id={contentId}
-                    likeState="NEUTRAL"
-                    onLikeChange={() => {}}
-                  />
-                </SwiperSlide>
-              ),
-            )}
+            {recommendData?.map((content: PersonaRecommendation) => (
+              <SwiperSlide
+                key={content.contentId}
+                className="flex justify-center"
+              >
+                <Poster
+                  title={content.title}
+                  posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                  id={content.contentId}
+                  contentType={content.type}
+                  likeState={reactionMap[content.contentId]}
+                  onLikeChange={(newState) =>
+                    handleReaction(content.contentId, newState, content.type)
+                  }
+                />
+              </SwiperSlide>
+            ))}
           </Swiper>
         )}
       </section>

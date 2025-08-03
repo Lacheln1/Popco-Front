@@ -1,35 +1,39 @@
-import { useState, useCallback, useMemo } from "react";
+import { useCallback } from "react";
+import { App } from "antd";
 import HotCollection from "../common/HotCollection";
-import { useWeeklyCollections } from "@/hooks/queries/collections/useWeeklyCollections";
-import { HotCollections } from "@/types/Collection.types";
+import {
+  useFetchCollectionsWeekly,
+  useToggleMarkCollection,
+} from "@/hooks/useCollections";
+import useAuthCheck from "@/hooks/useAuthCheck";
+import { CollectionProps } from "@/types/Collection.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { useNavigate } from "react-router-dom";
 
 const HeroCollection = () => {
-  const { data, isLoading, isError } = useWeeklyCollections(3);
+  const navigate = useNavigate();
+  const { message } = App.useApp();
+  const { user, accessToken } = useAuthCheck();
+  const { data, isLoading, isError } = useFetchCollectionsWeekly(
+    3,
+    accessToken,
+  );
+  const { mutate: toggleMark } = useToggleMarkCollection();
 
-  // 변환된 데이터를 캐싱 (메모이제이션)
-  const hotCollections: HotCollections[] = useMemo(() => {
-    if (!data) return [];
-    return data.map((collection) => ({
-      collectionId: collection.collectionId,
-      title: collection.title,
-      posters: collection.contentPosters
-        .slice(-4)
-        .reverse()
-        .map((c) => `${TMDB_IMAGE_BASE_URL}${c.posterPath}`),
-      href: `/collection/${collection.collectionId}`,
-      saveCount: collection.saveCount,
-    }));
-  }, [data]);
-
-  const [savedMap, setSavedMap] = useState<Record<number, boolean>>({});
-
-  const handleSaveToggle = useCallback((collectionId: number) => {
-    setSavedMap((prev) => ({
-      ...prev,
-      [collectionId]: !prev[collectionId],
-    }));
-  }, []);
+  const handleSaveToggle = useCallback(
+    (collectionId: number) => {
+      if (!user.isLoggedIn) {
+        message.warning("로그인이 필요한 기능입니다.");
+        navigate("/login");
+        return;
+      }
+      toggleMark({
+        collectionId: String(collectionId),
+        accessToken: accessToken!,
+      });
+    },
+    [user.isLoggedIn, accessToken, toggleMark, navigate, message],
+  );
 
   return (
     <section>
@@ -48,12 +52,15 @@ const HeroCollection = () => {
             <br />
             POPCO에서 당신만의 OTT 컬렉션을 만들어 공유해보세요.
           </div>
-          <button className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block">
+          <button
+            onClick={() => navigate("/collections")}
+            className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block"
+          >
             View more +
           </button>
         </div>
 
-        <div className="flex gap-5 px-4 pb-5 pt-12 md:p-0 lg:gap-12">
+        <div className="flex gap-3 px-4 pb-5 pt-12 sm:gap-6 md:gap-8 md:p-0 lg:gap-12">
           {isLoading ? (
             <div className="text-base text-gray-400">Loading...</div>
           ) : isError ? (
@@ -61,22 +68,32 @@ const HeroCollection = () => {
               데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
             </div>
           ) : (
-            hotCollections.map((collection, index) => (
+            data?.map((collection: CollectionProps, index: number) => (
               <div key={collection.collectionId} className="relative">
                 <span className="absolute -left-4 -top-6 z-10 font-mono text-[50px] font-bold text-transparent text-white drop-shadow-lg [-webkit-text-stroke:3px_#FFD751] lg:text-[70px]">
                   {index + 1}
                 </span>
                 <HotCollection
-                  {...collection}
-                  isSaved={savedMap[collection.collectionId] ?? false}
-                  onSaveToggle={handleSaveToggle}
+                  collectionId={collection.collectionId}
+                  title={collection.title}
+                  posters={collection.contentPosters
+                    .slice(0, 4)
+                    .map((p) => `${TMDB_IMAGE_BASE_URL}${p.posterPath}`)}
+                  saveCount={collection.saveCount}
+                  isSaved={collection.isMarked}
+                  href={`/collections/${collection.collectionId}`}
+                  onSaveToggle={() => handleSaveToggle(collection.collectionId)}
+                  size="small"
                 />
               </div>
             ))
           )}
         </div>
 
-        <button className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden">
+        <button
+          onClick={() => navigate("/collections")}
+          className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden"
+        >
           View more +
         </button>
       </div>
