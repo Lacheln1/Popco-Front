@@ -58,7 +58,7 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
   });
   const { mutate: toggleMark } = useToggleMarkCollection();
 
-  const collections = useMemo(() => {
+  const collections: NewCollectionProps[] = useMemo(() => {
     if (!apiData?.collections) return [];
     return apiData.collections.map((collection: CollectionProps) => ({
       collectionId: collection.collectionId,
@@ -71,6 +71,7 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
       totalCount: collection.contentCount,
       isSaved: collection.isMarked,
       href: `/collections/${collection.collectionId}`,
+      onSaveToggle: handleSaveToggle,
     }));
   }, [apiData]);
 

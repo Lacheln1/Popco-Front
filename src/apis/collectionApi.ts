@@ -8,7 +8,7 @@ const API_URL = "/api/client";
 export const fetchCollections = async (
   pageNumber: number = 0,
   pageSize: number = 10,
-  accessToken?: string | null, // accessToken 파라미터 추가
+  accessToken?: string | null,
 ): Promise<CollectionProps[]> => {
   const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
   const { data } = await axiosInstance.get<CollectionResponse>("/collections", {
@@ -16,7 +16,7 @@ export const fetchCollections = async (
       pageNumber,
       pageSize,
     },
-    headers, // 헤더 추가
+    headers,
   });
   return data.data;
 };
@@ -260,8 +260,8 @@ export const fetchMyCollections = async (
   const { data } = await axiosInstance.get(`/collections/my`, {
     headers: { Authorization: `Bearer ${accessToken}` },
     params: {
-      pageNumber: 0,
-      pageSize: 100, // 모달에 표시할 최대 컬렉션 개수
+      pageNumber: page,
+      pageSize: pageSize,
     },
   });
   return data.data;
