@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Modal, Input, Button, Empty } from "antd";
+import { Modal, Input, Empty } from "antd";
 import { IoAdd, IoCheckmark, IoSearch } from "react-icons/io5";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import Spinner from "@/components/common/Spinner";

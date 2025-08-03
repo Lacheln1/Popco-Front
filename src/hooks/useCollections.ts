@@ -186,6 +186,15 @@ export const useCreateCollection = () => {
   const navigate = useNavigate();
   const { message } = App.useApp();
 
+  const { mutate: addContent } = useMutation({
+    mutationFn: addContentToCollection,
+    onSuccess: (_data, _variables) => {},
+    onError: (error, variables) => {
+      console.error(`콘텐츠(ID: ${variables.contentId}) 추가 실패:`, error);
+      message.error("일부 작품 추가에 실패했습니다.");
+    },
+  });
+
   return useMutation({
     mutationFn: async (variables: {
       title: string;
@@ -195,7 +204,6 @@ export const useCreateCollection = () => {
     }) => {
       const { title, description, contents, accessToken } = variables;
 
-      // 1단계: 컬렉션 껍데기 생성
       const collectionResponse = await createCollection({
         title,
         description,
@@ -213,7 +221,6 @@ export const useCreateCollection = () => {
 
       const newCollectionId = collectionResponse.data.collectionId;
 
-      // 2단계: 콘텐츠가 있으면 배치(Batch) API로 한 번에 추가
       if (contents && contents.length > 0) {
         const batchContents = contents.map((content) => ({
           contentId: content.id,
@@ -227,7 +234,6 @@ export const useCreateCollection = () => {
         });
       }
 
-      // 성공 시, onSuccess 콜백에 새로 만들어진 ID를 전달
       return { collectionId: newCollectionId };
     },
 
@@ -247,7 +253,7 @@ export const useCreateCollection = () => {
 };
 
 // 컬렉션 콘텐츠 추가/제거를 위한 훅
-export const useManageCollectionContents = (collectionId: string) => {
+export const useManageCollectionContents = () => {
   const queryClient = useQueryClient();
   const { message } = App.useApp();
 

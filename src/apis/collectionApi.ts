@@ -252,7 +252,11 @@ export const fetchRelatedCollections = async (params: {
 };
 
 // 내 컬렉션 목록 조회 (GET /collections/my)
-export const fetchMyCollections = async (accessToken: string) => {
+export const fetchMyCollections = async (
+  accessToken: string,
+  page: number,
+  pageSize: number,
+) => {
   const { data } = await axiosInstance.get(`/collections/my`, {
     headers: { Authorization: `Bearer ${accessToken}` },
     params: {

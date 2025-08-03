@@ -277,7 +277,7 @@ export default function DetailPage() {
     );
   }
 
-  if (error || !contents) {
+  if (error || !contents || !contentId || !contentType) {
     return (
       <div className="flex h-screen items-center justify-center">
         {error || "데이터를 찾을 수 없습니다."}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { App, Spin, Avatar, Input, ConfigProvider } from "antd";
+import { App, Spin, Avatar, Input } from "antd";
 
 // Layout 및 공용 컴포넌트
 import PageLayout from "@/layout/PageLayout";
@@ -27,7 +27,6 @@ import {
 } from "@/hooks/useCollections";
 
 // Types & Constants
-import { CollectionProps } from "@/types/Collection.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 // SearchContentModal에서 추가할 콘텐츠의 타입

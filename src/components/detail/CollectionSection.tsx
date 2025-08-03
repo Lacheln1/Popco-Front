@@ -159,7 +159,7 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
           onUpdate={handleSlideChange}
           className="pb-2"
         >
-          {collections.map((collection) => (
+          {collections.map((collection: CollectionProps) => (
             <SwiperSlide key={collection.collectionId} className="!w-[350px]">
               <NewCollection
                 {...collection}
