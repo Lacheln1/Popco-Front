@@ -7,7 +7,7 @@ import EmptyLikeIcon from "@/assets/empty-like.png";
 import FullLikeIcon from "@/assets/full-like.png";
 import FullPopcornIcon from "@/assets/full-popcorn.svg";
 import HalfPopcornIcon from "@/assets/half-popcorn.svg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface ReviewData {
   movieTitle: string;
@@ -53,6 +53,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     isLiked,
     hasAlreadyReported,
   } = reviewData;
+  const location = useLocation();
+  const isMainPage = location.pathname === "/";
 
   const [isSpoilerRevealed, setIsSpoilerRevealed] = useState(false);
   const truncatedTitle =
@@ -111,7 +113,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
     );
   }
 
-  const cardMenu = (
+  const cardMenu = isMainPage ? null : (
     <div
       className="cursor-default"
       onClick={(e: React.MouseEvent) => e.stopPropagation()}

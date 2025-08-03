@@ -14,6 +14,7 @@ import { ContentCategory, ReactionType } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useNavigate } from "react-router-dom";
 import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
+import Spinner from "../common/Spinner";
 
 interface HeroRankingProps {
   onTop1Change: (type: ContentCategory, title: string) => void;
@@ -75,10 +76,6 @@ const HeroRanking = ({
     }
   }, [data, selected, onTop1Change]);
 
-  // 1등 / 나머지 등수
-  const first = data[0];
-  const contentsRank = data.slice(1);
-
   const contentList = useMemo(
     () =>
       data?.map((item) => ({
@@ -94,7 +91,11 @@ const HeroRanking = ({
     contentList,
   });
 
-  if (isLoading) return <div>Loading</div>;
+  if (isLoading || !data?.length) return <Spinner />;
+
+  // 1등 / 나머지 등수
+  const first = data[0];
+  const contentsRank = data.slice(1);
 
   if (!Array.isArray(data)) {
     console.error("HeroRanking Error", data);
