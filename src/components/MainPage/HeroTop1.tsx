@@ -105,7 +105,9 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
                   posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
                   id={content.content_id}
                   contentType={content.content_type}
-                  likeState={reactionMap[content.content_id]}
+                  likeState={
+                    content.user_reaction ?? reactionMap[content.content_id]
+                  }
                   onLikeChange={(newState) =>
                     handleReaction(
                       content.content_id,
