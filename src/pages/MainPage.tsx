@@ -22,7 +22,7 @@ const MainPage = () => {
         <SearchBar onSearch={() => {}} />
         <HeroRanking
           accessToken={accessToken ?? ""}
-          userId={user.userId}
+          userId={user?.userId}
           type={top1Type}
           onTop1Change={(type, title) => {
             setTop1Type(type);

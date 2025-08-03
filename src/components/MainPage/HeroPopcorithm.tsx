@@ -24,7 +24,7 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
   const [isEnd, setIsEnd] = useState(false);
 
   const HERO_POPCORITHM_LIMIT = 10;
-  const { data, isLoading, isError, isSuccess, isFetching } = usePopcorithm(
+  const { data, isError, isSuccess, isFetching } = usePopcorithm(
     userId,
     HERO_POPCORITHM_LIMIT,
     accessToken,

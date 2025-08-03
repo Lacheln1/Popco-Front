@@ -173,7 +173,7 @@ export const fetchBasedContent = async (
 
 // 좋아요 싫어요 버튼 반영
 export const fetchLikedFeedback = async (
-  user_id: number | null,
+  user_id: number,
   content_id: number,
   content_type: string,
   reaction_type: string,

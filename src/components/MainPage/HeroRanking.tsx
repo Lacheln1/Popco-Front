@@ -34,7 +34,7 @@ const HeroRanking = ({
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [selected, setSelected] = useState<ContentCategory>("all");
+  const [selected, setSelected] = useState<ContentCategory>(type);
   const navigate = useNavigate();
 
   const categoryMap = {
@@ -78,13 +78,12 @@ const HeroRanking = ({
   // 1등 / 나머지 등수
   const first = data[0];
   const contentsRank = data.slice(1);
-  if (isLoading) <div>Loading</div>;
 
   const contentList = useMemo(
     () =>
       data?.map((item) => ({
         id: item.contentId,
-        reaction: item.userReaction as ReactionType,
+        reaction: (item.userReaction as ReactionType) ?? "NEUTRAL",
       })) ?? [],
     [data],
   );
@@ -94,6 +93,8 @@ const HeroRanking = ({
     accessToken,
     contentList,
   });
+
+  if (isLoading) return <div>Loading</div>;
 
   if (!Array.isArray(data)) {
     console.error("HeroRanking Error", data);
