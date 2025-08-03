@@ -14,12 +14,26 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
   averageScore,
   maxScore,
 }) => {
+  // 최소값을 설정하여 0이어도 그래프가 보이도록 함
+  const minValue = 0.1;
+
+  // 실제 값이 0이면 minValue를 사용하고, 나머지 값도 조정
+  const getAdjustedValues = (score: number) => {
+    if (score === 0) {
+      return [minValue, maxScore - minValue];
+    }
+    return [score, maxScore - score];
+  };
+
+  const customerValues = getAdjustedValues(customerScore);
+  const averageValues = getAdjustedValues(averageScore);
+
   const data = {
     labels: ["고객님", "액션 헌터 평균"],
     datasets: [
       {
         label: "고객님",
-        data: [customerScore, maxScore - customerScore], // 2.5점, 나머지 2.5점
+        data: customerValues,
         backgroundColor: ["#3BA8F0", "#E5E5E5"],
         borderWidth: 0,
         cutout: "30%",
@@ -27,7 +41,7 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
       },
       {
         label: "액션 헌터 평균",
-        data: [averageScore, maxScore - averageScore], // 3.8점, 나머지 1.2점
+        data: averageValues,
         backgroundColor: ["#FD6B94", "#E5E5E5"],
         borderWidth: 0,
         cutout: "30%",
@@ -44,16 +58,30 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
         display: false, // 범례 숨김
       },
       tooltip: {
-        enabled: false, // 툴팁도 숨김 (선택사항)
+        enabled: true, // 툴팁도 숨김
       },
     },
   };
 
+  // 둘 다 0인 경우 체크
+  const bothScoresZero = customerScore === 0 && averageScore === 0;
+
   return (
     <div className="relative h-[120px] w-[120px] md:h-[200px] md:w-[200px]">
       <div className="relative h-full">
-        <Doughnut data={data} options={options} />
-        {/* 중앙에 점수 표시 */}
+        {bothScoresZero ? (
+          // 데이터가 없을 때 표시할 내용
+          <div className="flex h-[120px] w-[120px] items-center justify-center rounded-full border-2 border-gray-200 bg-gray-50 md:h-[200px] md:w-[200px]">
+            <span className="text-xs text-gray-500 md:text-sm">
+              데이터 없음
+            </span>
+          </div>
+        ) : (
+          <>
+            <Doughnut data={data} options={options} />
+            {/* 중앙에 점수 표시 */}
+          </>
+        )}
       </div>
     </div>
   );

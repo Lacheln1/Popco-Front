@@ -8,6 +8,7 @@ import {
 import axiosInstance from "./axiosInstance";
 import axios from "axios";
 
+const RECOMMEND_URL = import.meta.env.VITE_RECOMMEND_URL;
 const API_URL = "/api/client";
 interface LikeContentsResponse {
   code: number;
@@ -46,6 +47,25 @@ interface WishlistResponse {
   result: string;
   message: string;
   data: WishlistItem[];
+}
+
+interface RecommendationItem {
+  contentId: number;
+  title: string;
+  genres: string[];
+  type: string;
+  poster_path: string;
+  predicted_rating: number;
+  persona_genre_match: boolean | null;
+}
+
+// API 응답 타입
+interface RecommendationResponse {
+  message: string;
+  recommendations: RecommendationItem[];
+  main_persona: string;
+  sub_persona: string;
+  all_personas_scores: Record<string, number>;
 }
 
 // 주간 랭킹
@@ -127,4 +147,44 @@ export const getContentsDetail = async (
 ): Promise<ContentsDetail> => {
   const { data } = await axiosInstance.get(`/contents/ids/${id}/types/${type}`);
   return data.data;
+};
+
+// 영화 추천 가져오기
+export const getMovieRecommendations = async (
+  userId: number,
+): Promise<RecommendationResponse> => {
+  try {
+    const response = await axios.get<RecommendationResponse>(
+      `${RECOMMEND_URL}/recommends/personas/users/${userId}/recommendations`,
+      {
+        params: {
+          content_type: "movie",
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("영화 추천 데이터 가져오기 실패:", error);
+    throw error;
+  }
+};
+
+// TV 시리즈 추천 가져오기
+export const getTvRecommendations = async (
+  userId: number,
+): Promise<RecommendationResponse> => {
+  try {
+    const response = await axios.get<RecommendationResponse>(
+      `${RECOMMEND_URL}/recommends/personas/users/${userId}/recommendations`,
+      {
+        params: {
+          content_type: "tv",
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("TV 시리즈 추천 데이터 가져오기 실패:", error);
+    throw error;
+  }
 };
