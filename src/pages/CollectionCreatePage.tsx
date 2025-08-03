@@ -34,7 +34,7 @@ const CollectionCreatePage: React.FC = () => {
 
   // --- 로그인 가드 ---
   useEffect(() => {
-    if (!isAuthLoading && !user.isLoggedIn) {
+    if (!isAuthLoading && user.isLoggedIn === false) {
       message.error("로그인이 필요한 페이지입니다.");
       navigate("/login");
     }

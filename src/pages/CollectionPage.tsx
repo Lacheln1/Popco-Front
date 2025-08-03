@@ -4,6 +4,7 @@ import { Swiper as SwiperType } from "swiper";
 import { Navigation } from "swiper/modules";
 import { useInView } from "react-intersection-observer";
 import { useNavigate } from "react-router-dom";
+import { App } from "antd";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -14,7 +15,7 @@ import SectionHeader from "@/components/common/SectionHeader";
 import HotCollection from "@/components/common/HotCollection";
 import NewCollection from "@/components/common/NewCollection";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
-import Spinner from "@/components/common/Spinner"; 
+import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import {
   useFetchCollections,
@@ -27,6 +28,7 @@ import { useSwiperResize } from "@/hooks/useSwiperResize";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 const CollectionPage: React.FC = () => {
+  const { message } = App.useApp();
   const { user, accessToken } = useAuthCheck();
   const navigate = useNavigate();
   // --- Swiper 상태 관리 ---
@@ -66,8 +68,7 @@ const CollectionPage: React.FC = () => {
   const handleSaveToggle = useCallback(
     (collectionId: number) => {
       if (!user.isLoggedIn) {
-        // TODO: 로그인 페이지로 이동시키거나 로그인 모달을 띄우는 로직 추가
-        alert("로그인이 필요한 기능입니다.");
+        message.warning("로그인이 필요한 기능입니다.");
         return;
       }
       toggleMark({
@@ -176,7 +177,7 @@ const CollectionPage: React.FC = () => {
         {/* 무한 스크롤 감지를 위한 요소 */}
         <div ref={ref} style={{ height: "50px" }} />
 
-       {/* 로딩 텍스트를 Spinner 컴포넌트로 교체 */}
+        {/* 로딩 텍스트를 Spinner 컴포넌트로 교체 */}
         {isFetchingNextPage && <Spinner />}
       </section>
     </PageLayout>

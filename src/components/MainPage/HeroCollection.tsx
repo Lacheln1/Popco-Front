@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { App } from "antd";
 import HotCollection from "../common/HotCollection";
 import {
   useFetchCollectionsWeekly,
@@ -11,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 const HeroCollection = () => {
   const navigate = useNavigate();
+  const { message } = App.useApp();
   const { user, accessToken } = useAuthCheck();
   const { data, isLoading, isError } = useFetchCollectionsWeekly(
     3,
@@ -21,7 +23,7 @@ const HeroCollection = () => {
   const handleSaveToggle = useCallback(
     (collectionId: number) => {
       if (!user.isLoggedIn) {
-        alert("로그인이 필요한 기능입니다.");
+        message.warning("로그인이 필요한 기능입니다.");
         navigate("/login");
         return;
       }
@@ -30,7 +32,7 @@ const HeroCollection = () => {
         accessToken: accessToken!,
       });
     },
-    [user.isLoggedIn, accessToken, toggleMark, navigate],
+    [user.isLoggedIn, accessToken, toggleMark, navigate, message],
   );
 
   return (
