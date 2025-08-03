@@ -28,9 +28,9 @@ interface AutoResult {
   data?: SearchResult;
 }
 
-interface SearchBarProps {
+interface SearchBarProps<T = any> {
   placeholder?: string;
-  onSearch: (value: string, results: SearchResult[]) => void;
+  onSearch: (value: string, results: T[]) => void;
   onSelect?: (value: string, option: AutoResult) => void;
   showSuggestions?: boolean;
   debounceTime?: number;

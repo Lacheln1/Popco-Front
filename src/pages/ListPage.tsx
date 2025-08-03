@@ -11,6 +11,10 @@ import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const ListPage = () => {
   const [sort, setSort] = useState("recent");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchResults, setSearchResults] = useState<AllContentItem[] | null>(
+    null,
+  );
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useAllContents({ pageSize: 30, sort });
@@ -40,9 +44,19 @@ const ListPage = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage, sort]);
 
+  const handleSearch = (keyword: string, results: AllContentItem[]) => {
+    setSearchKeyword(keyword);
+    setSearchResults(results.length > 0 ? results : []);
+  };
+
   const handleChange = (value: string) => {
     setSort(value);
   };
+
+  const displayContents =
+    searchKeyword.trim() && searchResults !== null
+      ? searchResults
+      : allContents;
 
   return (
     <PageLayout
@@ -54,7 +68,7 @@ const ListPage = () => {
       }
       floatingBoxContent={
         <>
-          <SearchBar onSearch={() => {}} />
+          <SearchBar onSearch={handleSearch} />
           <FilterSection />
         </>
       }
@@ -71,21 +85,23 @@ const ListPage = () => {
         />
       </div>
 
-<div className="flex flex-wrap place-content-center gap-9">
-  {allContents.map((content) => ( 
-    <Poster
-      key={content.id}
-      id={content.id}
-      title={content.title}
-      contentType={content.type} 
-      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
-      likeState="NEUTRAL"
-      onLikeChange={() => {}}
-    />
-  ))}
-</div>
+      <div className="flex flex-wrap place-content-center gap-9">
+        {displayContents.map((content) => (
+          <Poster
+            key={content.id}
+            id={content.id}
+            title={content.title}
+            contentType={content.type}
+            posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+            likeState="NEUTRAL"
+            onLikeChange={() => {}}
+          />
+        ))}
+      </div>
 
-      {hasNextPage && <div ref={observerRef} className="h-10" />}
+      {hasNextPage && searchResults === null && (
+        <div ref={observerRef} className="h-10" />
+      )}
     </PageLayout>
   );
 };

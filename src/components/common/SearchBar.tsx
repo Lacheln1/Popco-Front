@@ -1,21 +1,15 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  KeyboardEvent,
-  ChangeEvent,
-} from "react";
+import { useEffect, useState, useRef, KeyboardEvent, ChangeEvent } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
 import { AutoResult, SearchBarProps } from "@/types/Search.types";
 
-const SearchBar: React.FC<SearchBarProps> = ({
+const SearchBar = <T,>({
   placeholder = "검색어를 입력 해 주세요.",
   onSearch,
   onSelect,
   showSuggestions = true,
   className,
-}) => {
+}: SearchBarProps<T>) => {
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState<AutoResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -35,10 +29,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
 
     const options: AutoResult[] = results.map((result) => ({
-      value: result.title,
+      value: (result as any).title,
       label: (
         <div className="py-1">
-          <div className="mb-[2px] font-bold">{result.title}</div>
+          <div className="mb-[2px] font-bold">{(result as any).title}</div>
         </div>
       ),
       data: result,
@@ -47,7 +41,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setSuggestions(options);
     setShowDropdown(options.length > 0);
 
-    onSearch(searchValue, results);
+    onSearch(searchValue, results as T[]);
   }, [results, searchValue, showSuggestions, onSearch]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +58,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      onSearch(searchValue, results);
+      onSearch(searchValue, results as unknown as T[]);
       setShowDropdown(false);
     } else if (e.key === "Escape") {
       setShowDropdown(false);
@@ -105,7 +99,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             className={`h-12 flex-1 border-none bg-transparent px-6 text-base outline-none ${className}`}
           />
           <button
-            onClick={() => onSearch(searchValue, results)}
+            onClick={() => onSearch(searchValue, results as unknown as T[])}
             disabled={loading}
             className="mr-3 flex h-10 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
           >
