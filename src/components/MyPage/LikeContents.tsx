@@ -5,6 +5,7 @@ import "swiper/swiper-bundle.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { fetchLikeContents } from "@/apis/contentsApi";
+import Spinner from "./../common/Spinner";
 
 interface LikeContent {
   contentId: number;
@@ -92,6 +93,7 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
         {/* 로딩 상태 */}
         {loading && (
           <div className="flex h-32 items-center justify-center text-gray-500">
+            <Spinner />
             좋아요한 컨텐츠를 불러오는 중...
           </div>
         )}

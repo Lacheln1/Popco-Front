@@ -16,6 +16,7 @@ import LikeContents from "./LikeContents";
 import WantWatching from "./WantWatching";
 import MyPageChart from "./MyPageChart";
 import { App } from "antd";
+import Spinner from "../common/Spinner";
 
 interface Movie {
   date: string;
@@ -317,7 +318,7 @@ const PageContents: React.FC = () => {
                 {/* 로딩 중 */}
                 {loading && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
-                    리뷰를 불러오는 중...
+                    <Spinner /> 리뷰를 불러오는 중...
                   </div>
                 )}
 
@@ -398,6 +399,7 @@ const PageContents: React.FC = () => {
                 {/* 로딩 상태 (첫 로드) */}
                 {collectionsLoading && collections.length === 0 && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
+                    <Spinner />
                     컬렉션을 불러오는 중...
                   </div>
                 )}
@@ -489,6 +491,7 @@ const PageContents: React.FC = () => {
                 {/* 로딩 상태 (첫 로드) */}
                 {markedCollectionsLoading && markedCollections.length === 0 && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
+                    <Spinner />
                     저장한 컬렉션을 불러오는 중...
                   </div>
                 )}
