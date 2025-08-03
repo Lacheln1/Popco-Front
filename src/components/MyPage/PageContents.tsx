@@ -17,7 +17,6 @@ import WantWatching from "./WantWatching";
 import MyPageChart from "./MyPageChart";
 import { App } from "antd";
 import Spinner from "../common/Spinner";
-import { useNavigate } from "react-router-dom";
 
 interface Movie {
   date: string;
@@ -91,8 +90,6 @@ const PageContents: React.FC = () => {
   const tabTitles = ["Calendar", "Collection", "MY"];
 
   const { message } = App.useApp();
-
-  const navigate = useNavigate();
 
   // YYYY-MM 형식으로 변환하기
   const formatMonthForApi = (date: Date): string => {
@@ -391,15 +388,6 @@ const PageContents: React.FC = () => {
                   <h1 className="gmarket-bold py-2 text-base md:text-2xl">
                     내가 만든 컬렉션
                   </h1>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => navigate("/collections/create")}
-                      className="rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
-                    >
-                      컬렉션 만들기
-                    </button>
-                  </div>
                   {/* 네비게이션 버튼 */}
                   <SwiperNavigation
                     swiper={swiperInstance}
