@@ -1,15 +1,42 @@
-import React from "react";
-import { Modal, Input, Button } from "antd";
+import React, { useState, useMemo, useEffect } from "react";
+import { Modal, Input, Empty } from "antd";
 import { IoAdd, IoCheckmark, IoSearch } from "react-icons/io5";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import Spinner from "@/components/common/Spinner";
+import { searchContents } from "@/apis/collectionApi";
 
-// 타입 정의
+// --- 디바운스 훅 ---
+// 지정된 시간(delay) 동안 입력 값의 변경이 없으면, 마지막 값을 반환합니다.
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    // 값이 변경되면 delay 이후에 debouncedValue를 업데이트하는 타이머를 설정합니다.
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    // 다음 effect가 실행되기 전에 이전 타이머를 정리(취소)합니다.
+    // 사용자가 계속 타이핑하면 타이머가 계속 리셋되어 API 호출을 막습니다.
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  return debouncedValue;
+}
+
+// ... (타입 정의는 기존과 동일)
+interface ApiContentItem {
+  contentId: number;
+  title: string;
+  posterPath: string | null;
+  contentType: string;
+}
 interface Content {
   id: number;
   title: string;
   posterUrl: string;
   type: string;
 }
-
 interface SearchContentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,14 +50,51 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
   onAddContent,
   existingContentIds = [],
 }) => {
-  const dummySearchResults: Content[] = Array.from({ length: 10 }, (_, i) => ({
-    id: 700 + i,
-    title: `검색된 영화 ${i + 1}`,
-    posterUrl: `https://picsum.photos/seed/s${i}/200/300`,
-    type: "movie",
-  }));
+  const [keyword, setKeyword] = useState("");
+  // --- 디바운스 훅 사용 ---
+  // 사용자가 입력한 keyword를 500ms(0.5초) 지연시켜 debouncedKeyword를 생성합니다.
+  const debouncedKeyword = useDebounce(keyword, 500);
 
-  // 아이콘 버튼 스타일
+  const [directResults, setDirectResults] = useState<ApiContentItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // --- debouncedKeyword가 바뀔 때마다 API를 호출 ---
+  useEffect(() => {
+    // 디바운싱된 검색어가 없으면 아무것도 하지 않음
+    if (!debouncedKeyword) {
+      setDirectResults([]);
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchDirectly = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await searchContents(debouncedKeyword);
+        setDirectResults(data?.content || []);
+      } catch (e: any) {
+        setError(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDirectly();
+  }, [debouncedKeyword]); // 이제 debouncedKeyword에 의존합니다.
+
+  const searchResults = useMemo(() => {
+    return directResults.map((item) => ({
+      id: item.contentId,
+      title: item.title,
+      posterUrl: item.posterPath
+        ? `${TMDB_IMAGE_BASE_URL}${item.posterPath}`
+        : "https://placehold.co/200x300?text=No+Image",
+      type: item.contentType,
+    }));
+  }, [directResults]);
+
   const primaryButtonClass =
     "flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-gray-700 transition-colors hover:bg-gray-300";
   const disabledButtonClass =
@@ -45,41 +109,63 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
       width={550}
     >
       <div className="flex flex-col gap-4 py-4">
-        <Input.Search
+        {/* Input.Search 대신 일반 Input 사용 */}
+        <Input
           placeholder="영화, 드라마 제목을 검색하세요"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
           size="large"
-          enterButton={<Button type="primary" icon={<IoSearch size={20} />} />}
+          prefix={<IoSearch className="text-gray-400" />}
+          allowClear
         />
         <div className="flex h-[400px] flex-col gap-3 overflow-y-auto pr-2">
-          {dummySearchResults.map((item) => {
-            const isAdded = existingContentIds.includes(item.id);
-
-            return (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-100"
-              >
-                <img
-                  src={item.posterUrl}
-                  alt={item.title}
-                  className="h-16 w-11 flex-shrink-0 rounded object-cover"
-                />
-                <span className="flex-1 font-semibold">{item.title}</span>
-
-                <button
-                  type="button"
-                  onClick={() => onAddContent(item)}
-                  className={isAdded ? disabledButtonClass : primaryButtonClass}
-                  disabled={isAdded}
-                  aria-label={
-                    isAdded ? `${item.title} 추가됨` : `${item.title} 추가`
-                  }
+          {isLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <Spinner />
+            </div>
+          ) : searchResults.length > 0 ? (
+            searchResults.map((item) => {
+              const isAdded = existingContentIds.includes(item.id);
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-100"
                 >
-                  {isAdded ? <IoCheckmark size={20} /> : <IoAdd size={20} />}
-                </button>
-              </div>
-            );
-          })}
+                  <img
+                    src={item.posterUrl}
+                    alt={item.title}
+                    className="h-16 w-11 flex-shrink-0 rounded bg-gray-200 object-cover"
+                  />
+                  <span className="flex-1 font-semibold">{item.title}</span>
+                  <button
+                    type="button"
+                    onClick={() => onAddContent(item)}
+                    className={
+                      isAdded ? disabledButtonClass : primaryButtonClass
+                    }
+                    disabled={isAdded}
+                    aria-label={
+                      isAdded ? `${item.title} 추가됨` : `${item.title} 추가`
+                    }
+                  >
+                    {isAdded ? <IoCheckmark size={20} /> : <IoAdd size={20} />}
+                  </button>
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <Empty
+                description={
+                  error
+                    ? "검색 중 오류가 발생했습니다."
+                    : debouncedKeyword
+                      ? "검색 결과가 없습니다."
+                      : "검색어를 입력해주세요."
+                }
+              />
+            </div>
+          )}
         </div>
       </div>
     </Modal>
