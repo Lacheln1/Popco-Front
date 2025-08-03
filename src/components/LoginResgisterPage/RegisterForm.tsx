@@ -31,45 +31,61 @@ const RegisterForm: React.FC = () => {
     resetCheckEmailValue();
   }, []);
 
+  // 이메일 형식 검증 함수
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // 비밀번호 형식 검증 함수 (4~6자 영문,숫자 혼합)
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,}$/;
+    return passwordRegex.test(password);
+  };
+
   // 로그인 버튼 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let hasError = false;
 
+    // 이메일 검증
     if (!email) {
       setEmailError("이메일을 입력해주세요.");
+      hasError = true;
+    } else if (!validateEmail(email)) {
+      setEmailError("올바른 이메일 형식을 입력해주세요.");
       hasError = true;
     } else {
       setEmailError("");
     }
 
+    // 비밀번호 검증
     if (!password) {
       setPasswordError("비밀번호를 입력해주세요.");
+      hasError = true;
+    } else if (!validatePassword(password)) {
+      setPasswordError("비밀번호는 4자 이상 영문, 숫자 혼합으로 입력해주세요.");
       hasError = true;
     } else {
       setPasswordError("");
     }
 
+    // 비밀번호 확인 검증
     if (!checkPassword) {
       setCheckPasswordError("비밀번호를 한번 더 입력해주세요.");
       hasError = true;
-    } else {
-      setCheckPasswordError("");
-    }
-
-    if (password != checkPassword) {
+    } else if (password !== checkPassword) {
       setCheckPasswordError("비밀번호가 일치하지 않습니다.");
       hasError = true;
     } else {
       setCheckPasswordError("");
     }
 
+    // 이메일 중복 확인 검증
     if (!checkEmailValue) {
       message.error("이메일 중복확인을 해주세요.");
       hasError = true;
-    } else {
-      setCheckEmailValue(true);
     }
 
     if (hasError) return;
@@ -100,7 +116,12 @@ const RegisterForm: React.FC = () => {
     e.preventDefault();
 
     if (!email) {
-      message.success("이메일을 입력해주세요.");
+      message.error("이메일을 입력해주세요.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      message.error("올바른 이메일 형식을 입력해주세요.");
       return;
     }
 
@@ -118,6 +139,32 @@ const RegisterForm: React.FC = () => {
       return;
     }
   };
+
+  // 이메일 입력 변경 핸들러
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    setCheckEmailValue(false);
+
+    if (value && !validateEmail(value)) {
+      setEmailError("올바른 이메일 형식을 입력해주세요.");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  // 비밀번호 입력 변경 핸들러
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    if (value && !validatePassword(value)) {
+      setPasswordError("비밀번호는 4~6자 영문, 숫자 혼합으로 입력해주세요.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
   return (
     <>
       <motion.form
@@ -147,11 +194,7 @@ const RegisterForm: React.FC = () => {
             className={`white w-full rounded-[40px] border-0 px-3 py-3 font-medium text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
               emailError ? "border-2 border-red-400" : ""
             } `}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setCheckEmailValue(false);
-              if (e.target.value) setEmailError("");
-            }}
+            onChange={handleEmailChange}
           />
           {emailError && (
             <motion.p
@@ -166,7 +209,7 @@ const RegisterForm: React.FC = () => {
 
         <motion.div className="w-full max-w-[500px]" variants={itemVariants}>
           <label className="mb-2 ml-4 block text-xs text-black md:text-base">
-            비밀번호
+            비밀번호 (4자 이상 영문,숫자 혼합)
           </label>
           <motion.div
             animate={passwordError ? "shake" : undefined}
@@ -176,10 +219,7 @@ const RegisterForm: React.FC = () => {
               value={password}
               type="password"
               placeholder="Password"
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (e.target.value) setPasswordError("");
-              }}
+              onChange={handlePasswordChange}
               className={`w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
                 passwordError ? "border-2 border-red-500" : ""
               }`}
@@ -201,7 +241,7 @@ const RegisterForm: React.FC = () => {
             비밀번호 확인
           </label>
           <motion.div
-            animate={passwordError ? "shake" : undefined}
+            animate={checkPasswordError ? "shake" : undefined}
             variants={shakeVariants}
           >
             <input
@@ -212,7 +252,9 @@ const RegisterForm: React.FC = () => {
                 setCheckPassword(e.target.value);
                 if (e.target.value) setCheckPasswordError("");
               }}
-              className={`} w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4`}
+              className={`w-full rounded-[40px] border-0 bg-white px-3 py-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd751] md:px-4 md:py-4 ${
+                checkPasswordError ? "border-2 border-red-500" : ""
+              }`}
             />
           </motion.div>
           {checkPasswordError && (
