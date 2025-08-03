@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { SearchOutlined } from "@ant-design/icons";
 import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
+import { AutoResult, SearchBarProps } from "@/types/Search.types";
 
 const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = "검색어를 입력 해 주세요.",
@@ -52,56 +53,34 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-    setSelectedIndex(-1);
     handleSearch(value);
   };
 
   const handleSelect = (option: AutoResult) => {
     setSearchValue(option.value);
     setShowDropdown(false);
-    setSelectedIndex(-1);
     onSelect?.(option.value, option);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (!showDropdown || suggestions.length === 0) {
-      if (e.key === "Enter") onSearch(searchValue, results);
-      return;
+    if (e.key === "Enter") {
+      onSearch(searchValue, results);
+      setShowDropdown(false);
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
     }
+  };
 
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev,
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (selectedIndex >= 0) handleSelect(suggestions[selectedIndex]);
-        else onSearch(searchValue, results);
-        break;
-      case "Escape":
-        setShowDropdown(false);
-        setSelectedIndex(-1);
-        break;
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      !dropdownRef.current?.contains(event.target as Node) &&
+      !inputRef.current?.contains(event.target as Node)
+    ) {
+      setShowDropdown(false);
     }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        !dropdownRef.current?.contains(event.target as Node) &&
-        !inputRef.current?.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-        setSelectedIndex(-1);
-      }
-    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
