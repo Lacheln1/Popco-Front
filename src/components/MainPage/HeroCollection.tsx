@@ -50,7 +50,10 @@ const HeroCollection = () => {
             <br />
             POPCO에서 당신만의 OTT 컬렉션을 만들어 공유해보세요.
           </div>
-          <button className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block">
+          <button
+            onClick={() => navigate("/collections")}
+            className="text-popco-foot border-popco-foot hidden w-fit rounded-full border-solid px-7 py-4 text-base md:block"
+          >
             View more +
           </button>
         </div>
@@ -85,7 +88,10 @@ const HeroCollection = () => {
           )}
         </div>
 
-        <button className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden">
+        <button
+          onClick={() => navigate("/collections")}
+          className="text-popco-foot w-fit rounded-full border-solid px-7 py-4 text-base text-white md:hidden"
+        >
           View more +
         </button>
       </div>

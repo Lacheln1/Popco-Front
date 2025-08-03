@@ -9,12 +9,16 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const GenderChart = () => {
+interface GenderChartProps {
+  genderPercent: number[];
+}
+
+const GenderChart = ({ genderPercent }: GenderChartProps) => {
   const data = {
     labels: ["남성", "여성"],
     datasets: [
       {
-        data: [40, 60],
+        data: [genderPercent[0], genderPercent[1]],
         backgroundColor: ["#36A2EB", "#FF6384"],
         borderWidth: 2,
       },

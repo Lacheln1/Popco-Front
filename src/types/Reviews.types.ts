@@ -10,6 +10,9 @@ export type ReviewModalProps = {
   author?: string;
   likeCount?: number;
   isLiked?: boolean;
+  token?: string;
+  refetchMyReview?: () => void;
+  reviewId: number;
 };
 
 export type ReviewProps = {
@@ -25,3 +28,26 @@ export type ReviewProps = {
   contentTitle: string;
   ranking: number;
 };
+
+export interface MyReview {
+  reviewId: number;
+  contentId: number;
+  contentType: string;
+  title: string;
+  posterPath: string;
+  score: number;
+  text: string;
+  createdAt: string;
+  likeCount: number;
+}
+
+export interface MyReviewResponse {
+  code: number;
+  result: string;
+  message: string;
+  data: {
+    existUserReview: boolean;
+    myReview: MyReview | null;
+    login: boolean;
+  };
+}

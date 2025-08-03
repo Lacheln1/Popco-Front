@@ -9,7 +9,7 @@ interface UserInfoSectionProps {
   currentPersona: string;
   profileImageUrl?: string;
   personaImageUrl?: string;
-  onProfileUpdate?: (newImageUrl: string) => void; // 부모 컴포넌트에 업데이트 알림
+  onProfileUpdate?: (newImageUrl: string) => void;
 }
 
 const UserInfoSection: React.FC<UserInfoSectionProps> = ({
@@ -42,7 +42,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
   // profileImageUrl이 변경될 때 에러 상태 초기화
   React.useEffect(() => {
-    // 새로운 URL이면 에러 목록에서 제거
     if (profileImageUrl) {
       setErrorUrls((prev) => {
         const newSet = new Set(prev);
@@ -52,20 +51,12 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
     }
   }, [profileImageUrl]);
 
-  // 이미지 로드 에러 처리 (한 번만 처리)
+  // 이미지 로드 에러 처리
   const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const imgSrc = event.currentTarget.src;
-
-    // 이미 에러 처리된 URL이면 무시
-    if (errorUrls.has(imgSrc)) {
+    if (errorUrls.has(imgSrc) || imgSrc === DEFAULT_PROFILE_IMAGE) {
       return;
     }
-
-    // 기본 이미지에서 에러가 발생하면 무시 (무한루프 방지)
-    if (imgSrc === DEFAULT_PROFILE_IMAGE) {
-      return;
-    }
-
     console.log("이미지 로드 실패:", imgSrc);
     setErrorUrls((prev) => new Set([...prev, imgSrc]));
   };
@@ -73,7 +64,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   // 이미지 로드 성공 처리
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
     const imgSrc = event.currentTarget.src;
-    // 성공한 URL은 에러 목록에서 제거
     setErrorUrls((prev) => {
       const newSet = new Set(prev);
       newSet.delete(imgSrc);
@@ -113,9 +103,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
     setIsLoading(true);
 
     try {
-      // 기존 프로필 이미지가 있으면 빈 파일 객체 생성, 없으면 기본 이미지 사용
       const dummyFile = new File([""], "dummy.txt", { type: "text/plain" });
-
       const response = await updateUserProfile(
         { nickname: newNickname.trim(), profileImageUrl: dummyFile },
         accessToken,
@@ -126,18 +114,16 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
       if (response.code === 200 && response.result === "SUCCESS") {
         setIsEditingNickname(false);
         message.success("닉네임이 성공적으로 변경되었습니다.");
-
-        // 새로고침으로 최신 데이터 반영
         setTimeout(() => {
           window.location.reload();
-        }, 500); // 성공 메시지를 보여준 후 새로고침
+        }, 500);
       } else {
         throw new Error("닉네임 변경 응답이 올바르지 않습니다.");
       }
     } catch (error) {
       console.error("닉네임 변경 오류:", error);
       message.error("닉네임 변경에 실패했습니다.");
-      setNewNickname(nickname); // 실패 시 원래 값으로 복원
+      setNewNickname(nickname);
     } finally {
       setIsLoading(false);
     }
@@ -151,18 +137,14 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
       handleCancelEditNickname();
     }
   };
+
   const getDisplayImageUrl = () => {
-    // 1. 미리보기 이미지가 있으면 우선 표시
     if (previewUrl) {
       return previewUrl;
     }
-
-    // 2. 프로필 이미지가 있고 에러 목록에 없으면 표시
     if (profileImageUrl && !errorUrls.has(profileImageUrl)) {
       return profileImageUrl;
     }
-
-    // 3. 기본 이미지 표시
     return DEFAULT_PROFILE_IMAGE;
   };
 
@@ -182,7 +164,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
       setSelectedImage(file);
 
-      // 사진 미리보기
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target?.result as string);
@@ -222,16 +203,11 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
       console.log("프로필 업데이트 성공:", response);
 
-      // 서버에서 data: null을 반환하므로, 부모 컴포넌트에 새로고침 요청
       if (response.code === 200 && response.result === "SUCCESS") {
-        // 업데이트 성공 시 부모 컴포넌트에서 최신 데이터를 다시 가져오도록 알림
         onProfileUpdate?.("refresh");
-
-        // 선택된 파일과 미리보기 초기화
         setSelectedImage(null);
         setPreviewUrl("");
 
-        // 파일 input 초기화
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -250,9 +226,9 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
   return (
     <div className="pretendard relative sm:top-3 md:top-4">
-      <div className="flex w-full flex-col justify-center gap-8 pl-6">
+      <div className="relative flex w-full flex-col gap-6 px-6 md:flex-row md:items-center md:gap-0">
         {/* 사용자 프로필 */}
-        <div className="relative flex items-center">
+        <div className="flex items-center md:ml-4 md:justify-center">
           <div className="relative">
             <img
               src={getDisplayImageUrl()}
@@ -335,30 +311,15 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
             )}
             <span className="text-base">{email}</span>
           </div>
+        </div>
 
-          {/* 선택된 이미지가 있을 때 업데이트/취소 버튼 표시 */}
-          {selectedImage && (
-            <div className="ml-4 flex gap-2">
-              <button
-                onClick={handleUpdateProfile}
-                disabled={isLoading}
-                className="rounded-lg bg-black px-4 py-2 text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isLoading ? "업데이트 중..." : "프로필 변경"}
-              </button>
-              <button
-                onClick={handleCancelPreview}
-                disabled={isLoading}
-                className="rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                취소
-              </button>
-            </div>
-          )}
+        {/* 중간선 */}
+        <div className="hidden justify-center md:absolute md:left-1/2 md:top-1/2 md:inline-block md:-translate-x-1/2 md:-translate-y-1/2">
+          <div className="h-px w-32 bg-gray-300 md:h-14 md:w-px" />
         </div>
 
         {/* 페르소나 정보 */}
-        <div className="flex items-center">
+        <div className="flex items-center md:absolute md:left-1/2 md:top-1/2 md:ml-8 md:-translate-y-1/2 md:justify-center">
           <div>
             <img
               src={personaImageUrl || DEFAULT_PROFILE_IMAGE}
@@ -371,6 +332,26 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
             <span className="text-base">{currentPersona}</span>
           </div>
         </div>
+
+        {/* 선택된 이미지가 있을 때 업데이트/취소 버튼 표시 */}
+        {selectedImage && (
+          <div className="flex justify-center gap-2 md:absolute md:bottom-4 md:left-1/2 md:-translate-x-1/2">
+            <button
+              onClick={handleUpdateProfile}
+              disabled={isLoading}
+              className="rounded-lg bg-black px-4 py-2 text-white transition-colors hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoading ? "업데이트 중..." : "프로필 변경"}
+            </button>
+            <button
+              onClick={handleCancelPreview}
+              disabled={isLoading}
+              className="rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              취소
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 파일 입력 (숨김) */}
