@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useIsMediumUp } from "@/hooks/useMediaQuery";
 import { PosterImage } from "@/components/EventPage/PosterImage";
-import { EventInfoCard } from "@/components/EventPage/EventInfoCard";
+import { EventInfoCard } from "@/components/EventPage/cards/EventInfoCard";
 import { renderCount } from "@/components/EventPage/Countdown";
 
 const image = {
