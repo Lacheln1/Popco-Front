@@ -23,7 +23,8 @@ const CollectionCreatePage: React.FC = () => {
   const { message } = App.useApp();
   const navigate = useNavigate();
   const { user, accessToken, isLoading: isAuthLoading } = useAuthCheck();
-  const { mutate: createCollection, isPending: isCreating } = useCreateCollection();
+  const { mutate: createCollection, isPending: isCreating } =
+    useCreateCollection();
 
   // --- States ---
   const [title, setTitle] = useState("");
@@ -62,7 +63,7 @@ const CollectionCreatePage: React.FC = () => {
     [message],
   );
 
-const handleSaveCollection = useCallback(() => {
+  const handleSaveCollection = useCallback(() => {
     if (isCreating) return;
 
     if (!title.trim()) {
@@ -74,15 +75,23 @@ const handleSaveCollection = useCallback(() => {
       return;
     }
 
-    // API 호출 시, 이제 contentIds 대신 contents 배열 전체를 넘겨줍니다.
-    createCollection({
+    const requestData = {
       title,
       description,
-      contents, // contentIds 대신 contents 배열 전달
+      contents,
       accessToken: accessToken!,
-    });
-    
-}, [title, description, contents, accessToken, createCollection, isCreating]);
+    };
+
+    createCollection(requestData);
+  }, [
+    title,
+    description,
+    contents,
+    accessToken,
+    createCollection,
+    isCreating,
+    message,
+  ]);
 
   // --- Render ---
   const primaryHeaderButtonClass =
@@ -92,11 +101,16 @@ const handleSaveCollection = useCallback(() => {
   if (isAuthLoading || !user.isLoggedIn) {
     return (
       <PageLayout
-        header={<SectionHeader title="컬렉션 만들기" description="나만의 컬렉션을 만들어 공유해보세요." />}
+        header={
+          <SectionHeader
+            title="컬렉션 만들기"
+            description="나만의 컬렉션을 만들어 공유해보세요."
+          />
+        }
         floatingBoxContent={
-            <div className="flex h-[50vh] w-full items-center justify-center">
-                <Spin size="large" />
-            </div>
+          <div className="flex h-[50vh] w-full items-center justify-center">
+            <Spin size="large" />
+          </div>
         }
       />
     );
@@ -147,7 +161,10 @@ const handleSaveCollection = useCallback(() => {
             >
               <div className="flex flex-col gap-6">
                 <div>
-                  <label htmlFor="collection-title" className="mb-2 block font-semibold">
+                  <label
+                    htmlFor="collection-title"
+                    className="mb-2 block font-semibold"
+                  >
                     컬렉션 제목 <span className="text-red-500">*</span>
                   </label>
                   <Input
@@ -161,7 +178,10 @@ const handleSaveCollection = useCallback(() => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="collection-description" className="mb-2 block font-semibold">
+                  <label
+                    htmlFor="collection-description"
+                    className="mb-2 block font-semibold"
+                  >
                     컬렉션 소개 (선택)
                   </label>
                   <Input.TextArea

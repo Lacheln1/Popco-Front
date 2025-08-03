@@ -143,33 +143,11 @@ export const searchContents = async (keyword: string, page: number = 0) => {
       },
     });
 
-    // --- 디버깅을 위한 핵심 코드 ---
-    // 서버가 프론트엔드에 실제로 보내준 전체 응답 데이터를 확인합니다.
-    console.log("Raw API response from server:", response.data);
-
     // response.data 안에 또 다른 data 필드가 있는지 확인하고 반환합니다.
     return response.data.data;
   } catch (error) {
-    // API 호출 자체에 실패했는지 확인하기 위해 에러 로그를 추가합니다.
-    console.error("API call failed:", error);
     return null; // 에러 발생 시 null 반환
   }
-};
-
-// 컬렉션 생성 (POST /collections)
-export const createCollection = async (params: {
-  title: string;
-  description: string;
-  // contentIds 파라미터 제거
-  accessToken: string;
-}) => {
-  const { title, description, accessToken } = params;
-  const { data } = await axiosInstance.post(
-    `/collections`,
-    { title, description }, // contentIds 제거
-    { headers: { Authorization: `Bearer ${accessToken}` } },
-  );
-  return data.data; 
 };
 
 // 컬렉션에 콘텐츠 추가 (POST /collections/{collectionId}/contents)
@@ -215,4 +193,35 @@ export const fetchCollectionContentsAll = async (collectionId: string) => {
 export const fetchCollectionContentCount = async (collectionId: string) => {
   const { data } = await axiosInstance.get(`/collections/${collectionId}/contents/count`);
   return data.data; // data: number 반환
+};
+
+// 컬렉션 생성 (POST /collections) - title, description만 전송
+export const createCollection = async (params: {
+  title: string;
+  description: string;
+  accessToken: string;
+}) => {
+  const { title, description, accessToken } = params;
+  // 서버의 전체 응답을 반환하여 훅에서 처리하도록 함
+  const { data } = await axiosInstance.post(
+    `/collections`,
+    { title, description },
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data;
+};
+
+// 컬렉션에 배치 콘텐츠 추가 (POST /collections/{collectionId}/contents/batch)
+export const addContentToCollectionBatch = async (params: {
+  collectionId: string;
+  contents: Array<{ contentId: number; contentType: string }>;
+  accessToken: string;
+}) => {
+  const { collectionId, contents, accessToken } = params;
+  const { data } = await axiosInstance.post(
+    `/collections/${collectionId}/contents/batch`,
+    { contents }, // API 명세에 따라 { contents: [...] } 형태로 전송
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data;
 };

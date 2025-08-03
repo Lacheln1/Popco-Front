@@ -13,6 +13,7 @@ import {
   fetchCollectionsWeekly,
   createCollection,
   addContentToCollection,
+  addContentToCollectionBatch, // 새로 추가
   removeContentFromCollection,
   fetchCollectionContentsAll,
   fetchCollectionContentCount,
@@ -57,7 +58,7 @@ export const useFetchCollectionById = (
   accessToken?: string | null,
 ) => {
   return useQuery({
-    queryKey: ["collections", "detail", collectionId],
+    queryKey: ["collections", "detail", collectionId, !!accessToken],
     queryFn: () =>
       fetchCollectionById({ collectionId: collectionId!, accessToken }),
     enabled: !!collectionId,
@@ -93,14 +94,22 @@ export const useToggleMarkCollection = () => {
 
   return useMutation({
     mutationFn: toggleCollectionMark,
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       if (data?.data === true) {
         message.success("컬렉션이 저장되었습니다.");
       } else {
         message.success("컬렉션 저장이 취소되었습니다.");
       }
-      // 목록과 상세 페이지의 모든 관련 쿼리를 무효화
-      return queryClient.invalidateQueries({ queryKey: ["collections"] });
+
+      // 이제 이 invalidateQueries는 수정된 queryKey를 올바르게 찾아낼 것입니다.
+      return queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey[0] === "collections" &&
+          (query.queryKey[1] === "list" ||
+            query.queryKey[1] === "weekly" ||
+            (query.queryKey[1] === "detail" &&
+              query.queryKey[2] === variables.collectionId)),
+      });
     },
     onError: () => {
       message.error("오류가 발생했습니다. 다시 시도해주세요.");
@@ -146,54 +155,68 @@ export const useDeleteCollection = () => {
   });
 };
 
-// 컬렉션 생성을 위한 훅
+// 컬렉션 생성을 위한 훅 (배치 API 사용 및 오류 처리 강화)
 export const useCreateCollection = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { message } = App.useApp();
 
-  const { mutate: addContent } = useMutation({
-    mutationFn: addContentToCollection,
-    onError: (error, variables) => {
-      // 개별 콘텐츠 추가 실패 시 에러 메시지를 보여줄 수 있습니다.
-      console.error(`콘텐츠(ID: ${variables.contentId}) 추가 실패:`, error);
-      message.error("일부 작품 추가에 실패했습니다.");
-    },
-  });
-
   return useMutation({
-    // 1단계: 껍데기 만들기
-    mutationFn: createCollection,
-    // 2단계: 껍데기 만들기가 성공하면, 콘텐츠를 하나씩 추가
-    onSuccess: (data, variables) => {
-      const newCollectionId = data?.collectionId;
-      if (!newCollectionId) {
-        message.error("컬렉션 생성에 실패했습니다.");
-        return;
+    mutationFn: async (variables: {
+      title: string;
+      description: string;
+      contents: Array<{ id: number; type: string }>;
+      accessToken: string;
+    }) => {
+      const { title, description, contents, accessToken } = variables;
+
+      // 1단계: 컬렉션 껍데기 생성
+      const collectionResponse = await createCollection({
+        title,
+        description,
+        accessToken,
+      });
+
+      if (
+        collectionResponse.result !== "SUCCESS" ||
+        !collectionResponse.data?.collectionId
+      ) {
+        throw new Error(
+          collectionResponse.message || "컬렉션 생성에 실패했습니다.",
+        );
       }
 
-      const { contents, accessToken } = variables;
+      const newCollectionId = collectionResponse.data.collectionId;
 
-      // 각 콘텐츠에 대해 '콘텐츠 추가' API를 순차적으로 호출합니다.
+      // 2단계: 콘텐츠가 있으면 배치(Batch) API로 한 번에 추가
       if (contents && contents.length > 0) {
-        contents.forEach((content: any) => {
-          addContent({
-            collectionId: String(newCollectionId),
-            contentId: content.id,
-            contentType: content.type,
-            accessToken: accessToken,
-          });
+        const batchContents = contents.map((content) => ({
+          contentId: content.id,
+          contentType: content.type,
+        }));
+
+        await addContentToCollectionBatch({
+          collectionId: String(newCollectionId),
+          contents: batchContents,
+          accessToken,
         });
       }
 
-      message.success("컬렉션이 성공적으로 생성되었습니다!");
-      queryClient.invalidateQueries({ queryKey: ["collections", "list"] });
-
-      // 모든 콘텐츠 추가 요청을 보낸 후, 상세 페이지로 즉시 이동합니다.
-      navigate(`/collections/${newCollectionId}`);
+      // 성공 시, onSuccess 콜백에 새로 만들어진 ID를 전달
+      return { collectionId: newCollectionId };
     },
-    onError: () => {
-      message.error("컬렉션 생성에 실패했습니다. 다시 시도해주세요.");
+
+    onSuccess: (data) => {
+      const { collectionId } = data;
+      message.success("컬렉션이 성공적으로 생성되었습니다!");
+
+      queryClient.invalidateQueries({ queryKey: ["collections"] });
+
+      navigate(`/collections/${collectionId}`);
+    },
+
+    onError: (error: Error) => {
+      message.error(error.message);
     },
   });
 };
@@ -203,18 +226,14 @@ export const useManageCollectionContents = (collectionId: string) => {
   const queryClient = useQueryClient();
   const { message } = App.useApp();
 
+  const handleSuccess = (successMessage: string) => {
+    message.success(successMessage);
+    return queryClient.invalidateQueries({ queryKey: ["collections"] });
+  };
+
   const addContent = useMutation({
     mutationFn: addContentToCollection,
-    onSuccess: () => {
-      message.success("작품이 추가되었습니다.");
-      // 상세 페이지의 콘텐츠 목록과 개수 캐시를 무효화
-      queryClient.invalidateQueries({
-        queryKey: ["collections", "detail", collectionId, "contents"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["collections", "detail", collectionId, "count"],
-      });
-    },
+    onSuccess: () => handleSuccess("작품이 추가되었습니다."),
     onError: () => {
       message.error("작품 추가에 실패했습니다.");
     },
@@ -222,16 +241,7 @@ export const useManageCollectionContents = (collectionId: string) => {
 
   const removeContent = useMutation({
     mutationFn: removeContentFromCollection,
-    onSuccess: () => {
-      message.success("작품이 삭제되었습니다.");
-      // 상세 페이지의 콘텐츠 목록과 개수 캐시를 무효화
-      queryClient.invalidateQueries({
-        queryKey: ["collections", "detail", collectionId, "contents"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["collections", "detail", collectionId, "count"],
-      });
-    },
+    onSuccess: () => handleSuccess("작품이 삭제되었습니다."),
     onError: () => {
       message.error("작품 삭제에 실패했습니다.");
     },

@@ -160,8 +160,8 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
                   error
                     ? "검색 중 오류가 발생했습니다."
                     : debouncedKeyword
-                    ? "검색 결과가 없습니다."
-                    : "검색어를 입력해주세요."
+                      ? "검색 결과가 없습니다."
+                      : "검색어를 입력해주세요."
                 }
               />
             </div>
