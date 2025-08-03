@@ -17,6 +17,7 @@ import WantWatching from "./WantWatching";
 import MyPageChart from "./MyPageChart";
 import { App } from "antd";
 import Spinner from "../common/Spinner";
+import { useNavigate } from "react-router-dom";
 
 interface Movie {
   date: string;
@@ -90,6 +91,7 @@ const PageContents: React.FC = () => {
   const tabTitles = ["Calendar", "Collection", "MY"];
 
   const { message } = App.useApp();
+  const navigate = useNavigate();
 
   // YYYY-MM 형식으로 변환하기
   const formatMonthForApi = (date: Date): string => {
@@ -146,7 +148,7 @@ const PageContents: React.FC = () => {
       setCollectionsLoading(true);
       setCollectionsError(null);
 
-      const response = await fetchMyCollections(accessToken);
+      const response = await fetchMyCollections(accessToken, 0, 100);
       console.log("컬렉션 API 응답:", response);
 
       // 변경된 응답 구조에 맞게 수정
@@ -385,9 +387,18 @@ const PageContents: React.FC = () => {
               {/* 컬렉션 Swiper 섹션 */}
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
-                    내가 만든 컬렉션
-                  </h1>
+                  <div className="flex flex-col items-center gap-3 text-center sm:flex-row">
+                    <h1 className="gmarket-bold mt-2 py-2 text-base md:text-2xl">
+                      내가 만든 컬렉션
+                    </h1>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/collections/create")}
+                      className="h-8 rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
+                    >
+                      컬렉션 만들기
+                    </button>
+                  </div>
                   {/* 네비게이션 버튼 */}
                   <SwiperNavigation
                     swiper={swiperInstance}
@@ -477,7 +488,7 @@ const PageContents: React.FC = () => {
               {/* 내가 저장한 컬렉션 */}
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
+                  <h1 className="gmarket-bold mt-2 py-2 text-base md:text-2xl">
                     내가 저장한 컬렉션
                   </h1>
                   {/* 네비게이션 버튼 */}
