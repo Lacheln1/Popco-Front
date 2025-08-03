@@ -15,21 +15,15 @@ export const fetchCollectionsWeekly = async (
 };
 
 // 내 컬렉션 목록 조회
-export const fetchMyCollections = async (
-  accessToken: string,
-  pageNumber: number = 0,
-  pageSize: number = 20,
-) => {
-  const response = await axios.get(`${API_URL}/collections/my`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+export const fetchMyCollections = async (accessToken: string) => {
+  const { data } = await axiosInstance.get("/collections/my", {
+    headers: { Authorization: ` Bearer ${accessToken}` },
     params: {
-      pageNumber,
-      pageSize,
+      pageNumber: 0,
+      pageSize: 100, // 모달에 표시할 최대 컬렉션 개수
     },
   });
-  return response.data;
+  return data.data;
 };
 
 // 내가 마크한 컬렉션 목록
