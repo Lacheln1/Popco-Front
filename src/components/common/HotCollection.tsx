@@ -107,7 +107,7 @@ const HotCollection: React.FC<HotCollectionProps> = React.memo(
             type="button"
             onClick={handleSaveToggle}
             aria-label={isSaved ? "찜 해제" : "찜하기"}
-            className="flex-shrink-0 rounded-full p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="flex-shrink-0 rounded-full p-1 transition-transform hover:scale-110 focus:outline-none"
           >
             <img
               src={isSaved ? FullSaveIcon : EmptySaveIcon}

@@ -33,5 +33,5 @@ export const useContentsDetail = () => {
     fetchContentsDetail();
   }, [id, type]);
 
-  return { contents, loading, error };
+  return { contents, loading, error, contentId: id, contentType: type };
 };
