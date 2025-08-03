@@ -157,6 +157,8 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
             "#ffd751",
           ],
           borderWidth: 1,
+          barPercentage: 0.4,
+          categoryPercentage: 1,
         },
       ],
     };
