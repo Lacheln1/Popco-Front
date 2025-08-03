@@ -25,7 +25,7 @@ export const useContentReaction = ({
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (!initializedRef.current && contentList.length > 0) {
+    if (contentList.length > 0) {
       const initialMap = contentList.reduce(
         (acc, cur) => {
           acc[cur.id] = cur.reaction ?? "NEUTRAL";
@@ -34,7 +34,6 @@ export const useContentReaction = ({
         {} as Record<number, ReactionType>,
       );
       setReactionMap(initialMap);
-      initializedRef.current = true;
     }
   }, [contentList]);
 
@@ -52,25 +51,14 @@ export const useContentReaction = ({
       newState === "LIKE" ? "좋아요" : newState === "DISLIKE" ? "싫어요" : null;
 
     if (reactionKor) {
-      sendFeedback(
-        {
-          user_id: userId,
-          content_id: contentId,
-          content_type: contentType,
-          reaction_type: reactionKor,
-          score: null,
-          token: accessToken,
-        },
-        {
-          onSuccess: () => {
-            if (invalidateQueryKey) {
-              queryClient.invalidateQueries({
-                queryKey: invalidateQueryKey,
-              });
-            }
-          },
-        },
-      );
+      sendFeedback({
+        user_id: userId,
+        content_id: contentId,
+        content_type: contentType,
+        reaction_type: reactionKor,
+        score: null,
+        token: accessToken,
+      });
     }
   };
 

@@ -42,7 +42,6 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
     userId,
     accessToken,
     contentList,
-    invalidateQueryKey: ["storyBasedRecommendations", userId, type],
   });
 
   const handleSwiperInit = (swiper: SwiperType) => {
@@ -105,9 +104,7 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
                   posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
                   id={content.content_id}
                   contentType={content.content_type}
-                  likeState={
-                    content.user_reaction ?? reactionMap[content.content_id]
-                  }
+                  likeState={reactionMap[content.content_id] ?? "NEUTRAL"}
                   onLikeChange={(newState) =>
                     handleReaction(
                       content.content_id,
