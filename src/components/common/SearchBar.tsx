@@ -22,6 +22,8 @@ const SearchBar = <T,>({
 
   // 결과 변경 시 자동완성 구성 및 onSearch 콜백 호출
   useEffect(() => {
+    if (!Array.isArray(results)) return;
+
     if (!showSuggestions || !searchValue.trim()) {
       setSuggestions([]);
       setShowDropdown(false);
@@ -41,7 +43,7 @@ const SearchBar = <T,>({
     setSuggestions(options);
     setShowDropdown(options.length > 0);
 
-    onSearch(searchValue, results as T[]);
+    onSearch(searchValue, results as unknown as T[]);
   }, [results, searchValue, showSuggestions, onSearch]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {

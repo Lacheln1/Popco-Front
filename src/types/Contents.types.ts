@@ -25,7 +25,6 @@ export interface FetchAllContentsParams {
   pageSize?: number;
   sort?: string;
 }
-
 export interface FetchAllContentsResponse {
   contents: AllContentItem[];
   totalElements: number;

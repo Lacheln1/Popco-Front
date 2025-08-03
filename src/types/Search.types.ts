@@ -38,4 +38,11 @@ interface SearchBarProps<T = any> {
   className?: string;
 }
 
-export type { SearchResult, AutoResult, SearchBarProps };
+interface SearchContentsParams {
+  keyword: string;
+  actors?: string[];
+  page?: number;
+  size: number;
+}
+
+export type { SearchResult, AutoResult, SearchBarProps, SearchContentsParams };
