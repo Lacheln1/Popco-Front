@@ -3,6 +3,8 @@ import recommendInstance from "./recommendInstance";
 import {
   ContentBasedItem,
   ContentBasedResponse,
+  ContentFeedbackItem,
+  ContentFeedbackResponse,
   PopcorithmResponse,
   RecommendationItem,
 } from "@/types/Recommend.types";
@@ -52,9 +54,9 @@ export const getOnboardingPersona = async (
 ): Promise<OnboardingResponse> => {
   try {
     console.log("🔍 온보딩 요청 디버그:", {
-      url: "/client/recommends/personas/onboard", 
+      url: "/client/recommends/personas/onboard",
       params,
-      headers: { Authorization: `Bearer ${accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const response = await recommendInstance.post<OnboardingResponse>(
@@ -63,7 +65,7 @@ export const getOnboardingPersona = async (
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       },
@@ -91,8 +93,11 @@ export const getOnboardingPersonaAlternative = async (
 ): Promise<OnboardingResponse> => {
   try {
     // 환경변수에서 API Base URL을 가져옵니다
-    const baseURL = import.meta.env.VITE_API_BASE_URL || process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
-    
+    const baseURL =
+      import.meta.env.VITE_API_BASE_URL ||
+      process.env.REACT_APP_API_BASE_URL ||
+      "http://localhost:8080";
+
     console.log("🔍 온보딩 요청 (대안) 디버그:", {
       baseURL,
       url: `${baseURL}/api/client/recommends/personas/onboard`,
@@ -100,7 +105,7 @@ export const getOnboardingPersonaAlternative = async (
     });
 
     const response = await axios.post<OnboardingResponse>(
-      `${baseURL}/api/client/recommends/personas/onboard`, 
+      `${baseURL}/api/client/recommends/personas/onboard`,
       params,
       {
         headers: {
@@ -163,5 +168,39 @@ export const fetchBasedContent = async (
   } catch (error) {
     console.error("fetchBasedContent 실패:", error);
     throw new Error("연관 작품을 불러오는 데 실패했습니다.");
+  }
+};
+
+// 좋아요 싫어요 버튼 반영
+export const fetchLikedFeedback = async (
+  user_id: number,
+  content_id: number,
+  content_type: string,
+  reaction_type: string,
+  score?: number | null,
+  token?: string,
+): Promise<ContentFeedbackItem[]> => {
+  try {
+    const endpoint = `/recommends/personas/feedback`;
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    const body = {
+      user_id,
+      content_id,
+      content_type,
+      reaction_type,
+      ...(score != null ? { score } : {}),
+    };
+    const { data } = await recommendInstance.post<ContentFeedbackResponse>(
+      endpoint,
+      body,
+      { headers },
+    );
+    return data.recommendations;
+  } catch (error) {
+    console.error("fetchLikedFeedback 실패:", error);
+    throw new Error("좋아요 반영 실패");
   }
 };

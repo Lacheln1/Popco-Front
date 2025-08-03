@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
@@ -9,6 +9,8 @@ import { usePopcorithm } from "@/hooks/queries/contents/usePopcorithm";
 import { RecommendationItem } from "@/types/Recommend.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import LoginBlur from "../common/LoginBlur";
+import { ReactionType } from "@/types/Contents.types";
+import { useContentReaction } from "@/hooks/queries/contents/usePopcorithmFeedback";
 
 interface Props {
   accessToken: string;
@@ -22,18 +24,35 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
   const [isEnd, setIsEnd] = useState(false);
 
   const HERO_POPCORITHM_LIMIT = 10;
-  const { data, isLoading, isError, isSuccess } = usePopcorithm(
+  const { data, isError, isSuccess, isFetching } = usePopcorithm(
     userId,
     HERO_POPCORITHM_LIMIT,
     accessToken,
   );
-  if (isLoading) {
-    return (
-      <div className="py-20 text-center text-white">
-        <p>추천 콘텐츠를 불러오는 중입니다...</p>
-      </div>
-    );
-  }
+
+  const contentList = useMemo(
+    () =>
+      data?.map((item) => ({
+        id: item.content_id,
+        reaction: "NEUTRAL" as ReactionType,
+      })) ?? [],
+    [data],
+  );
+
+  const { reactionMap, handleReaction } = useContentReaction({
+    userId,
+    accessToken,
+    contentList,
+    invalidateQueryKey: ["popcorithm", userId],
+  });
+
+  useEffect(() => {
+    if (swiperInstance) {
+      setIsBeginning(swiperInstance.isBeginning);
+      setIsEnd(swiperInstance.isEnd);
+    }
+  }, [swiperInstance]);
+
   if (isError) {
     return (
       <div className="py-20 text-center text-red-600">
@@ -99,38 +118,52 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
                   isEnd={isEnd}
                 />
               </div>
-              <Swiper
-                modules={[Navigation]}
-                slidesPerView={2}
-                onSwiper={handleSwiperInit}
-                onSlideChange={handleSlideChange}
-                className="pb-6"
-                breakpoints={{
-                  0: { slidesPerView: 2.3 },
-                  638: { slidesPerView: 3 },
-                  768: { slidesPerView: 2 },
-                  1024: { slidesPerView: 2.5 },
-                  1280: { slidesPerView: 3.5 },
-                  1440: { slidesPerView: 4 },
-                  1920: { slidesPerView: 5 },
-                }}
-              >
-                {data?.map((content: RecommendationItem) => (
-                  <SwiperSlide
-                    key={content.content_id}
-                    className="flex flex-col items-center justify-items-center"
-                  >
-                    <Poster
-                      title={content.title}
-                      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
-                      id={content.content_id}
-                      contentType={content.type}
-                      likeState="NEUTRAL"
-                      onLikeChange={() => {}}
-                    />
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+              <div className="relative">
+                {isFetching && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-white" />
+                  </div>
+                )}
+
+                <Swiper
+                  modules={[Navigation]}
+                  slidesPerView={2}
+                  onSwiper={handleSwiperInit}
+                  onSlideChange={handleSlideChange}
+                  className="pb-6"
+                  breakpoints={{
+                    0: { slidesPerView: 2.3 },
+                    638: { slidesPerView: 3 },
+                    768: { slidesPerView: 2 },
+                    1024: { slidesPerView: 2.5 },
+                    1280: { slidesPerView: 3.5 },
+                    1440: { slidesPerView: 4 },
+                    1920: { slidesPerView: 5 },
+                  }}
+                >
+                  {data?.map((content: RecommendationItem) => (
+                    <SwiperSlide
+                      key={content.content_id}
+                      className="flex flex-col items-center justify-items-center"
+                    >
+                      <Poster
+                        title={content.title}
+                        posterUrl={`${TMDB_IMAGE_BASE_URL}${content.poster_path}`}
+                        id={content.content_id}
+                        contentType={content.type}
+                        likeState={reactionMap[content.content_id]}
+                        onLikeChange={(newState) =>
+                          handleReaction(
+                            content.content_id,
+                            newState,
+                            content.type,
+                          )
+                        }
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
             </div>
           )}
 

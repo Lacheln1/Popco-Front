@@ -21,7 +21,7 @@ import CollectionSection from "@/components/detail/CollectionSection";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
-
+import Spinner from "@/components/common/Spinner";
 // ======================================================================
 // 1. UI와 스크롤 로직을 담당할 별도 컴포넌트 생성
 // ======================================================================
@@ -272,7 +272,7 @@ export default function DetailPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        로딩 중...
+        <Spinner/>
       </div>
     );
   }

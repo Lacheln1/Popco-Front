@@ -11,11 +11,11 @@ import "swiper/css/navigation";
 
 // --- 컴포넌트 & 훅 ---
 import PageLayout from "@/layout/PageLayout";
+import Spinner from "@/components/common/Spinner";
 import SectionHeader from "@/components/common/SectionHeader";
 import HotCollection from "@/components/common/HotCollection";
 import NewCollection from "@/components/common/NewCollection";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
-import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import {
   useFetchCollections,
@@ -91,7 +91,9 @@ const CollectionPage: React.FC = () => {
         <section className="px-6 pt-4 sm:px-8">
           <h2 className="text-xl font-bold sm:text-2xl">HOT</h2>
           {isLoadingHot ? (
-            <div>로딩 중...</div>
+            <div className="flex h-[340px] items-center justify-center md:h-[360px]">
+              <Spinner />
+            </div>
           ) : (
             <div className="relative mt-4 h-[340px] md:ml-12 md:h-[360px]">
               <SwiperNavigation
@@ -146,7 +148,9 @@ const CollectionPage: React.FC = () => {
         </div>
 
         {isLoadingNew ? (
-          <div className="mt-10 text-center">로딩 중...</div>
+          <div className="flex h-screen items-center justify-center">
+            <Spinner />
+          </div>
         ) : (
           <div className="mt-10 grid grid-cols-1 justify-items-center gap-x-24 gap-y-16 lg:grid-cols-2">
             {newCollectionsData?.pages.map((page, i) => (

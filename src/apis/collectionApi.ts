@@ -83,7 +83,7 @@ export const toggleCollectionMark = async (params: {
   return data;
 };
 
-// 특정 컬렉션 수정 (PUT /collections/{collectionId})
+// 특정 컬렉션 수정 (PATCH /collections/{collectionId})
 export const updateCollection = async (params: {
   collectionId: string;
   title: string;
@@ -91,7 +91,7 @@ export const updateCollection = async (params: {
   accessToken: string;
 }) => {
   const { collectionId, title, description, accessToken } = params;
-  const { data } = await axiosInstance.put(
+  const { data } = await axiosInstance.patch(
     `/collections/${collectionId}`,
     { title, description },
     { headers: { Authorization: `Bearer ${accessToken}` } },
