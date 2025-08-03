@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Footer from "../components/common/Footer";
 import Header from "@/components/common/Header";
 import useAuthCheck from "@/hooks/useAuthCheck";
+import Spinner from "@/components/common/Spinner";
 
 const Layout = () => {
   const { user, isLoading, logout } = useAuthCheck();
@@ -18,7 +19,7 @@ const Layout = () => {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div>로딩 중...</div>
+        <Spinner />
       </div>
     );
   }
