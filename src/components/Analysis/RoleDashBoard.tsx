@@ -5,6 +5,7 @@ import {
   getMovieRecommendations,
   getTvRecommendations,
 } from "@/apis/contentsApi";
+import Spinner from "../common/Spinner";
 
 interface RoleDashBoardProps {
   genderPercent: number[];
@@ -27,7 +28,10 @@ interface RecommendationItem {
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center space-x-2">
     <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
-    <span className="text-gray-600">가져오는 중...</span>
+    <span className="text-gray-600">
+      <Spinner />
+      가져오는 중...
+    </span>
   </div>
 );
 
