@@ -246,7 +246,9 @@ export const useManageCollectionContents = (collectionId: string) => {
 
   const handleSuccess = (successMessage: string) => {
     message.success(successMessage);
-    return queryClient.invalidateQueries({ queryKey: ["collections"] });
+    return queryClient.invalidateQueries({
+      queryKey: ["collections", "detail", collectionId],
+    });
   };
 
   const addContent = useMutation({
