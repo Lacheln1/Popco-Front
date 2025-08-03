@@ -3,13 +3,15 @@ import { Dropdown, Empty } from "antd";
 import type { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 
-// Swiper 라이브러리 관련 import
+// Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 
-// 공통 컴포넌트 import
-import NewCollection from "@/components/common/NewCollection";
+// 컴포넌트
+import NewCollection, {
+  NewCollectionProps,
+} from "@/components/common/NewCollection";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import Spinner from "@/components/common/Spinner";
 
@@ -44,7 +46,6 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
   const [sortType, setSortType] = useState<"latest" | "popular">("latest");
   const navigate = useNavigate();
 
-  // --- 데이터 페칭 ---
   const { accessToken } = useAuthCheck();
   const {
     data: apiData,
@@ -58,34 +59,6 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
   });
   const { mutate: toggleMark } = useToggleMarkCollection();
 
-  // API 응답 데이터를 NewCollectionProps 형태로 변환
-  const collections: Omit<NewCollectionProps, "onSaveToggle">[] =
-    useMemo(() => {
-      if (!apiData?.collections) return [];
-      return apiData.collections.map((collection: CollectionProps) => ({
-        collectionId: collection.collectionId,
-        userNickname: collection.userNickname,
-        title: collection.title,
-        description: collection.description,
-        posters: collection.contentPosters
-          .slice(0, 6)
-          .map((p) => `${TMDB_IMAGE_BASE_URL}${p.posterPath}`),
-        totalCount: collection.contentCount,
-        isSaved: collection.isMarked,
-        href: `/collections/${collection.collectionId}`,
-      }));
-    }, [apiData]);
-
-  // --- 핸들러 ---
-  const handleSlideChange = useCallback((swiperInstance: SwiperType) => {
-    setIsBeginning(swiperInstance.isBeginning);
-    setIsEnd(swiperInstance.isEnd);
-  }, []);
-
-  const handleSortChange = useCallback(({ key }: { key: string }) => {
-    setSortType(key as "latest" | "popular");
-  }, []);
-
   const handleSaveToggle = useCallback(
     (collectionId: number) => {
       if (!accessToken) {
@@ -98,7 +71,32 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
     [accessToken, toggleMark, navigate],
   );
 
-  // --- 렌더링 ---
+  const collections: NewCollectionProps[] = useMemo(() => {
+    if (!apiData?.collections) return [];
+    return apiData.collections.map((collection: CollectionProps) => ({
+      collectionId: collection.collectionId,
+      userNickname: collection.userNickname,
+      title: collection.title,
+      description: collection.description,
+      posters: collection.contentPosters
+        .slice(0, 6)
+        .map((p: any) => `${TMDB_IMAGE_BASE_URL}${p.posterPath}`),
+      totalCount: collection.contentCount,
+      isSaved: collection.isMarked,
+      href: `/collections/${collection.collectionId}`,
+      onSaveToggle: handleSaveToggle,
+    }));
+  }, [apiData, handleSaveToggle]);
+
+  const handleSlideChange = useCallback((swiperInstance: SwiperType) => {
+    setIsBeginning(swiperInstance.isBeginning);
+    setIsEnd(swiperInstance.isEnd);
+  }, []);
+
+  const handleSortChange = useCallback(({ key }: { key: string }) => {
+    setSortType(key as "latest" | "popular");
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
@@ -120,7 +118,6 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-2xl font-bold">관련 컬렉션</h3>
       </div>
-
       <div className="mb-4 ml-1 flex items-center justify-between">
         <Dropdown
           menu={{ items: sortMenuItems, onClick: handleSortChange }}
@@ -151,7 +148,6 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
           isEnd={isEnd}
         />
       </div>
-
       {collections.length > 0 ? (
         <Swiper
           slidesPerView="auto"
@@ -161,13 +157,9 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
           onUpdate={handleSlideChange}
           className="pb-2"
         >
-          {collections.map((collection: CollectionProps) => (
+          {collections.map((collection) => (
             <SwiperSlide key={collection.collectionId} className="!w-[350px]">
-              <NewCollection
-                {...collection}
-                onSaveToggle={handleSaveToggle}
-                size="small"
-              />
+              <NewCollection {...collection} size="small" />
             </SwiperSlide>
           ))}
         </Swiper>

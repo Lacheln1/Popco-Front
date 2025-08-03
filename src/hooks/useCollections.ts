@@ -241,16 +241,12 @@ export const useCreateCollection = () => {
 
 // 컬렉션 콘텐츠 추가/제거를 위한 훅
 export const useManageCollectionContents = (collectionId: string) => {
-  // collectionId 인자 다시 추가
   const queryClient = useQueryClient();
   const { message } = App.useApp();
 
   const handleSuccess = (successMessage: string) => {
     message.success(successMessage);
-    // collectionId를 사용하여 더 명확하게 캐시 무효화
-    return queryClient.invalidateQueries({
-      queryKey: ["collections", "detail", collectionId],
-    });
+    return queryClient.invalidateQueries({ queryKey: ["collections"] });
   };
 
   const addContent = useMutation({
@@ -281,7 +277,6 @@ export const useManageCollectionContents = (collectionId: string) => {
 export const useFetchMyCollections = (accessToken?: string | null) => {
   return useQuery({
     queryKey: ["collections", "my", accessToken],
-    // fetchMyCollections에 누락된 인자(page, pageSize) 추가
     queryFn: () => fetchMyCollections(accessToken!, 0, 100),
     enabled: !!accessToken,
   });
