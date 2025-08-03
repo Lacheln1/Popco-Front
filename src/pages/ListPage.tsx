@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Select } from "antd";
+import { Radio, Select } from "antd";
 import PageLayout from "@/layout/PageLayout";
 import SectionHeader from "@/components/common/SectionHeader";
 import SearchBar from "@/components/common/SearchBar";
@@ -13,9 +13,16 @@ import { SearchResult } from "@/types/Search.types";
 
 const ListPage = () => {
   const [sort, setSort] = useState("recent");
-  const [searchKeyword, setSearchKeyword] = useState("");
 
-  const isSearching = !!searchKeyword.trim();
+  // 검색 관련 상태
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchActors, setSearchActors] = useState<string[]>([]);
+  const [searchType, setSearchType] = useState<"keyword" | "actors">("keyword");
+
+  const isSearching =
+    (searchType === "keyword" && searchKeyword.trim().length > 0) ||
+    (searchType === "actors" && searchActors.length > 0);
+
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   // 전체 콘텐츠
@@ -29,14 +36,15 @@ const ListPage = () => {
   const allContents: AllContentItem[] =
     allData?.pages.flatMap((page) => page.contents) ?? [];
 
-  // 검색 결과
+  // 검색 api 호출
   const {
     data: searchData,
     fetchNextPage: fetchSearchNext,
     hasNextPage: hasSearchNext,
     isFetchingNextPage: isFetchingSearchNext,
   } = useSearchContents({
-    keyword: searchKeyword,
+    keyword: searchType === "keyword" ? searchKeyword : undefined,
+    actors: searchType === "actors" ? searchActors : undefined,
     size: 30,
   });
 
@@ -45,8 +53,8 @@ const ListPage = () => {
     results: SearchResult[],
   ): AllContentItem[] => {
     return results.map((result) => ({
-      id: result.contentId, // AllContentItem의 id는 contentId로 매핑
-      type: result.contentType as ContentCategory, // 문자열을 enum으로 타입 단언
+      id: result.contentId,
+      type: result.contentType as ContentCategory,
       title: result.title,
       releaseDate: result.releaseDate,
       posterPath: result.posterPath,
@@ -58,7 +66,6 @@ const ListPage = () => {
       mapSearchResultsToAllContentItems(page.content),
     ) ?? [];
 
-  // 현재 화면에 보여줄 콘텐츠
   const displayContents = isSearching ? searchResults : allContents;
 
   // 무한 스크롤 처리
@@ -94,8 +101,15 @@ const ListPage = () => {
     fetchAllNext,
   ]);
 
-  const handleSearch = (keyword: string) => {
-    setSearchKeyword(keyword);
+  // 검색 실행
+  const handleSearch = (input: string) => {
+    if (searchType === "keyword") {
+      setSearchKeyword(input);
+      setSearchActors([]);
+    } else {
+      setSearchActors([input]);
+      setSearchKeyword("");
+    }
   };
 
   const handleSortChange = (value: string) => {
@@ -112,7 +126,11 @@ const ListPage = () => {
       }
       floatingBoxContent={
         <>
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar
+            onSearch={handleSearch}
+            searchType={searchType}
+            setSearchType={setSearchType}
+          />
           <FilterSection />
         </>
       }
@@ -128,7 +146,6 @@ const ListPage = () => {
           ]}
         />
       </div>
-
       <div className="flex flex-wrap place-content-center gap-9">
         {displayContents.map((content) => (
           <Poster
@@ -142,7 +159,6 @@ const ListPage = () => {
           />
         ))}
       </div>
-
       {(isSearching ? hasSearchNext : hasAllNext) && (
         <div ref={observerRef} className="h-10" />
       )}

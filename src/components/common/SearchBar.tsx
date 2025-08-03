@@ -10,9 +10,13 @@ const SearchBar = <T,>({
   onSelect,
   showSuggestions = true,
   className,
-}: SearchBarProps<T>) => {
+  searchType,
+  setSearchType,
+}: SearchBarProps<T> & {
+  searchType: "keyword" | "actors";
+  setSearchType: (type: "keyword" | "actors") => void;
+}) => {
   const [searchValue, setSearchValue] = useState("");
-  const [searchType, setSearchType] = useState<"keyword" | "actors">("keyword");
   const [suggestions, setSuggestions] = useState<AutoResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -33,7 +37,7 @@ const SearchBar = <T,>({
     }
 
     const options: AutoResult[] = results.map((result) => ({
-      value: (result as any).title,
+      value: (result as any).title ?? (result as any).value,
       label: (
         <div className="py-1">
           <div className="mb-[2px] font-bold">
@@ -98,7 +102,7 @@ const SearchBar = <T,>({
   };
 
   return (
-    <div className="flex justify-center px-4 pt-8">
+    <div className="flex flex-col items-center px-4 pt-8">
       <Radio.Group
         className="mb-2"
         value={searchType}
@@ -109,7 +113,7 @@ const SearchBar = <T,>({
         <Radio.Button value="keyword">작품 키워드</Radio.Button>
         <Radio.Button value="actors">배우 이름</Radio.Button>
       </Radio.Group>
-      {/* 검색 입력창 */}
+
       <div className="relative w-full max-w-[700px]">
         <div className="relative flex h-10 min-w-80 items-center rounded-full border border-[#ededed] bg-white shadow-[0px_10px_15px_#0000000d] sm:h-16">
           <input
@@ -135,7 +139,7 @@ const SearchBar = <T,>({
             )}
           </button>
         </div>
-        {/* 자동완성 드롭다운 */}
+
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}

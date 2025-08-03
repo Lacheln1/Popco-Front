@@ -10,17 +10,19 @@ interface SearchResponse {
   size: number;
 }
 
+interface SearchContentsParams {
+  keyword?: string;
+  actors?: string[];
+  page?: number;
+  size: number;
+}
+
 export const fetchSearchContents = async ({
   keyword = "",
   actors = [],
   page = 0,
   size,
-}: {
-  keyword?: string;
-  actors?: string[];
-  page?: number;
-  size: number;
-}): Promise<SearchResponse> => {
+}: SearchContentsParams): Promise<SearchResponse> => {
   const hasKeyword = keyword.trim().length > 0;
   const hasActors = Array.isArray(actors) && actors.length > 0;
 

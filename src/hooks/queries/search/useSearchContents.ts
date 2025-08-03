@@ -1,28 +1,27 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { SearchContentsParams } from "@/types/Search.types";
 import { fetchSearchContents } from "@/apis/searchApi";
+import { SearchContentsParams, SearchResponse } from "@/types/Search.types";
 
 export const useSearchContents = ({
   keyword,
   actors,
   size,
-}: Omit<SearchContentsParams, "pageNumber">) => {
-  return useInfiniteQuery({
+}: SearchContentsParams) => {
+  return useInfiniteQuery<SearchResponse, Error>({
     queryKey: ["searchContents", keyword, actors],
     queryFn: ({ pageParam = 0 }) =>
       fetchSearchContents({
         keyword,
         actors,
-        page: pageParam,
+        page: pageParam as number,
         size,
       }),
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.last ? undefined : allPages.length;
-    },
+    getNextPageParam: (lastPage) =>
+      lastPage.last ? undefined : lastPage.number + 1,
     initialPageParam: 0,
-    enabled: !!(keyword?.trim() || (actors?.length ?? 0) > 0),
-    staleTime: 1000 * 60 * 30,
-    gcTime: 1000 * 60 * 60 * 2,
-    retry: 1,
+    enabled: !!(
+      (keyword && keyword.trim().length > 0) ||
+      (actors && actors.some((a) => a.trim().length > 0))
+    ),
   });
 };
