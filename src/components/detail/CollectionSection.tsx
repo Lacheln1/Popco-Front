@@ -58,22 +58,23 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
   });
   const { mutate: toggleMark } = useToggleMarkCollection();
 
-  const collections: NewCollectionProps[] = useMemo(() => {
-    if (!apiData?.collections) return [];
-    return apiData.collections.map((collection: CollectionProps) => ({
-      collectionId: collection.collectionId,
-      userNickname: collection.userNickname,
-      title: collection.title,
-      description: collection.description,
-      posters: collection.contentPosters
-        .slice(0, 6)
-        .map((p: any) => `${TMDB_IMAGE_BASE_URL}${p.posterPath}`),
-      totalCount: collection.contentCount,
-      isSaved: collection.isMarked,
-      href: `/collections/${collection.collectionId}`,
-      onSaveToggle: handleSaveToggle,
-    }));
-  }, [apiData]);
+  // API 응답 데이터를 NewCollectionProps 형태로 변환
+  const collections: Omit<NewCollectionProps, "onSaveToggle">[] =
+    useMemo(() => {
+      if (!apiData?.collections) return [];
+      return apiData.collections.map((collection: CollectionProps) => ({
+        collectionId: collection.collectionId,
+        userNickname: collection.userNickname,
+        title: collection.title,
+        description: collection.description,
+        posters: collection.contentPosters
+          .slice(0, 6)
+          .map((p) => `${TMDB_IMAGE_BASE_URL}${p.posterPath}`),
+        totalCount: collection.contentCount,
+        isSaved: collection.isMarked,
+        href: `/collections/${collection.collectionId}`,
+      }));
+    }, [apiData]);
 
   // --- 핸들러 ---
   const handleSlideChange = useCallback((swiperInstance: SwiperType) => {

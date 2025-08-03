@@ -180,21 +180,13 @@ export const useDeleteCollection = () => {
   });
 };
 
-// 컬렉션 생성을 위한 훅 (배치 API 사용 및 오류 처리 강화)
+// 컬렉션 생성을 위한 훅
 export const useCreateCollection = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { message } = App.useApp();
 
-  const { mutate: addContent } = useMutation({
-    mutationFn: addContentToCollection,
-    onSuccess: (_data, _variables) => {},
-    onError: (error, variables) => {
-      console.error(`콘텐츠(ID: ${variables.contentId}) 추가 실패:`, error);
-      message.error("일부 작품 추가에 실패했습니다.");
-    },
-  });
-
+  // addContent 뮤테이션이 사용되지 않으므로 삭제
   return useMutation({
     mutationFn: async (variables: {
       title: string;
@@ -233,19 +225,14 @@ export const useCreateCollection = () => {
           accessToken,
         });
       }
-
       return { collectionId: newCollectionId };
     },
-
     onSuccess: (data) => {
       const { collectionId } = data;
       message.success("컬렉션이 성공적으로 생성되었습니다!");
-
       queryClient.invalidateQueries({ queryKey: ["collections"] });
-
       navigate(`/collections/${collectionId}`);
     },
-
     onError: (error: Error) => {
       message.error(error.message);
     },
@@ -253,13 +240,17 @@ export const useCreateCollection = () => {
 };
 
 // 컬렉션 콘텐츠 추가/제거를 위한 훅
-export const useManageCollectionContents = () => {
+export const useManageCollectionContents = (collectionId: string) => {
+  // collectionId 인자 다시 추가
   const queryClient = useQueryClient();
   const { message } = App.useApp();
 
   const handleSuccess = (successMessage: string) => {
     message.success(successMessage);
-    return queryClient.invalidateQueries({ queryKey: ["collections"] });
+    // collectionId를 사용하여 더 명확하게 캐시 무효화
+    return queryClient.invalidateQueries({
+      queryKey: ["collections", "detail", collectionId],
+    });
   };
 
   const addContent = useMutation({
@@ -290,7 +281,8 @@ export const useManageCollectionContents = () => {
 export const useFetchMyCollections = (accessToken?: string | null) => {
   return useQuery({
     queryKey: ["collections", "my", accessToken],
-    queryFn: () => fetchMyCollections(accessToken!),
+    // fetchMyCollections에 누락된 인자(page, pageSize) 추가
+    queryFn: () => fetchMyCollections(accessToken!, 0, 100),
     enabled: !!accessToken,
   });
 };
@@ -302,7 +294,8 @@ export const useAddContentToCollection = () => {
 
   return useMutation({
     mutationFn: addContentToCollection,
-    onSuccess: (data, variables) => {
+    // 사용하지 않는 인자는 _(언더스코어)로 처리
+    onSuccess: (_data, _variables) => {
       message.success("컬렉션에 작품을 추가했습니다.");
       queryClient.invalidateQueries({ queryKey: ["collections"] });
     },
