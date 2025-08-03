@@ -6,13 +6,15 @@ const API_URL = "/api/client";
 
 // 전체 컬렉션 목록 조회
 export const fetchCollections = async (
+  pageNumber: number = 0,
+  pageSize: number = 10,
   accessToken?: string | null,
 ): Promise<CollectionProps[]> => {
   const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
   const { data } = await axiosInstance.get<CollectionResponse>("/collections", {
     params: {
-      pageNumber: 0,
-      pageSize: 100, // 모달에 표시할 최대 컬렉션 개수
+      pageNumber,
+      pageSize,
     },
     headers,
   });
