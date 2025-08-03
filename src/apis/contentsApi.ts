@@ -73,8 +73,6 @@ export const fetchContentsRanking = async (
   type: ContentCategory,
   token?: string,
 ): Promise<ContentItem[]> => {
-  console.log(type, token);
-
   const headers = {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -82,7 +80,6 @@ export const fetchContentsRanking = async (
   const { data } = await axiosInstance.get(`/contents/popular/types/${type}`, {
     headers,
   });
-  console.log("주간 랭킹", data);
   return data.data;
 };
 

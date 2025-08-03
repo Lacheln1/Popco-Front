@@ -49,8 +49,11 @@ const HeroRanking = ({
       label,
     }),
   );
-
-  const { data = [], isLoading } = useContentsRanking(selected, accessToken);
+  const { data = [], isLoading } = useContentsRanking(
+    selected,
+    accessToken,
+    userId,
+  );
 
   useEffect(() => {
     const checkView = () => {
@@ -90,7 +93,6 @@ const HeroRanking = ({
     userId,
     accessToken,
     contentList,
-    invalidateQueryKey: ["contentsRanking", userId, type],
   });
 
   if (!Array.isArray(data)) {

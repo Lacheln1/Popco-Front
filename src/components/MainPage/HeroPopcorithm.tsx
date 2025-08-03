@@ -10,7 +10,7 @@ import { RecommendationItem } from "@/types/Recommend.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import LoginBlur from "../common/LoginBlur";
 import { ReactionType } from "@/types/Contents.types";
-import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
+import { useContentReaction } from "@/hooks/queries/contents/usePopcorithmFeedback";
 
 interface Props {
   accessToken: string;
