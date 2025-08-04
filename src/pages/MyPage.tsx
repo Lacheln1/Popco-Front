@@ -1,11 +1,13 @@
+import React, { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import { getUserDetail, getUserPersonas } from "@/apis/userApi";
 import SectionHeader from "@/components/common/SectionHeader";
 import Spinner from "@/components/common/Spinner";
-import PageContents from "@/components/MyPage/PageContents";
-import UserInfoSection from "@/components/MyPage/UserInfoSection";
+const PageContents = lazy(() => import("@/components/MyPage/PageContents"));
+const UserInfoSection = lazy(
+  () => import("@/components/MyPage/UserInfoSection"),
+);
 import useAuthCheck from "@/hooks/useAuthCheck";
 import PageLayout from "@/layout/PageLayout";
-import React, { useEffect, useState, useCallback } from "react";
 
 const MyPage: React.FC = () => {
   const { accessToken, user } = useAuthCheck();
@@ -105,24 +107,28 @@ const MyPage: React.FC = () => {
           />
         }
         floatingBoxContent={
-          <UserInfoSection
-            accessToken={accessToken}
-            nickname={userData?.nickname || user?.nickname || "사용자"}
-            email={userData?.email || user?.email || "이메일 없음"}
-            currentPersona={
-              userPersonaData?.data.myPersonaName || "페르소나 없음"
-            }
-            profileImageUrl={userData?.data.profileImageUrl}
-            personaImageUrl={userPersonaData?.data.mainPersonaImgPath}
-            onProfileUpdate={handleProfileUpdate}
-          />
+          <Suspense fallback={<Spinner />}>
+            <UserInfoSection
+              accessToken={accessToken}
+              nickname={userData?.nickname || user?.nickname || "사용자"}
+              email={userData?.email || user?.email || "이메일 없음"}
+              currentPersona={
+                userPersonaData?.data.myPersonaName || "페르소나 없음"
+              }
+              profileImageUrl={userData?.data.profileImageUrl}
+              personaImageUrl={userPersonaData?.data.mainPersonaImgPath}
+              onProfileUpdate={handleProfileUpdate}
+            />
+          </Suspense>
         }
       >
-        <PageContents
-          accessToken={accessToken} // string 타입 보장됨
-          user={user}
-          isLoggedIn={isLoggedIn()}
-        />
+        <Suspense fallback={<Spinner />}>
+          <PageContents
+            accessToken={accessToken} // string 타입 보장됨
+            user={user}
+            isLoggedIn={isLoggedIn()}
+          />
+        </Suspense>
       </PageLayout>
     </div>
   );

@@ -1,12 +1,21 @@
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { getRoleDashBoardData, getUserPersonas } from "@/apis/userApi";
-import AnalysisHeroSection from "@/components/Analysis/AnalysisHeroSection";
-import LikeContentSection from "@/components/Analysis/LikeContentsSection";
-import MyStyleSection from "@/components/Analysis/MyStyleSection";
-import MyWatchingStyleBoard from "@/components/Analysis/MyWatchingStyleBoard";
-import RoleDashBoard from "@/components/Analysis/RoleDashBoard";
+const AnalysisHeroSection = lazy(
+  () => import("@/components/Analysis/AnalysisHeroSection"),
+);
+const LikeContentSection = lazy(
+  () => import("@/components/Analysis/LikeContentsSection"),
+);
+const MyStyleSection = lazy(
+  () => import("@/components/Analysis/MyStyleSection"),
+);
+const MyWatchingStyleBoard = lazy(
+  () => import("@/components/Analysis/MyWatchingStyleBoard"),
+);
+const RoleDashBoard = lazy(() => import("@/components/Analysis/RoleDashBoard"));
 import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
-import { useEffect, useState, useRef } from "react";
+import { getPersonaText } from "@/apis/personaApi";
 
 interface UserPersonaData {
   mainPersonaImgPath: string;
@@ -32,11 +41,17 @@ interface RoleDashBoardData {
   myLikePercent: number[];
 }
 
+interface PersonaText {
+  text1: string;
+  text2: string;
+}
+
 const AnalysisPage = () => {
   const [userData, setUserData] = useState<UserPersonaData | null>(null);
   const [dashBoardData, setDashBoardData] = useState<RoleDashBoardData | null>(
     null,
   );
+  const [personaText, setPersonaText] = useState<PersonaText | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { accessToken, isLoading: authLoading, user } = useAuthCheck();
@@ -87,19 +102,23 @@ const AnalysisPage = () => {
 
         const response = await getUserPersonas(accessToken);
         const dashboardResponse = await getRoleDashBoardData(accessToken);
+        const personaTextResponse = await getPersonaText(accessToken);
         if (
           !response ||
           !response.data ||
           !dashboardResponse ||
-          !dashboardResponse.data
+          !dashboardResponse.data ||
+          !personaTextResponse
         ) {
           throw new Error("유효하지 않은 응답 데이터");
         }
         console.log("API 응답:", response);
         setUserData(response.data);
         setDashBoardData(dashboardResponse.data);
+        setPersonaText(personaTextResponse.data);
         console.log("userdata 설정 후:", response.data);
         console.log("대쉬보드 설정 후:", dashboardResponse.data);
+        console.log("페르소나 텍스트:", personaTextResponse.data);
       } catch (error) {
         console.error("페르소나 데이터 가져오기 실패:", error);
         setError("데이터를 불러오는데 실패했습니다.");
@@ -151,7 +170,7 @@ const AnalysisPage = () => {
         <div className="flex h-screen items-center justify-center">
           <div>
             <Spinner />
-            데이터를 불러오는 중...
+            고객님의 취향을 분석중입니다. 잠시만 기다려주세요...
           </div>
         </div>
       </main>
@@ -170,7 +189,7 @@ const AnalysisPage = () => {
   }
 
   // userData가 null일 때
-  if (!userData || !dashBoardData || !accessToken) {
+  if (!userData || !dashBoardData || !personaText || !accessToken) {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
@@ -183,40 +202,56 @@ const AnalysisPage = () => {
   // 정상적으로 데이터가 있을 때만 렌더링
   return (
     <main className="pretendard">
-      <AnalysisHeroSection
-        mainPersonaImgPath={userData.mainPersonaImgPath}
-        mainPersonaName={userData.mainPersonaName}
-        mainPersonaPercent={userData.mainPersonaPercent}
-        myPersonaImgPath={userData.myPersonaImgPath}
-        myPersonaName={userData.myPersonaName}
-        subPersonaImgPath={userData.subPersonaImgPath}
-        subPersonaName={userData.subPersonaName}
-        subPersonaPercent={userData.subPersonaPercent}
-      />
-      <MyStyleSection
-        myPersonaTags={userData.myPersonaTags}
-        myPersonaDescription={userData.myPersonaDescription}
-        myPersonaGenres={userData.myPersonaGenres}
-      />
-      <RoleDashBoard
-        genderPercent={dashBoardData.genderPercent}
-        agePercent={dashBoardData.agePercent}
-        userId={user.userId}
-        personaName={userData.myPersonaName}
-      />
-      <MyWatchingStyleBoard
-        ratingPercent={dashBoardData.ratingPercent}
-        eventPercent={dashBoardData.eventPercent}
-        eventCount={dashBoardData.eventCount}
-        reviewPercent={dashBoardData.reviewPercent}
-        myLikePercent={dashBoardData.myLikePercent}
-        personaName={userData.myPersonaName}
-      />
-      <LikeContentSection
-        userId={user.userId}
-        personaName={userData.myPersonaName}
-        accessToken={accessToken}
-      />
+      <Suspense fallback={<Spinner />}>
+        <AnalysisHeroSection
+          mainPersonaImgPath={userData.mainPersonaImgPath}
+          mainPersonaName={userData.mainPersonaName}
+          mainPersonaPercent={userData.mainPersonaPercent}
+          myPersonaImgPath={userData.myPersonaImgPath}
+          myPersonaName={userData.myPersonaName}
+          subPersonaImgPath={userData.subPersonaImgPath}
+          subPersonaName={userData.subPersonaName}
+          subPersonaPercent={userData.subPersonaPercent}
+          personaText1={personaText.text1}
+          personaText2={personaText.text2}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <MyStyleSection
+          myPersonaTags={userData.myPersonaTags}
+          myPersonaDescription={userData.myPersonaDescription}
+          myPersonaGenres={userData.myPersonaGenres}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <RoleDashBoard
+          genderPercent={dashBoardData.genderPercent}
+          agePercent={dashBoardData.agePercent}
+          userId={user.userId}
+          personaName={userData.myPersonaName}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <MyWatchingStyleBoard
+          ratingPercent={dashBoardData.ratingPercent}
+          eventPercent={dashBoardData.eventPercent}
+          eventCount={dashBoardData.eventCount}
+          reviewPercent={dashBoardData.reviewPercent}
+          myLikePercent={dashBoardData.myLikePercent}
+          personaName={userData.myPersonaName}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <LikeContentSection
+          userId={user.userId}
+          personaName={userData.myPersonaName}
+          accessToken={accessToken}
+        />
+      </Suspense>
     </main>
   );
 };
