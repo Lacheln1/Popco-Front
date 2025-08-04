@@ -14,7 +14,10 @@ const MyPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 사용자 데이터를 가져오는 함수를 useCallback으로 최적화
+  const isLoggedIn = useCallback(() => {
+    return !!(accessToken && user?.isLoggedIn);
+  }, [accessToken, user?.isLoggedIn]);
+
   const fetchUserData = useCallback(async () => {
     if (!accessToken) {
       console.log("accessToken이 없습니다");
@@ -25,12 +28,10 @@ const MyPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // 사용자 상세 정보 가져오기
       const userDetailResponse = await getUserDetail(accessToken);
       console.log("사용자 상세 정보:", userDetailResponse);
       setUserData(userDetailResponse);
 
-      // 사용자 페르소나 정보 가져오기
       const userPersonaResponse = await getUserPersonas(accessToken);
       console.log("사용자 페르소나 정보:", userPersonaResponse);
       setUserPersonaData(userPersonaResponse);
@@ -46,16 +47,33 @@ const MyPage: React.FC = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  // 프로필 업데이트 후 호출될 콜백 함수
   const handleProfileUpdate = useCallback(
     async (signal: string) => {
       if (signal === "refresh") {
-        // 서버에서 최신 사용자 데이터 다시 가져오기
         await fetchUserData();
       }
     },
     [fetchUserData],
   );
+
+  if (!isLoggedIn()) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-lg text-gray-500">로그인이 필요합니다.</div>
+      </div>
+    );
+  }
+
+  if (!accessToken) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-lg text-gray-500">
+          <Spinner />
+          인증 정보를 확인하는 중...
+        </div>
+      </div>
+    );
+  }
 
   // 로딩 상태
   if (loading) {
@@ -99,7 +117,11 @@ const MyPage: React.FC = () => {
           />
         }
       >
-        <PageContents />
+        <PageContents
+          accessToken={accessToken} // string 타입 보장됨
+          user={user}
+          isLoggedIn={isLoggedIn()}
+        />
       </PageLayout>
     </div>
   );
