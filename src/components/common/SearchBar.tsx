@@ -76,7 +76,7 @@ const SearchBar = <T,>({
     const filteredResults = results.filter((result: AutocompleteItem) => {
       return searchType === "keyword"
         ? result.type === "content"
-        : result.type === "actor";
+        : result.type === "actors";
     });
 
     const options: AutoResult[] = filteredResults.map((result) => ({
