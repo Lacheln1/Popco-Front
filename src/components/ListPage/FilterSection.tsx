@@ -1,5 +1,5 @@
 import { DownOutlined } from "@ant-design/icons";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Space } from "antd";
 import { AnimatePresence } from "framer-motion";
 import { TAB_LIST, TabKey } from "@/constants/FilterTabs";
