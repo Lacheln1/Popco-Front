@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 
 // --- 타입 임포트 ---
 import { ContentsDetail, Crew } from "@/types/Contents.types";
@@ -20,7 +19,6 @@ import MovieInfo from "@/components/detail/MovieInfo";
 import ActionButtons from "@/components/detail/ActionButtons";
 import ReviewSection from "@/components/detail/ReviewSection";
 import CollectionSection from "@/components/detail/CollectionSection";
-import { validateAndRefreshTokens } from "@/apis/tokenApi";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import Spinner from "@/components/common/Spinner";
 // ======================================================================
@@ -263,7 +261,6 @@ export default function DetailPage() {
   const [myCurrentRating, setMyCurrentRating] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isHated, setIsHated] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
