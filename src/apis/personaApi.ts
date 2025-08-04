@@ -2,6 +2,7 @@ import { PersonaRecommendation, PersonaResponse } from "@/types/Persona.types";
 import axios from "axios";
 import recommendInstance from "./recommendInstance";
 
+const API_URL = "/api/client";
 interface QuestionOption {
   optionId: number;
   content: string;
@@ -54,4 +55,19 @@ export const fetchHeroPersona = async (
     main_persona: data.main_persona,
     recommendations: data.recommendations,
   };
+};
+
+export const getPersonaText = async (accessToken: string) => {
+  try {
+    const response = await axios.get(`${API_URL}/personas/texts`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("getPersonaText 실패:", error);
+    throw error;
+  }
 };
