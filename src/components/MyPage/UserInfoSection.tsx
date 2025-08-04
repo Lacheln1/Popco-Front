@@ -9,6 +9,7 @@ interface UserInfoSectionProps {
   currentPersona: string;
   profileImageUrl?: string;
   personaImageUrl?: string;
+  accessToken: string;
   onProfileUpdate?: (newImageUrl: string) => void;
 }
 
@@ -19,8 +20,8 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
   profileImageUrl,
   personaImageUrl,
   onProfileUpdate,
+  accessToken,
 }) => {
-  const { accessToken } = useAuthCheck();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -266,25 +267,27 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
                   value={newNickname}
                   onChange={(e) => setNewNickname(e.target.value)}
                   onKeyDown={handleNicknameKeyPress}
-                  className="pretendard-bold border-b border-gray-300 bg-transparent px-1 py-1 text-lg outline-none focus:border-black"
+                  className="pretendard-bold w-28 border-b border-gray-300 bg-transparent px-1 py-1 text-lg outline-none focus:border-black md:w-auto"
                   placeholder="닉네임을 입력하세요"
                   autoFocus
                   maxLength={5}
                 />
-                <button
-                  onClick={handleSaveNickname}
-                  disabled={isLoading}
-                  className="rounded bg-black px-2 py-1 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
-                >
-                  저장
-                </button>
-                <button
-                  onClick={handleCancelEditNickname}
-                  disabled={isLoading}
-                  className="rounded bg-gray-500 px-2 py-1 text-sm text-white hover:bg-gray-600 disabled:opacity-50"
-                >
-                  취소
-                </button>
+                <div className="flex gap-2 md:-translate-x-[110px] lg:-translate-x-0">
+                  <button
+                    onClick={handleSaveNickname}
+                    disabled={isLoading}
+                    className="rounded bg-black px-2 py-1 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    저장
+                  </button>
+                  <button
+                    onClick={handleCancelEditNickname}
+                    disabled={isLoading}
+                    className="rounded bg-gray-500 px-2 py-1 text-sm text-white hover:bg-gray-600 disabled:opacity-50"
+                  >
+                    취소
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -336,7 +339,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
         {/* 선택된 이미지가 있을 때 업데이트/취소 버튼 표시 */}
         {selectedImage && (
-          <div className="flex justify-center gap-2 md:absolute md:bottom-4 md:left-1/2 md:-translate-x-1/2">
+          <div className="flex justify-center gap-2 md:absolute md:bottom-4 md:left-1/2 md:-translate-x-[300px] lg:-translate-x-[250px]">
             <button
               onClick={handleUpdateProfile}
               disabled={isLoading}
