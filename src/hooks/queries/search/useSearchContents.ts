@@ -37,7 +37,7 @@ export const useSearchContents = ({
           page: pageParam as number,
           size,
         });
-        console.log(result);
+
         // API 응답 검증
         if (!result) {
           throw new Error("API returned null/undefined response");
@@ -64,13 +64,10 @@ export const useSearchContents = ({
       }
     },
     getNextPageParam: (lastPage, allPages) => {
-      console.log("getNextPageParam called:", { lastPage, allPages });
-      // lastPage가 undefined이거나 null인 경우 처리
       if (!lastPage) {
         console.warn("lastPage is undefined in getNextPageParam");
         return undefined;
       }
-      // last 속성이 없는 경우도 처리
       if (typeof lastPage.last !== "boolean") {
         console.warn("lastPage.last is not a boolean:", lastPage);
         // content가 비어있거나 size보다 작으면 마지막으로 간주
@@ -93,13 +90,12 @@ export const useSearchContents = ({
       ),
     // 에러 발생 시 재시도 설정
     retry: (failureCount, error) => {
-      console.log("Retry attempt:", failureCount, error);
+      console.log("에러 발생으로 재시도 설정:", failureCount, error);
       return failureCount < 3;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     // 데이터 검증을 위한 select 함수 추가
     select: (data) => {
-      console.log("Select function called with data:", data);
       return {
         ...data,
         pages: data.pages.filter((page) => page !== undefined && page !== null),

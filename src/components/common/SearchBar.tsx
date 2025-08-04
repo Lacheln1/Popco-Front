@@ -20,6 +20,7 @@ const SearchBar = <T,>({
   className,
   searchType,
   setSearchType,
+  onDebouncedChange,
 }: SearchBarProps<T> & {
   searchType: "keyword" | "actors";
   setSearchType: (type: "keyword" | "actors") => void;
@@ -120,7 +121,8 @@ const SearchBar = <T,>({
     const value = e.target.value;
     setSearchValue(value);
     triggerAutocomplete(value);
-    setSelectedIndex(-1); // 입력 시 선택 인덱스 초기화
+    setSelectedIndex(-1);
+    onDebouncedChange?.(value);
   };
 
   const handleSelect = (option: AutoResult) => {
@@ -135,7 +137,7 @@ const SearchBar = <T,>({
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!showDropdown || suggestions.length === 0) {
       if (e.key === "Enter") {
-        // 드롭다운이 없을 때 엔터 시 실제 검색 실행
+        // 드롭다운이 없을 때 엔터 시 실제 검색
         memoizedOnSearch(searchValue, results as unknown as T[]);
         setShowDropdown(false);
       }

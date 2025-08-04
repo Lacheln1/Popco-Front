@@ -78,6 +78,7 @@ const ListPage = () => {
     sort,
     allContentsQuery.hasNextPage,
     allContentsQuery.isFetching,
+    allContentsQuery,
   ]);
 
   // 검색 결과 변환 함수
@@ -263,29 +264,6 @@ const ListPage = () => {
 
   const isEmpty = displayContents.length === 0 && !isLoading;
 
-  // 디버깅용 로그 (개발 중에만 사용)
-  useEffect(() => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("🔍 Search State:", {
-        searchType,
-        isKeywordSearch,
-        searchKeyword,
-        isActorSearch,
-        searchActors,
-        isSearching,
-        displayContents: displayContents.length,
-      });
-    }
-  }, [
-    searchType,
-    isKeywordSearch,
-    searchKeyword,
-    isActorSearch,
-    searchActors,
-    isSearching,
-    displayContents.length,
-  ]);
-
   return (
     <PageLayout
       header={
@@ -297,6 +275,7 @@ const ListPage = () => {
       floatingBoxContent={
         <>
           <SearchBar
+            onDebouncedChange={handleSearch}
             onSearch={handleSearch}
             searchType={searchType}
             setSearchType={setSearchType}
@@ -343,14 +322,6 @@ const ListPage = () => {
         ) : (
           <div className="py-8 text-center text-gray-500">
             {isLoading ? "로딩 중..." : "결과가 없습니다."}
-            {/* 개발 모드에서 추가 정보 표시 */}
-            {process.env.NODE_ENV === "development" && (
-              <div className="mt-2 text-xs text-gray-400">
-                Search: {isSearching ? "ON" : "OFF"} | Filter:{" "}
-                {hasActiveFilter ? "ON" : "OFF"} | Type: {searchType} | Keyword:
-                "{searchKeyword}" | Actors: {JSON.stringify(searchActors)}
-              </div>
-            )}
           </div>
         )}
       </div>

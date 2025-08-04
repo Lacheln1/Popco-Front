@@ -23,7 +23,6 @@ export const fetchSearchContents = async ({
 }: SearchContentsParams): Promise<SearchResponse> => {
   const hasKeyword = keyword.trim().length > 0;
   const hasActors = Array.isArray(actors) && actors.length > 0;
-
   if (!hasKeyword && !hasActors) {
     return {
       content: [],
@@ -34,20 +33,16 @@ export const fetchSearchContents = async ({
       size,
     };
   }
-
   const params: Record<string, string | string[]> = {
     page: String(page),
     size: String(size),
   };
-
   if (hasKeyword) params.keyword = keyword;
   if (hasActors) params.actors = actors;
-
   try {
     const response = await axiosInstance.get(`/search/contents/advanced`, {
       params,
     });
-
     return response.data;
   } catch (error) {
     console.error("검색 API 오류:", error);
@@ -73,8 +68,6 @@ export const postFilteredContents = async (
   );
   return response.data.data;
 };
-
-// searchApi.ts에 추가할 자동완성 API 함수
 
 export interface AutocompleteItem {
   value: string;

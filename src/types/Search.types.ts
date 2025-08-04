@@ -65,6 +65,7 @@ interface SearchBarProps<T = any> {
   debounceTime?: number;
   maxSuggestions?: number;
   className?: string;
+  onDebouncedChange?: (value: string) => void;
 }
 
 interface SearchContentsParams {
