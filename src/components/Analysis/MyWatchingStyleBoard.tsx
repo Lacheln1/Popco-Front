@@ -37,6 +37,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
                 customerScore={ratingPercent[0]}
                 averageScore={ratingPercent[1]}
                 maxScore={5}
+                personaName={personaName}
               />
             </div>
             <span className="text-base md:text-2xl">
@@ -50,6 +51,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
                 customerScore={eventPercent[0]}
                 averageScore={eventPercent[1]}
                 maxScore={eventCount}
+                personaName={personaName}
               />
             </div>
             <span className="text-base md:text-2xl">
@@ -63,6 +65,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
                 customerScore={reviewPercent[0]}
                 averageScore={reviewPercent[1]}
                 maxScore={reviewPercent[2]}
+                personaName={personaName}
               />
               <div className="flex justify-center">
                 <span className="text-base md:text-2xl">

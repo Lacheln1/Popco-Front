@@ -169,6 +169,9 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
                       <h3 className="truncate text-sm font-medium text-gray-800">
                         {content.title}
                       </h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {content.contentType === "movie" ? "영화" : "TV 시리즈"}
+                      </p>
                     </div>
                   </div>
                 </SwiperSlide>

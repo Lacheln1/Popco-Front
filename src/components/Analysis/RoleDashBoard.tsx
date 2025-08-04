@@ -183,9 +183,7 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
             <LoadingSection title="선호영화" />
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="text-base md:text-2xl lg:text-4xl">
-                선호영화
-              </span>
+              <span className="text-base md:text-2xl">선호영화</span>
               <div className="mt-2 rounded-xl bg-white px-4 sm:mt-4 lg:px-7">
                 {movieData.map((movie, index) => (
                   <div
@@ -214,9 +212,7 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
             <LoadingSection title="선호 시리즈" />
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="text-base md:text-2xl lg:text-4xl">
-                선호 시리즈
-              </span>
+              <span className="text-base md:text-2xl">선호 시리즈</span>
               <div className="mt-2 rounded-xl bg-white px-4 sm:mt-4 lg:px-7">
                 {seriesData.map((series, index) => (
                   <div
