@@ -3,13 +3,31 @@ export interface QuizOption {
   content: string;
 }
 
+export interface RawQuestionResponse {
+  quizId: number;
+  questionId: number;
+  content: string;
+  quizQuestionId: number;
+  firstCapacity: number;
+  options: RawOption[];
+}
+
+export interface RawOption {
+  content: string;
+  isCorrect: boolean;
+}
+
+export interface QuizOption {
+  id: number;
+  content: string;
+}
+
 export interface QuestionData {
   questionId: number;
   content: string;
   firstCapacity: number;
   options: QuizOption[];
 }
-
 export interface ServerBroadcast {
   type?: "QUESTION_START" | "QUESTION_TIMEOUT";
   remainingTime?: number;
