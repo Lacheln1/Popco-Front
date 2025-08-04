@@ -11,7 +11,8 @@ export const useQuizInfo = (token: string | null | undefined) => {
   return useQuery<QuizInfoResponse>({
     queryKey: ["quizInfo"],
     queryFn: () => fetchQuizInfo(token!),
-    staleTime: 1000 * 60 * 30,
+    staleTime: 0,
+    gcTime: 0,
     retry: 1,
     enabled: !!token,
   });

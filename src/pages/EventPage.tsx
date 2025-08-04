@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useIsMediumUp } from "@/hooks/useMediaQuery";
 import { PosterImage } from "@/components/EventPage/PosterImage";
 import { EventInfoCard } from "@/components/EventPage/cards/EventInfoCard";
@@ -8,6 +8,10 @@ import { WaitingRoom } from "@/components/EventPage/cards/WaitingRoom";
 import { Eliminated } from "@/components/EventPage/cards/Eliminated";
 import { FinalWinner } from "@/components/EventPage/cards/FinalWinner";
 import { useQuizStore } from "@/stores/useQuizStore";
+import { useNavigate } from "react-router-dom";
+import useAuthCheck from "@/hooks/useAuthCheck";
+import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
+import { App } from "antd";
 
 const image = {
   src: "https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
@@ -15,10 +19,25 @@ const image = {
 };
 
 const EventPage = () => {
+  const { message } = App.useApp();
+  const navigate = useNavigate();
+  const { accessToken } = useAuthCheck();
+  const { data, isLoading } = useQuizInfo(accessToken);
   const isMediumUp = useIsMediumUp();
   const postersToRender = isMediumUp ? 4 : 1;
   const [isButtonActive, setIsButtonActive] = React.useState(false);
   const { step } = useQuizStore();
+
+  useEffect(() => {
+    if (data && !data.quizPageAccess) {
+      navigate("/", { replace: true });
+      message.error("오늘은 퀴즈가 없습니다.");
+    }
+  }, [accessToken, isLoading, data, navigate]);
+
+  if (isLoading) {
+    return <div className="mt-20 text-center">퀴즈 정보를 불러오는 중...</div>;
+  }
 
   const renderStepComponent = () => {
     switch (step) {
