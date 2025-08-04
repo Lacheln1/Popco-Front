@@ -10,7 +10,8 @@ export const connectSocket = (token: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     const client = new Client({
       // SockJS 사용 시 brokerURL 대신 webSocketFactory 사용
-      webSocketFactory: () => new SockJS("/ws-quiz"),
+      webSocketFactory: () =>
+        new SockJS("http://popco.site/api/client/ws-quiz"),
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
