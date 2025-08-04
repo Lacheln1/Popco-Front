@@ -16,8 +16,8 @@ export const useHeroPersona = (
   >({
     queryKey: ["heroPersona", userId, contentType],
     queryFn: () => fetchHeroPersona(userId, token, contentType),
-    staleTime: 1000 * 60 * 60 * 6,
-    gcTime: 1000 * 60 * 60 * 7,
+    staleTime: 0,
+    gcTime: 1000 * 60 * 10,
     retry: 1,
     enabled: !!userId && !!token,
   });

@@ -71,8 +71,15 @@ interface RecommendationResponse {
 // 주간 랭킹
 export const fetchContentsRanking = async (
   type: ContentCategory,
+  token?: string,
 ): Promise<ContentItem[]> => {
-  const { data } = await axiosInstance.get(`/contents/popular/types/${type}`);
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+  const { data } = await axiosInstance.get(`/contents/popular/types/${type}`, {
+    headers,
+  });
   return data.data;
 };
 
@@ -112,6 +119,37 @@ export const fetchWishlist = async (
     console.error("위시리스트 조회 실패", error);
     throw error;
   }
+};
+
+// 위시리스트에 추가 (POST /wishlists/users/{userId})
+export const addToWishlist = async (params: {
+  userId: number;
+  contentId: number;
+  contentType: string;
+  accessToken: string;
+}) => {
+  const { userId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.post(
+    `/wishlists/users/${userId}`,
+    { contentId, contentType },
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data;
+};
+
+// 위시리스트에서 삭제 (DELETE /wishlists/users/{userId})
+export const removeFromWishlist = async (params: {
+  userId: number;
+  contentId: number;
+  contentType: string;
+  accessToken: string;
+}) => {
+  const { userId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.delete(`/wishlists/users/${userId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    data: { contentId, contentType },
+  });
+  return data;
 };
 
 // 전체 컨텐츠 조회

@@ -6,17 +6,13 @@ import Spinner from "@/components/common/Spinner";
 import { searchContents } from "@/apis/collectionApi";
 
 // --- 디바운스 훅 ---
-// 지정된 시간(delay) 동안 입력 값의 변경이 없으면, 마지막 값을 반환합니다.
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
   useEffect(() => {
-    // 값이 변경되면 delay 이후에 debouncedValue를 업데이트하는 타이머를 설정합니다.
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
-    // 다음 effect가 실행되기 전에 이전 타이머를 정리(취소)합니다.
-    // 사용자가 계속 타이핑하면 타이머가 계속 리셋되어 API 호출을 막습니다.
     return () => {
       clearTimeout(handler);
     };
@@ -24,7 +20,6 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-// ... (타입 정의는 기존과 동일)
 interface ApiContentItem {
   contentId: number;
   title: string;
@@ -52,7 +47,7 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
 }) => {
   const [keyword, setKeyword] = useState("");
   // --- 디바운스 훅 사용 ---
-  // 사용자가 입력한 keyword를 500ms(0.5초) 지연시켜 debouncedKeyword를 생성합니다.
+  // 사용자가 입력한 keyword를 500ms(0.5초) 지연시켜 debouncedKeyword를 생성
   const debouncedKeyword = useDebounce(keyword, 500);
 
   const [directResults, setDirectResults] = useState<ApiContentItem[]>([]);
@@ -61,7 +56,6 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
 
   // --- debouncedKeyword가 바뀔 때마다 API를 호출 ---
   useEffect(() => {
-    // 디바운싱된 검색어가 없으면 아무것도 하지 않음
     if (!debouncedKeyword) {
       setDirectResults([]);
       setIsLoading(false);
@@ -109,7 +103,6 @@ const SearchContentModal: React.FC<SearchContentModalProps> = ({
       width={550}
     >
       <div className="flex flex-col gap-4 py-4">
-        {/* Input.Search 대신 일반 Input 사용 */}
         <Input
           placeholder="영화, 드라마 제목을 검색하세요"
           value={keyword}

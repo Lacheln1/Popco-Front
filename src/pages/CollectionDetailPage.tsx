@@ -99,13 +99,20 @@ const CollectionDetailPage: React.FC = () => {
 
   const handleEditSave = useCallback(() => {
     if (!accessToken) return;
-    updateCollection({
-      collectionId: collectionId!,
-      title: editedTitle,
-      description: editedDescription,
-      accessToken,
-    });
-    setIsEditing(false);
+
+    updateCollection(
+      {
+        collectionId: collectionId!,
+        title: editedTitle,
+        description: editedDescription,
+        accessToken,
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+        },
+      },
+    );
   }, [
     collectionId,
     editedTitle,

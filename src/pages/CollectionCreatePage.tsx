@@ -9,6 +9,7 @@ import PageLayout from "@/layout/PageLayout";
 import SectionHeader from "@/components/common/SectionHeader";
 import AddContentCard from "@/components/collection/AddContentCard";
 import EditablePoster from "@/components/collection/EditablePoster";
+import Spinner from "@/components/common/Spinner";
 import SearchContentModal from "@/components/collection/SearchContentModal";
 
 // 타입 정의
@@ -108,8 +109,8 @@ const CollectionCreatePage: React.FC = () => {
           />
         }
         floatingBoxContent={
-          <div className="flex h-[50vh] w-full items-center justify-center">
-            <Spin size="large" />
+          <div className="flex h-[340px] items-center justify-center md:h-[360px]">
+            <Spinner />
           </div>
         }
       />

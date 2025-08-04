@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
@@ -10,21 +10,32 @@ import type { MenuProps } from "antd";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
-import { ContentCategory } from "@/types/Contents.types";
+import { ContentCategory, ReactionType } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { useNavigate } from "react-router-dom";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 
 interface HeroRankingProps {
   onTop1Change: (type: ContentCategory, title: string) => void;
+  accessToken: string;
+  userId: number;
+  type: ContentCategory;
 }
 
-const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
+const HeroRanking = ({
+  accessToken,
+  userId,
+  type,
+  onTop1Change,
+}: HeroRankingProps) => {
   const [viewMode, setViewMode] = useState<"swiper" | "desktop">("desktop");
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [selected, setSelected] = useState<ContentCategory>("all");
+  const [selected, setSelected] = useState<ContentCategory>(type);
+  const navigate = useNavigate();
 
   const categoryMap = {
     all: "전체",
@@ -37,6 +48,11 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
       key,
       label,
     }),
+  );
+  const { data = [], isLoading } = useContentsRanking(
+    selected,
+    accessToken,
+    userId,
   );
 
   useEffect(() => {
@@ -53,22 +69,37 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
     return () => window.removeEventListener("resize", checkView);
   }, []);
 
-  const { data = [], isLoading } = useContentsRanking(selected);
-
   useEffect(() => {
     if (data && data.length > 0) {
       onTop1Change(selected, data[0].title);
     }
   }, [data, selected, onTop1Change]);
 
-  if (!Array.isArray(data)) {
-    console.error("HeroRanking Error: data is not an array", data);
-    return <div>데이터가 없습니다.</div>;
-  }
-
+  // 1등 / 나머지 등수
   const first = data[0];
   const contentsRank = data.slice(1);
-  if (isLoading) <div>Loading</div>;
+
+  const contentList = useMemo(
+    () =>
+      data?.map((item) => ({
+        id: item.contentId,
+        reaction: (item.userReaction as ReactionType) ?? "NEUTRAL",
+      })) ?? [],
+    [data],
+  );
+
+  const { reactionMap, handleReaction } = useContentReaction({
+    userId,
+    accessToken,
+    contentList,
+  });
+
+  if (isLoading) return <div>Loading</div>;
+
+  if (!Array.isArray(data)) {
+    console.error("HeroRanking Error", data);
+    return <div>데이터가 없습니다.</div>;
+  }
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -139,7 +170,12 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                   {first.overview}
                 </p>
 
-                <button className="bg-popco-hair hover:bg-popco-main mt-2 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-black sm:text-base">
+                <button
+                  onClick={() =>
+                    navigate(`/detail/${first.type}/${first.contentId}`)
+                  }
+                  className="bg-popco-hair hover:bg-popco-main mt-2 flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-black sm:text-base"
+                >
                   <LuEye className="text-base sm:text-lg" />
                   <span>view more</span>
                 </button>
@@ -184,8 +220,14 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
                       posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
                       id={content.contentId}
                       contentType={content.type}
-                      likeState="NEUTRAL"
-                      onLikeChange={() => {}}
+                      likeState={reactionMap[content.contentId]}
+                      onLikeChange={(newState) =>
+                        handleReaction(
+                          content.contentId,
+                          newState,
+                          content.type,
+                        )
+                      }
                     />
                   </SwiperSlide>
                 ))}
@@ -193,28 +235,26 @@ const HeroRanking = ({ onTop1Change }: HeroRankingProps) => {
             </>
           ) : (
             <ul className="ml-9 mt-12 grid grid-cols-2 justify-items-center gap-4 sm:mt-6 sm:flex sm:justify-between sm:gap-6">
-              {contentsRank.map(
-                (
-                  content, 
-                ) => (
-                  <li
-                    key={content.contentId} 
-                    className="relative flex-col items-center *:flex"
-                  >
-                    <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
-                      {content.rank} 
-                    </span>
-                    <Poster
-                      title={content.title} 
-                      posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`} 
-                      id={content.contentId} 
-                      contentType={content.type} 
-                      likeState="NEUTRAL"
-                      onLikeChange={() => {}}
-                    />
-                  </li>
-                ),
-              )}
+              {contentsRank.map((content) => (
+                <li
+                  key={content.contentId}
+                  className="relative flex-col items-center *:flex"
+                >
+                  <span className="absolute -left-11 -top-6 z-10 font-mono text-[60px] font-bold text-transparent drop-shadow-lg [-webkit-text-stroke:3px_#0f1525] sm:text-[80px] md:text-[90px]">
+                    {content.rank}
+                  </span>
+                  <Poster
+                    title={content.title}
+                    posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+                    id={content.contentId}
+                    contentType={content.type}
+                    likeState={reactionMap[content.contentId]}
+                    onLikeChange={(newState) =>
+                      handleReaction(content.contentId, newState, content.type)
+                    }
+                  />
+                </li>
+              ))}
             </ul>
           )}
         </>
