@@ -115,7 +115,7 @@ const AgeChart = ({ agePercent }: AgeChartProps) => {
   };
 
   return (
-    <div className="w-full sm:h-[250px] sm:text-3xl">
+    <div className="w-full sm:h-[250px]">
       <Bar options={options} data={data} />
     </div>
   );

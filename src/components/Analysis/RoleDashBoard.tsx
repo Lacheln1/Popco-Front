@@ -157,13 +157,13 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
       >
         <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-48">
           <div className="flex flex-col items-center text-center">
-            <span className="text-2xl">성별</span>
+            <span className="text-base">성별</span>
             <div>
               <GenderChart genderPercent={genderPercent} />
             </div>
           </div>
           <div className="flex flex-col items-center text-center">
-            <span className="text-2xl">연령대</span>
+            <span className="text-base">연령대</span>
             <div>
               <AgeChart agePercent={agePercent} />
             </div>
@@ -177,13 +177,15 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
           </div>
         )}
 
-        <div className="mt-4 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-36 lg:gap-24">
+        <div className="mt-14 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-36 lg:gap-24">
           {/* 선호영화 */}
           {loading ? (
             <LoadingSection title="선호영화" />
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="sm:text-3xl lg:text-4xl">선호영화</span>
+              <span className="text-base sm:text-3xl lg:text-4xl">
+                선호영화
+              </span>
               <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
                 {movieData.map((movie, index) => (
                   <div
@@ -212,7 +214,9 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
             <LoadingSection title="선호 시리즈" />
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="sm:text-3xl lg:text-4xl">선호 시리즈</span>
+              <span className="text-base sm:text-3xl lg:text-4xl">
+                선호 시리즈
+              </span>
               <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
                 {seriesData.map((series, index) => (
                   <div

@@ -35,7 +35,7 @@ const GenderChart = ({ genderPercent }: GenderChartProps) => {
         position: "top",
         labels: {
           font: {
-            size: 20,
+            size: 16,
             family: "Pretendard",
           },
         },

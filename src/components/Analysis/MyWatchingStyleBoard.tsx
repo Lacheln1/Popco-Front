@@ -31,7 +31,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
       >
         <div className="flex sm:gap-10 sm:text-2xl lg:gap-32">
           <div className="flex flex-col items-center">
-            <span>평균 별점</span>
+            <span className="text-base">평균 별점</span>
             <div>
               <AverageDoubleDonutChart
                 customerScore={ratingPercent[0]}
@@ -42,7 +42,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
             <span>{ratingPercent[0]}/5 점</span>
           </div>
           <div className="flex flex-col items-center">
-            <span>이벤트 참여 수</span>
+            <span className="text-base">이벤트 참여 수</span>
             <div>
               <AverageDoubleDonutChart
                 customerScore={eventPercent[0]}
@@ -76,7 +76,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
             </div>
           </div>
         </div>
-        <div className="mt-4 w-full md:w-[700px] lg:w-[900px] xl:w-[1000px]">
+        <div className="mt-10 w-full md:w-[700px] lg:w-[900px] xl:w-[1000px]">
           <div className="flex flex-col">
             <div className="mx-3 flex justify-between">
               <div>
@@ -96,10 +96,14 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
             </div>
             <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8">
               <div
-                className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
+                className="relative flex items-center justify-center bg-yellow-200 font-medium text-gray-700"
                 style={{ width: `${myLikePercent[0]}%` }}
               >
-                <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
+                <span
+                  className={`text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl ${
+                    myLikePercent[0] === 0 ? "hidden" : ""
+                  }`}
+                >
                   {`${myLikePercent[0]}%`}
                 </span>
               </div>
@@ -107,7 +111,11 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
                 className="relative flex items-center justify-center bg-yellow-200 font-medium text-gray-700"
                 style={{ width: `${myLikePercent[1]}%` }}
               >
-                <span className="text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl">
+                <span
+                  className={`text-xs font-bold sm:text-sm md:text-base lg:text-lg xl:text-xl ${
+                    myLikePercent[1] === 0 ? "hidden" : ""
+                  }`}
+                >
                   {`${myLikePercent[1]}%`}
                 </span>
               </div>
