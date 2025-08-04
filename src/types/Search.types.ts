@@ -72,4 +72,36 @@ interface SearchContentsParams {
   size: number;
 }
 
+// 필터링
+export interface PostFilterRequest {
+  contentType?: string | null;
+  genres?: string[];
+  minRating?: number;
+  maxRating?: number;
+  platforms?: string[];
+  minReleaseYear?: number;
+  maxReleaseYear?: number;
+  ageGroupFilter?: Record<string, unknown>;
+  personaFilter?: Record<string, unknown>;
+  popcorithmFilter?: Record<string, unknown>;
+}
+
+export interface FilteredContentResponse {
+  contentId: number;
+  contentType: string;
+  title: string;
+  genres: string[];
+  platforms: string[];
+  ratingAverage: number;
+  releaseDate: string;
+}
+
+export interface PostFilterResponse {
+  contents: FilteredContentResponse[];
+  totalElements: number;
+  page: number;
+  size: number;
+  totalPages: number;
+}
+
 export type { SearchResult, AutoResult, SearchBarProps, SearchContentsParams };

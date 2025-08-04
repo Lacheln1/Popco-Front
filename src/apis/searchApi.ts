@@ -1,4 +1,9 @@
-import { SearchResult } from "@/types/Search.types";
+import {
+  PostFilterRequest,
+  PostFilterResponse,
+  SearchContentsParams,
+  SearchResult,
+} from "@/types/Search.types";
 import axiosInstance from "./axiosInstance";
 
 interface SearchResponse {
@@ -7,13 +12,6 @@ interface SearchResponse {
   totalPages: number;
   totalElements: number;
   number: number;
-  size: number;
-}
-
-interface SearchContentsParams {
-  keyword?: string;
-  actors?: string[];
-  page?: number;
   size: number;
 }
 
@@ -62,4 +60,16 @@ export const fetchSearchContents = async ({
       size,
     };
   }
+};
+
+export const postFilteredContents = async (
+  body: PostFilterRequest,
+  page = 0,
+  size = 20,
+) => {
+  const response = await axiosInstance.post<{ data: PostFilterResponse }>(
+    `/contents/filters?page=${page}&size=${size}`,
+    body,
+  );
+  return response.data.data;
 };

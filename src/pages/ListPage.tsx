@@ -10,6 +10,8 @@ import { AllContentItem, ContentCategory } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useSearchContents } from "@/hooks/queries/search/useSearchContents";
 import { SearchResult } from "@/types/Search.types";
+import { useFilterStore } from "@/store/useFilterStore";
+import { useFilteredContents } from "@/hooks/queries/search/useFilteredContents";
 
 const ListPage = () => {
   const [sort, setSort] = useState("recent");
@@ -60,6 +62,14 @@ const ListPage = () => {
       posterPath: result.posterPath,
     }));
   };
+
+  // 필터 관련 상태
+  const { filter } = useFilterStore();
+  const { mutate } = useFilteredContents();
+
+  useEffect(() => {
+    mutate({ filter, page: 0, size: 30 });
+  }, [filter]);
 
   const searchResults: AllContentItem[] =
     searchData?.pages.flatMap((page) =>
