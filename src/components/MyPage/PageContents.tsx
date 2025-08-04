@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import MovieCalendar from "./MovieCalendar";
 import ReviewCard from "../common/ReviewCard";
 import useAuthCheck from "@/hooks/useAuthCheck";
@@ -62,13 +62,6 @@ interface Collection {
   contentPosters: ContentPoster[];
 }
 
-// YYYY-MM 형식으로 변환하기
-const formatMonthForApi = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
-};
-
 const PageContents: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -95,133 +88,90 @@ const PageContents: React.FC = () => {
   const [isEnd, setIsEnd] = useState(false);
 
   const { accessToken, user } = useAuthCheck();
+  const tabTitles = ["Calendar", "Collection", "MY"];
 
   const { message } = App.useApp();
   const navigate = useNavigate();
 
-  //로그인 상태를 매번 계산하지 않고 캐시하여 최적화
-  const isLoggedIn = useMemo(
-    () => accessToken && user.isLoggedIn,
-    [accessToken, user.isLoggedIn],
-  );
+  // YYYY-MM 형식으로 변환하기
+  const formatMonthForApi = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}`;
+  };
 
-  //탭 제목은 정적 배열이므로 한번만 생성하게 하여 최적화
-  const tabTitles = useMemo(() => ["Calendar", "Collection", "MY"], []);
+  const fetchMonthlyReviews = async (month: string) => {
+    if (!accessToken || !user.isLoggedIn) {
+      console.log("로그인이 필요합니다");
+      setMovies([]);
+      return;
+    }
 
-  //Swiper의 브레이크 포인트 객체들 최적화
-  const swiperBreakpoints = useMemo(
-    () => ({
-      320: { slidesPerView: 1.45, spaceBetween: 12 },
-      480: { slidesPerView: 2, spaceBetween: 12 },
-      640: { slidesPerView: 2, spaceBetween: 14 },
-      768: { slidesPerView: 2.7, spaceBetween: 16 },
-      1024: { slidesPerView: 3.9, spaceBetween: 16 },
-    }),
-    [],
-  );
+    try {
+      setLoading(true);
+      console.log(`API 요청: /reviews/my/monthly?month=${month}`);
+      const response = await getMonthlyReviews({ month }, accessToken);
+      console.log("월별영화api응답==", response);
 
-  //Collection에 사용되는 swiper 브레이크 포인트 객체 최적화
-  const collectionSwiperBreakpoints = useMemo(
-    () => ({
-      320: { slidesPerView: 1.45, spaceBetween: 12 },
-      480: { slidesPerView: 2, spaceBetween: 12 },
-      640: { slidesPerView: 2, spaceBetween: 14 },
-      768: { slidesPerView: 3, spaceBetween: 16 },
-      1024: { slidesPerView: 4.7, spaceBetween: 16 },
-    }),
-    [],
-  );
+      if (response.data) {
+        const movieData: Movie[] = response.data.map((review) => ({
+          date: review.createdAt
+            ? review.createdAt.split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          title: review.title || "제목 없음",
+          poster: review.posterPath || "",
+          reviewText: review.text || "",
+          score: review.score || 0,
+          contentId: review.contentId || 0,
+          contentType: review.contentType || "",
+          reviewId: review.reviewId || 0,
+        }));
 
-  //좋아요한 collection에 사용되는 swiper 브레이크 포인트 객체 최적화
-  const markedCollectionsSwiperBreakpoints = useMemo(
-    () => ({
-      320: { slidesPerView: 1.6, spaceBetween: 12 },
-      480: { slidesPerView: 2, spaceBetween: 12 },
-      640: { slidesPerView: 2, spaceBetween: 14 },
-      768: { slidesPerView: 3, spaceBetween: 16 },
-      1024: { slidesPerView: 4.7, spaceBetween: 16 },
-    }),
-    [],
-  );
-
-  //useCallback을 사용하여 API호출 함수 최적화
-  const fetchMonthlyReviews = useCallback(
-    async (month: string) => {
-      if (!isLoggedIn || !accessToken) {
-        console.log("로그인이 필요합니다");
-        setMovies([]);
-        return;
+        setMovies(movieData);
+        console.log("변환된 영화 데이터:", movieData);
       }
+    } catch (error) {
+      console.error("영화api요청 실패", error);
+      setMovies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      try {
-        setLoading(true);
-        console.log(`API 요청: /reviews/my/monthly?month=${month}`);
-        const response = await getMonthlyReviews({ month }, accessToken);
-        console.log("월별영화api응답==", response);
+  // 컬렉션 목록 가져오기
+  const fetchMyCollectionsData = async (reset = false) => {
+    if (!accessToken || !user.isLoggedIn || collectionsLoading) {
+      return;
+    }
 
-        if (response.data) {
-          const movieData: Movie[] = response.data.map((review) => ({
-            date: review.createdAt
-              ? review.createdAt.split("T")[0]
-              : new Date().toISOString().split("T")[0],
-            title: review.title || "제목 없음",
-            poster: review.posterPath || "",
-            reviewText: review.text || "",
-            score: review.score || 0,
-            contentId: review.contentId || 0,
-            contentType: review.contentType || "",
-            reviewId: review.reviewId || 0,
-          }));
+    try {
+      setCollectionsLoading(true);
+      setCollectionsError(null);
 
-          setMovies(movieData);
-          console.log("변환된 영화 데이터:", movieData);
+      const response = await fetchMyCollections(accessToken, 0, 100);
+      console.log("컬렉션 API 응답:", response);
+
+      // 변경된 응답 구조에 맞게 수정
+      if (response && response.collections) {
+        const newCollections = response.collections;
+
+        if (reset) {
+          setCollections(newCollections);
+        } else {
+          setCollections((prev) => [...prev, ...newCollections]);
         }
-      } catch (error) {
-        console.error("영화api요청 실패", error);
-        setMovies([]);
-      } finally {
-        setLoading(false);
       }
-    },
-    [isLoggedIn, accessToken],
-  );
+    } catch (err) {
+      console.error("컬렉션 조회 실패:", err);
+      setCollectionsError("컬렉션을 불러오는데 실패했습니다.");
+    } finally {
+      setCollectionsLoading(false);
+    }
+  };
 
-  //useCallback을 사용하여 API호출 함수 최적화2
-  const fetchMyCollectionsData = useCallback(
-    async (reset = false) => {
-      if (!isLoggedIn || !accessToken || collectionsLoading) {
-        return;
-      }
-
-      try {
-        setCollectionsLoading(true);
-        setCollectionsError(null);
-
-        const response = await fetchMyCollections(accessToken, 0, 100);
-        console.log("컬렉션 API 응답:", response);
-
-        if (response && response.collections) {
-          const newCollections = response.collections;
-
-          if (reset) {
-            setCollections(newCollections);
-          } else {
-            setCollections((prev) => [...prev, ...newCollections]);
-          }
-        }
-      } catch (err) {
-        console.error("컬렉션 조회 실패:", err);
-        setCollectionsError("컬렉션을 불러오는데 실패했습니다.");
-      } finally {
-        setCollectionsLoading(false);
-      }
-    },
-    [isLoggedIn, accessToken, collectionsLoading],
-  );
-
-  // 저장한 컬렉션 목록 가져오기 , useCallback을 사용하여 API호출 함수 최적화3
-  const fetchMyMarkedCollectionsData = useCallback(async () => {
-    if (!isLoggedIn || !accessToken || markedCollectionsLoading) {
+  // 저장한 컬렉션 목록 가져오기
+  const fetchMyMarkedCollectionsData = async () => {
+    if (!accessToken || !user.isLoggedIn || markedCollectionsLoading) {
       return;
     }
 
@@ -242,10 +192,10 @@ const PageContents: React.FC = () => {
     } finally {
       setMarkedCollectionsLoading(false);
     }
-  }, [isLoggedIn, accessToken, markedCollectionsLoading]);
+  };
 
-  // 컬렉션 저장/취소 토글 , useCallback을 사용하여 API호출 함수 최적화4
-  const handleSaveToggle = useCallback(async (collectionId: number) => {
+  // 컬렉션 저장/취소 토글
+  const handleSaveToggle = async (collectionId: number) => {
     try {
       // 실제로는 저장/취소 API를 호출해야 합니다
       console.log("저장 토글:", collectionId);
@@ -254,45 +204,42 @@ const PageContents: React.FC = () => {
     } catch (err) {
       console.error("저장 토글 실패:", err);
     }
-  }, []);
+  };
 
-  const handleSwiperInit = useCallback((swiper: SwiperType) => {
+  const handleSwiperInit = (swiper: SwiperType) => {
     console.log("Swiper 초기화됨:", swiper);
     setSwiperInstance(swiper);
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
-  }, []);
+  };
 
-  const handleSlideChange = useCallback((swiper: SwiperType) => {
+  const handleSlideChange = (swiper: SwiperType) => {
     console.log("슬라이드 변경:", swiper.activeIndex);
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
-  }, []);
+  };
 
   // Movie 데이터를 ReviewCard가 요구하는 ReviewData 형태로 변환
-  const convertToReviewData = useCallback(
-    (movie: Movie): ReviewData => {
-      return {
-        movieTitle: movie.title || "제목 없음",
-        score: movie.score || 0,
-        reviewText: movie.reviewText || "리뷰 내용이 없습니다",
-        nickname: user.nickname || "익명",
-        likeCount: 0,
-        isSpoiler: false,
-        isOwnReview: true,
-        isLiked: false,
-        hasAlreadyReported: false,
-      };
-    },
-    [user.nickname],
-  );
+  const convertToReviewData = (movie: Movie): ReviewData => {
+    return {
+      movieTitle: movie.title || "제목 없음",
+      score: movie.score || 0,
+      reviewText: movie.reviewText || "리뷰 내용이 없습니다",
+      nickname: user.nickname || "익명",
+      likeCount: 0,
+      isSpoiler: false,
+      isOwnReview: true,
+      isLiked: false,
+      hasAlreadyReported: false,
+    };
+  };
 
   // 컴포넌트 마운트 시 및 로그인 상태 변경 시 현재 월 데이터 가져오기
   useEffect(() => {
     const initialMonth = formatMonthForApi(new Date());
     setCurrentMonth(initialMonth);
     fetchMonthlyReviews(initialMonth);
-  }, [fetchMonthlyReviews]);
+  }, [accessToken, user.isLoggedIn]);
 
   // 컬렉션 탭이 활성화될 때 컬렉션 데이터 가져오기
   useEffect(() => {
@@ -305,39 +252,18 @@ const PageContents: React.FC = () => {
       fetchMyCollectionsData(true); // reset을 true로 변경
       fetchMyMarkedCollectionsData(); // 저장한 컬렉션도 함께 로드
     }
-  }, [
-    activeTab,
-    isLoggedIn,
-    collections.length,
-    fetchMyCollectionsData,
-    fetchMyMarkedCollectionsData,
-  ]);
+  }, [activeTab, accessToken, user.isLoggedIn]);
 
   // 달력에서 월이 변경될 때 호출될 함수
-  const handleMonthChange = useCallback(
-    (activeStartDate: Date | null) => {
-      if (activeStartDate) {
-        const newMonth = formatMonthForApi(activeStartDate);
-        if (newMonth !== currentMonth) {
-          setCurrentMonth(newMonth);
-          fetchMonthlyReviews(newMonth);
-        }
+  const handleMonthChange = (activeStartDate: Date | null) => {
+    if (activeStartDate) {
+      const newMonth = formatMonthForApi(activeStartDate);
+      if (newMonth !== currentMonth) {
+        setCurrentMonth(newMonth);
+        fetchMonthlyReviews(newMonth);
       }
-    },
-    [currentMonth, fetchMonthlyReviews],
-  );
-
-  const handleReportError = useCallback(() => {
-    message.error("자신이 작성한 리뷰는 신고할 수 없습니다!");
-  }, [message]);
-
-  const handleCreateCollection = useCallback(() => {
-    navigate("/collections/create");
-  }, [navigate]);
-
-  const handleTabChange = useCallback((tabIndex: number) => {
-    setActiveTab(tabIndex);
-  }, []);
+    }
+  };
 
   return (
     <div className="pretendard">
@@ -351,7 +277,7 @@ const PageContents: React.FC = () => {
                   ? "bg-popco-main text-gray-900 shadow-sm"
                   : "text-gray-600 hover:text-gray-900"
               } `}
-              onClick={() => handleTabChange(i)}
+              onClick={() => setActiveTab(i)}
             >
               {title}
             </button>
@@ -411,7 +337,28 @@ const PageContents: React.FC = () => {
                         prevEl: ".swiper-button-prev",
                         nextEl: ".swiper-button-next",
                       }}
-                      breakpoints={swiperBreakpoints}
+                      breakpoints={{
+                        320: {
+                          slidesPerView: 1.45,
+                          spaceBetween: 12,
+                        },
+                        480: {
+                          slidesPerView: 2,
+                          spaceBetween: 12,
+                        },
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 14,
+                        },
+                        768: {
+                          slidesPerView: 2.7,
+                          spaceBetween: 16,
+                        },
+                        1024: {
+                          slidesPerView: 3.9,
+                          spaceBetween: 16,
+                        },
+                      }}
                       className="w-full overflow-hidden"
                     >
                       {movies.map((movie) => (
@@ -420,7 +367,11 @@ const PageContents: React.FC = () => {
                             reviewData={convertToReviewData(movie)}
                             contentId={movie.contentId}
                             contentType={movie.contentType}
-                            onReport={handleReportError}
+                            onReport={() => {
+                              message.error(
+                                "자신이 작성한 리뷰는 신고할 수 없습니다!",
+                              );
+                            }}
                           />
                         </SwiperSlide>
                       ))}
@@ -442,7 +393,7 @@ const PageContents: React.FC = () => {
                     </h1>
                     <button
                       type="button"
-                      onClick={handleCreateCollection}
+                      onClick={() => navigate("/collections/create")}
                       className="h-8 rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
                     >
                       컬렉션 만들기
@@ -468,7 +419,7 @@ const PageContents: React.FC = () => {
                 {!collectionsLoading &&
                   collections.length === 0 &&
                   !collectionsError &&
-                  isLoggedIn && (
+                  user.isLoggedIn && (
                     <div className="flex h-32 items-center justify-center text-gray-500">
                       아직 만든 컬렉션이 없습니다.
                     </div>
@@ -487,7 +438,28 @@ const PageContents: React.FC = () => {
                         prevEl: ".swiper-button-prev",
                         nextEl: ".swiper-button-next",
                       }}
-                      breakpoints={collectionSwiperBreakpoints}
+                      breakpoints={{
+                        320: {
+                          slidesPerView: 1.45,
+                          spaceBetween: 12,
+                        },
+                        480: {
+                          slidesPerView: 2,
+                          spaceBetween: 12,
+                        },
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 14,
+                        },
+                        768: {
+                          slidesPerView: 3,
+                          spaceBetween: 16,
+                        },
+                        1024: {
+                          slidesPerView: 4.7,
+                          spaceBetween: 16,
+                        },
+                      }}
                       className="w-full overflow-hidden pt-5"
                     >
                       {collections.map((collection) => (
@@ -539,7 +511,7 @@ const PageContents: React.FC = () => {
                 {!markedCollectionsLoading &&
                   markedCollections.length === 0 &&
                   !markedCollectionsError &&
-                  isLoggedIn && (
+                  user.isLoggedIn && (
                     <div className="flex h-32 items-center justify-center text-gray-500">
                       아직 저장한 컬렉션이 없습니다.
                     </div>
@@ -558,7 +530,28 @@ const PageContents: React.FC = () => {
                         prevEl: ".swiper-button-prev",
                         nextEl: ".swiper-button-next",
                       }}
-                      breakpoints={markedCollectionsSwiperBreakpoints}
+                      breakpoints={{
+                        320: {
+                          slidesPerView: 1.6,
+                          spaceBetween: 12,
+                        },
+                        480: {
+                          slidesPerView: 2,
+                          spaceBetween: 12,
+                        },
+                        640: {
+                          slidesPerView: 2,
+                          spaceBetween: 14,
+                        },
+                        768: {
+                          slidesPerView: 3,
+                          spaceBetween: 16,
+                        },
+                        1024: {
+                          slidesPerView: 4.7,
+                          spaceBetween: 16,
+                        },
+                      }}
                       className="w-full overflow-hidden pt-5"
                     >
                       {markedCollections.map((collection) => (
@@ -593,7 +586,7 @@ const PageContents: React.FC = () => {
               </div>
               {/* 내가 보고싶어해요 */}
               <div>
-                {isLoggedIn ? (
+                {accessToken ? (
                   <WantWatching userId={user.userId} />
                 ) : (
                   <div className="flex h-32 items-center justify-center text-gray-500">
@@ -604,7 +597,7 @@ const PageContents: React.FC = () => {
 
               {/* 내가 좋아해요 */}
               <div>
-                {isLoggedIn ? (
+                {accessToken ? (
                   <LikeContents accessToken={accessToken} />
                 ) : (
                   <div className="flex h-32 items-center justify-center text-gray-500">
