@@ -116,18 +116,16 @@ export const searchContents = async (keyword: string, page: number = 0) => {
     return null;
   }
   try {
-    // axios.get()의 응답 전체를 response 변수에 받도록 수정합니다.
     const response = await axiosInstance.get(`/search/contents/advanced`, {
       params: {
         keyword,
         page,
         size: 20,
       },
-    });
-
-    // response.data 안에 또 다른 data 필드가 있는지 확인하고 반환합니다.
-    return response.data.data;
+    }); 
+    return response.data;
   } catch (error) {
+    console.error("Content search failed:", error); // 디버깅을 위해 에러 로그 추가
     return null; // 에러 발생 시 null 반환
   }
 };

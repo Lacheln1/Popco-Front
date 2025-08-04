@@ -1,15 +1,19 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
 
 // --- 타입 임포트 ---
-import { ContentsDetail, Crew } from "@/types/Contents.types";
+import { ContentsDetail, Crew, MyReview } from "@/types/Contents.types";
+import { ReviewCardData } from "@/types/Reviews.types";
 
 // --- 훅 임포트 ---
 import { useContentsDetail } from "@/hooks/useContentsDetail";
+import { useMyReview } from "@/hooks/queries/review/useMyReview"; // 내 리뷰 조회 훅
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useFetchWishlist, useToggleWishlist } from "@/hooks/useWishlist";
 
 // --- 컴포넌트 임포트 ---
+import ReviewModal from "@/components/ReviewModal/ReviewModal";
 import LikePopcorn from "@/components/popcorn/LikePopcorn";
 import HatePopcorn from "@/components/popcorn/HatePopcorn";
 import CastAndCrew from "@/components/detail/CastAndCrew";
@@ -21,27 +25,31 @@ import ReviewSection from "@/components/detail/ReviewSection";
 import CollectionSection from "@/components/detail/CollectionSection";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import Spinner from "@/components/common/Spinner";
+
 // ======================================================================
-// 1. UI와 스크롤 로직을 담당할 별도 컴포넌트 생성
+// 1. UI 담당 프레젠테이셔널 컴포넌트
 // ======================================================================
 interface DetailContentsProps {
   contents: ContentsDetail;
   contentId: number;
   contentType: string;
   myCurrentRating: number;
-  setMyCurrentRating: (rating: number) => void;
+  setMyCurrentRating: (rating: number | null) => void;
   isWished: boolean;
   handleWishClick: () => void;
   isLiked: boolean;
   handleLikeClick: () => void;
   isHated: boolean;
   handleHateClick: () => void;
+  onEditReview: (reviewData: ReviewCardData) => void;
+  onReviewClick: () => void; // '리뷰' 버튼 클릭 핸들러
+  reviewButtonLabel: string; // '리뷰' 버튼 텍스트
 }
 
 const DetailContents = ({
   contents,
-  contentId, // props 받기
-  contentType, // props 받기
+  contentId,
+  contentType,
   myCurrentRating,
   setMyCurrentRating,
   isWished,
@@ -50,8 +58,10 @@ const DetailContents = ({
   handleLikeClick,
   isHated,
   handleHateClick,
+  onEditReview,
+  onReviewClick,
+  reviewButtonLabel,
 }: DetailContentsProps) => {
-  // Framer Motion 관련 훅과 로직
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: scrollRef,
@@ -62,7 +72,6 @@ const DetailContents = ({
   const bannerY = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const { accessToken } = useAuthCheck();
 
-  // API 데이터를 UI에 맞게 가공
   const bannerUrl = `${TMDB_IMAGE_BASE_URL}${contents.backdropPath}`;
   const posterUrl = `${TMDB_IMAGE_BASE_URL}${contents.posterPath}`;
 
@@ -71,10 +80,9 @@ const DetailContents = ({
   const trailerProps = (contents.videos || [])
     .filter((video) => video.type === "Trailer")
     .map((video) => ({
-      videoId: video.key, // API의 'key'를 'videoId'로 매핑
-      thumbnailUrl: `https://i.ytimg.com/vi/${video.key}/sddefault.jpg`, // 썸네일 URL 생성
+      videoId: video.key,
+      thumbnailUrl: `https://i.ytimg.com/vi/${video.key}/sddefault.jpg`,
     }));
-
   const movieInfoProps = {
     genres: contents.genres.map((genre) => genre.name),
     ott: contents.watchProviders.map((provider) => ({
@@ -103,17 +111,13 @@ const DetailContents = ({
         </div>
       </motion.div>
 
-      {/*메인 컨텐츠 */}
+      {/* 메인 컨텐츠 */}
       <div className="mx-auto mt-8 max-w-6xl pb-16">
-        {/* --- 데스크톱 (md 이상) --- */}
+        {/* --- 데스크톱 --- */}
         <div className="hidden md:block">
           <div className="mb-8 flex items-center justify-between border-y border-gray-200 py-4">
             <div className="flex items-center gap-10">
-              <RatingDisplay
-                label="평균 팝콘"
-                rating={contents.ratingAverage}
-                size={36}
-              />
+              <RatingDisplay label="평균 팝콘" rating={contents.ratingAverage} size={36} />
               <RatingDisplay
                 label="나의 팝콘"
                 rating={myCurrentRating}
@@ -122,11 +126,13 @@ const DetailContents = ({
               />
             </div>
             <ActionButtons
+              onReviewClick={onReviewClick}
+              reviewButtonLabel={reviewButtonLabel}
               isWished={isWished}
               onWishClick={handleWishClick}
               isDesktop
               token={accessToken}
-              movieTitle={contents?.title}
+              movieTitle={contents.title}
               moviePoster={`${TMDB_IMAGE_BASE_URL}${contents.posterPath}`}
             />
           </div>
@@ -149,7 +155,7 @@ const DetailContents = ({
           </div>
         </div>
 
-        {/* --- 모바일 (md 미만) --- */}
+        {/* --- 모바일 --- */}
         <div className="flex flex-col px-4 md:hidden">
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-1 flex flex-col gap-6">
@@ -158,9 +164,7 @@ const DetailContents = ({
                 alt={`${contents.title} poster`}
                 className="w-full rounded-lg shadow-2xl"
               />
-              <h2 className="text-center text-lg font-bold">
-                {contents.title}
-              </h2>
+              <h2 className="text-center text-lg font-bold">{contents.title}</h2>
             </div>
             <div className="col-span-2 flex flex-col justify-between">
               <div className="flex w-full justify-around border-b border-gray-200 pb-2">
@@ -169,11 +173,7 @@ const DetailContents = ({
               </div>
               <div className="flex flex-grow flex-col justify-center gap-2">
                 <div className="flex items-center justify-center">
-                  <RatingDisplay
-                    label="평균 팝콘"
-                    rating={contents.ratingAverage}
-                    size={28}
-                  />
+                  <RatingDisplay label="평균 팝콘" rating={contents.ratingAverage} size={28} />
                 </div>
                 <div className="flex items-center justify-center">
                   <RatingDisplay
@@ -186,6 +186,8 @@ const DetailContents = ({
               </div>
               <div className="border-t border-gray-200 pt-2">
                 <ActionButtons
+                  onReviewClick={onReviewClick}
+                  reviewButtonLabel={reviewButtonLabel}
                   isWished={isWished}
                   onWishClick={handleWishClick}
                   token={accessToken}
@@ -212,16 +214,19 @@ const DetailContents = ({
           </div>
         </div>
 
-        {/* --- 리뷰 섹션 --- */}
         <hr className="my-12 border-t border-gray-200" />
         <div className="px-4 lg:px-0">
-          <ReviewSection />
+          <ReviewSection
+            contentId={contentId}
+            contentType={contentType}
+            contentTitle={contents.title}
+            contentsPosterPath={contents.posterPath}
+            onEditClick={onEditReview}
+          />
         </div>
 
-        {/*-- 컬렉션 섹션 --- */}
         <hr className="my-12 border-t border-gray-200" />
         <div className="px-4 lg:px-0">
-          {/* contents 객체에서 contentId와 contentType을 props로 전달. */}
           <CollectionSection contentId={contentId} contentType={contentType} />
         </div>
       </div>
@@ -229,112 +234,162 @@ const DetailContents = ({
   );
 };
 
+
 // ======================================================================
-// 2. 메인 페이지 컴포넌트: 데이터 로딩과 상태 관리만 담당
+// 2. 메인 페이지 로직 컨테이너 컴포넌트
 // ======================================================================
 export default function DetailPage() {
+  const queryClient = useQueryClient();
   const { user, accessToken } = useAuthCheck();
-  const { contents, loading, error, contentId, contentType } =
-    useContentsDetail();
+  const { contents, loading, error, contentId, contentType } = useContentsDetail();
 
-  // --- 위시리스트 상태 관리 로직 ---
+  // 내 리뷰 데이터 조회
+  const { data: myReviewData } = useMyReview(
+    Number(contentId),
+    contentType!,
+    accessToken,
+  );
+
+  // 리뷰 모달 상태
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isWritingReview, setIsWritingReview] = useState(true);
+  const [editingReviewData, setEditingReviewData] = useState<ReviewCardData | null>(null);
+
+  // 사용자가 UI로 직접 변경한 평점 (상호작용 전에는 null)
+  const [interactiveRating, setInteractiveRating] = useState<number | null>(null);
+
+  // 화면에 최종적으로 표시될 평점 계산
+  const displayRating =
+    interactiveRating ?? myReviewData?.myReview?.score ?? contents?.myScore ?? 0;
+
+  // 리뷰 작성 모달 열기
+  const handleOpenWriteModal = useCallback(() => {
+    if (!user.isLoggedIn) return; // TODO: 로그인 필요 메시지
+    setIsWritingReview(true);
+    setEditingReviewData(null);
+    setIsReviewModalOpen(true);
+  }, [user.isLoggedIn]);
+
+  // 리뷰 수정 모달 열기
+  const handleOpenEditModal = useCallback((reviewData: ReviewCardData) => {
+    setIsWritingReview(false);
+    setEditingReviewData(reviewData);
+    setIsReviewModalOpen(true);
+  }, []);
+  
+  // ActionButtons의 '리뷰' 버튼 클릭 통합 핸들러
+  const handleReviewButtonClick = useCallback(() => {
+    if (myReviewData?.existUserReview && myReviewData.myReview) {
+      const reviewToEdit: ReviewCardData = {
+        reviewId: myReviewData.myReview.reviewId,
+        contentId: Number(contentId),
+        contentType: contentType!,
+        contentTitle: contents!.title,
+        score: myReviewData.myReview.score,
+        reviewText: myReviewData.myReview.text,
+        authorNickname: user.nickname || "나",
+        isSpoiler: myReviewData.myReview.status === "SPOILER",
+        likeCount: myReviewData.myReview.likeCount,
+        isLiked: false, 
+        isOwnReview: true,
+        hasAlreadyReported: false,
+        reviewDate: myReviewData.myReview.reviewDate,
+      };
+      handleOpenEditModal(reviewToEdit);
+    } else {
+      handleOpenWriteModal();
+    }
+  }, [myReviewData, user, contents, handleOpenEditModal, handleOpenWriteModal]);
+
+  // 리뷰 등록/수정 성공 콜백
+  const handleReviewUpdateSuccess = (newScore: number) => {
+    setInteractiveRating(null);
+
+    // 관련 쿼리 무효화로 최신 데이터 요청
+    queryClient.invalidateQueries({ queryKey: ["reviews", contentId, contentType] });
+    queryClient.invalidateQueries({ queryKey: ["contentsDetail", contentId, contentType] });
+    queryClient.invalidateQueries({ queryKey: ["myReview", contentId, contentType] });
+    setIsReviewModalOpen(false);
+  };
+
+  // 위시리스트 상태 및 핸들러
   const { data: wishlistData } = useFetchWishlist(user.userId, accessToken);
   const { mutate: toggleWishlist } = useToggleWishlist();
-
-  // API로부터 받아온 전체 위시리스트를 기반으로 현재 콘텐츠의 보고싶어요 초기 상태를 결정
-  const initialIsWished = useMemo(() => {
-    if (!wishlistData?.data || !contentId) return false;
-    return wishlistData.data.some(
-      (item: any) => item.contentId === Number(contentId),
-    );
-  }, [wishlistData, contentId]);
-
-  // isWished 상태를 한 번만 선언하고, initialIsWished 값으로 초기화
-  const [isWished, setIsWished] = useState(initialIsWished);
-
-  // 위시리스트 데이터가 변경될 때마다 로컬 상태를 동기화
-  useEffect(() => {
-    setIsWished(initialIsWished);
-  }, [initialIsWished]);
-
-  // --- 기존 상태 관리 ---
-  const [myCurrentRating, setMyCurrentRating] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isHated, setIsHated] = useState(false);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
+  const isWished = useMemo(
+    () => wishlistData?.data.some((item: any) => item.contentId === Number(contentId)) ?? false,
+    [wishlistData, contentId],
+  );
   const handleWishClick = useCallback(() => {
-    if (
-      !user.isLoggedIn ||
-      !user.userId ||
-      !contentId ||
-      !contentType ||
-      !accessToken
-    ) {
-      return;
-    }
-
-    const previousIsWished = isWished;
-    setIsWished((prev) => !prev);
-
-    toggleWishlist(
-      {
-        isWished: previousIsWished, // 낙관적 업데이트 이전의 상태를 전달
-        userId: user.userId,
-        contentId: Number(contentId),
-        contentType,
-        accessToken,
-      },
-      {
-        onError: () => {
-          setIsWished(previousIsWished);
-        },
-      },
-    );
+    if (!user.isLoggedIn) return;
+    toggleWishlist({
+      isWished,
+      userId: user.userId,
+      contentId: Number(contentId),
+      contentType: contentType!,
+      accessToken: accessToken!,
+    });
   }, [isWished, user, contentId, contentType, accessToken, toggleWishlist]);
 
+  // 좋아요/싫어요 로컬 상태 (추후 서버 연동 필요)
+  const [isLiked, setIsLiked] = useState(false);
+  const [isHated, setIsHated] = useState(false);
   const handleLikeClick = () => {
     setIsLiked((prev) => !prev);
     if (isHated) setIsHated(false);
   };
-
   const handleHateClick = () => {
     setIsHated((prev) => !prev);
     if (isLiked) setIsLiked(false);
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Spinner />
-      </div>
-    );
+    return <div className="flex h-screen items-center justify-center"><Spinner /></div>;
   }
 
   if (error || !contents || !contentId || !contentType) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        {error || "데이터를 찾을 수 없습니다."}
-      </div>
-    );
+    return <div className="flex h-screen items-center justify-center">{error || "데이터를 찾을 수 없습니다."}</div>;
   }
 
   return (
-    <DetailContents
-      contents={contents}
-      contentId={Number(contentId)}
-      contentType={contentType}
-      myCurrentRating={myCurrentRating}
-      setMyCurrentRating={setMyCurrentRating}
-      isWished={isWished}
-      handleWishClick={handleWishClick}
-      isLiked={isLiked}
-      handleLikeClick={handleLikeClick}
-      isHated={isHated}
-      handleHateClick={handleHateClick}
-    />
+    <>
+      <DetailContents
+        contents={contents}
+        contentId={Number(contentId)}
+        contentType={contentType}
+        myCurrentRating={displayRating}
+        setMyCurrentRating={setInteractiveRating}
+        isWished={isWished}
+        handleWishClick={handleWishClick}
+        isLiked={isLiked}
+        handleLikeClick={handleLikeClick}
+        isHated={isHated}
+        handleHateClick={handleHateClick}
+        onEditReview={handleOpenEditModal}
+        onReviewClick={handleReviewButtonClick}
+        reviewButtonLabel={myReviewData?.existUserReview ? "리뷰 수정" : "리뷰 쓰기"}
+      />
+
+      {isReviewModalOpen && (
+        <ReviewModal
+          isModalOpen={isReviewModalOpen}
+          setIsModalOpen={setIsReviewModalOpen}
+          isWriting={isWritingReview}
+          contentId={Number(contentId)}
+          contentType={contentType}
+          contentsTitle={contents.title}
+          contentsImg={contents.posterPath}
+          popcorn={editingReviewData?.score ?? displayRating}
+          reviewDetail={editingReviewData?.reviewText ?? ""}
+          author={editingReviewData?.authorNickname ?? user.nickname ?? "익명"}
+          token={accessToken}
+          reviewId={editingReviewData?.reviewId}
+          onUpdateSuccess={handleReviewUpdateSuccess}
+        />
+      )}
+    </>
   );
 }
