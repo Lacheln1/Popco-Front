@@ -47,7 +47,7 @@ export const useDebouncedAutocomplete = () => {
       (prefix: string) => {
         performAutocomplete(prefix);
       },
-      300, // 300ms 디바운스
+      200, // 200ms 디바운스
     );
 
     // 클린업 함수

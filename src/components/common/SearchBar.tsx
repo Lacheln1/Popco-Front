@@ -212,16 +212,28 @@ const SearchBar = <T,>({
 
   return (
     <div className="flex flex-col items-center px-4 pt-8">
-      <Radio.Group
-        className="mb-2"
-        value={searchType}
-        onChange={(e) => setSearchType(e.target.value)}
-        optionType="button"
-        buttonStyle="solid"
-      >
-        <Radio.Button value="keyword">작품 키워드</Radio.Button>
-        <Radio.Button value="actors">배우 이름</Radio.Button>
-      </Radio.Group>
+      <div className="flex w-full max-w-[240px] justify-between rounded-[20px] bg-[#f7f7f7] p-1 shadow-sm">
+        <button
+          onClick={() => setSearchType("keyword")}
+          className={`w-1/2 rounded-[16px] py-2 text-sm font-semibold transition-all duration-200 ${
+            searchType === "keyword"
+              ? "bg-white text-black shadow"
+              : "text-gray-400"
+          }`}
+        >
+          작품 키워드
+        </button>
+        <button
+          onClick={() => setSearchType("actors")}
+          className={`w-1/2 rounded-[16px] py-2 text-sm font-semibold transition-all duration-200 ${
+            searchType === "actors"
+              ? "bg-white text-black shadow"
+              : "text-gray-400"
+          }`}
+        >
+          배우 이름
+        </button>
+      </div>
 
       <div className="relative w-full max-w-[700px]">
         <div className="relative flex h-10 min-w-80 items-center rounded-full border border-[#ededed] bg-white shadow-[0px_10px_15px_#0000000d] sm:h-16">
@@ -253,7 +265,7 @@ const SearchBar = <T,>({
         {showDropdown && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-4 right-4 top-full z-50 max-h-80 min-w-60 overflow-y-auto rounded-b-lg border border-t-0 border-[#ededed] bg-white shadow-lg"
+            className="absolute left-4 right-4 top-full z-50 max-h-80 overflow-y-auto rounded-b-lg border border-t-0 border-[#ededed] bg-white shadow-lg"
           >
             {suggestions.map((option, index) => (
               <div
