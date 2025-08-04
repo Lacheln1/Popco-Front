@@ -170,7 +170,7 @@ const AnalysisPage = () => {
         <div className="flex h-screen items-center justify-center">
           <div>
             <Spinner />
-            고객님의 취향을 분석중입니다. 잠시만 기다려주세요...
+            나의 취향을 분석중입니다. 잠시만 기다려주세요...
           </div>
         </div>
       </main>
