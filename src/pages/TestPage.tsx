@@ -311,7 +311,7 @@ const TestPage = () => {
                 placeholder="닉네임을 입력해주세요"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                maxLength={7}
+                maxLength={5}
                 size="large"
                 className="text-center"
               />

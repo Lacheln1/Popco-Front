@@ -21,7 +21,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
   return (
     <div className="flex flex-col items-center px-3 md:px-8">
       <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
-        <div className="gmarket-medium text-xl text-white md:text-3xl">
+        <div className="gmarket-medium pt-2 text-xl text-white md:text-3xl">
           <span>나의 시청 스타일이 궁금해?</span>
         </div>
       </div>
@@ -94,7 +94,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
                 />
               </div>
             </div>
-            <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8 lg:h-9 xl:h-10">
+            <div className="mx-3 flex h-6 overflow-hidden rounded-full bg-gray-200 sm:h-7 md:h-8">
               <div
                 className="relative flex items-center justify-center bg-yellow-400 font-medium text-gray-700"
                 style={{ width: `${myLikePercent[0]}%` }}

@@ -15,6 +15,9 @@ import HotCollection from "../common/HotCollection"; // HotCollection import
 import LikeContents from "./LikeContents";
 import WantWatching from "./WantWatching";
 import MyPageChart from "./MyPageChart";
+import { App } from "antd";
+import Spinner from "../common/Spinner";
+import { useNavigate } from "react-router-dom";
 
 interface Movie {
   date: string;
@@ -69,7 +72,6 @@ const PageContents: React.FC = () => {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [collectionsLoading, setCollectionsLoading] = useState(false);
   const [collectionsError, setCollectionsError] = useState<string | null>(null);
-  const [pageSize] = useState(20);
 
   // 저장한 컬렉션 관련 상태
   const [markedCollections, setMarkedCollections] = useState<Collection[]>([]);
@@ -87,6 +89,9 @@ const PageContents: React.FC = () => {
 
   const { accessToken, user } = useAuthCheck();
   const tabTitles = ["Calendar", "Collection", "MY"];
+
+  const { message } = App.useApp();
+  const navigate = useNavigate();
 
   // YYYY-MM 형식으로 변환하기
   const formatMonthForApi = (date: Date): string => {
@@ -134,7 +139,7 @@ const PageContents: React.FC = () => {
   };
 
   // 컬렉션 목록 가져오기
-  const fetchMyCollectionsData = async (page = 0, reset = false) => {
+  const fetchMyCollectionsData = async (reset = false) => {
     if (!accessToken || !user.isLoggedIn || collectionsLoading) {
       return;
     }
@@ -143,12 +148,12 @@ const PageContents: React.FC = () => {
       setCollectionsLoading(true);
       setCollectionsError(null);
 
-      console.log(`컬렉션 API 요청: page=${page}, pageSize=${pageSize}`);
-      const response = await fetchMyCollections(accessToken, page, pageSize);
+      const response = await fetchMyCollections(accessToken, 0, 100);
       console.log("컬렉션 API 응답:", response);
 
-      if (response.code === 200 && response.data) {
-        const newCollections = response.data.collections;
+      // 변경된 응답 구조에 맞게 수정
+      if (response && response.collections) {
+        const newCollections = response.collections;
 
         if (reset) {
           setCollections(newCollections);
@@ -175,10 +180,10 @@ const PageContents: React.FC = () => {
       setMarkedCollectionsError(null);
 
       console.log("저장한 컬렉션 API 요청");
-      const response = await fetchMyMarkedCollections(accessToken, 0, pageSize);
-      console.log("저장한 컬렉션 API 응답:", response);
+      const response = await fetchMyMarkedCollections(accessToken);
+      console.log("저장한 컬렉션 API 응답:", response.data);
 
-      if (response.code === 1073741824 && response.data) {
+      if (response.code === 200 && response.data) {
         setMarkedCollections(response.data.collections);
       }
     } catch (err) {
@@ -244,7 +249,7 @@ const PageContents: React.FC = () => {
       user.isLoggedIn &&
       collections.length === 0
     ) {
-      fetchMyCollectionsData(0, true);
+      fetchMyCollectionsData(true); // reset을 true로 변경
       fetchMyMarkedCollectionsData(); // 저장한 컬렉션도 함께 로드
     }
   }, [activeTab, accessToken, user.isLoggedIn]);
@@ -315,7 +320,7 @@ const PageContents: React.FC = () => {
                 {/* 로딩 중 */}
                 {loading && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
-                    리뷰를 불러오는 중...
+                    <Spinner /> 리뷰를 불러오는 중...
                   </div>
                 )}
 
@@ -334,7 +339,7 @@ const PageContents: React.FC = () => {
                       }}
                       breakpoints={{
                         320: {
-                          slidesPerView: 2,
+                          slidesPerView: 1.45,
                           spaceBetween: 12,
                         },
                         480: {
@@ -362,6 +367,11 @@ const PageContents: React.FC = () => {
                             reviewData={convertToReviewData(movie)}
                             contentId={movie.contentId}
                             contentType={movie.contentType}
+                            onReport={() => {
+                              message.error(
+                                "자신이 작성한 리뷰는 신고할 수 없습니다!",
+                              );
+                            }}
                           />
                         </SwiperSlide>
                       ))}
@@ -377,9 +387,18 @@ const PageContents: React.FC = () => {
               {/* 컬렉션 Swiper 섹션 */}
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
-                    내가 만든 컬렉션
-                  </h1>
+                  <div className="flex flex-col items-center gap-3 text-center sm:flex-row">
+                    <h1 className="gmarket-bold mt-2 py-2 text-base md:text-2xl">
+                      내가 만든 컬렉션
+                    </h1>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/collections/create")}
+                      className="h-8 rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
+                    >
+                      컬렉션 만들기
+                    </button>
+                  </div>
                   {/* 네비게이션 버튼 */}
                   <SwiperNavigation
                     swiper={swiperInstance}
@@ -391,6 +410,7 @@ const PageContents: React.FC = () => {
                 {/* 로딩 상태 (첫 로드) */}
                 {collectionsLoading && collections.length === 0 && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
+                    <Spinner />
                     컬렉션을 불러오는 중...
                   </div>
                 )}
@@ -420,11 +440,11 @@ const PageContents: React.FC = () => {
                       }}
                       breakpoints={{
                         320: {
-                          slidesPerView: 1.2,
+                          slidesPerView: 1.45,
                           spaceBetween: 12,
                         },
                         480: {
-                          slidesPerView: 1.5,
+                          slidesPerView: 2,
                           spaceBetween: 12,
                         },
                         640: {
@@ -432,11 +452,11 @@ const PageContents: React.FC = () => {
                           spaceBetween: 14,
                         },
                         768: {
-                          slidesPerView: 2.5,
+                          slidesPerView: 3,
                           spaceBetween: 16,
                         },
                         1024: {
-                          slidesPerView: 3,
+                          slidesPerView: 4.7,
                           spaceBetween: 16,
                         },
                       }}
@@ -468,7 +488,7 @@ const PageContents: React.FC = () => {
               {/* 내가 저장한 컬렉션 */}
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h1 className="gmarket-bold py-2 text-base md:text-2xl">
+                  <h1 className="gmarket-bold mt-2 py-2 text-base md:text-2xl">
                     내가 저장한 컬렉션
                   </h1>
                   {/* 네비게이션 버튼 */}
@@ -482,6 +502,7 @@ const PageContents: React.FC = () => {
                 {/* 로딩 상태 (첫 로드) */}
                 {markedCollectionsLoading && markedCollections.length === 0 && (
                   <div className="flex h-32 items-center justify-center text-gray-500">
+                    <Spinner />
                     저장한 컬렉션을 불러오는 중...
                   </div>
                 )}
@@ -511,11 +532,11 @@ const PageContents: React.FC = () => {
                       }}
                       breakpoints={{
                         320: {
-                          slidesPerView: 1.2,
+                          slidesPerView: 1.6,
                           spaceBetween: 12,
                         },
                         480: {
-                          slidesPerView: 1.5,
+                          slidesPerView: 2,
                           spaceBetween: 12,
                         },
                         640: {
@@ -523,11 +544,11 @@ const PageContents: React.FC = () => {
                           spaceBetween: 14,
                         },
                         768: {
-                          slidesPerView: 2.5,
+                          slidesPerView: 3,
                           spaceBetween: 16,
                         },
                         1024: {
-                          slidesPerView: 3,
+                          slidesPerView: 4.7,
                           spaceBetween: 16,
                         },
                       }}

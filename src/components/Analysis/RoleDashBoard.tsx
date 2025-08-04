@@ -140,8 +140,8 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
 
   return (
     <div className="flex flex-col items-center px-3 md:px-8">
-      <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 text-center">
-        <div className="gmarket-medium text-xl text-white md:text-3xl">
+      <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 pt-4 text-center">
+        <div className="gmarket-medium pt-2 text-xl text-white md:text-3xl">
           <span>나와 같은&nbsp;</span>
           <span className="gmarket-bold">{personaName}</span>
           <span>&nbsp;들은?</span>
@@ -151,7 +151,7 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
         className="pretendard flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-28">
+        <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-48">
           <div className="flex flex-col items-center text-center">
             <span className="text-2xl">성별</span>
             <div>
@@ -180,11 +180,11 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
               <span className="sm:text-3xl lg:text-4xl">선호영화</span>
-              <div className="mt-2 rounded-xl bg-white sm:mt-4">
+              <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
                 {movieData.map((movie, index) => (
                   <div
                     key={movie.contentId}
-                    className="flex w-40 items-center justify-start gap-1 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80 lg:text-3xl"
+                    className="flex w-40 items-center justify-start gap-1 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80 lg:gap-3 lg:text-2xl"
                   >
                     <span className="gmarket-bold">{index + 1}</span>
                     <img
@@ -209,11 +209,11 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
               <span className="sm:text-3xl lg:text-4xl">선호 시리즈</span>
-              <div className="mt-2 rounded-xl bg-white sm:mt-4">
+              <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
                 {seriesData.map((series, index) => (
                   <div
                     key={series.contentId}
-                    className="flex w-40 items-center justify-start gap-1 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80 lg:text-3xl"
+                    className="flex w-40 items-center justify-start gap-1 py-2 text-center text-base sm:w-64 sm:py-4 sm:text-2xl lg:w-80 lg:gap-3 lg:text-2xl"
                   >
                     <span className="gmarket-bold">{index + 1}</span>
                     <img

@@ -4,6 +4,7 @@ import LikeContentSection from "@/components/Analysis/LikeContentsSection";
 import MyStyleSection from "@/components/Analysis/MyStyleSection";
 import MyWatchingStyleBoard from "@/components/Analysis/MyWatchingStyleBoard";
 import RoleDashBoard from "@/components/Analysis/RoleDashBoard";
+import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useEffect, useState, useRef } from "react";
 
@@ -123,7 +124,10 @@ const AnalysisPage = () => {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
-          <div>인증 확인 중...</div>
+          <div>
+            <Spinner />
+            인증 확인 중...
+          </div>
         </div>
       </main>
     );
@@ -145,7 +149,10 @@ const AnalysisPage = () => {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
-          <div>데이터를 불러오는 중...</div>
+          <div>
+            <Spinner />
+            데이터를 불러오는 중...
+          </div>
         </div>
       </main>
     );
