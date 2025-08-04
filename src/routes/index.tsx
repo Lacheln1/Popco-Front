@@ -17,38 +17,34 @@ import KakaoCallback from "@/pages/KakaoCallback";
 import MyPage from "@/pages/MyPage";
 import CollectionDetailPage from "@/pages/CollectionDetailPage";
 import CollectionCreatePage from "@/pages/CollectionCreatePage";
+import EntryRouter from "@/pages/EntryPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <EntryRouter />,
+  },
+  {
+    path: "/main",
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "/list", element: <ListPage /> },
-      { path: "/detail/:type/:id", element: <DetailPage /> },
-      { path: "/collections", element: <CollectionPage /> },
-      { path: "/collections/create", element: <CollectionCreatePage /> },
-      { path: "/collections/:collectionId", element: <CollectionDetailPage /> },
-      { path: "/analysis", element: <AnalysisPage /> },
-      { path: "/mypage", element: <MyPage /> },
+      { path: "list", element: <ListPage /> },
+      { path: "detail/:type/:id", element: <DetailPage /> },
+      { path: "collections", element: <CollectionPage /> },
+      { path: "collections/create", element: <CollectionCreatePage /> },
+      { path: "collections/:collectionId", element: <CollectionDetailPage /> },
+      { path: "analysis", element: <AnalysisPage /> },
+      { path: "mypage", element: <MyPage /> },
     ],
   },
   {
     element: <WithoutHeaderFooterLayout />,
     children: [
       { path: "/intro", element: <IntroPage /> },
-      {
-        path: "/login",
-        element: <LoginPage />,
-      },
-      {
-        path: "/register",
-        element: <RegisterPage />,
-      },
-      {
-        path: "/auth/kakao/login",
-        element: <KakaoCallback />,
-      },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
+      { path: "/auth/kakao/login", element: <KakaoCallback /> },
     ],
   },
   {
