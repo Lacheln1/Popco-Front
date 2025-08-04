@@ -8,6 +8,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
 import CollectionPage from "@/pages/CollectionPage";
+import IntroPage from "@/pages/IntroPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
   {
     element: <WithoutHeaderFooterLayout />,
     children: [
+      { path: "/intro", element: <IntroPage /> },
       {
         path: "/login",
         element: <LoginPage />,
