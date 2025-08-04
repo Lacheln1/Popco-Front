@@ -297,77 +297,35 @@ const PageContents: React.FC<PageContentsProps> = ({
         return;
       }
 
-      // 즉시 UI 업데이트
-      setCollectionsState((prev) => ({
-        ...prev,
-        collections: prev.collections.map((collection) =>
-          collection.collectionId === collectionId
-            ? {
-                ...collection,
-                isMarked: !collection.isMarked,
-                saveCount:
-                  collection.saveCount + (collection.isMarked ? -1 : 1),
-              }
-            : collection,
-        ),
-      }));
-
-      // 저장한 컬렉션 목록도 업데이트
-      setMarkedCollectionsState((prev) => {
-        const isCurrentlySaved = prev.collections.some(
-          (c) => c.collectionId === collectionId,
-        );
-
-        if (isCurrentlySaved) {
-          // 저장 해제 - 목록에서 제거
-          return {
-            ...prev,
-            collections: prev.collections.filter(
-              (c) => c.collectionId !== collectionId,
-            ),
-          };
-        } else {
-          // 저장 추가 - 해당 컬렉션을 찾아서 추가
-          const collectionToAdd = collectionsState.collections.find(
-            (c) => c.collectionId === collectionId,
-          );
-          if (collectionToAdd) {
-            return {
-              ...prev,
-              collections: [
-                ...prev.collections,
-                { ...collectionToAdd, isMarked: true },
-              ],
-            };
-          }
-          return prev;
-        }
-      });
-
       // API 호출
       toggleMark({
         collectionId: String(collectionId),
         accessToken: accessToken,
       });
+
+      // API 호출 후 약간의 지연을 두고 데이터 새로고침
+      setTimeout(() => {
+        fetchMyCollectionsData(true);
+        fetchMyMarkedCollectionsData();
+      }, 500);
     },
     [
       user.isLoggedIn,
       accessToken,
       toggleMark,
-      collectionsState.collections,
+      fetchMyCollectionsData,
+      fetchMyMarkedCollectionsData,
       message,
     ],
   );
 
   const handleSwiperInit = useCallback((swiper: SwiperType) => {
-    console.log("Swiper 초기화됨:", swiper);
     setSwiperInstance(swiper);
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
   }, []);
 
   const handleSlideChange = useCallback((swiper: SwiperType) => {
-    console.log("슬라이드 변경:", swiper.activeIndex);
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
   }, []);
