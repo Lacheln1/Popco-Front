@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Select } from "antd";
 import PageLayout from "@/layout/PageLayout";
 import SectionHeader from "@/components/common/SectionHeader";
@@ -52,20 +52,29 @@ const ListPage = () => {
     enabled: isSearching,
   });
 
-  const {
-    mutate: mutateFilter,
-    data: filteredData,
-    isPending: isFilterLoading,
-  } = useFilteredContents();
-
-  console.log("filteredData", filteredData);
+  const { data: filteredData, isPending: isFilterLoading } =
+    useFilteredContents();
 
   // 필터 적용 효과
   useEffect(() => {
-    if (!isSearching && hasActiveFilter) {
-      mutateFilter({ filter, page: 0, size: 30 });
+    if (
+      !isSearching &&
+      !hasActiveFilter &&
+      allContentsQuery.data?.pages?.length === 1 &&
+      allContentsQuery.hasNextPage
+    ) {
+      const timer = setTimeout(() => {
+        allContentsQuery.fetchNextPage();
+      }, 100); // 살짝 지연을 주는 것이 안정적
+      return () => clearTimeout(timer);
     }
-  }, [filter, isSearching, hasActiveFilter, mutateFilter]);
+  }, [
+    isSearching,
+    hasActiveFilter,
+    sort,
+    allContentsQuery.data?.pages?.length,
+    allContentsQuery,
+  ]);
 
   // 검색 결과 변환 함수 (null 체크 추가)
   const mapSearchResultsToAllContentItems = (
@@ -146,7 +155,7 @@ const ListPage = () => {
   };
 
   // 무한 스크롤 설정
-  const getInfiniteScrollConfig = () => {
+  const getInfiniteScrollConfig = useCallback(() => {
     if (isSearching) {
       return {
         hasNext: searchQuery.hasNextPage,
@@ -164,7 +173,7 @@ const ListPage = () => {
     }
 
     return { hasNext: false, isFetching: false, fetchNext: () => {} };
-  };
+  }, [isSearching, hasActiveFilter, searchQuery, allContentsQuery]);
 
   // 무한 스크롤 IntersectionObserver
   useEffect(() => {
@@ -184,10 +193,14 @@ const ListPage = () => {
 
     observer.observe(target);
 
+    if (target.getBoundingClientRect().top < window.innerHeight) {
+      fetchNext();
+    }
+
     return () => {
-      if (target) observer.unobserve(target);
+      observer.unobserve(target);
     };
-  }, [observerRef.current, getInfiniteScrollConfig]);
+  }, [isSearching, hasActiveFilter, sort, getInfiniteScrollConfig]);
 
   // 이벤트 핸들러
   const handleSearch = (input: string) => {
@@ -202,6 +215,8 @@ const ListPage = () => {
 
   const handleSortChange = (value: SortType) => {
     setSort(value);
+    setSearchKeyword("");
+    setSearchActors([]);
   };
 
   const handleLikeChange = (contentId: number) => {
@@ -217,15 +232,6 @@ const ListPage = () => {
 
   // 개선된 isEmpty 로직
   const isEmpty = displayContents.length === 0 && !isLoading;
-
-  console.log("Debug Info:", {
-    isSearching,
-    hasActiveFilter,
-    isLoading,
-    displayContentsLength: displayContents.length,
-    isEmpty,
-    allContentsQueryData: allContentsQuery.data?.pages?.length,
-  });
 
   return (
     <PageLayout
