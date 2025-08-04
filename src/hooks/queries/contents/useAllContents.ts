@@ -3,7 +3,7 @@ import { fetchAllContents } from "@/apis/contentsApi";
 import { FetchAllContentsParams } from "@/types/Contents.types";
 
 export const useAllContents = ({
-  pageSize,
+  size,
   sort,
   enabled = true,
 }: Omit<FetchAllContentsParams, "pageNumber"> & { enabled?: boolean }) => {
@@ -11,8 +11,8 @@ export const useAllContents = ({
     queryKey: ["allContents", sort],
     queryFn: ({ pageParam = 0 }) =>
       fetchAllContents({
-        pageNumber: pageParam,
-        pageSize,
+        page: pageParam,
+        size,
         sort,
       }),
     getNextPageParam: (lastPage, allPages) => {

@@ -40,7 +40,7 @@ const ListPage = () => {
 
   // API 훅들 - enabled 옵션으로 필요한 것만 실행
   const allContentsQuery = useAllContents({
-    pageSize: 30,
+    size: 30,
     sort,
     enabled: !isSearching && !hasActiveFilter,
   });
@@ -168,7 +168,8 @@ const ListPage = () => {
 
   // 무한 스크롤 IntersectionObserver
   useEffect(() => {
-    if (!observerRef.current) return;
+    const target = observerRef.current;
+    if (!target) return;
 
     const { hasNext, isFetching, fetchNext } = getInfiniteScrollConfig();
 
@@ -178,16 +179,15 @@ const ListPage = () => {
           fetchNext();
         }
       },
-      { threshold: 0 },
+      { threshold: 0.1 },
     );
 
-    const target = observerRef.current;
     observer.observe(target);
 
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, [isSearching, hasActiveFilter]);
+  }, [observerRef.current, getInfiniteScrollConfig]);
 
   // 이벤트 핸들러
   const handleSearch = (input: string) => {
