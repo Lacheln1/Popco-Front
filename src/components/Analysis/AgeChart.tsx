@@ -46,6 +46,14 @@ const AgeChart = ({ agePercent }: AgeChartProps) => {
       title: {
         display: false,
       },
+      tooltip: {
+        callbacks: {
+          label: function (context: any) {
+            const value = context.raw;
+            return `${value}명`;
+          },
+        },
+      },
     },
     scales: {
       x: {
@@ -56,6 +64,9 @@ const AgeChart = ({ agePercent }: AgeChartProps) => {
           },
           color: "#333",
         },
+        grid: {
+          display: false,
+        },
       },
       y: {
         beginAtZero: true,
@@ -65,6 +76,12 @@ const AgeChart = ({ agePercent }: AgeChartProps) => {
             size: isSmallScreen ? 16 : 18,
           },
           stepSize: 10,
+          callback: function (value: string | number) {
+            return value + "명";
+          },
+        },
+        grid: {
+          display: false,
         },
       },
     },
