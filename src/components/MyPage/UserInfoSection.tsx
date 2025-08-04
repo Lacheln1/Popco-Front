@@ -339,7 +339,7 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
 
         {/* 선택된 이미지가 있을 때 업데이트/취소 버튼 표시 */}
         {selectedImage && (
-          <div className="flex justify-center gap-2 md:absolute md:bottom-4 md:left-1/2 md:-translate-x-[300px] lg:-translate-x-[250px]">
+          <div className="flex justify-center gap-2 md:absolute md:bottom-4 md:left-1/2 md:-translate-x-[120px] md:translate-y-8 md:flex-col lg:-translate-x-[250px] lg:translate-y-0 lg:flex-row">
             <button
               onClick={handleUpdateProfile}
               disabled={isLoading}
