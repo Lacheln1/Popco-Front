@@ -19,7 +19,7 @@ export const fetchSearchContents = async ({
   keyword = "",
   actors = [],
   page = 0,
-  size,
+  size = 28,
 }: SearchContentsParams): Promise<SearchResponse> => {
   const hasKeyword = keyword.trim().length > 0;
   const hasActors = Array.isArray(actors) && actors.length > 0;
@@ -48,7 +48,7 @@ export const fetchSearchContents = async ({
       params,
     });
 
-    return response.data?.data as SearchResponse;
+    return response.data;
   } catch (error) {
     console.error("검색 API 오류:", error);
     return {
@@ -72,4 +72,47 @@ export const postFilteredContents = async (
     body,
   );
   return response.data.data;
+};
+
+// searchApi.ts에 추가할 자동완성 API 함수
+
+export interface AutocompleteItem {
+  value: string;
+  type: string;
+  contentId: number;
+  contentType: string;
+}
+
+export interface AutocompleteResponse {
+  code: number;
+  result: string;
+  message: string;
+  data: AutocompleteItem[];
+}
+
+// 자동완성 API 함수
+export const fetchAutocomplete = async (
+  prefix: string,
+): Promise<AutocompleteItem[]> => {
+  try {
+    const response = await axiosInstance.get<AutocompleteResponse>(
+      `/search/autocomplete`,
+      {
+        params: {
+          prefix: prefix,
+        },
+      },
+    );
+    const data = response.data;
+    if (data.code === 200 && data.result === "SUCCESS") {
+      return data.data || [];
+    } else {
+      throw new Error(
+        data.message || "자동완성 데이터를 가져오는데 실패했습니다.",
+      );
+    }
+  } catch (error) {
+    console.error("자동완성 API 에러:", error);
+    return [];
+  }
 };

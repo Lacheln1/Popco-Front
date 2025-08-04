@@ -1,7 +1,15 @@
-import { useEffect, useState, useRef, KeyboardEvent, ChangeEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  KeyboardEvent,
+  ChangeEvent,
+  useCallback,
+} from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import { useDebouncedSearch } from "@/hooks/useDebouncedSearch";
+import { useDebouncedAutocomplete } from "@/hooks/useDebouncedAutocomplete";
 import { AutoResult, SearchBarProps } from "@/types/Search.types";
+import { AutocompleteItem } from "@/apis/searchApi";
 import { Radio } from "antd";
 
 const SearchBar = <T,>({
@@ -24,82 +32,181 @@ const SearchBar = <T,>({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { results, loading, handleSearch } = useDebouncedSearch();
+  const { results, loading, handleAutocomplete, clearResults } =
+    useDebouncedAutocomplete();
 
-  // 결과 변경 시 자동완성 구성 및 onSearch 콜백 호출
+  // onSearch 콜백을 useCallback으로 메모이제이션
+  const memoizedOnSearch = useCallback(onSearch, []);
+
+  // searchType에 따른 아이콘 반환
+  const getSearchTypeIcon = () => {
+    switch (searchType) {
+      case "keyword":
+        return "🔍";
+      case "actors":
+        return "👤";
+      default:
+        return "🔍";
+    }
+  };
+
+  // searchType에 따른 한글 표시
+  const getSearchTypeLabel = () => {
+    switch (searchType) {
+      case "keyword":
+        return "작품";
+      case "actors":
+        return "배우";
+      default:
+        return "검색";
+    }
+  };
+
+  // 자동완성 결과를 AutoResult 형태로 변환 및 필터링
   useEffect(() => {
     if (!Array.isArray(results)) return;
-
     if (!showSuggestions || !searchValue.trim()) {
-      setSuggestions([]);
+      if (suggestions.length > 0) {
+        setSuggestions([]);
+      }
       setShowDropdown(false);
       return;
     }
+    const filteredResults = results.filter((result: AutocompleteItem) => {
+      return searchType === "keyword"
+        ? result.type === "content"
+        : result.type === "actor";
+    });
 
-    const options: AutoResult[] = results.map((result) => ({
-      value: (result as any).title ?? (result as any).value,
+    const options: AutoResult[] = filteredResults.map((result) => ({
+      value: result.value,
       label: (
-        <div className="py-1">
-          <div className="mb-[2px] font-bold">
-            {(result as any).title ?? (result as any).value}
+        <div className="flex items-center gap-2 py-1">
+          <span className="text-lg">{getSearchTypeIcon()}</span>
+          <div className="flex-1">
+            <div className="mb-[2px] font-bold">{result.value}</div>
+            <div className="text-xs text-gray-500">
+              {getSearchTypeLabel()} • {result.type}
+            </div>
           </div>
         </div>
       ),
       data: result,
     }));
 
-    setSuggestions(options);
-    setShowDropdown(options.length > 0);
+    const prevValues = suggestions.map((item) => item.value).join(",");
+    const nextValues = options.map((item) => item.value).join(",");
 
-    onSearch(searchValue, results as unknown as T[]);
-  }, [results, searchValue, showSuggestions, onSearch]);
-
-  const triggerSearch = (value: string) => {
-    if (searchType === "keyword") {
-      handleSearch({ keyword: value });
-    } else {
-      handleSearch({ actors: [value] });
+    if (prevValues !== nextValues) {
+      setSuggestions(options);
+      setShowDropdown(options.length > 0);
     }
-  };
+  }, [results, searchValue, showSuggestions, searchType]);
+
+  const triggerAutocomplete = useCallback(
+    (value: string) => {
+      if (value.trim()) {
+        handleAutocomplete({ prefix: value });
+      } else {
+        clearResults();
+        setSuggestions([]);
+        setShowDropdown(false);
+      }
+    },
+    [handleAutocomplete, clearResults],
+  );
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-    triggerSearch(value);
+    triggerAutocomplete(value);
+    setSelectedIndex(-1); // 입력 시 선택 인덱스 초기화
   };
 
   const handleSelect = (option: AutoResult) => {
     setSearchValue(option.value);
     setShowDropdown(false);
+    clearResults();
     onSelect?.(option.value, option);
+    // 선택 시에만 실제 검색 실행
+    memoizedOnSearch(option.value, [option.data] as unknown as T[]);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      onSearch(searchValue, results as unknown as T[]);
-      setShowDropdown(false);
-    } else if (e.key === "Escape") {
-      setShowDropdown(false);
+    if (!showDropdown || suggestions.length === 0) {
+      if (e.key === "Enter") {
+        // 드롭다운이 없을 때 엔터 시 실제 검색 실행
+        memoizedOnSearch(searchValue, results as unknown as T[]);
+        setShowDropdown(false);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : 0,
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev > 0 ? prev - 1 : suggestions.length - 1,
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+          handleSelect(suggestions[selectedIndex]);
+        } else {
+          // 선택된 항목이 없으면 현재 입력값으로 검색
+          memoizedOnSearch(searchValue, results as unknown as T[]);
+          setShowDropdown(false);
+        }
+        break;
+      case "Escape":
+        setShowDropdown(false);
+        setSelectedIndex(-1);
+        break;
     }
   };
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = useCallback((event: MouseEvent) => {
     if (
       !dropdownRef.current?.contains(event.target as Node) &&
       !inputRef.current?.contains(event.target as Node)
     ) {
       setShowDropdown(false);
+      setSelectedIndex(-1);
     }
-  };
+  }, []);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [handleClickOutside]);
 
   const handleFocus = () => {
-    if (suggestions.length > 0) setShowDropdown(true);
+    if (suggestions.length > 0 && searchValue.trim()) {
+      setShowDropdown(true);
+    }
   };
+
+  const handleSearchButtonClick = () => {
+    // 검색 버튼 클릭 시에만 실제 검색 실행
+    memoizedOnSearch(searchValue, results as unknown as T[]);
+    setShowDropdown(false);
+    clearResults();
+  };
+
+  // 검색 타입 변경 시 결과 초기화
+  useEffect(() => {
+    clearResults();
+    setSuggestions([]);
+    setShowDropdown(false);
+    setSelectedIndex(-1);
+  }, [searchType, clearResults]);
 
   return (
     <div className="flex flex-col items-center px-4 pt-8">
@@ -126,9 +233,10 @@ const SearchBar = <T,>({
             onFocus={handleFocus}
             placeholder={placeholder}
             className={`h-12 flex-1 border-none bg-transparent px-6 text-base outline-none ${className}`}
+            autoComplete="off"
           />
           <button
-            onClick={() => onSearch(searchValue, results as unknown as T[])}
+            onClick={handleSearchButtonClick}
             disabled={loading}
             className="mr-3 flex h-10 w-10 items-center justify-center text-black transition-colors duration-200 focus:outline-none disabled:opacity-50"
           >
@@ -149,7 +257,7 @@ const SearchBar = <T,>({
               <div
                 key={index}
                 onClick={() => handleSelect(option)}
-                className={`flex h-12 cursor-pointer items-center border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50 ${
+                className={`flex h-auto min-h-[48px] cursor-pointer items-center border-b border-gray-100 px-4 py-2 last:border-b-0 hover:bg-gray-50 ${
                   selectedIndex === index ? "bg-blue-50" : ""
                 }`}
               >

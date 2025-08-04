@@ -1,3 +1,5 @@
+import { AutocompleteItem } from "@/apis/searchApi";
+
 interface Cast {
   actorName: string;
   characterName: string;
@@ -52,7 +54,7 @@ export interface SearchResponse {
 interface AutoResult {
   value: string;
   label: React.ReactNode;
-  data?: SearchResult;
+  data?: AutocompleteItem;
 }
 
 interface SearchBarProps<T = any> {

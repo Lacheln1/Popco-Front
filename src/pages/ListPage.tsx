@@ -26,7 +26,7 @@ const ListPage = () => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const { filter } = useFilterStore();
 
-  // 상태 계산
+  // 상태 계산 - 더 엄격한 검증
   const isKeywordSearch =
     searchType === "keyword" && searchKeyword.trim().length > 0;
   const isActorSearch = searchType === "actors" && searchActors.length > 0;
@@ -38,17 +38,17 @@ const ListPage = () => {
     ),
   );
 
-  // API 훅들 - enabled 옵션으로 필요한 것만 실행
+  // API 훅들 - 조건부 실행 최적화
   const allContentsQuery = useAllContents({
     size: 28,
     sort,
     enabled: !isSearching && !hasActiveFilter,
   });
 
-  console.log(allContentsQuery);
+  // actors 검색 수정 - 빈 배열이 아닌 실제 값만 전달
   const searchQuery = useSearchContents({
-    keyword: searchType === "keyword" ? searchKeyword : undefined,
-    actors: searchType === "actors" ? searchActors : undefined,
+    keyword: isKeywordSearch ? searchKeyword : undefined,
+    actors: isActorSearch ? searchActors : undefined,
     size: 30,
     enabled: isSearching,
   });
@@ -56,78 +56,84 @@ const ListPage = () => {
   const { data: filteredData, isPending: isFilterLoading } =
     useFilteredContents();
 
-  // 필터 적용 효과
+  // 무한 로딩 방지 - dependency 최적화
   useEffect(() => {
     if (
       !isSearching &&
       !hasActiveFilter &&
       allContentsQuery.data?.pages?.length === 1 &&
-      allContentsQuery.hasNextPage
+      allContentsQuery.hasNextPage &&
+      !allContentsQuery.isFetching
     ) {
       const timer = setTimeout(() => {
-        allContentsQuery.fetchNextPage();
-      }, 100); // 살짝 지연을 주는 것이 안정적
+        if (!allContentsQuery.isFetching) {
+          allContentsQuery.fetchNextPage();
+        }
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [
     isSearching,
     hasActiveFilter,
     sort,
-    allContentsQuery.data?.pages?.length,
-    allContentsQuery,
+    allContentsQuery.hasNextPage,
+    allContentsQuery.isFetching,
   ]);
 
-  // 검색 결과 변환 함수 (null 체크 추가)
-  const mapSearchResultsToAllContentItems = (
-    results: SearchResult[] | undefined,
-  ): AllContentItem[] => {
-    if (!results || !Array.isArray(results)) {
-      return [];
-    }
+  // 검색 결과 변환 함수
+  const mapSearchResultsToAllContentItems = useCallback(
+    (results: SearchResult[] | undefined): AllContentItem[] => {
+      if (!results || !Array.isArray(results)) {
+        return [];
+      }
+      return results
+        .filter((result) => result && result.contentId)
+        .map((result) => ({
+          id: result.contentId,
+          type: result.contentType as ContentCategory,
+          title: result.title || "",
+          releaseDate: result.releaseDate || "",
+          posterPath: result.posterPath || "",
+        }));
+    },
+    [],
+  );
 
-    return results.map((result) => ({
-      id: result.contentId,
-      type: result.contentType as ContentCategory,
-      title: result.title,
-      releaseDate: result.releaseDate,
-      posterPath: result.posterPath,
-    }));
-  };
-
-  // 콘텐츠 데이터 가져오기
-  const getAllContents = (): AllContentItem[] => {
+  // 콘텐츠 데이터 가져오기 함수들 - 메모이제이션
+  const getAllContents = useCallback((): AllContentItem[] => {
     return allContentsQuery.data?.pages.flatMap((page) => page.contents) ?? [];
-  };
+  }, [allContentsQuery.data?.pages]);
 
-  const getSearchResults = (): AllContentItem[] => {
-    return (
-      searchQuery.data?.pages.flatMap((page) =>
-        mapSearchResultsToAllContentItems(page.content),
-      ) ?? []
-    );
-  };
+  const getSearchResults = useCallback((): AllContentItem[] => {
+    if (!searchQuery.data?.pages) return [];
+    return searchQuery.data.pages
+      .filter((page) => page?.content)
+      .flatMap((page) => mapSearchResultsToAllContentItems(page.content))
+      .filter(Boolean);
+  }, [searchQuery.data?.pages, mapSearchResultsToAllContentItems]);
 
-  const mapFilteredResultsToAllContentItems = (
-    results: FilteredContentResponse[] | undefined,
-  ): AllContentItem[] => {
-    if (!results) return [];
-    return results.map((result) => ({
-      id: result.contentId,
-      title: result.title,
-      type: result.contentType as ContentCategory,
-      releaseDate: result.releaseDate,
-      posterPath: result.posterPath,
-    }));
-  };
+  const mapFilteredResultsToAllContentItems = useCallback(
+    (results: FilteredContentResponse[] | undefined): AllContentItem[] => {
+      if (!results) return [];
+      return results.map((result) => ({
+        id: result.contentId,
+        title: result.title,
+        type: result.contentType as ContentCategory,
+        releaseDate: result.releaseDate,
+        posterPath: result.posterPath,
+      }));
+    },
+    [],
+  );
 
-  const getFilteredResults = (): AllContentItem[] => {
+  const getFilteredResults = useCallback((): AllContentItem[] => {
     return filteredData
       ? mapFilteredResultsToAllContentItems(filteredData.contents)
       : [];
-  };
+  }, [filteredData, mapFilteredResultsToAllContentItems]);
 
-  // 현재 활성화된 쿼리의 로딩 상태만 체크
-  const getCurrentLoadingState = () => {
+  // 로딩 상태 체크
+  const getCurrentLoadingState = useCallback(() => {
     if (isSearching) {
       return searchQuery.isLoading || searchQuery.isFetching;
     }
@@ -135,10 +141,16 @@ const ListPage = () => {
       return isFilterLoading;
     }
     return allContentsQuery.isLoading || allContentsQuery.isFetching;
-  };
+  }, [
+    isSearching,
+    hasActiveFilter,
+    searchQuery,
+    isFilterLoading,
+    allContentsQuery,
+  ]);
 
-  // 현재 상황에 맞는 에러 상태 체크
-  const getCurrentErrorState = () => {
+  // 에러 상태 체크
+  const getCurrentErrorState = useCallback(() => {
     if (isSearching) {
       return searchQuery.error;
     }
@@ -146,42 +158,59 @@ const ListPage = () => {
       return allContentsQuery.error;
     }
     return null;
-  };
+  }, [isSearching, hasActiveFilter, searchQuery.error, allContentsQuery.error]);
 
   // 표시할 콘텐츠 결정
-  const getDisplayContents = (): AllContentItem[] => {
+  const getDisplayContents = useCallback((): AllContentItem[] => {
     if (isSearching) return getSearchResults();
     if (hasActiveFilter) return getFilteredResults();
     return getAllContents();
-  };
+  }, [
+    isSearching,
+    hasActiveFilter,
+    getSearchResults,
+    getFilteredResults,
+    getAllContents,
+  ]);
 
-  // 무한 스크롤 설정
+  // 무한 스크롤 설정 - 안정성 개선
   const getInfiniteScrollConfig = useCallback(() => {
     if (isSearching) {
       return {
-        hasNext: searchQuery.hasNextPage,
+        hasNext: searchQuery.hasNextPage && !searchQuery.isFetching,
         isFetching: searchQuery.isFetchingNextPage,
-        fetchNext: searchQuery.fetchNextPage,
+        fetchNext: () => {
+          if (searchQuery.hasNextPage && !searchQuery.isFetching) {
+            searchQuery.fetchNextPage();
+          }
+        },
       };
     }
 
     if (!hasActiveFilter) {
       return {
-        hasNext: allContentsQuery.hasNextPage,
+        hasNext: allContentsQuery.hasNextPage && !allContentsQuery.isFetching,
         isFetching: allContentsQuery.isFetchingNextPage,
-        fetchNext: allContentsQuery.fetchNextPage,
+        fetchNext: () => {
+          if (allContentsQuery.hasNextPage && !allContentsQuery.isFetching) {
+            allContentsQuery.fetchNextPage();
+          }
+        },
       };
     }
 
     return { hasNext: false, isFetching: false, fetchNext: () => {} };
   }, [isSearching, hasActiveFilter, searchQuery, allContentsQuery]);
 
-  // 무한 스크롤 IntersectionObserver
+  // 무한 스크롤 IntersectionObserver - 최적화
   useEffect(() => {
     const target = observerRef.current;
     if (!target) return;
 
     const { hasNext, isFetching, fetchNext } = getInfiniteScrollConfig();
+
+    // 이미 모든 데이터를 불러왔거나 로딩 중이면 옵저버 설정하지 않음
+    if (!hasNext || isFetching) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -189,50 +218,73 @@ const ListPage = () => {
           fetchNext();
         }
       },
-      { threshold: 0.1 },
+      { threshold: 0.1, rootMargin: "50px" },
     );
 
     observer.observe(target);
+    return () => observer.unobserve(target);
+  }, [getInfiniteScrollConfig]);
 
-    if (target.getBoundingClientRect().top < window.innerHeight) {
-      fetchNext();
-    }
+  // 이벤트 핸들러 - actors 검색 개선
+  const handleSearch = useCallback(
+    (input: string) => {
+      if (searchType === "keyword") {
+        setSearchKeyword(input.trim());
+        setSearchActors([]);
+      } else {
+        // actors 검색 시 빈 문자열 체크
+        if (input.trim()) {
+          setSearchActors([input.trim()]);
+        } else {
+          setSearchActors([]);
+        }
+        setSearchKeyword("");
+      }
+    },
+    [searchType],
+  );
 
-    return () => {
-      observer.unobserve(target);
-    };
-  }, [isSearching, hasActiveFilter, sort, getInfiniteScrollConfig]);
-
-  // 이벤트 핸들러
-  const handleSearch = (input: string) => {
-    if (searchType === "keyword") {
-      setSearchKeyword(input);
-      setSearchActors([]);
-    } else {
-      setSearchActors([input]);
-      setSearchKeyword("");
-    }
-  };
-
-  const handleSortChange = (value: SortType) => {
+  const handleSortChange = useCallback((value: SortType) => {
     setSort(value);
     setSearchKeyword("");
     setSearchActors([]);
-  };
+  }, []);
 
-  const handleLikeChange = (contentId: number) => {
+  const handleLikeChange = useCallback((contentId: number) => {
     // TODO: 좋아요 상태 변경 로직 구현
     console.log("Like changed for content:", contentId);
-  };
+  }, []);
 
-  // 렌더링 데이터
+  // 렌더링 데이터 - 메모이제이션
   const displayContents = getDisplayContents();
-  const { hasNext } = getInfiniteScrollConfig();
+  const { hasNext, isFetching } = getInfiniteScrollConfig();
   const isLoading = getCurrentLoadingState();
   const error = getCurrentErrorState();
 
-  // isEmpty 로직
   const isEmpty = displayContents.length === 0 && !isLoading;
+
+  // 디버깅용 로그 (개발 중에만 사용)
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔍 Search State:", {
+        searchType,
+        isKeywordSearch,
+        searchKeyword,
+        isActorSearch,
+        searchActors,
+        isSearching,
+        displayContents: displayContents.length,
+      });
+    }
+  }, [
+    searchType,
+    isKeywordSearch,
+    searchKeyword,
+    isActorSearch,
+    searchActors,
+    isSearching,
+    displayContents.length,
+  ]);
 
   return (
     <PageLayout
@@ -271,6 +323,9 @@ const ListPage = () => {
         {error ? (
           <div className="py-8 text-center text-red-500">
             데이터를 불러오는 중 오류가 발생했습니다.
+            {process.env.NODE_ENV === "development" && (
+              <div className="mt-2 text-sm text-gray-400">{error.message}</div>
+            )}
           </div>
         ) : !isEmpty ? (
           displayContents.map((content) => (
@@ -288,12 +343,29 @@ const ListPage = () => {
         ) : (
           <div className="py-8 text-center text-gray-500">
             {isLoading ? "로딩 중..." : "결과가 없습니다."}
+            {/* 개발 모드에서 추가 정보 표시 */}
+            {process.env.NODE_ENV === "development" && (
+              <div className="mt-2 text-xs text-gray-400">
+                Search: {isSearching ? "ON" : "OFF"} | Filter:{" "}
+                {hasActiveFilter ? "ON" : "OFF"} | Type: {searchType} | Keyword:
+                "{searchKeyword}" | Actors: {JSON.stringify(searchActors)}
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* 무한 스크롤 트리거 */}
-      {hasNext && <div ref={observerRef} className="h-10" />}
+      {/* 무한 스크롤 트리거 & 로딩 스피너 */}
+      {hasNext && (
+        <>
+          <div ref={observerRef} className="h-10" />
+          {isFetching && (
+            <div className="flex justify-center py-6">
+              <span className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-transparent" />
+            </div>
+          )}
+        </>
+      )}
     </PageLayout>
   );
 };
