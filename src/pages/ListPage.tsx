@@ -40,11 +40,12 @@ const ListPage = () => {
 
   // API 훅들 - enabled 옵션으로 필요한 것만 실행
   const allContentsQuery = useAllContents({
-    size: 30,
+    size: 28,
     sort,
     enabled: !isSearching && !hasActiveFilter,
   });
 
+  console.log(allContentsQuery);
   const searchQuery = useSearchContents({
     keyword: searchType === "keyword" ? searchKeyword : undefined,
     actors: searchType === "actors" ? searchActors : undefined,
@@ -230,7 +231,7 @@ const ListPage = () => {
   const isLoading = getCurrentLoadingState();
   const error = getCurrentErrorState();
 
-  // 개선된 isEmpty 로직
+  // isEmpty 로직
   const isEmpty = displayContents.length === 0 && !isLoading;
 
   return (
@@ -281,6 +282,7 @@ const ListPage = () => {
               posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
               likeState="NEUTRAL"
               onLikeChange={() => handleLikeChange(content.id)}
+              className="max-w-[260px] md:w-[260px]"
             />
           ))
         ) : (

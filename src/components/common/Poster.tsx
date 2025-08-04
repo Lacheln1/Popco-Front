@@ -13,6 +13,7 @@ type PosterProps = {
   likeState: LikeState;
   onLikeChange: (newState: LikeState) => void;
   disableHover?: boolean;
+  className?: string;
 };
 
 const Poster = ({
@@ -23,6 +24,7 @@ const Poster = ({
   likeState,
   onLikeChange,
   disableHover,
+  className = "",
 }: PosterProps) => {
   const navigator = useNavigate();
 
@@ -57,7 +59,10 @@ const Poster = ({
   };
 
   return (
-    <div className="group flex w-[35vw] min-w-[100px] max-w-[210px] flex-col gap-1 md:w-[210px]">
+    <div
+      className={`group flex w-[35vw] min-w-[100px] max-w-[210px] flex-col gap-1 md:w-[210px] ${className}`}
+    >
+      {" "}
       <div
         onClick={handlePosterClick}
         role="button"
@@ -94,7 +99,6 @@ const Poster = ({
           </div>
         )}
       </div>
-
       {/* 모바일 하단 버튼 */}
       <div className="flex w-full items-center justify-between gap-2">
         <div className="w-1/2 overflow-hidden truncate text-ellipsis text-[clamp(0.78rem,3vw,1rem)] sm:w-full sm:text-center sm:text-[17px]">
