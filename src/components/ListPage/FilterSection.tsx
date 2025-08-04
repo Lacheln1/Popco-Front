@@ -1,5 +1,5 @@
 import { DownOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Space } from "antd";
 import { AnimatePresence } from "framer-motion";
 import { TAB_LIST, TabKey } from "@/constants/FilterTabs";
@@ -12,42 +12,64 @@ import { useFilterStore } from "@/store/useFilterStore";
 const FilterSection = () => {
   const [activeKey, setActiveKey] = useState<number | null>(null);
 
-  // 개별 상태
-  const [basicInfo, setBasicInfo] = useState({
-    type: [] as string[],
+  // 초기값을 상수로 정의
+  const INITIAL_BASIC_INFO = {
+    type: "" as string,
     genre: [] as string[],
     rating: [0, 5] as [number, number],
-  });
+  };
 
-  const [usageEnv, setUsageEnv] = useState({
+  const INITIAL_USAGE_ENV = {
     platform: [] as string[],
     year: [1980, 2025] as [number, number],
-  });
+  };
 
-  const [personalization, setPersonalization] = useState({
+  const INITIAL_PERSONALIZATION = {
     age: [0, 65] as [number, number],
     persona: [] as string[],
     algorithm: [] as string[],
-  });
+  };
 
-  const { setFilter } = useFilterStore();
+  // 개별 상태
+  const [basicInfo, setBasicInfo] = useState(INITIAL_BASIC_INFO);
+  const [usageEnv, setUsageEnv] = useState(INITIAL_USAGE_ENV);
+  const [personalization, setPersonalization] = useState(
+    INITIAL_PERSONALIZATION,
+  );
 
-  // 필터 값이 바뀔 때마다 zustand store에 저장
+  const { setFilter, markTouched } = useFilterStore();
+
+  // 값이 초기값과 다른지 체크하는 함수
+  const isValueChanged = (current: any, initial: any): boolean => {
+    return JSON.stringify(current) !== JSON.stringify(initial);
+  };
+
+  const hasAnyChange = () => {
+    return (
+      isValueChanged(basicInfo, INITIAL_BASIC_INFO) ||
+      isValueChanged(usageEnv, INITIAL_USAGE_ENV) ||
+      isValueChanged(personalization, INITIAL_PERSONALIZATION)
+    );
+  };
+
   useEffect(() => {
     const newBody = buildFilterRequestBody({
       basicInfo,
       usageEnv,
       personalization,
     });
-    setFilter(newBody);
-  }, [basicInfo, usageEnv, personalization]);
+    if (hasAnyChange()) {
+      setFilter(newBody);
+      markTouched();
+    }
+  }, [basicInfo, usageEnv, personalization, setFilter, markTouched]);
 
-  const filterComponentMap: Record<TabKey, JSX.Element> = {
+  const filterComponentMap: Record<TabKey, React.ReactNode> = {
     기본정보: (
       <BasicInfo
         onChange={(_, val) =>
           setBasicInfo({
-            type: val.type as string[],
+            type: val.type as string,
             genre: val.genre as string[],
             rating: val.rating as [number, number],
           })

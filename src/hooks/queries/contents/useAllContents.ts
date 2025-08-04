@@ -5,7 +5,8 @@ import { FetchAllContentsParams } from "@/types/Contents.types";
 export const useAllContents = ({
   pageSize,
   sort,
-}: Omit<FetchAllContentsParams, "pageNumber">) => {
+  enabled = true,
+}: Omit<FetchAllContentsParams, "pageNumber"> & { enabled?: boolean }) => {
   return useInfiniteQuery({
     queryKey: ["allContents", sort],
     queryFn: ({ pageParam = 0 }) =>
@@ -21,5 +22,6 @@ export const useAllContents = ({
     staleTime: 1000 * 60 * 30,
     gcTime: 1000 * 60 * 60 * 2,
     retry: 1,
+    enabled,
   });
 };

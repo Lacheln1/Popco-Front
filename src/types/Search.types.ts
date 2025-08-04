@@ -70,6 +70,7 @@ interface SearchContentsParams {
   actors?: string[];
   page?: number;
   size: number;
+  enabled?: boolean;
 }
 
 // 필터링
@@ -94,6 +95,7 @@ export interface FilteredContentResponse {
   platforms: string[];
   ratingAverage: number;
   releaseDate: string;
+  posterPath: string;
 }
 
 export interface PostFilterResponse {

@@ -1,5 +1,5 @@
 import { TabKey } from "@/constants/FilterTabs";
-import { Form, Checkbox, Slider } from "antd";
+import { Form, Checkbox, Slider, Radio } from "antd";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
@@ -12,6 +12,11 @@ const BasicInfo = ({
 }) => {
   const [form] = Form.useForm();
   const [rating, setRating] = useState<[number, number]>([0, 5]);
+  const [basicInfo, setBasicInfo] = useState({
+    type: "",
+    genre: [] as string[],
+    rating: [0, 5] as [number, number],
+  });
 
   useEffect(() => {
     if (value) {
@@ -28,7 +33,7 @@ const BasicInfo = ({
   const handleFormChange = (_: unknown, allValues: Record<string, unknown>) => {
     const final = {
       ...allValues,
-      rating: value?.rating, // 슬라이더는 따로 처리됨
+      rating, // 현재 상태에서 가져온 값 사용
     };
     onChange("기본정보", final);
   };
@@ -58,7 +63,12 @@ const BasicInfo = ({
           label={<span className="text-gray-400">타입</span>}
           name="type"
         >
-          <Checkbox.Group options={["영화", "시리즈/드라마"]} />
+          <Radio.Group
+            options={[
+              { label: "영화", value: "movie" },
+              { label: "시리즈/드라마", value: "tv" },
+            ]}
+          />
         </Form.Item>
 
         <Form.Item

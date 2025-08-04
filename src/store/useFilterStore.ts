@@ -5,6 +5,9 @@ interface FilterStore {
   filter: PostFilterRequest;
   setFilter: (val: PostFilterRequest) => void;
   resetFilter: () => void;
+  isTouched: boolean;
+  markTouched: () => void;
+  resetTouched: () => void;
 }
 
 export const useFilterStore = create<FilterStore>((set) => ({
@@ -15,7 +18,8 @@ export const useFilterStore = create<FilterStore>((set) => ({
     popcorithmFilter: {},
     ageGroupFilter: {},
   },
-  setFilter: (val) => set({ filter: val }),
+  isTouched: false,
+  setFilter: (val) => set({ filter: val, isTouched: true }),
   resetFilter: () =>
     set({
       filter: {
@@ -25,5 +29,8 @@ export const useFilterStore = create<FilterStore>((set) => ({
         popcorithmFilter: {},
         ageGroupFilter: {},
       },
+      isTouched: false,
     }),
+  markTouched: () => set({ isTouched: true }),
+  resetTouched: () => set({ isTouched: false }),
 }));
