@@ -155,15 +155,15 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
         className="pretendard flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-48">
+        <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-20">
           <div className="flex flex-col items-center text-center">
-            <span className="text-base">성별</span>
+            <span className="text-base md:text-2xl">성별</span>
             <div>
               <GenderChart genderPercent={genderPercent} />
             </div>
           </div>
           <div className="flex flex-col items-center text-center">
-            <span className="text-base">연령대</span>
+            <span className="text-base md:text-2xl">연령대</span>
             <div>
               <AgeChart agePercent={agePercent} />
             </div>
@@ -177,16 +177,16 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
           </div>
         )}
 
-        <div className="mt-14 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-36 lg:gap-24">
+        <div className="mt-14 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-20 lg:gap-24">
           {/* 선호영화 */}
           {loading ? (
             <LoadingSection title="선호영화" />
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="text-base sm:text-3xl lg:text-4xl">
+              <span className="text-base md:text-2xl lg:text-4xl">
                 선호영화
               </span>
-              <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
+              <div className="mt-2 rounded-xl bg-white px-4 sm:mt-4 lg:px-7">
                 {movieData.map((movie, index) => (
                   <div
                     key={movie.contentId}
@@ -214,10 +214,10 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
             <LoadingSection title="선호 시리즈" />
           ) : (
             <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="text-base sm:text-3xl lg:text-4xl">
+              <span className="text-base md:text-2xl lg:text-4xl">
                 선호 시리즈
               </span>
-              <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
+              <div className="mt-2 rounded-xl bg-white px-4 sm:mt-4 lg:px-7">
                 {seriesData.map((series, index) => (
                   <div
                     key={series.contentId}
