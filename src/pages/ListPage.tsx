@@ -27,18 +27,30 @@ const ListPage = () => {
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // 전체 콘텐츠
+  // 필터 관련 상태
+  const { filter } = useFilterStore();
+  const hasActiveFilter = Object.values(filter).some((filterGroup) =>
+    Object.values(filterGroup).some((value) =>
+      Array.isArray(value) ? value.length > 0 : value !== undefined,
+    ),
+  );
+
+  // 전체 콘텐츠 (필터가 없을 때만)
   const {
     data: allData,
     fetchNextPage: fetchAllNext,
     hasNextPage: hasAllNext,
     isFetchingNextPage: isFetchingAllNext,
-  } = useAllContents({ pageSize: 30, sort });
+  } = useAllContents({
+    pageSize: 30,
+    sort,
+    enabled: !isSearching && !hasActiveFilter, // 검색이나 필터가 없을 때만 활성화
+  });
 
   const allContents: AllContentItem[] =
     allData?.pages.flatMap((page) => page.contents) ?? [];
 
-  // 검색 api 호출
+  // 검색 API 호출
   const {
     data: searchData,
     fetchNextPage: fetchSearchNext,
@@ -49,6 +61,20 @@ const ListPage = () => {
     actors: searchType === "actors" ? searchActors : undefined,
     size: 30,
   });
+
+  // 필터된 콘텐츠 (검색하지 않을 때만)
+  const {
+    mutate: mutateFilter,
+    data: filteredData,
+    isLoading: isFilterLoading,
+  } = useFilteredContents();
+
+  // 필터 적용
+  useEffect(() => {
+    if (!isSearching && hasActiveFilter) {
+      mutateFilter({ filter, page: 0, size: 30 });
+    }
+  }, [filter, isSearching, hasActiveFilter, mutateFilter]);
 
   // 검색결과 -> 전체 리스트 타입에 매핑
   const mapSearchResultsToAllContentItems = (
@@ -63,20 +89,21 @@ const ListPage = () => {
     }));
   };
 
-  // 필터 관련 상태
-  const { filter } = useFilterStore();
-  const { mutate } = useFilteredContents();
-
-  useEffect(() => {
-    mutate({ filter, page: 0, size: 30 });
-  }, [filter]);
-
   const searchResults: AllContentItem[] =
     searchData?.pages.flatMap((page) =>
       mapSearchResultsToAllContentItems(page.content),
     ) ?? [];
 
-  const displayContents = isSearching ? searchResults : allContents;
+  const filteredResults: AllContentItem[] = filteredData
+    ? mapSearchResultsToAllContentItems(filteredData.content)
+    : [];
+
+  // 표시할 콘텐츠 결정
+  const displayContents = isSearching
+    ? searchResults
+    : hasActiveFilter
+      ? filteredResults
+      : allContents;
 
   // 무한 스크롤 처리
   useEffect(() => {
@@ -87,10 +114,15 @@ const ListPage = () => {
         if (!entries[0].isIntersecting) return;
 
         if (isSearching) {
-          if (hasSearchNext && !isFetchingSearchNext) fetchSearchNext();
-        } else {
-          if (hasAllNext && !isFetchingAllNext) fetchAllNext();
+          if (hasSearchNext && !isFetchingSearchNext) {
+            fetchSearchNext();
+          }
+        } else if (!hasActiveFilter) {
+          if (hasAllNext && !isFetchingAllNext) {
+            fetchAllNext();
+          }
         }
+        // 필터된 결과는 현재 무한 스크롤 미지원
       },
       { threshold: 0 },
     );
@@ -109,6 +141,7 @@ const ListPage = () => {
     hasAllNext,
     isFetchingAllNext,
     fetchAllNext,
+    hasActiveFilter,
   ]);
 
   // 검색 실행
@@ -157,19 +190,25 @@ const ListPage = () => {
         />
       </div>
       <div className="flex flex-wrap place-content-center gap-9">
-        {displayContents.map((content) => (
-          <Poster
-            key={content.id}
-            id={content.id}
-            title={content.title}
-            contentType={content.type}
-            posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
-            likeState="NEUTRAL"
-            onLikeChange={() => {}}
-          />
-        ))}
+        {displayContents.length > 0 ? (
+          displayContents.map((content) => (
+            <Poster
+              key={content.id}
+              id={content.id}
+              title={content.title}
+              contentType={content.type}
+              posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+              likeState="NEUTRAL"
+              onLikeChange={() => {}}
+            />
+          ))
+        ) : (
+          <div className="py-8 text-center text-gray-500">
+            {isFilterLoading ? "로딩 중..." : "결과가 없습니다."}
+          </div>
+        )}
       </div>
-      {(isSearching ? hasSearchNext : hasAllNext) && (
+      {(isSearching ? hasSearchNext : !hasActiveFilter && hasAllNext) && (
         <div ref={observerRef} className="h-10" />
       )}
     </PageLayout>
