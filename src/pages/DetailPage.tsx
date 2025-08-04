@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +7,8 @@ import { ContentsDetail, Crew } from "@/types/Contents.types";
 
 // --- 훅 임포트 ---
 import { useContentsDetail } from "@/hooks/useContentsDetail";
+import useAuthCheck from "@/hooks/useAuthCheck";
+import { useFetchWishlist, useToggleWishlist } from "@/hooks/useWishlist";
 
 // --- 컴포넌트 임포트 ---
 import LikePopcorn from "@/components/popcorn/LikePopcorn";
@@ -19,7 +21,6 @@ import ActionButtons from "@/components/detail/ActionButtons";
 import ReviewSection from "@/components/detail/ReviewSection";
 import CollectionSection from "@/components/detail/CollectionSection";
 import { validateAndRefreshTokens } from "@/apis/tokenApi";
-import useAuthCheck from "@/hooks/useAuthCheck";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import Spinner from "@/components/common/Spinner";
 // ======================================================================
@@ -234,10 +235,31 @@ const DetailContents = ({
 // 2. 메인 페이지 컴포넌트: 데이터 로딩과 상태 관리만 담당
 // ======================================================================
 export default function DetailPage() {
+  const { user, accessToken } = useAuthCheck();
   const { contents, loading, error, contentId, contentType } =
     useContentsDetail();
 
-  const [isWished, setIsWished] = useState(false);
+  // --- 위시리스트 상태 관리 로직 ---
+  const { data: wishlistData } = useFetchWishlist(user.userId, accessToken);
+  const { mutate: toggleWishlist } = useToggleWishlist();
+
+  // API로부터 받아온 전체 위시리스트를 기반으로 현재 콘텐츠의 보고싶어요 초기 상태를 결정
+  const initialIsWished = useMemo(() => {
+    if (!wishlistData?.data || !contentId) return false;
+    return wishlistData.data.some(
+      (item: any) => item.contentId === Number(contentId),
+    );
+  }, [wishlistData, contentId]);
+
+  // isWished 상태를 한 번만 선언하고, initialIsWished 값으로 초기화
+  const [isWished, setIsWished] = useState(initialIsWished);
+
+  // 위시리스트 데이터가 변경될 때마다 로컬 상태를 동기화
+  useEffect(() => {
+    setIsWished(initialIsWished);
+  }, [initialIsWished]);
+
+  // --- 기존 상태 관리 ---
   const [myCurrentRating, setMyCurrentRating] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isHated, setIsHated] = useState(false);
@@ -245,14 +267,37 @@ export default function DetailPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const checkAuth = async () => {
-      const isValid = await validateAndRefreshTokens();
-      if (!isValid) {
-        navigate("/login");
-      }
-    };
-    checkAuth();
   }, []);
+
+  const handleWishClick = useCallback(() => {
+    if (
+      !user.isLoggedIn ||
+      !user.userId ||
+      !contentId ||
+      !contentType ||
+      !accessToken
+    ) {
+      return;
+    }
+
+    const previousIsWished = isWished;
+    setIsWished((prev) => !prev);
+
+    toggleWishlist(
+      {
+        isWished: previousIsWished, // 낙관적 업데이트 이전의 상태를 전달
+        userId: user.userId,
+        contentId: Number(contentId),
+        contentType,
+        accessToken,
+      },
+      {
+        onError: () => {
+          setIsWished(previousIsWished);
+        },
+      },
+    );
+  }, [isWished, user, contentId, contentType, accessToken, toggleWishlist]);
 
   const handleLikeClick = () => {
     setIsLiked((prev) => !prev);
@@ -264,15 +309,10 @@ export default function DetailPage() {
     if (isLiked) setIsLiked(false);
   };
 
-  const handleWishClick = useCallback(() => {
-    setIsWished((prev) => !prev);
-  }, []);
-
-  // 로딩 및 에러 UI 처리
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner/>
+        <Spinner />
       </div>
     );
   }
@@ -285,7 +325,6 @@ export default function DetailPage() {
     );
   }
 
-  // 데이터 로딩 완료 후, 상태와 데이터를 props로 넘겨주며 DetailContents 렌더링
   return (
     <DetailContents
       contents={contents}
