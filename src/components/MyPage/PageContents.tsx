@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  lazy,
+  Suspense,
+} from "react";
 import MovieCalendar from "./MovieCalendar";
 import ReviewCard from "../common/ReviewCard";
 import { getMonthlyReviews } from "@/apis/userApi";
@@ -10,10 +17,10 @@ import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import HotCollection from "../common/HotCollection";
-import LikeContents from "./LikeContents";
-import WantWatching from "./WantWatching";
-import MyPageChart from "./MyPageChart";
+const HotCollection = lazy(() => import("../common/HotCollection"));
+const LikeContents = lazy(() => import("./LikeContents"));
+const WantWatching = lazy(() => import("./WantWatching"));
+const MyPageChart = lazy(() => import("./MyPageChart"));
 import { App } from "antd";
 import Spinner from "../common/Spinner";
 import { useNavigate } from "react-router-dom";
@@ -582,19 +589,21 @@ const PageContents: React.FC<PageContentsProps> = ({
                             key={collection.collectionId}
                             className="!h-auto"
                           >
-                            <HotCollection
-                              collectionId={collection.collectionId}
-                              title={collection.title}
-                              posters={collection.contentPosters.map(
-                                (poster) => poster.posterPath,
-                              )}
-                              saveCount={collection.saveCount || 0}
-                              isSaved={collection.isMarked || false} // 실제 저장 상태 사용
-                              href={`/collections/${collection.collectionId}`}
-                              onSaveToggle={() =>
-                                handleSaveToggle(collection.collectionId)
-                              }
-                            />
+                            <Suspense fallback={<Spinner />}>
+                              <HotCollection
+                                collectionId={collection.collectionId}
+                                title={collection.title}
+                                posters={collection.contentPosters.map(
+                                  (poster) => poster.posterPath,
+                                )}
+                                saveCount={collection.saveCount || 0}
+                                isSaved={collection.isMarked || false} // 실제 저장 상태 사용
+                                href={`/collections/${collection.collectionId}`}
+                                onSaveToggle={() =>
+                                  handleSaveToggle(collection.collectionId)
+                                }
+                              />
+                            </Suspense>
                           </SwiperSlide>
                         ))}
                       </Swiper>
@@ -646,19 +655,21 @@ const PageContents: React.FC<PageContentsProps> = ({
                               key={collection.collectionId}
                               className="!h-auto"
                             >
-                              <HotCollection
-                                collectionId={collection.collectionId}
-                                title={collection.title}
-                                posters={collection.contentPosters.map(
-                                  (poster) => poster.posterPath,
-                                )}
-                                saveCount={collection.saveCount || 0}
-                                isSaved={collection.isMarked || true} // 저장한 컬렉션은 항상 저장됨
-                                href={`/collections/${collection.collectionId}`}
-                                onSaveToggle={() =>
-                                  handleSaveToggle(collection.collectionId)
-                                }
-                              />
+                              <Suspense fallback={<Spinner />}>
+                                <HotCollection
+                                  collectionId={collection.collectionId}
+                                  title={collection.title}
+                                  posters={collection.contentPosters.map(
+                                    (poster) => poster.posterPath,
+                                  )}
+                                  saveCount={collection.saveCount || 0}
+                                  isSaved={collection.isMarked || true} // 저장한 컬렉션은 항상 저장됨
+                                  href={`/collections/${collection.collectionId}`}
+                                  onSaveToggle={() =>
+                                    handleSaveToggle(collection.collectionId)
+                                  }
+                                />
+                              </Suspense>
                             </SwiperSlide>
                           ),
                         )}
@@ -672,18 +683,24 @@ const PageContents: React.FC<PageContentsProps> = ({
           {activeTab === 2 && (
             <div>
               <div>
-                <MyPageChart accessToken={accessToken} />
+                <Suspense fallback={<Spinner />}>
+                  <MyPageChart accessToken={accessToken} />
+                </Suspense>
               </div>
               <div>
                 {isLoggedIn ? (
-                  <WantWatching userId={user.userId} />
+                  <Suspense fallback={<Spinner />}>
+                    <WantWatching userId={user.userId} />
+                  </Suspense>
                 ) : (
                   renderEmptyState("로그인이 필요합니다.")
                 )}
               </div>
               <div>
                 {isLoggedIn ? (
-                  <LikeContents accessToken={accessToken} />
+                  <Suspense fallback={<Spinner />}>
+                    <LikeContents accessToken={accessToken} />
+                  </Suspense>
                 ) : (
                   renderEmptyState("로그인이 필요합니다.")
                 )}

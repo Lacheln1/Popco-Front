@@ -106,6 +106,7 @@ const MyPage: React.FC = () => {
         }
         floatingBoxContent={
           <UserInfoSection
+            accessToken={accessToken}
             nickname={userData?.nickname || user?.nickname || "사용자"}
             email={userData?.email || user?.email || "이메일 없음"}
             currentPersona={
