@@ -1,46 +1,41 @@
-import React, { useState } from "react";
+import React from "react";
 import reviewIconUrl from "@/assets/review.png";
 import emptyPlusIconUrl from "@/assets/empty-plus.png";
 import fullPlusIconUrl from "@/assets/full-plus.png";
 import folderIconUrl from "@/assets/folder.png";
-import ReviewModal from "../ReviewModal/ReviewModal";
 import AddToCollectionModal from "../collection/AddToCollectionModal";
-import { useMyReview } from "@/hooks/queries/review/useMyReview";
 import { App } from "antd";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
+// props 타입 정의
 interface ActionButtonsProps {
   isWished: boolean;
   onWishClick: () => void;
+  onReviewClick: () => void;
+  reviewButtonLabel: string;
   isDesktop?: boolean;
   token?: string | null;
   movieTitle: string;
-  moviePoster: string;
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
   isWished,
   onWishClick,
+  onReviewClick,
+  reviewButtonLabel,
   isDesktop = false,
   token,
   movieTitle,
-  moviePoster,
 }) => {
   const iconSize = isDesktop ? "h-8 w-8" : "h-6 w-6";
   const textSize = isDesktop ? "text-sm" : "text-xs";
   const gap = isDesktop ? "gap-2" : "gap-1";
-
   const { message } = App.useApp();
+
+  // 콜렉션 모달 상태는 ActionButtons가 독립적으로 가져도 괜찮음
   const { id, type = "" } = useParams();
   const contentId = id ? Number(id) : undefined;
-
-  const { data, isLoading, isFetching, isError, refetch } = useMyReview(
-    contentId,
-    type,
-    token ?? undefined,
-  );
-
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isAddToCollectionModalOpen, setIsAddToCollectionModalOpen] =
     useState(false);
 
@@ -60,18 +55,13 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setIsAddToCollectionModalOpen(true);
   };
 
-  const handleReviewClick = async () => {
+  const handleReviewClick = () => {
     if (!token) {
       message.info("로그인 먼저 진행해주세요!", 1.5);
       return;
     }
-    await refetch();
-    setIsReviewModalOpen(true);
+    onReviewClick(); // 부모로부터 받은 함수 호출
   };
-
-  if (isLoading || isFetching || isError || !data) return null;
-  const { existUserReview, myReview } = data;
-  const reviewButtonLabel = existUserReview ? "리뷰 수정" : "리뷰 쓰기";
 
   return (
     <>
@@ -83,7 +73,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           className={`flex flex-col items-center ${gap} hover:opacity-80`}
           onClick={handleReviewClick}
         >
-          <img src={reviewIconUrl} alt="리뷰 쓰기" className={iconSize} />
+          <img src={reviewIconUrl} alt="리뷰" className={iconSize} />
           <span className={`${textSize} font-semibold`}>
             {reviewButtonLabel}
           </span>
@@ -112,26 +102,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         </button>
       </div>
 
-      <ReviewModal
-        isModalOpen={isReviewModalOpen}
-        setIsModalOpen={setIsReviewModalOpen}
-        isAuthor={true}
-        isWriting={!existUserReview}
-        contentsTitle={
-          movieTitle || myReview?.title || "선택된 영화가 없습니다."
-        }
-        contentsImg={moviePoster || myReview?.posterPath || "/images/n.png"}
-        popcorn={myReview?.score ?? 0}
-        reviewDetail={myReview?.text ?? ""}
-        author="나"
-        likeCount={myReview?.likeCount}
-        isLiked={false}
-        token={token ?? ""}
-        refetchMyReview={refetch}
-        reviewId={myReview?.reviewId ?? 0}
-      />
-
-      {/* 모달에 실제 콘텐츠 정보를 전달합니다. */}
       <AddToCollectionModal
         isOpen={isAddToCollectionModalOpen}
         onClose={() => setIsAddToCollectionModalOpen(false)}

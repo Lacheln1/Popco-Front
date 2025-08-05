@@ -12,7 +12,8 @@ import { getMonthlyReviews } from "@/apis/userApi";
 import {
   fetchMyCollections,
   fetchMyMarkedCollections,
-} from "@/apis/collectionApi";
+} from "@/apis/collectionApi"; // 컬렉션 API import
+import { ReviewCardData } from "@/types/Reviews.types"; //리뷰타입 import
 import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -46,18 +47,6 @@ interface Movie {
   contentId: number;
   contentType: string;
   reviewId: number;
-}
-
-interface ReviewData {
-  movieTitle: string;
-  score: number;
-  reviewText: string;
-  nickname: string;
-  likeCount: number;
-  isSpoiler: boolean;
-  isOwnReview: boolean;
-  isLiked: boolean;
-  hasAlreadyReported: boolean;
 }
 
 interface ContentPoster {
@@ -330,46 +319,27 @@ const PageContents: React.FC<PageContentsProps> = ({
     setIsEnd(swiper.isEnd);
   }, []);
 
-  const convertToReviewData = useCallback(
-    (movie: Movie): ReviewData => ({
-      movieTitle: movie.title || "제목 없음",
-      score: movie.score || 0,
-      reviewText: movie.reviewText || "리뷰 내용이 없습니다",
-      nickname: user.nickname || "익명",
+  // Movie 데이터를 ReviewCard가 요구하는 ReviewCardData 형태로 변환
+  const convertMovieToReviewCardData = (movie: Movie): ReviewCardData => {
+    return {
+      // === 추후 수정 필요함!!!!!!! import도 수정!! ===
+      reviewId: movie.reviewId,
+      contentId: movie.contentId,
+      contentType: movie.contentType,
+      contentTitle: movie.title,
+      authorNickname: user.nickname || "익명",
+      score: movie.score,
+      reviewText: movie.reviewText,
+      status: "COMMON",
       likeCount: 0,
-      isSpoiler: false,
-      isOwnReview: true,
       isLiked: false,
+      isOwnReview: true,
       hasAlreadyReported: false,
-    }),
-    [user.nickname],
-  );
+      posterPath: movie.poster,
+    };
+  };
 
-  const handleMonthChange = useCallback(
-    (activeStartDate: Date | null) => {
-      if (activeStartDate) {
-        const newMonth = formatMonthForApi(activeStartDate);
-        if (newMonth !== currentMonth) {
-          setCurrentMonth(newMonth);
-          fetchMonthlyReviews(newMonth);
-        }
-      }
-    },
-    [currentMonth, fetchMonthlyReviews],
-  );
-
-  const handleReportError = useCallback(() => {
-    message.error("자신이 작성한 리뷰는 신고할 수 없습니다!");
-  }, [message]);
-
-  const handleCreateCollection = useCallback(() => {
-    navigate("/collections/create");
-  }, [navigate]);
-
-  const handleTabChange = useCallback((tabIndex: number) => {
-    setActiveTab(tabIndex);
-  }, []);
-
+  // 컴포넌트 마운트 시 및 로그인 상태 변경 시 현재 월 데이터 가져오기
   useEffect(() => {
     const initialMonth = formatMonthForApi(new Date());
     setCurrentMonth(initialMonth);
@@ -410,6 +380,24 @@ const PageContents: React.FC<PageContentsProps> = ({
     ),
     [],
   );
+
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+  };
+
+  const handleMonthChange = (activeStartDate: Date | null) => {
+    if (activeStartDate) {
+      const newMonth = formatMonthForApi(activeStartDate);
+      if (newMonth !== currentMonth) {
+        setCurrentMonth(newMonth);
+        fetchMonthlyReviews(newMonth);
+      }
+    }
+  };
+
+  const handleCreateCollection = () => {
+    navigate("/collections/create"); // 새 컬렉션 만들기 페이지로 이동
+  };
 
   return (
     <div className="pretendard">
@@ -479,10 +467,13 @@ const PageContents: React.FC<PageContentsProps> = ({
                       {movies.map((movie) => (
                         <SwiperSlide key={movie.reviewId} className="!h-auto">
                           <ReviewCard
-                            reviewData={convertToReviewData(movie)}
-                            contentId={movie.contentId}
-                            contentType={movie.contentType}
-                            onReport={handleReportError}
+                            {...convertMovieToReviewCardData(movie)}
+                            // MyPage에서는 리뷰 카드에 대한 상호작용이 없으므로,
+                            // 빈 함수를 전달하여 필수 prop 조건을 만족시킵니다.
+                            onLikeClick={() => {}}
+                            onReport={() => {}}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
                           />
                         </SwiperSlide>
                       ))}

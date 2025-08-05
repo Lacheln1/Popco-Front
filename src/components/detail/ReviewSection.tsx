@@ -1,212 +1,353 @@
 import React, { useState } from "react";
-import { Dropdown } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Dropdown, Button, Form, Select, App } from "antd";
 import type { MenuProps } from "antd";
-
-// Swiper 관련 임포트
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 
+import {
+  useFetchInfiniteReviews,
+  useToggleReviewReaction,
+  useDeleteReview,
+  useFetchReviewSummary,
+  useFetchDeclarationTypes,
+  usePostReviewDeclaration,
+} from "@/hooks/useReviews";
+import useAuthCheck from "@/hooks/useAuthCheck";
 import ReviewCard from "@/components/common/ReviewCard";
+import { ReviewCardData, ContentReview } from "@/types/Reviews.types";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import AiReviewSummaryBg from "@/assets/AiReviewPopco.png";
+import Spinner from "@/components/common/Spinner";
 
-// ReviewCard에 필요한 데이터 타입 (가져왔다고 가정)
-interface ReviewData {
-  movieTitle: string;
-  score: number;
-  reviewText: string;
-  nickname: string;
-  likeCount: number;
-  isSpoiler: boolean;
-  isOwnReview: boolean;
-  isLiked: boolean;
-  hasAlreadyReported: boolean;
+interface ReviewSectionProps {
+  contentId: number;
+  contentType: string;
+  contentTitle: string;
+  onEditClick: (review: ReviewCardData) => void;
 }
 
-const initialMockReviews: ReviewData[] = [
-  // isLiked 상태를 일부러 false로 설정하여 테스트
-  {
-    movieTitle: "F1 더무비",
-    score: 3.0,
-    reviewText: "F1 입문하기에 좋은 영화",
-    nickname: "ㅇㄹㄴㅇㄹ",
-    likeCount: 120,
-    isSpoiler: false,
-    isOwnReview: false,
-    isLiked: false,
-    hasAlreadyReported: false,
-  },
-  {
-    movieTitle: "F1 더무비",
-    score: 5.0,
-    reviewText: "정말 재미있고 감동적인 레이싱 영화입니다. 꼭 보세요!",
-    nickname: "abcdfasdf",
-    likeCount: 120,
-    isSpoiler: false,
-    isOwnReview: false,
-    isLiked: true,
-    hasAlreadyReported: false,
-  },
-  {
-    movieTitle: "F1 더무비",
-    score: 2.0,
-    reviewText:
-      "졸작이라고는 할 수 없다. 감독이 판타지와 현실을 어떻게 연결할지...",
-    nickname: "gdsss",
-    likeCount: 120,
-    isSpoiler: true,
-    isOwnReview: false,
-    isLiked: false,
-    hasAlreadyReported: false,
-  },
-  {
-    movieTitle: "F1 더무비",
-    score: 1.5,
-    reviewText:
-      "기대했는데 너무 실망스러워요. 스토리가 너무 뻔하고 지루합니다.",
-    nickname: "MovieLover2",
-    likeCount: 15,
-    isSpoiler: false,
-    isOwnReview: false,
-    isLiked: false,
-    hasAlreadyReported: false,
-  },
-  {
-    movieTitle: "F1 더무비",
-    score: 4.0,
-    reviewText: "사운드 디자인이 압권이네요. 영화관에서 꼭 봐야 할 영화.",
-    nickname: "SoundMan",
-    likeCount: 88,
-    isSpoiler: false,
-    isOwnReview: false,
-    isLiked: false,
-    hasAlreadyReported: false,
-  },
-  {
-    movieTitle: "F1 더무비",
-    score: 3.0,
-    reviewText:
-      "주인공이 마지막에 우승하는 장면은 정말 감동이었어요. 스포주의!",
-    nickname: "스포일러빌런",
-    likeCount: 42,
-    isSpoiler: true,
-    isOwnReview: false,
-    isLiked: false,
-    hasAlreadyReported: false,
-  },
-];
-
-const ReviewSection: React.FC = () => {
+const ReviewSection: React.FC<ReviewSectionProps> = ({
+  contentId,
+  contentType,
+  contentTitle,
+  onEditClick,
+}) => {
+  const { accessToken } = useAuthCheck();
   const [swiper, setSwiper] = useState<SwiperType | undefined>(undefined);
-  const [reviews, setReviews] = useState<ReviewData[]>(initialMockReviews);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
-  const [sortOrder, setSortOrder] = useState("최신순");
+  const [sortOrder, setSortOrder] = useState<"recent" | "popular">("recent");
+  const [reportForm] = Form.useForm();
+  const { message, modal } = App.useApp();
+  const navigate = useNavigate();
+
+  // AI 리뷰 요약 데이터 호출
+  const { data: summaryData, isLoading: isSummaryLoading } =
+    useFetchReviewSummary(contentId, contentType);
+
+  // 신고 유형 조회
+  const { data: declarationTypes, isLoading: isDeclarationTypesLoading } =
+    useFetchDeclarationTypes();
+
+  // 리뷰 삭제 훅
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview(
+    contentId,
+    contentType,
+  );
+
+  // 신고 훅 (sortOrder를 넘겨주지 않아도 됨)
+  const { mutate: reportReview, isPending: isReporting } =
+    usePostReviewDeclaration(contentId, contentType);
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useFetchInfiniteReviews(
+    contentId,
+    contentType,
+    sortOrder,
+    accessToken ?? undefined,
+  );
+
+  const { mutate: toggleReaction } = useToggleReviewReaction(
+    contentId,
+    contentType,
+    sortOrder,
+  );
+
+  const transformToCardData = (review: ContentReview): ReviewCardData => ({
+    reviewId: review.reviewId,
+    contentId: contentId,
+    contentType: contentType,
+    contentTitle: contentTitle,
+    score: review.score,
+    reviewText: review.text,
+    status: review.status,
+    likeCount: review.likeCount,
+    isLiked: review.isLiked,
+    isOwnReview: review.isAuthor,
+    hasAlreadyReported: review.isDeclaration,
+    authorNickname: review.reviewerName,
+    reviewDate: review.reviewDate,
+  });
+
+  const allReviews =
+    data?.pages.flatMap((page) =>
+      page.data.reviewList.map(transformToCardData),
+    ) || [];
+
+  const handleAuthRequiredAction = (action: () => void) => {
+    if (!accessToken) {
+      message.error("로그인이 필요한 기능입니다.");
+      navigate("/login");
+      return;
+    }
+    action();
+  };
+
+  const handleLikeToggle = (reviewId: number) => {
+    handleAuthRequiredAction(() => {
+      toggleReaction({ reviewId, token: accessToken! });
+    });
+  };
+
+  const handleReport = (reviewId: number) => {
+    handleAuthRequiredAction(() => {
+      const form = reportForm;
+      form.resetFields();
+
+      modal.confirm({
+        title: "리뷰 신고하기",
+        content: (
+          <Form form={form} layout="vertical" className="mr-6 mt-4">
+            <Form.Item
+              name="declarationType"
+              label="신고 유형"
+              rules={[{ required: true, message: "신고 유형을 선택해주세요" }]}
+            >
+              <Select
+                placeholder="신고 유형을 선택해주세요"
+                loading={isDeclarationTypesLoading}
+              >
+                {declarationTypes?.map((type) => (
+                  <Select.Option key={type.code} value={type.code}>
+                    {type.description}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Form>
+        ),
+        okText: "신고",
+        cancelText: "취소",
+        okButtonProps: { loading: isReporting },
+        onOk: async () => {
+          try {
+            const values = await form.validateFields();
+            reportReview(
+              {
+                reviewId,
+                body: {
+                  declarationType: String(values.declarationType),
+                  content: "",
+                },
+                token: accessToken!,
+              },
+              {
+                onSuccess: () => {
+                  message.success("신고가 접수되었습니다.");
+                },
+                onError: (error: any) => {
+                  message.error(
+                    error.message || "신고 처리 중 오류가 발생했습니다.",
+                  );
+                },
+              },
+            );
+          } catch (error) {
+            console.error("신고 폼 검증 또는 제출 실패:", error);
+            return Promise.reject(error);
+          }
+        },
+      });
+    });
+  };
+
+  const handleEdit = (review: ReviewCardData) => {
+    handleAuthRequiredAction(() => {
+      onEditClick(review);
+    });
+  };
+
+  const handleDelete = (reviewId: number) => {
+    handleAuthRequiredAction(() => {
+      modal.confirm({
+        title: "리뷰 삭제",
+        content: "정말로 리뷰를 삭제하시겠습니까?",
+        okText: "삭제",
+        cancelText: "취소",
+        okButtonProps: { loading: isDeleting },
+        async onOk() {
+          deleteReview(
+            { reviewId, token: accessToken! },
+            {
+              onSuccess: () => {
+                message.success("리뷰가 삭제되었습니다.");
+              },
+              onError: (error) => {
+                console.error("리뷰 삭제 API 에러:", error);
+                message.error("리뷰 삭제에 실패했습니다.");
+              },
+            },
+          );
+        },
+      });
+    });
+  };
 
   const handleSlideChange = (swiperInstance: SwiperType) => {
     setIsBeginning(swiperInstance.isBeginning);
     setIsEnd(swiperInstance.isEnd);
   };
 
-  const handleSortChange = (key: string) => {
-    setSortOrder(key === "1" ? "최신순" : "인기순");
-  };
-
-  const handleLikeToggle = (clickedIndex: number) => {
-    setReviews((currentReviews) =>
-      currentReviews.map((review, index) => {
-        if (index === clickedIndex) {
-          const newLikeCount = review.isLiked
-            ? review.likeCount - 1
-            : review.likeCount + 1;
-          return {
-            ...review,
-            isLiked: !review.isLiked,
-            likeCount: newLikeCount,
-          };
-        }
-        return review;
-      }),
-    );
+  const handleSortChange = (key: "recent" | "popular") => {
+    setSortOrder(key);
   };
 
   const sortItems: MenuProps["items"] = [
-    { key: "1", label: "최신순", onClick: () => handleSortChange("1") },
-    { key: "2", label: "인기순", onClick: () => handleSortChange("2") },
+    {
+      key: "recent",
+      label: "최신순",
+      onClick: () => handleSortChange("recent"),
+    },
+    {
+      key: "popular",
+      label: "인기순",
+      onClick: () => handleSortChange("popular"),
+    },
   ];
 
+  const sortOrderText = sortOrder === "recent" ? "최신순" : "인기순";
+
   return (
-    <section>
-      <h3 className="mb-6 text-2xl font-bold">리뷰</h3>
+    <>
+      <section>
+        <h3 className="mb-6 text-2xl font-bold">리뷰</h3>
 
-      <div
-        className="relative mx-auto mb-10 h-32 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-40"
-        style={{ backgroundImage: `url(${AiReviewSummaryBg})` }}
-      >
-        <div className="absolute left-1/2 top-1/2 ml-3 w-full max-w-md -translate-x-1/2 -translate-y-1/2 text-center">
-          <p className="mt-1 text-[0.6rem] leading-relaxed text-gray-400 md:mb-2 md:text-xs">
-            리뷰에서 많이 언급된 특징을 AI가 분석했어요.
-          </p>
-
-          <p className="text-xs leading-relaxed text-gray-600 md:text-base">
-            팝코가 요약한 결과, 액션과 연출에 대한 평이 높아요!
-            <br />
-            다만 스토리와 캐릭터에 대한 평가는 엇갈리고 있어요.
-          </p>
+        {/* AI 리뷰 요약 섹션 */}
+        <div
+          className="relative mx-auto mb-10 h-32 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-40"
+          style={{ backgroundImage: `url(${AiReviewSummaryBg})` }}
+        >
+          <div className="absolute left-1/2 top-1/2 ml-3 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center text-center">
+            <p className="mt-1 text-[0.6rem] leading-relaxed text-gray-400 md:mb-2 md:text-xs">
+              리뷰에서 많이 언급된 특징을 AI가 분석했어요.
+            </p>
+            {isSummaryLoading ? (
+              <div className="mt-2">
+                <Spinner />
+              </div>
+            ) : summaryData?.hasSummary ? (
+              <p className="text-xs leading-relaxed text-gray-600 md:text-base">
+                {summaryData.summary}
+              </p>
+            ) : (
+              <p className="text-xs leading-relaxed text-gray-400 md:text-base">
+                아직 충분한 리뷰가 없어 분석할 수 없습니다.
+              </p>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="mb-4 flex items-center justify-between">
-        <Dropdown menu={{ items: sortItems }} trigger={["click"]}>
-          <button className="ml-1 mt-3 flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900">
-            {sortOrder}
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+        <div className="mb-4 flex items-center justify-between">
+          <Dropdown menu={{ items: sortItems }} trigger={["click"]}>
+            <button className="ml-1 mt-3 flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900">
+              {sortOrderText}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 7.5L10 12.5L15 7.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </Dropdown>
+          <SwiperNavigation
+            swiper={swiper}
+            isBeginning={isBeginning}
+            isEnd={isEnd}
+          />
+        </div>
+
+        {isLoading && (
+          <div className="flex justify-center p-8">
+            <Spinner />
+          </div>
+        )}
+        {error && (
+          <div className="text-center text-gray-500">
+            리뷰를 불러오는 중 오류가 발생했습니다.
+          </div>
+        )}
+
+        {!isLoading && !error && allReviews.length > 0 && (
+          <Swiper
+            slidesPerView="auto"
+            spaceBetween={28}
+            onSwiper={setSwiper}
+            onSlideChange={handleSlideChange}
+            className="pb-2 pl-1"
+          >
+            {allReviews.map((reviewCardData) => (
+              <SwiperSlide
+                key={reviewCardData.reviewId}
+                className="!h-auto !w-[150px] md:!w-[250px]"
+              >
+                <ReviewCard
+                  {...reviewCardData}
+                  onLikeClick={() => handleLikeToggle(reviewCardData.reviewId)}
+                  onReport={() => handleReport(reviewCardData.reviewId)}
+                  onEdit={() => handleEdit(reviewCardData)}
+                  onDelete={() => handleDelete(reviewCardData.reviewId)}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
+
+        {!isLoading && !error && allReviews.length === 0 && (
+          <div className="py-10 text-center text-gray-400">
+            작성된 리뷰가 없습니다.
+          </div>
+        )}
+
+        <div className="mt-8 text-center">
+          {hasNextPage && (
+            <Button
+              onClick={() => fetchNextPage()}
+              loading={isFetchingNextPage}
+              disabled={isFetchingNextPage}
             >
-              <path
-                d="M5 7.5L10 12.5L15 7.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </Dropdown>
-
-        <SwiperNavigation
-          swiper={swiper}
-          isBeginning={isBeginning}
-          isEnd={isEnd}
-        />
-      </div>
-
-      <Swiper
-        slidesPerView="auto"
-        spaceBetween={28}
-        onSwiper={setSwiper}
-        onSlideChange={handleSlideChange}
-        className="pb-2 pl-1"
-      >
-        {reviews.map((review, index) => (
-          <SwiperSlide key={index} className="!h-auto !w-[150px] md:!w-[250px]">
-            <ReviewCard
-              reviewData={review}
-              onLikeClick={() => handleLikeToggle(index)}
-              onReport={() => console.log("report clicked")}
-              onEdit={() => console.log("edit clicked")}
-              onDelete={() => console.log("delete clicked")}
-              onCardClick={() => console.log("card clicked")}
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </section>
+              {isFetchingNextPage ? "불러오는 중..." : "더보기"}
+            </Button>
+          )}
+        </div>
+      </section>
+    </>
   );
 };
 
