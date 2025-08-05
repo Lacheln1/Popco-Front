@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Dropdown, Button, Form, Select, App } from "antd";
+// useNavigate 삭제
+import { Dropdown, Form, Select, App } from "antd"; // Button 삭제
 import type { MenuProps } from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
@@ -41,7 +41,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
   const [sortOrder, setSortOrder] = useState<"recent" | "popular">("recent");
   const [reportForm] = Form.useForm();
   const { message, modal } = App.useApp();
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // 삭제
 
   // AI 리뷰 요약 데이터 호출
   const { data: summaryData, isLoading: isSummaryLoading } =
@@ -65,9 +65,9 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     data,
     isLoading,
     error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    // fetchNextPage,      // 삭제
+    // hasNextPage,        // 삭제
+    // isFetchingNextPage, // 삭제
   } = useFetchInfiniteReviews(
     contentId,
     contentType,
@@ -104,8 +104,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
 
   const handleAuthRequiredAction = (action: () => void) => {
     if (!accessToken) {
-      message.error("로그인이 필요한 기능입니다.");
-      navigate("/login");
+      message.info("로그인 먼저 진행해주세요!", 1.5);
       return;
     }
     action();
@@ -334,18 +333,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             작성된 리뷰가 없습니다.
           </div>
         )}
-
-        <div className="mt-8 text-center">
-          {hasNextPage && (
-            <Button
-              onClick={() => fetchNextPage()}
-              loading={isFetchingNextPage}
-              disabled={isFetchingNextPage}
-            >
-              {isFetchingNextPage ? "불러오는 중..." : "더보기"}
-            </Button>
-          )}
-        </div>
+        
       </section>
     </>
   );

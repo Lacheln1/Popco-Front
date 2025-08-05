@@ -30,9 +30,6 @@ const Layout = () => {
       <main className="flex-grow">
         <Outlet />
       </main>
-      <button className="fixed bottom-10 right-0 z-50 w-[80px] animate-bounce-chatbot sm:bottom-12 sm:right-10 sm:w-[130px] lg:right-28">
-        <img src="/images/main/chatbot.svg" alt="chatbot" />
-      </button>
       <Footer />
     </div>
   );
