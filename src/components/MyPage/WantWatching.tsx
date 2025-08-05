@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { fetchWishlist } from "@/apis/contentsApi";
 import { useNavigate } from "react-router-dom";
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 interface WishlistItem {
   wishlistId: number;
@@ -152,7 +153,7 @@ const WantWatching: React.FC<WantWatchingProps> = ({ userId }) => {
                   >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
-                        src={`https://image.tmdb.org/t/p/original${item.contentPosterUrl}`}
+                        src={`${TMDB_IMAGE_BASE_URL}${item.contentPosterUrl}`}
                         alt={item.contentTitle}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
