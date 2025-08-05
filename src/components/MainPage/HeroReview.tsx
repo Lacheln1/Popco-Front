@@ -47,7 +47,7 @@ const HeroReview = () => {
       rowData.map((review, idx) => (
         <div key={`${i}-${idx}`} className="flex-shrink-0">
           <ReviewCard
-            reviewData={{
+            {...{
               contentTitle: review.contentTitle,
               score: review.score,
               reviewText: review.reviewText,

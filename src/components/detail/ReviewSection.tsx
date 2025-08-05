@@ -150,7 +150,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
               {
                 reviewId,
                 body: {
-                  declarationType: values.declarationType,
+                  declarationType: String(values.declarationType),
                   content: "",
                 },
                 token: accessToken ?? undefined,
