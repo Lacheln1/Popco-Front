@@ -1,5 +1,6 @@
 import { getUserDetail, getUserPersonas } from "@/apis/userApi";
 import SectionHeader from "@/components/common/SectionHeader";
+import Spinner from "@/components/common/Spinner";
 import PageContents from "@/components/MyPage/PageContents";
 import UserInfoSection from "@/components/MyPage/UserInfoSection";
 import useAuthCheck from "@/hooks/useAuthCheck";
@@ -61,7 +62,7 @@ const MyPage: React.FC = () => {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-lg text-gray-500">
-          사용자 정보를 불러오는 중...
+          <Spinner />
         </div>
       </div>
     );

@@ -121,6 +121,37 @@ export const fetchWishlist = async (
   }
 };
 
+// 위시리스트에 추가 (POST /wishlists/users/{userId})
+export const addToWishlist = async (params: {
+  userId: number;
+  contentId: number;
+  contentType: string;
+  accessToken: string;
+}) => {
+  const { userId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.post(
+    `/wishlists/users/${userId}`,
+    { contentId, contentType },
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data;
+};
+
+// 위시리스트에서 삭제 (DELETE /wishlists/users/{userId})
+export const removeFromWishlist = async (params: {
+  userId: number;
+  contentId: number;
+  contentType: string;
+  accessToken: string;
+}) => {
+  const { userId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.delete(`/wishlists/users/${userId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    data: { contentId, contentType },
+  });
+  return data;
+};
+
 // 전체 컨텐츠 조회
 export const fetchAllContents = async ({
   pageNumber = 0,
