@@ -1,5 +1,11 @@
 import { Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  TooltipItem,
+} from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -60,7 +66,12 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
         display: false, // 범례 숨김
       },
       tooltip: {
-        enabled: false, // 툴팁도 숨김
+        enabled: true,
+        filter: (tooltipItem: TooltipItem<"doughnut">) => {
+          const { dataset, dataIndex } = tooltipItem;
+          const backgroundColor = dataset.backgroundColor as string[];
+          return backgroundColor[dataIndex] !== "#E5E5E5";
+        },
       },
     },
   };
