@@ -21,11 +21,10 @@ export interface AllContentItem {
 }
 
 export interface FetchAllContentsParams {
-  pageNumber?: number;
-  pageSize?: number;
+  page?: number;
+  size?: number;
   sort?: string;
 }
-
 export interface FetchAllContentsResponse {
   contents: AllContentItem[];
   totalElements: number;

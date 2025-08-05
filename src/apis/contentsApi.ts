@@ -154,14 +154,14 @@ export const removeFromWishlist = async (params: {
 
 // 전체 컨텐츠 조회
 export const fetchAllContents = async ({
-  pageNumber = 0,
-  pageSize,
+  page = 0,
+  size,
   sort = "recent",
 }: FetchAllContentsParams): Promise<FetchAllContentsResponse> => {
   const { data } = await axiosInstance.get(`/contents`, {
     params: {
-      pageNumber: pageNumber,
-      pageSize: pageSize,
+      page: page,
+      size: size,
       sort,
     },
   });
