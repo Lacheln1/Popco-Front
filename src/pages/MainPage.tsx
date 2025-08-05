@@ -1,4 +1,3 @@
-import SearchBar from "@/components/common/SearchBar";
 import HeroCarousel from "@/components/MainPage/HeroCarousel";
 import HeroCollection from "@/components/MainPage/HeroCollection";
 import HeroPersona from "@/components/MainPage/HeroPersona";
