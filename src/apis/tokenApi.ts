@@ -47,17 +47,13 @@ export const validateAndRefreshTokens = async () => {
 //로그아웃 시 토큰 정리
 export const clearTokens = async (accessToken?: string): Promise<void> => {
   try {
-    console.log("🔍 clearTokens 시작, 토큰:", accessToken);
-
     await axios.post(
       `${API_URL}/auth/logout`,
       {},
       {
-        headers: accessToken
-          ? {
-              Authorization: `Bearer ${accessToken}`,
-            }
-          : {},
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
         withCredentials: true,
       },
     );

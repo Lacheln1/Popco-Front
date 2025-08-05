@@ -1,10 +1,13 @@
+import React, { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import { getUserDetail, getUserPersonas } from "@/apis/userApi";
 import SectionHeader from "@/components/common/SectionHeader";
-import PageContents from "@/components/MyPage/PageContents";
-import UserInfoSection from "@/components/MyPage/UserInfoSection";
+import Spinner from "@/components/common/Spinner";
+const PageContents = lazy(() => import("@/components/MyPage/PageContents"));
+const UserInfoSection = lazy(
+  () => import("@/components/MyPage/UserInfoSection"),
+);
 import useAuthCheck from "@/hooks/useAuthCheck";
 import PageLayout from "@/layout/PageLayout";
-import React, { useEffect, useState, useCallback } from "react";
 
 const MyPage: React.FC = () => {
   const { accessToken, user } = useAuthCheck();
@@ -13,7 +16,10 @@ const MyPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 사용자 데이터를 가져오는 함수를 useCallback으로 최적화
+  const isLoggedIn = useCallback(() => {
+    return !!(accessToken && user?.isLoggedIn);
+  }, [accessToken, user?.isLoggedIn]);
+
   const fetchUserData = useCallback(async () => {
     if (!accessToken) {
       console.log("accessToken이 없습니다");
@@ -24,12 +30,10 @@ const MyPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // 사용자 상세 정보 가져오기
       const userDetailResponse = await getUserDetail(accessToken);
       console.log("사용자 상세 정보:", userDetailResponse);
       setUserData(userDetailResponse);
 
-      // 사용자 페르소나 정보 가져오기
       const userPersonaResponse = await getUserPersonas(accessToken);
       console.log("사용자 페르소나 정보:", userPersonaResponse);
       setUserPersonaData(userPersonaResponse);
@@ -45,23 +49,40 @@ const MyPage: React.FC = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  // 프로필 업데이트 후 호출될 콜백 함수
   const handleProfileUpdate = useCallback(
     async (signal: string) => {
       if (signal === "refresh") {
-        // 서버에서 최신 사용자 데이터 다시 가져오기
         await fetchUserData();
       }
     },
     [fetchUserData],
   );
 
+  if (!isLoggedIn()) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-lg text-gray-500">로그인이 필요합니다.</div>
+      </div>
+    );
+  }
+
+  if (!accessToken) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-lg text-gray-500">
+          <Spinner />
+          인증 정보를 확인하는 중...
+        </div>
+      </div>
+    );
+  }
+
   // 로딩 상태
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-lg text-gray-500">
-          사용자 정보를 불러오는 중...
+          <Spinner />
         </div>
       </div>
     );
@@ -86,19 +107,28 @@ const MyPage: React.FC = () => {
           />
         }
         floatingBoxContent={
-          <UserInfoSection
-            nickname={userData?.nickname || user?.nickname || "사용자"}
-            email={userData?.email || user?.email || "이메일 없음"}
-            currentPersona={
-              userPersonaData?.data.myPersonaName || "페르소나 없음"
-            }
-            profileImageUrl={userData?.data.profileImageUrl}
-            personaImageUrl={userPersonaData?.data.mainPersonaImgPath}
-            onProfileUpdate={handleProfileUpdate}
-          />
+          <Suspense fallback={<Spinner />}>
+            <UserInfoSection
+              accessToken={accessToken}
+              nickname={userData?.nickname || user?.nickname || "사용자"}
+              email={userData?.email || user?.email || "이메일 없음"}
+              currentPersona={
+                userPersonaData?.data.myPersonaName || "페르소나 없음"
+              }
+              profileImageUrl={userData?.data.profileImageUrl}
+              personaImageUrl={userPersonaData?.data.mainPersonaImgPath}
+              onProfileUpdate={handleProfileUpdate}
+            />
+          </Suspense>
         }
       >
-        <PageContents />
+        <Suspense fallback={<Spinner />}>
+          <PageContents
+            accessToken={accessToken} // string 타입 보장됨
+            user={user}
+            isLoggedIn={isLoggedIn()}
+          />
+        </Suspense>
       </PageLayout>
     </div>
   );

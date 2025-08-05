@@ -13,10 +13,10 @@ const MyStyleSection: React.FC<MyStyleSectionProps> = ({
   return (
     <section className="pretendard flex justify-center px-3 md:px-8">
       <div
-        className="mx-1 flex w-full max-w-[1200px] flex-col bg-slate-50 py-5"
+        className="mx-1 flex w-full max-w-[1200px] flex-col bg-slate-50 py-8"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
       >
-        <div className="flex flex-col text-center text-base md:text-2xl lg:text-2xl">
+        <div className="flex flex-col text-center text-base md:mb-2 md:text-2xl lg:text-2xl">
           <span className="gmarket-medium">내 OTT 시청 스타일은</span>
           <span className="">{myPersonaTags}</span>
         </div>
@@ -30,7 +30,7 @@ const MyStyleSection: React.FC<MyStyleSectionProps> = ({
             </div>
           ))}
         </div>
-        <div className="mt-4 flex justify-center break-keep px-1 text-center">
+        <div className="mt-4 flex justify-center break-keep px-1 text-center md:mt-7">
           <span className="break-keep md:text-xl">{myPersonaDescription}</span>
         </div>
       </div>

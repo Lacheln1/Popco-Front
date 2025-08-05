@@ -1,7 +1,7 @@
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
-import loginPopcoImg from "@/assets/login-popco.svg";
-import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
+import loginPopcoImg from "@/assets/login-popco.webp";
+import kakaoSymbolImg from "@/assets/kakao-symbol.webp";
 import LoginForm from "@/components/LoginResgisterPage/LoginForm";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -136,7 +136,7 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* 모바일 레이아웃 */}
-      <div className="flex flex-col lg:hidden">
+      <div className="flex h-screen flex-col lg:hidden">
         {/* 상단 - 스포트라이트와 로고 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
           <Link to="/">
@@ -189,15 +189,15 @@ const LoginPage: React.FC = () => {
               </p>
             </motion.div>
 
-            <div className="mt-4 flex w-full justify-center">
+            <div className="mt-4 flex justify-center">
               <motion.div
-                className="flex w-full max-w-[440px] gap-2"
+                className="flex w-full max-w-[500px] gap-2"
                 variants={socialContainerVariants}
                 initial="hidden"
                 animate="visible"
               >
                 <button
-                  className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-2.5 text-xs font-medium text-black transition-colors"
+                  className="flex flex-1 items-center justify-center rounded-xl bg-[#FEE500] px-3 py-4 text-xl font-medium text-black transition-colors"
                   onClick={handleKakaoLogin}
                 >
                   <div className="pr-4">

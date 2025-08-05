@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { getMyScoreDistribution } from "@/apis/reviewApi";
+import Spinner from "../common/Spinner";
 
 ChartJS.register(
   CategoryScale,
@@ -156,6 +157,8 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
             "#ffd751",
           ],
           borderWidth: 1,
+          barPercentage: 0.4,
+          categoryPercentage: 1,
         },
       ],
     };
@@ -200,6 +203,9 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
           display: true,
           text: "평점",
         },
+        grid: {
+          display: false,
+        },
       },
     },
   };
@@ -209,6 +215,7 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
     return (
       <div className="mb-6">
         <div className="flex h-64 items-center justify-center text-gray-500">
+          <Spinner />
           점수 분포를 불러오는 중...
         </div>
       </div>

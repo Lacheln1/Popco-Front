@@ -1,21 +1,32 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import Layout from "./Layout";
 import TestLayout from "@/layout/TestLayout";
 import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
+const LoginPage = lazy(() => import("@/pages/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
 import CollectionPage from "@/pages/CollectionPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
-import AnalysisPage from "@/pages/AnalysisPage";
-import KakaoCallback from "@/pages/KakaoCallback";
-import MyPage from "@/pages/MyPage";
+const AnalysisPage = lazy(() => import("@/pages/AnalysisPage"));
+const KakaoCallback = lazy(() => import("@/pages/KakaoCallback"));
+const MyPage = lazy(() => import("@/pages/MyPage"));
 import CollectionDetailPage from "@/pages/CollectionDetailPage";
 import CollectionCreatePage from "@/pages/CollectionCreatePage";
+
+import Spinner from "@/components/common/Spinner";
+
+const PageLoading = () => {
+  return (
+    <div>
+      <Spinner />
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
@@ -28,8 +39,22 @@ const router = createBrowserRouter([
       { path: "/collections", element: <CollectionPage /> },
       { path: "/collections/create", element: <CollectionCreatePage /> },
       { path: "/collections/:collectionId", element: <CollectionDetailPage /> },
-      { path: "/analysis", element: <AnalysisPage /> },
-      { path: "/mypage", element: <MyPage /> },
+      {
+        path: "/analysis",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <AnalysisPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/mypage",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <MyPage />
+          </Suspense>
+        ),
+      },
     ],
   },
   {
@@ -37,15 +62,27 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        element: <LoginPage />,
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <LoginPage />
+          </Suspense>
+        ),
       },
       {
         path: "/register",
-        element: <RegisterPage />,
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <RegisterPage />
+          </Suspense>
+        ),
       },
       {
         path: "/auth/kakao/login",
-        element: <KakaoCallback />,
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <KakaoCallback />
+          </Suspense>
+        ),
       },
     ],
   },
