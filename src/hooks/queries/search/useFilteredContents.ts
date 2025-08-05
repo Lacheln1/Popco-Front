@@ -16,7 +16,7 @@ export const useFilteredContents = ({
     queryKey: ["filteredContents", filter],
     queryFn: ({ pageParam = 0 }) =>
       postFilteredContents(filter, pageParam, size),
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage) => {
       const nextPage = lastPage.page + 1;
       const totalPages = lastPage.totalPages;
       return nextPage < totalPages ? nextPage : undefined;

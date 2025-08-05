@@ -10,7 +10,6 @@ import { SearchOutlined } from "@ant-design/icons";
 import { useDebouncedAutocomplete } from "@/hooks/useDebouncedAutocomplete";
 import { AutoResult, SearchBarProps } from "@/types/Search.types";
 import { AutocompleteItem } from "@/apis/searchApi";
-import { Radio } from "antd";
 
 const SearchBar = <T,>({
   placeholder = "검색어를 입력 해 주세요.",

@@ -19,7 +19,6 @@ const MainPage = () => {
     <div className="flex flex-col gap-32 overflow-x-hidden pb-20 sm:gap-40 md:pb-32">
       <div className="flex flex-col gap-10 bg-gradient-to-b from-[#172039] to-[#FFFFFF] pt-32 sm:gap-20">
         <HeroCarousel />
-        <SearchBar onSearch={() => {}} />
         <HeroRanking
           accessToken={accessToken ?? ""}
           userId={user?.userId}

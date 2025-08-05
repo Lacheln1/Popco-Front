@@ -63,7 +63,7 @@ export const useSearchContents = ({
         throw error;
       }
     },
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage) => {
       const nextPage = lastPage.number + 1;
       const hasNext = nextPage < lastPage.totalPages;
 
@@ -77,9 +77,6 @@ export const useSearchContents = ({
         (debouncedActors && debouncedActors.some((a) => a.trim().length > 0))
       ),
     // 에러 발생 시 재시도 설정
-    retry: (failureCount, error) => {
-      return failureCount < 3;
-    },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     // 데이터 검증을 위한 select 함수 추가
     select: (data) => {

@@ -11,7 +11,9 @@ export const useDebouncedAutocomplete = () => {
   const [loading, setLoading] = useState(false);
 
   //  useRef로 debounced 함수를 안정적으로 관리
-  const debouncedAutocompleteRef = useRef<ReturnType<typeof debounce>>();
+  const debouncedAutocompleteRef = useRef<ReturnType<typeof debounce> | null>(
+    null,
+  );
 
   //  실제 자동완성 로직을 별도 함수로 분리
   const performAutocomplete = useCallback(async (prefix: string) => {
