@@ -59,7 +59,7 @@ export const useFetchInfiniteReviews = (
         { contentId, contentType, page: pageParam, size: 10, sort },
         token,
       ),
-    getNextPageParam: (lastPage) => {
+    getNextPageParam: (lastPage: PaginatedReviewsResponse) => {
       const currentPage = lastPage.data.page;
       const totalPages = lastPage.data.totalPages;
       if (currentPage < totalPages - 1) {

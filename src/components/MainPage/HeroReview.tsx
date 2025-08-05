@@ -58,9 +58,9 @@ const HeroReview = () => {
               isOwnReview: false,
               isLiked: false,
               hasAlreadyReported: false,
+              contentId: review.contentId,
+              contentType: review.contentType,
             }}
-            contentId={review.contentId}
-            contentType={review.contentType}
             onCardClick={() =>
               handleCardClick(review.contentType, review.contentId)
             }

@@ -7,6 +7,7 @@ import {
   fetchMyCollections,
   fetchMyMarkedCollections,
 } from "@/apis/collectionApi"; // 컬렉션 API import
+import { ReviewCardData } from "@/types/Reviews.types"; //리뷰타입 import
 import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -25,18 +26,6 @@ interface Movie {
   contentId: number;
   contentType: string;
   reviewId: number;
-}
-
-interface ReviewData {
-  movieTitle: string;
-  score: number;
-  reviewText: string;
-  nickname: string;
-  likeCount: number;
-  isSpoiler: boolean;
-  isOwnReview: boolean;
-  isLiked: boolean;
-  hasAlreadyReported: boolean;
 }
 
 interface ContentPoster {
@@ -214,18 +203,23 @@ const PageContents: React.FC = () => {
     setIsEnd(swiper.isEnd);
   };
 
-  // Movie 데이터를 ReviewCard가 요구하는 ReviewData 형태로 변환
-  const convertToReviewData = (movie: Movie): ReviewData => {
+  // Movie 데이터를 ReviewCard가 요구하는 ReviewCardData 형태로 변환
+  const convertMovieToReviewCardData = (movie: Movie): ReviewCardData => {
     return {
-      movieTitle: movie.title || "제목 없음",
-      score: movie.score || 0,
-      reviewText: movie.reviewText || "리뷰 내용이 없습니다",
-      nickname: user.nickname || "익명",
+      // === 추후 수정 필요함!!!!!!! import도 수정!! ===
+      reviewId: movie.reviewId,
+      contentId: movie.contentId,
+      contentType: movie.contentType,
+      contentTitle: movie.title,
+      authorNickname: user.nickname || "익명",
+      score: movie.score,
+      reviewText: movie.reviewText,
+      status: "COMMON",
       likeCount: 0,
-      isSpoiler: false,
-      isOwnReview: true,
       isLiked: false,
+      isOwnReview: true,
       hasAlreadyReported: false,
+      posterPath: movie.poster,
     };
   };
 
@@ -359,9 +353,8 @@ const PageContents: React.FC = () => {
                       {movies.map((movie) => (
                         <SwiperSlide key={movie.reviewId} className="!h-auto">
                           <ReviewCard
-                            reviewData={convertToReviewData(movie)}
-                            contentId={movie.contentId}
-                            contentType={movie.contentType}
+                            // 리뷰카드 호출!!
+                            reviewData={convertMovieToReviewCardData(movie)}
                           />
                         </SwiperSlide>
                       ))}

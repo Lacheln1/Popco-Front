@@ -3,8 +3,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 
 // --- 타입 임포트 ---
-import { ContentsDetail, Crew} from "@/types/Contents.types";
-import { ReviewCardData, MyReview } from "@/types/Reviews.types";
+import { ContentsDetail, Crew } from "@/types/Contents.types";
+import { ReviewCardData } from "@/types/Reviews.types";
 
 // --- 훅 임포트 ---
 import { useContentsDetail } from "@/hooks/useContentsDetail";
@@ -228,7 +228,6 @@ const DetailContents = ({
             contentId={contentId}
             contentType={contentType}
             contentTitle={contents.title}
-            contentsPosterPath={contents.posterPath}
             onEditClick={onEditReview}
           />
         </div>
@@ -254,7 +253,7 @@ export default function DetailPage() {
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
     Number(contentId),
-    contentType,
+    contentType ?? "",
     accessToken,
   );
 
@@ -294,11 +293,11 @@ export default function DetailPage() {
         reviewId: myReviewData.myReview.reviewId,
         contentId: Number(contentId),
         contentType: contentType,
-        contentTitle: contents!.title,
+        contentTitle: contents?.title ?? "제목 없음",
         score: myReviewData.myReview.score,
         reviewText: myReviewData.myReview.text,
         authorNickname: user.nickname || "나",
-        status: myReviewData.myReview.status,
+        status: "COMMON",
         likeCount: myReviewData.myReview.likeCount,
         isLiked: false,
         isOwnReview: true,
@@ -339,7 +338,7 @@ export default function DetailPage() {
     [wishlistData, contentId],
   );
   const handleWishClick = useCallback(() => {
-    if (!user.isLoggedIn) return;
+    if (!user.isLoggedIn || !contentType || !accessToken) return;
     toggleWishlist({
       isWished,
       userId: user.userId,
@@ -414,8 +413,8 @@ export default function DetailPage() {
           popcorn={editingReviewData?.score ?? displayRating}
           reviewDetail={editingReviewData?.reviewText ?? ""}
           author={editingReviewData?.authorNickname ?? user.nickname ?? "익명"}
-          token={accessToken}
-          reviewId={editingReviewData?.reviewId}
+          token={accessToken ?? undefined} 
+          reviewId={editingReviewData?.reviewId ?? 0}
           onUpdateSuccess={handleReviewUpdateSuccess}
         />
       )}

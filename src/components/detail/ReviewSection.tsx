@@ -4,7 +4,6 @@ import { Dropdown, Button, Form, Select, App } from "antd";
 import type { MenuProps } from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
-import { useQueryClient } from "@tanstack/react-query";
 import "swiper/css";
 
 import {
@@ -17,7 +16,6 @@ import {
 } from "@/hooks/useReviews";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import ReviewCard from "@/components/common/ReviewCard";
-import ReviewModal from "@/components/ReviewModal/ReviewModal";
 import { ReviewCardData, ContentReview } from "@/types/Reviews.types";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import AiReviewSummaryBg from "@/assets/AiReviewPopco.png";
@@ -110,7 +108,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
 
   const handleLikeToggle = (reviewId: number) => {
     handleAuthRequiredAction(() => {
-      toggleReaction({ reviewId, token: accessToken! });
+      toggleReaction({ reviewId, token: accessToken ?? undefined });
     });
   };
 
@@ -122,7 +120,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
       modal.confirm({
         title: "리뷰 신고하기",
         content: (
-          <Form form={form} layout="vertical" className="mt-4 mr-6">
+          <Form form={form} layout="vertical" className="mr-6 mt-4">
             <Form.Item
               name="declarationType"
               label="신고 유형"
@@ -154,7 +152,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                   declarationType: values.declarationType,
                   content: "",
                 },
-                token: accessToken!,
+                token: accessToken ?? undefined,
               },
               {
                 onSuccess: () => {
@@ -192,7 +190,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
         okButtonProps: { loading: isDeleting },
         async onOk() {
           deleteReview(
-            { reviewId, token: accessToken! },
+            { reviewId, token: accessToken ?? undefined },
             {
               onSuccess: () => {
                 message.success("리뷰가 삭제되었습니다.");
@@ -316,8 +314,6 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
               >
                 <ReviewCard
                   reviewData={reviewCardData}
-                  contentId={contentId}
-                  contentType={contentType}
                   onLikeClick={() => handleLikeToggle(reviewCardData.reviewId)}
                   onReport={() => handleReport(reviewCardData.reviewId)}
                   onEdit={() => handleEdit(reviewCardData)}
