@@ -117,7 +117,11 @@ const DetailContents = ({
         <div className="hidden md:block">
           <div className="mb-8 flex items-center justify-between border-y border-gray-200 py-4">
             <div className="flex items-center gap-10">
-              <RatingDisplay label="평균 팝콘" rating={contents.ratingAverage} size={36} />
+              <RatingDisplay
+                label="평균 팝콘"
+                rating={contents.ratingAverage}
+                size={36}
+              />
               <RatingDisplay
                 label="나의 팝콘"
                 rating={myCurrentRating}
@@ -133,7 +137,6 @@ const DetailContents = ({
               isDesktop
               token={accessToken}
               movieTitle={contents.title}
-              moviePoster={`${TMDB_IMAGE_BASE_URL}${contents.posterPath}`}
             />
           </div>
           <div className="flex flex-row items-center gap-12">
@@ -164,7 +167,9 @@ const DetailContents = ({
                 alt={`${contents.title} poster`}
                 className="w-full rounded-lg shadow-2xl"
               />
-              <h2 className="text-center text-lg font-bold">{contents.title}</h2>
+              <h2 className="text-center text-lg font-bold">
+                {contents.title}
+              </h2>
             </div>
             <div className="col-span-2 flex flex-col justify-between">
               <div className="flex w-full justify-around border-b border-gray-200 pb-2">
@@ -173,7 +178,11 @@ const DetailContents = ({
               </div>
               <div className="flex flex-grow flex-col justify-center gap-2">
                 <div className="flex items-center justify-center">
-                  <RatingDisplay label="평균 팝콘" rating={contents.ratingAverage} size={28} />
+                  <RatingDisplay
+                    label="평균 팝콘"
+                    rating={contents.ratingAverage}
+                    size={28}
+                  />
                 </div>
                 <div className="flex items-center justify-center">
                   <RatingDisplay
@@ -192,7 +201,6 @@ const DetailContents = ({
                   onWishClick={handleWishClick}
                   token={accessToken}
                   movieTitle={contents.title}
-                  moviePoster={`${TMDB_IMAGE_BASE_URL}${contents.posterPath}`}
                 />
               </div>
             </div>
@@ -234,14 +242,14 @@ const DetailContents = ({
   );
 };
 
-
 // ======================================================================
 // 2. 메인 페이지 로직 컨테이너 컴포넌트
 // ======================================================================
 export default function DetailPage() {
   const queryClient = useQueryClient();
   const { user, accessToken } = useAuthCheck();
-  const { contents, loading, error, contentId, contentType } = useContentsDetail();
+  const { contents, loading, error, contentId, contentType } =
+    useContentsDetail();
 
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
@@ -253,14 +261,16 @@ export default function DetailPage() {
   // 리뷰 모달 상태
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isWritingReview, setIsWritingReview] = useState(true);
-  const [editingReviewData, setEditingReviewData] = useState<ReviewCardData | null>(null);
+  const [editingReviewData, setEditingReviewData] =
+    useState<ReviewCardData | null>(null);
 
   // 사용자가 UI로 직접 변경한 평점 (상호작용 전에는 null)
-  const [interactiveRating, setInteractiveRating] = useState<number | null>(null);
+  const [interactiveRating, setInteractiveRating] = useState<number | null>(
+    null,
+  );
 
   // 화면에 최종적으로 표시될 평점 계산
-  const displayRating =
-    interactiveRating ?? myReviewData?.myReview?.score ?? contents?.myScore ?? 0;
+  const displayRating = interactiveRating ?? myReviewData?.myReview?.score ?? 0;
 
   // 리뷰 작성 모달 열기
   const handleOpenWriteModal = useCallback(() => {
@@ -276,7 +286,7 @@ export default function DetailPage() {
     setEditingReviewData(reviewData);
     setIsReviewModalOpen(true);
   }, []);
-  
+
   // ActionButtons의 '리뷰' 버튼 클릭 통합 핸들러
   const handleReviewButtonClick = useCallback(() => {
     if (myReviewData?.existUserReview && myReviewData.myReview) {
@@ -288,12 +298,12 @@ export default function DetailPage() {
         score: myReviewData.myReview.score,
         reviewText: myReviewData.myReview.text,
         authorNickname: user.nickname || "나",
-        isSpoiler: myReviewData.myReview.status === "SPOILER",
+        status: myReviewData.myReview.status,
         likeCount: myReviewData.myReview.likeCount,
-        isLiked: false, 
+        isLiked: false,
         isOwnReview: true,
         hasAlreadyReported: false,
-        reviewDate: myReviewData.myReview.reviewDate,
+        reviewDate: myReviewData.myReview.createdAt,
       };
       handleOpenEditModal(reviewToEdit);
     } else {
@@ -306,9 +316,15 @@ export default function DetailPage() {
     setInteractiveRating(null);
 
     // 관련 쿼리 무효화로 최신 데이터 요청
-    queryClient.invalidateQueries({ queryKey: ["reviews", contentId, contentType] });
-    queryClient.invalidateQueries({ queryKey: ["contentsDetail", contentId, contentType] });
-    queryClient.invalidateQueries({ queryKey: ["myReview", contentId, contentType] });
+    queryClient.invalidateQueries({
+      queryKey: ["reviews", contentId, contentType],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["contentsDetail", contentId, contentType],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["myReview", contentId, contentType],
+    });
     setIsReviewModalOpen(false);
   };
 
@@ -316,7 +332,10 @@ export default function DetailPage() {
   const { data: wishlistData } = useFetchWishlist(user.userId, accessToken);
   const { mutate: toggleWishlist } = useToggleWishlist();
   const isWished = useMemo(
-    () => wishlistData?.data.some((item: any) => item.contentId === Number(contentId)) ?? false,
+    () =>
+      wishlistData?.data.some(
+        (item: any) => item.contentId === Number(contentId),
+      ) ?? false,
     [wishlistData, contentId],
   );
   const handleWishClick = useCallback(() => {
@@ -347,11 +366,19 @@ export default function DetailPage() {
   }, []);
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center"><Spinner /></div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (error || !contents || !contentId || !contentType) {
-    return <div className="flex h-screen items-center justify-center">{error || "데이터를 찾을 수 없습니다."}</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        {error || "데이터를 찾을 수 없습니다."}
+      </div>
+    );
   }
 
   return (
@@ -370,7 +397,9 @@ export default function DetailPage() {
         handleHateClick={handleHateClick}
         onEditReview={handleOpenEditModal}
         onReviewClick={handleReviewButtonClick}
-        reviewButtonLabel={myReviewData?.existUserReview ? "리뷰 수정" : "리뷰 쓰기"}
+        reviewButtonLabel={
+          myReviewData?.existUserReview ? "리뷰 수정" : "리뷰 쓰기"
+        }
       />
 
       {isReviewModalOpen && (

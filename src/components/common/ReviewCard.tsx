@@ -32,12 +32,11 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   onCardClick,
 }) => {
   const {
-    reviewId,
     score,
     reviewText,
     authorNickname,
     likeCount,
-    status, // isSpoiler 대신 status 사용
+    status,
     isOwnReview,
     isLiked,
     hasAlreadyReported,
@@ -191,7 +190,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
         e.stopPropagation();
         navigate(`/detail/${contentType}/${contentId}`);
       }}
-      className="h-full w-full cursor-pointer text-sm font-bold transition-colors hover:text-blue-600 md:text-lg"
+      className="h-full w-full cursor-pointer text-sm font-semibold transition-colors md:text-lg"
       title={contentTitle}
     >
       {truncatedTitle}
@@ -254,7 +253,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
                 className="relative cursor-pointer"
                 onClick={handleSpoilerClick}
               >
-                <p className="line-clamp-2 min-h-[36px] select-none text-xs leading-relaxed text-gray-800 filter-none blur-sm md:min-h-[40px] md:text-sm">
+                <p className="line-clamp-2 min-h-[36px] select-none text-xs leading-relaxed text-gray-800 blur-sm filter-none md:min-h-[40px] md:text-sm">
                   {reviewText}
                 </p>
               </div>

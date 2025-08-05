@@ -17,7 +17,6 @@ import {
 } from "@/apis/reviewApi";
 import {
   PaginatedReviewsResponse,
-  PaginatedReviewsData,
   ContentReview,
   PostReviewRequest,
   DeclarationType,
@@ -54,8 +53,8 @@ export const useFetchInfiniteReviews = (
 ) => {
   return useInfiniteQuery<PaginatedReviewsResponse, Error>({
     queryKey: ["reviews", contentId, contentType, sort, token],
-
-    queryFn: ({ pageParam = 0 }) =>
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) =>
       fetchContentReviews(
         { contentId, contentType, page: pageParam, size: 10, sort },
         token,
@@ -179,7 +178,7 @@ export const useToggleReviewReaction = (
       }
       return { previousData };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       const queryKey = ["reviews", contentId, contentType, sort];
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);

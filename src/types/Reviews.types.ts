@@ -62,6 +62,12 @@ export interface DeclarationType {
   code: string;
   description: string;
 }
+// 리뷰 생성 및 수정을 위한 요청 타입
+export interface PostReviewRequest {
+  score: number;
+  text: string;
+  status: "COMMON" | "SPOILER"; 
+}
 
 // ReviewCard가 사용할 표준 데이터 타입
 export interface ReviewCardData {
@@ -71,15 +77,16 @@ export interface ReviewCardData {
   contentTitle: string;
   score: number;
   reviewText: string;
-  isSpoiler: boolean;
+  status: "COMMON" | "SPOILER" | "BLIND"; 
   likeCount: number;
   isLiked: boolean;
   isOwnReview: boolean;
   hasAlreadyReported: boolean;
   authorNickname: string;
   reviewDate?: string;
-  posterPath?: string; // 포스터 이미지 경로 추가
+  posterPath?: string;
 }
+
 
 // 상세 페이지 API 응답 타입
 export interface ContentReview {

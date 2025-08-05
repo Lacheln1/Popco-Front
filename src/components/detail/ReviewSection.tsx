@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Dropdown, Button, Form, Input, Select, App } from "antd";
+import { Dropdown, Button, Form, Select, App } from "antd";
 import type { MenuProps } from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
@@ -27,7 +27,6 @@ interface ReviewSectionProps {
   contentId: number;
   contentType: string;
   contentTitle: string;
-  contentsPosterPath: string;
   onEditClick: (review: ReviewCardData) => void;
 }
 
@@ -35,10 +34,8 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
   contentId,
   contentType,
   contentTitle,
-  contentsPosterPath,
   onEditClick,
 }) => {
-  const queryClient = useQueryClient();
   const { accessToken } = useAuthCheck();
   const [swiper, setSwiper] = useState<SwiperType | undefined>(undefined);
   const [isBeginning, setIsBeginning] = useState(true);
@@ -73,9 +70,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useFetchInfiniteReviews(contentId, contentType, sortOrder, accessToken, {
-    enabled: !!accessToken,
-  });
+  } = useFetchInfiniteReviews(contentId, contentType, sortOrder, accessToken);
 
   const { mutate: toggleReaction } = useToggleReviewReaction(
     contentId,
@@ -148,7 +143,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
         ),
         okText: "신고",
         cancelText: "취소",
-        confirmLoading: isReporting,
+        okButtonProps: { loading: isReporting },
         onOk: async () => {
           try {
             const values = await form.validateFields();
@@ -157,6 +152,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                 reviewId,
                 body: {
                   declarationType: values.declarationType,
+                  content: "",
                 },
                 token: accessToken!,
               },
@@ -193,7 +189,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
         content: "정말로 리뷰를 삭제하시겠습니까?",
         okText: "삭제",
         cancelText: "취소",
-        confirmLoading: isDeleting,
+        okButtonProps: { loading: isDeleting },
         async onOk() {
           deleteReview(
             { reviewId, token: accessToken! },
@@ -252,7 +248,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             </p>
             {isSummaryLoading ? (
               <div className="mt-2">
-                <Spinner size="sm" />
+                <Spinner />
               </div>
             ) : summaryData?.hasSummary ? (
               <p className="text-xs leading-relaxed text-gray-600 md:text-base">
