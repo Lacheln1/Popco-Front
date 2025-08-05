@@ -3,8 +3,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 
 // --- 타입 임포트 ---
-import { ContentsDetail, Crew, MyReview } from "@/types/Contents.types";
-import { ReviewCardData } from "@/types/Reviews.types";
+import { ContentsDetail, Crew} from "@/types/Contents.types";
+import { ReviewCardData, MyReview } from "@/types/Reviews.types";
 
 // --- 훅 임포트 ---
 import { useContentsDetail } from "@/hooks/useContentsDetail";
@@ -254,7 +254,7 @@ export default function DetailPage() {
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
     Number(contentId),
-    contentType!,
+    contentType,
     accessToken,
   );
 
@@ -293,7 +293,7 @@ export default function DetailPage() {
       const reviewToEdit: ReviewCardData = {
         reviewId: myReviewData.myReview.reviewId,
         contentId: Number(contentId),
-        contentType: contentType!,
+        contentType: contentType,
         contentTitle: contents!.title,
         score: myReviewData.myReview.score,
         reviewText: myReviewData.myReview.text,
@@ -312,7 +312,7 @@ export default function DetailPage() {
   }, [myReviewData, user, contents, handleOpenEditModal, handleOpenWriteModal]);
 
   // 리뷰 등록/수정 성공 콜백
-  const handleReviewUpdateSuccess = (newScore: number) => {
+  const handleReviewUpdateSuccess = () => {
     setInteractiveRating(null);
 
     // 관련 쿼리 무효화로 최신 데이터 요청
@@ -344,8 +344,8 @@ export default function DetailPage() {
       isWished,
       userId: user.userId,
       contentId: Number(contentId),
-      contentType: contentType!,
-      accessToken: accessToken!,
+      contentType: contentType,
+      accessToken: accessToken,
     });
   }, [isWished, user, contentId, contentType, accessToken, toggleWishlist]);
 

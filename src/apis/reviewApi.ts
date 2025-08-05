@@ -1,4 +1,13 @@
-import { MyReview, MyReviewResponse, ReviewProps } from "@/types/Reviews.types";
+import {
+  MyReview,
+  MyReviewResponse,
+  ReviewProps,
+  DeclarationType,
+  DeclarationPostRequest,
+  PaginatedReviewsResponse,
+  ReviewSummary,
+  ReviewSummaryResponse,
+} from "@/types/Reviews.types";
 import axiosInstance from "./axiosInstance";
 import axios from "axios";
 

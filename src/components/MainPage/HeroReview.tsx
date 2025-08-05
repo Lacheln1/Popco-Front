@@ -54,7 +54,7 @@ const HeroReview = () => {
               authorNickname: review.userNickname,
               likeCount: review.likeCount,
               reviewId: review.reviewId,
-              isSpoiler: review.status === "SPOILER",
+              status: review.status,
               isOwnReview: false,
               isLiked: false,
               hasAlreadyReported: false,
