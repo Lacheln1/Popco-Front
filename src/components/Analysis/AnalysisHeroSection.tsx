@@ -47,7 +47,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
             <div className="mx-auto flex">
               <div className="absolute flex -translate-x-[107px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[500px]">
                 {personaText1 ? (
-                  <span className="gmarket-medium lg:bg-popco-main mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
+                  <span className="gmarket-medium lg:bg-popco-main mb-2 inline whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
                     {personaText1}
                   </span>
                 ) : (
@@ -61,7 +61,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
                   className="hidden object-cover lg:ml-36 lg:inline lg:w-52 xl:ml-56 xl:w-64"
                 />
               </div>
-              <div className="absolute flex -translate-x-[107px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-190px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
+              <div className="absolute flex -translate-x-[107px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-220px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
                 {personaText2 ? (
                   <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl">
                     {personaText2}
@@ -86,7 +86,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
           </div>
         </div>
       </div>
-      <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-4xl lg:mt-0">
+      <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-3xl lg:mt-0">
         {myPersonaName}
       </div>
 
