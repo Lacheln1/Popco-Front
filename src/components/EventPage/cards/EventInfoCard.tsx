@@ -55,11 +55,15 @@ export const EventInfoCard = ({
     <aside className="absolute left-1/2 top-[31%] z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-xl bg-white/80 px-4 py-8 shadow-xl backdrop-blur-md md:h-[520px] md:w-[800px] md:px-8">
       {quizDetail ? (
         <>
-          <h3 className="gmarket md: mb-1 text-center text-xl font-medium tracking-tight text-gray-900 md:text-[1.75rem]">
-            {isButtonActive
-              ? "퀴즈 이벤트가 시작되었습니다!"
-              : "퀴즈 이벤트가 곧 시작됩니다!"}
-          </h3>
+          {isButtonActive ? (
+            <h3 className="gmarket mb-8 text-center text-xl font-medium tracking-tight text-gray-900 md:text-[1.75rem]">
+              퀴즈 이벤트가 시작되었습니다!
+            </h3>
+          ) : (
+            <h3 className="gmarket md: mb-1 text-center text-xl font-medium tracking-tight text-gray-900 md:text-[1.75rem]">
+              퀴즈 이벤트가 곧 시작됩니다!
+            </h3>
+          )}
           <Countdown
             key={isButtonActive ? "started" : "waiting"}
             date={new Date(quizDetail.quizStartTime)}
