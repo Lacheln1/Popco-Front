@@ -27,7 +27,6 @@ interface RecommendationItem {
 // 로딩 스피너 컴포넌트
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center space-x-2">
-    <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
     <span className="text-gray-600">
       <Spinner />
       가져오는 중...

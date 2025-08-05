@@ -6,6 +6,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  TooltipItem,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
@@ -48,7 +49,7 @@ const AgeChart = ({ agePercent }: AgeChartProps) => {
       },
       tooltip: {
         callbacks: {
-          label: function (context: any) {
+          label: function (context: TooltipItem<"bar">) {
             const value = context.raw;
             return `${value}명`;
           },

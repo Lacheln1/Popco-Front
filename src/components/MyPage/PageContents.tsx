@@ -307,7 +307,7 @@ const PageContents: React.FC<PageContentsProps> = ({
       setTimeout(() => {
         fetchMyCollectionsData(true);
         fetchMyMarkedCollectionsData();
-      }, 500);
+      }, 100);
     },
     [
       user.isLoggedIn,

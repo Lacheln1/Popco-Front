@@ -37,7 +37,7 @@ const RegisterForm: React.FC = () => {
     return emailRegex.test(email);
   };
 
-  // 비밀번호 형식 검증 함수 (4~6자 영문,숫자 혼합)
+  // 비밀번호 형식 검증 함수 (4자 이상 영문,숫자 혼합)
   const validatePassword = (password: string): boolean => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,}$/;
     return passwordRegex.test(password);
