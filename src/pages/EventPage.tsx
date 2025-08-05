@@ -26,7 +26,7 @@ const EventPage = () => {
   const isMediumUp = useIsMediumUp();
   const postersToRender = isMediumUp ? 4 : 1;
   const [isButtonActive, setIsButtonActive] = React.useState(false);
-  const { step } = useQuizStore();
+  const { step, setQuizId } = useQuizStore();
 
   useEffect(() => {
     if (data && !data.quizPageAccess) {
@@ -35,13 +35,21 @@ const EventPage = () => {
     }
   }, [accessToken, isLoading, data, navigate]);
 
+  useEffect(() => {
+    if (data?.quizDetail?.quizId !== undefined) {
+      setQuizId(data.quizDetail.quizId);
+    }
+  }, [data]);
+
   if (isLoading) {
     return <div className="mt-20 text-center">퀴즈 정보를 불러오는 중...</div>;
   }
 
   const renderStepComponent = () => {
+    console.log("🎭 renderStepComponent - Current step:", step);
     switch (step) {
       case "entry":
+        console.log("→ Rendering EventInfoCard");
         return (
           <EventInfoCard
             isButtonActive={isButtonActive}
@@ -50,15 +58,19 @@ const EventPage = () => {
           />
         );
       case "question":
+        console.log("→ Rendering Question");
         return <Question />;
       case "waiting":
+        console.log("→ Rendering WaitingRoom");
         return <WaitingRoom />;
       case "eliminated":
+        console.log("→ Rendering Eliminated");
         return <Eliminated />;
       case "winner":
+        console.log("→ Rendering FinalWinner");
         return <FinalWinner />;
       default:
-        return <div>⚠️ 알 수 없는 단계입니다.</div>;
+        return <div>알 수 없는 단계입니다.</div>;
     }
   };
 

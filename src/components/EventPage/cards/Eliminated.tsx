@@ -7,7 +7,6 @@ export const Eliminated = () => {
 
   useEffect(() => {
     disconnectSocket();
-    reset();
   }, []);
 
   return (

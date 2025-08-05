@@ -96,6 +96,14 @@ export const EventInfoCard = ({
 
             <button
               onClick={handleEnter}
+              className={clsx(
+                "mt-4 w-fit cursor-pointer self-center rounded-full bg-[#222] px-14 py-3 text-white shadow-md transition hover:bg-black",
+              )}
+            >
+              이벤트 입장하기
+            </button>
+            {/* <button
+              onClick={handleEnter}
               disabled={!isButtonActive}
               className={clsx(
                 "mt-4 w-fit self-center rounded-full px-14 py-3 shadow-md transition",
@@ -107,7 +115,7 @@ export const EventInfoCard = ({
               {isButtonActive
                 ? "이벤트 입장하기"
                 : "아직 이벤트가 준비중입니다"}
-            </button>
+            </button> */}
           </div>
         </>
       ) : (

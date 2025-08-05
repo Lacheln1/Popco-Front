@@ -20,6 +20,7 @@ interface QuizStore {
 
   setQuizId: (id: number) => void;
   nextQuestion: () => void;
+  setQuestionId: (id: number) => void;
   setQuestionData: (data: QuestionData) => void;
   setConnected: (flag: boolean) => void;
   setSubscribed: (flag: boolean) => void;
@@ -45,13 +46,14 @@ export const useQuizStore = create<QuizStore>((set) => ({
 
   setStep: (step) => set({ step }),
   setQuizId: (id) => set({ quizId: id }),
+  setQuestionId: (id: number) => set({ questionId: id }),
   nextQuestion: () =>
     set((state) => {
       const nextId = state.questionId + 1;
       if (nextId > 3) {
         return {
           questionId: state.questionId,
-          step: "winner", // 🎯 최종 우승 상태
+          step: "winner", // 최종 우승 상태
           hasSubmitted: false,
           timer: 0,
         };

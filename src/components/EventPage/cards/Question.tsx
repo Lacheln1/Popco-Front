@@ -27,9 +27,25 @@ export const Question = () => {
   } = useQuizStore();
 
   const { accessToken } = useAuthCheck();
+  console.log("📋 Question component:", {
+    quizId,
+    questionId,
+    accessToken: !!accessToken,
+    questionData: !!questionData,
+    hasSubmitted,
+  });
+
   // 1. 문제 데이터 불러오기
   const loadQuestionData = async () => {
-    if (!quizId || !accessToken) return;
+    if (!quizId || !accessToken) {
+      console.log("❌ loadQuestionData 조건 미충족:", {
+        quizId,
+        accessToken: !!accessToken,
+      });
+      return;
+    }
+
+    console.log("🚀 API 호출 시작:", { quizId, questionId });
 
     try {
       const res = await axiosInstance.get<ApiResponse<RawQuestionResponse>>(
@@ -61,22 +77,44 @@ export const Question = () => {
     if (data.type === "QUESTION_TIMEOUT") {
       setStep("eliminated");
     }
+    if (data.type === "NEXT_QUESTION") {
+      const { setQuestionId, setStep, setHasSubmitted } =
+        useQuizStore.getState();
+      console.log("📢 다음 문제로 이동:", data.questionId);
+
+      setHasSubmitted(false);
+      setQuestionId(data.questionId);
+      setStep("question");
+    }
   };
 
   // 3. 초기 로드 및 소켓 구독
   useEffect(() => {
-    console.log("useEffect triggered", { quizId, questionId, accessToken });
-    loadQuestionData();
-    if (quizId) {
-      subscribeToQuestion(quizId, questionId, handleServerMessage);
+    if (!quizId || !questionId || !accessToken) {
+      console.log("❌ Missing dependencies:", {
+        quizId,
+        questionId,
+        accessToken: !!accessToken,
+      });
+      return;
     }
+    loadQuestionData();
+
+    // 소켓 메시지 수신 설정
+    const unsubscribe = subscribeToQuestion(
+      quizId,
+      questionId,
+      handleServerMessage,
+    );
+    return () => {
+      unsubscribe?.();
+    };
   }, [quizId, questionId, accessToken]);
 
   // 4. 정답 제출
   const submitAnswer = async (optionId: number) => {
     if (hasSubmitted || !quizId || !accessToken) return;
     setHasSubmitted(true);
-
     try {
       const res = await axiosInstance.post(
         `/quizzes/${quizId}/questions/${questionId}`,
@@ -87,7 +125,6 @@ export const Question = () => {
           },
         },
       );
-      console.log(res);
       const { survived } = res.data.data;
       setStep(survived ? "waiting" : "eliminated");
     } catch (err) {
@@ -96,7 +133,11 @@ export const Question = () => {
     }
   };
 
-  if (!questionData) return <div>문제 불러오는 중...</div>;
+  if (!questionData) {
+    console.log("No questionData - showing loading");
+    return <div>문제 불러오는 중...</div>;
+  }
+  console.log("Rendering question:", questionData.content);
 
   return (
     <div className="flex flex-col items-center justify-center px-4 pt-12 text-center">

@@ -1,5 +1,6 @@
 import SockJS from "sockjs-client";
 import { Client, IMessage } from "@stomp/stompjs";
+import { useQuizStore } from "@/stores/useQuizStore";
 
 // 전역으로 연결 객체와 구독 정보 보관
 let stompClient: Client | null = null;
@@ -60,9 +61,25 @@ export const subscribeToQuestion = (
   currentSubscription = stompClient.subscribe(topic, (message: IMessage) => {
     try {
       const data = JSON.parse(message.body);
-      onMessage(data);
+
+      if (data.type === "NEXT_QUESTION") {
+        const { setQuestionId, setStep, setHasSubmitted } =
+          useQuizStore.getState();
+
+        console.log("📢 다음 문제로 이동:", data.questionId);
+
+        setHasSubmitted(false);
+        setQuestionId(data.questionId);
+        setStep("question");
+      }
+
+      if (data.type === "QUIZ_ENDED") {
+        const { setStep } = useQuizStore.getState();
+        console.log("🎉 퀴즈 종료!");
+        setStep("winner");
+      }
     } catch (e) {
-      console.error("메시지 파싱 실패", e);
+      console.error("이벤트 메시지 파싱 실패", e);
     }
   });
 
