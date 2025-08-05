@@ -9,8 +9,8 @@ interface AnalysisHeroSectionProps {
   subPersonaImgPath: string;
   subPersonaName: string;
   subPersonaPercent: number;
-  personaText1: string;
-  personaText2: string;
+  personaText1?: string; // optional로 변경
+  personaText2?: string; // optional로 변경
 }
 
 const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
@@ -25,14 +25,6 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
   personaText1,
   personaText2,
 }) => {
-  const isPersonaTextReady = personaText1 && personaText2;
-  if (!isPersonaTextReady) {
-    return (
-      <div>
-        <Spinner />
-      </div>
-    );
-  }
   return (
     <div className="pretendard">
       <div className="relative h-[400px] overflow-hidden md:h-[445px] lg:h-[500px]">
@@ -54,19 +46,31 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
           <div className="flex pt-56">
             <div className="mx-auto flex">
               <div className="absolute flex -translate-x-[107px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[500px]">
-                <span className="gmarket-medium lg:bg-popco-main mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
-                  {personaText1}
-                </span>
+                {personaText1 ? (
+                  <span className="gmarket-medium lg:bg-popco-main mb-2 inline whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
+                    {personaText1}
+                  </span>
+                ) : (
+                  <div className="mb-2 flex h-8 items-center px-1 py-1 md:h-10">
+                    <Spinner />
+                  </div>
+                )}
                 <img
                   src="/images/persona/Persona-text-line.svg"
                   alt="텍스트 라인"
                   className="hidden object-cover lg:ml-36 lg:inline lg:w-52 xl:ml-56 xl:w-64"
                 />
               </div>
-              <div className="absolute flex -translate-x-[107px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-190px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
-                <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl">
-                  {personaText2}
-                </span>
+              <div className="absolute flex -translate-x-[107px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-220px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
+                {personaText2 ? (
+                  <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl">
+                    {personaText2}
+                  </span>
+                ) : (
+                  <div className="mb-2 flex h-8 items-center px-1 py-1 md:h-10">
+                    <Spinner />
+                  </div>
+                )}
                 <img
                   src="/images/persona/Persona-text-line.svg"
                   alt="텍스트 라인"
@@ -76,13 +80,13 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
               <img
                 src={`${myPersonaImgPath}`}
                 alt="캐릭터이미지"
-                className="s h-[150px] w-[150px] translate-y-7 object-cover md:mt-5 md:h-[200px] md:w-[200px] lg:h-[220px] lg:w-[220px]"
+                className="z-99 h-[150px] w-[150px] translate-y-7 object-cover md:mt-5 md:h-[200px] md:w-[200px] lg:h-[220px] lg:w-[220px]"
               />
             </div>
           </div>
         </div>
       </div>
-      <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-4xl lg:mt-0">
+      <div className="gmarket-medium mt-5 flex justify-center text-3xl md:mt-8 md:text-3xl lg:mt-0">
         {myPersonaName}
       </div>
 

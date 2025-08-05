@@ -5,6 +5,7 @@ import React, {
   useMemo,
   lazy,
   Suspense,
+  useRef,
 } from "react";
 import MovieCalendar from "./MovieCalendar";
 import ReviewCard from "../common/ReviewCard";
@@ -12,8 +13,8 @@ import { getMonthlyReviews } from "@/apis/userApi";
 import {
   fetchMyCollections,
   fetchMyMarkedCollections,
-} from "@/apis/collectionApi"; // 컬렉션 API import
-import { ReviewCardData } from "@/types/Reviews.types"; //리뷰타입 import
+} from "@/apis/collectionApi";
+import { ReviewCardData } from "@/types/Reviews.types";
 import { SwiperNavigation } from "../common/SwiperButton";
 import { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -22,13 +23,21 @@ const HotCollection = lazy(() => import("../common/HotCollection"));
 const LikeContents = lazy(() => import("./LikeContents"));
 const WantWatching = lazy(() => import("./WantWatching"));
 const MyPageChart = lazy(() => import("./MyPageChart"));
-import { App } from "antd";
+import { App, Form, Select } from "antd";
 import Spinner from "../common/Spinner";
 import { useNavigate } from "react-router-dom";
 import { useToggleMarkCollection } from "@/hooks/useCollections";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useDeleteReview,
+  useFetchDeclarationTypes,
+  usePostReviewDeclaration,
+  useToggleReviewReaction,
+} from "@/hooks/useReviews";
+import ReviewModal from "@/components/ReviewModal/ReviewModal";
 
 interface PageContentsProps {
-  accessToken: string; // null이 아닌 string 타입 보장
+  accessToken: string;
   user: {
     userId: number;
     nickname: string;
@@ -47,6 +56,8 @@ interface Movie {
   contentId: number;
   contentType: string;
   reviewId: number;
+  likeCount?: number;
+  isLiked?: boolean;
 }
 
 interface ContentPoster {
@@ -67,7 +78,7 @@ interface Collection {
   createdAt: string;
   updatedAt: string;
   contentPosters: ContentPoster[];
-  isMarked?: boolean; // 저장 상태 추가
+  isMarked?: boolean;
 }
 
 // YYYY-MM 형식으로 변환하기
@@ -82,12 +93,30 @@ const PageContents: React.FC<PageContentsProps> = ({
   user,
   isLoggedIn,
 }) => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState(0);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState<string>("");
+  const [reportForm] = Form.useForm();
 
-  // 컬렉션 관련 상태를 객체로 그룹화
+  // 현재 월을 안정적으로 관리
+  const [currentMonth, setCurrentMonth] = useState(() =>
+    formatMonthForApi(new Date()),
+  );
+
+  // API 요청 중복 방지를 위한 refs
+  const collectionsRequestRef = useRef(false);
+  const markedCollectionsRequestRef = useRef(false);
+  const isInitializedRef = useRef(false);
+
+  // 리뷰 모달 상태
+  const [reviewModalState, setReviewModalState] = useState({
+    isOpen: false,
+    isWriting: true,
+    editingData: null as ReviewCardData | null,
+  });
+
+  // 컬렉션 상태를 단순화
   const [collectionsState, setCollectionsState] = useState({
     collections: [] as Collection[],
     loading: false,
@@ -100,17 +129,46 @@ const PageContents: React.FC<PageContentsProps> = ({
     error: null as string | null,
   });
 
-  const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
-    undefined,
-  );
-  const [isBeginning, setIsBeginning] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
+  // Swiper 상태를 하나의 객체로 관리
+  const [swiperState, setSwiperState] = useState({
+    instance: undefined as SwiperType | undefined,
+    isBeginning: true,
+    isEnd: false,
+  });
 
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const navigate = useNavigate();
 
   const { mutate: toggleMark } = useToggleMarkCollection();
 
+  // 리뷰 관련 훅들
+  const { data: declarationTypes, isLoading: isDeclarationTypesLoading } =
+    useFetchDeclarationTypes();
+
+  // 현재 리뷰 컨텍스트 관리
+  const [reviewContext, setReviewContext] = useState({
+    contentId: 1,
+    contentType: "movie",
+  });
+
+  const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview(
+    reviewContext.contentId,
+    reviewContext.contentType,
+  );
+
+  const { mutate: reportReview, isPending: isReporting } =
+    usePostReviewDeclaration(
+      reviewContext.contentId,
+      reviewContext.contentType,
+    );
+
+  const { mutate: toggleLikeReaction } = useToggleReviewReaction(
+    reviewContext.contentId,
+    reviewContext.contentType,
+    "recent",
+  );
+
+  // 메모이제이션된 상수들
   const tabTitles = useMemo(() => ["Calendar", "Collection", "MY"], []);
 
   const swiperBreakpoints = useMemo(
@@ -146,10 +204,10 @@ const PageContents: React.FC<PageContentsProps> = ({
     [],
   );
 
+  // 월별 리뷰 fetch 함수 최적화
   const fetchMonthlyReviews = useCallback(
     async (month: string) => {
-      if (!isLoggedIn) {
-        console.log("로그인이 필요합니다");
+      if (!isLoggedIn || !accessToken) {
         setMovies([]);
         return;
       }
@@ -157,10 +215,9 @@ const PageContents: React.FC<PageContentsProps> = ({
       try {
         setLoading(true);
         const response = await getMonthlyReviews({ month }, accessToken);
-        console.log("월별영화api응답==", response);
 
         if (response.data) {
-          const movieData: Movie[] = response.data.map((review) => ({
+          const movieData: Movie[] = response.data.map((review: any) => ({
             date: review.createdAt
               ? review.createdAt.split("T")[0]
               : new Date().toISOString().split("T")[0],
@@ -171,10 +228,11 @@ const PageContents: React.FC<PageContentsProps> = ({
             contentId: review.contentId || 0,
             contentType: review.contentType || "",
             reviewId: review.reviewId || 0,
+            likeCount: review.likeCount || 0,
+            isLiked: review.liked || false,
           }));
 
           setMovies(movieData);
-          console.log("변환된 영화 데이터:", movieData);
         }
       } catch (error) {
         console.error("영화api요청 실패", error);
@@ -183,41 +241,37 @@ const PageContents: React.FC<PageContentsProps> = ({
         setLoading(false);
       }
     },
-    [isLoggedIn, accessToken],
+    [isLoggedIn, accessToken], // 의존성 최소화
   );
 
-  // 수정된 컬렉션 데이터 가져오기 - 저장 상태 포함
+  // 컬렉션 데이터 fetch 함수 최적화
   const fetchMyCollectionsData = useCallback(
     async (reset = false) => {
-      if (!isLoggedIn || collectionsState.loading) {
+      if (!isLoggedIn || !accessToken || collectionsRequestRef.current) {
         return;
       }
 
       try {
+        collectionsRequestRef.current = true;
+
         setCollectionsState((prev) => ({
           ...prev,
           loading: true,
           error: null,
         }));
 
-        // 내가 만든 컬렉션과 저장한 컬렉션을 동시에 가져오기
         const [myCollectionsResponse, markedCollectionsResponse] =
           await Promise.all([
             fetchMyCollections(accessToken, 0, 100),
             fetchMyMarkedCollections(accessToken),
           ]);
 
-        console.log("컬렉션 API 응답:", myCollectionsResponse);
-        console.log("저장한 컬렉션 API 응답:", markedCollectionsResponse);
-
         if (myCollectionsResponse?.collections) {
-          // 저장한 컬렉션 ID 목록 추출
           const markedCollectionIds =
             markedCollectionsResponse.data?.collections?.map(
               (c: Collection) => c.collectionId,
             ) || [];
 
-          // 각 컬렉션에 저장 상태 추가
           const newCollections = myCollectionsResponse.collections.map(
             (collection: Collection) => ({
               ...collection,
@@ -240,26 +294,29 @@ const PageContents: React.FC<PageContentsProps> = ({
           loading: false,
           error: "컬렉션을 불러오는데 실패했습니다.",
         }));
+      } finally {
+        collectionsRequestRef.current = false;
       }
     },
-    [isLoggedIn, accessToken, collectionsState.loading],
+    [isLoggedIn, accessToken],
   );
 
+  // 저장한 컬렉션 fetch 함수 최적화
   const fetchMyMarkedCollectionsData = useCallback(async () => {
-    if (!isLoggedIn || markedCollectionsState.loading) {
+    if (!isLoggedIn || !accessToken || markedCollectionsRequestRef.current) {
       return;
     }
 
     try {
+      markedCollectionsRequestRef.current = true;
+
       setMarkedCollectionsState((prev) => ({
         ...prev,
         loading: true,
         error: null,
       }));
 
-      console.log("저장한 컬렉션 API 요청");
       const response = await fetchMyMarkedCollections(accessToken);
-      console.log("저장한 컬렉션 API 응답:", response.data);
 
       if (response.code === 200 && response.data) {
         setMarkedCollectionsState((prev) => ({
@@ -275,10 +332,219 @@ const PageContents: React.FC<PageContentsProps> = ({
         loading: false,
         error: "저장한 컬렉션을 불러오는데 실패했습니다.",
       }));
+    } finally {
+      markedCollectionsRequestRef.current = false;
     }
-  }, [isLoggedIn, accessToken, markedCollectionsState.loading]);
+  }, [isLoggedIn, accessToken]);
 
-  // 저장 토글 핸들러
+  // 로그인 필요 액션 핸들러 최적화
+  const handleAuthRequiredAction = useCallback(
+    (action: () => void) => {
+      if (!accessToken || !isLoggedIn) {
+        message.error("로그인이 필요한 기능입니다.");
+        navigate("/login");
+        return;
+      }
+      action();
+    },
+    [accessToken, isLoggedIn, message, navigate],
+  );
+
+  // 리뷰 모달 관련 핸들러들
+  const openEditModal = useCallback((review: ReviewCardData) => {
+    setReviewModalState({
+      isOpen: true,
+      isWriting: false,
+      editingData: review,
+    });
+  }, []);
+
+  const closeReviewModal = useCallback(() => {
+    setReviewModalState({
+      isOpen: false,
+      isWriting: true,
+      editingData: null,
+    });
+  }, []);
+
+  const handleReviewUpdateSuccess = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["reviews"],
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["myReview"],
+    });
+
+    fetchMonthlyReviews(currentMonth);
+    closeReviewModal();
+  }, [queryClient, currentMonth, fetchMonthlyReviews, closeReviewModal]);
+
+  // 리뷰 액션 핸들러들 최적화
+  const handleLikeToggle = useCallback(
+    (reviewId: number, contentId: number, contentType: string) => {
+      handleAuthRequiredAction(() => {
+        setReviewContext({ contentId, contentType });
+
+        // 컨텍스트 업데이트 후 API 호출
+        setTimeout(() => {
+          toggleLikeReaction(
+            { reviewId, token: accessToken },
+            {
+              onSuccess: () => {
+                message.success("좋아요가 처리되었습니다.");
+                fetchMonthlyReviews(currentMonth);
+              },
+              onError: () => {
+                message.error("좋아요 처리에 실패했습니다.");
+              },
+            },
+          );
+        }, 50); // 딜레이 단축
+      });
+    },
+    [
+      handleAuthRequiredAction,
+      toggleLikeReaction,
+      accessToken,
+      message,
+      fetchMonthlyReviews,
+      currentMonth,
+    ],
+  );
+
+  const handleReport = useCallback(
+    (reviewId: number, contentId: number, contentType: string) => {
+      handleAuthRequiredAction(() => {
+        setReviewContext({ contentId, contentType });
+
+        const form = reportForm;
+        form.resetFields();
+
+        modal.confirm({
+          title: "리뷰 신고하기",
+          content: (
+            <Form form={form} layout="vertical" className="mr-6 mt-4">
+              <Form.Item
+                name="declarationType"
+                label="신고 유형"
+                rules={[
+                  { required: true, message: "신고 유형을 선택해주세요" },
+                ]}
+              >
+                <Select
+                  placeholder="신고 유형을 선택해주세요"
+                  loading={isDeclarationTypesLoading}
+                >
+                  {declarationTypes?.map((type) => (
+                    <Select.Option key={type.code} value={type.code}>
+                      {type.description}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Form>
+          ),
+          okText: "신고",
+          cancelText: "취소",
+          okButtonProps: { loading: isReporting },
+          onOk: async () => {
+            try {
+              const values = await form.validateFields();
+              reportReview(
+                {
+                  reviewId,
+                  body: {
+                    declarationType: String(values.declarationType),
+                    content: "",
+                  },
+                  token: accessToken,
+                },
+                {
+                  onSuccess: () => {
+                    message.success("신고가 접수되었습니다.");
+                  },
+                  onError: (error: any) => {
+                    message.error(
+                      error.message || "신고 처리 중 오류가 발생했습니다.",
+                    );
+                  },
+                },
+              );
+            } catch (error) {
+              console.error("신고 폼 검증 또는 제출 실패:", error);
+              return Promise.reject(error);
+            }
+          },
+        });
+      });
+    },
+    [
+      handleAuthRequiredAction,
+      reportForm,
+      modal,
+      isDeclarationTypesLoading,
+      declarationTypes,
+      isReporting,
+      reportReview,
+      accessToken,
+      message,
+    ],
+  );
+
+  const handleEdit = useCallback(
+    (review: ReviewCardData) => {
+      handleAuthRequiredAction(() => {
+        openEditModal(review);
+      });
+    },
+    [handleAuthRequiredAction, openEditModal],
+  );
+
+  const handleDelete = useCallback(
+    (reviewId: number, contentId: number, contentType: string) => {
+      handleAuthRequiredAction(() => {
+        setReviewContext({ contentId, contentType });
+
+        modal.confirm({
+          title: "리뷰 삭제",
+          content: "정말로 리뷰를 삭제하시겠습니까?",
+          okText: "삭제",
+          cancelText: "취소",
+          okButtonProps: { loading: isDeleting },
+          async onOk() {
+            deleteReview(
+              {
+                reviewId,
+                token: accessToken,
+              },
+              {
+                onSuccess: () => {
+                  message.success("리뷰가 삭제되었습니다.");
+                  fetchMonthlyReviews(currentMonth);
+                },
+                onError: (error) => {
+                  console.error("리뷰 삭제 API 에러:", error);
+                  message.error("리뷰 삭제에 실패했습니다.");
+                },
+              },
+            );
+          },
+        });
+      });
+    },
+    [
+      handleAuthRequiredAction,
+      modal,
+      isDeleting,
+      deleteReview,
+      accessToken,
+      message,
+      fetchMonthlyReviews,
+      currentMonth,
+    ],
+  );
+
+  // 저장 토글 핸들러 최적화 - 양방향 상태 업데이트 + saveCount 반영
   const handleSaveToggle = useCallback(
     (collectionId: number) => {
       if (!user.isLoggedIn) {
@@ -286,83 +552,114 @@ const PageContents: React.FC<PageContentsProps> = ({
         return;
       }
 
-      // API 호출
+      // 현재 컬렉션 정보 찾기
+      const currentCollection =
+        collectionsState.collections.find(
+          (c) => c.collectionId === collectionId,
+        ) ||
+        markedCollectionsState.collections.find(
+          (c) => c.collectionId === collectionId,
+        );
+
+      if (!currentCollection) return;
+
+      const isCurrentlyMarked = currentCollection.isMarked;
+      const countChange = isCurrentlyMarked ? -1 : 1; // 저장하면 +1, 해제하면 -1
+
       toggleMark({
         collectionId: String(collectionId),
         accessToken: accessToken,
       });
 
-      // API 호출 후 약간의 지연을 두고 데이터 새로고침
-      setTimeout(() => {
-        fetchMyCollectionsData(true);
-        fetchMyMarkedCollectionsData();
-      }, 100);
+      // "내가 만든 컬렉션"에서 isMarked 상태 토글 + saveCount 업데이트
+      setCollectionsState((prev) => ({
+        ...prev,
+        collections: prev.collections.map((collection) =>
+          collection.collectionId === collectionId
+            ? {
+                ...collection,
+                isMarked: !collection.isMarked,
+                saveCount: Math.max(0, collection.saveCount + countChange), // 0 이하로 내려가지 않도록
+              }
+            : collection,
+        ),
+      }));
+
+      // "내가 저장한 컬렉션" 목록 업데이트
+      if (isCurrentlyMarked) {
+        // 저장 해제: 저장한 컬렉션 목록에서 제거
+        setMarkedCollectionsState((prev) => ({
+          ...prev,
+          collections: prev.collections.filter(
+            (collection) => collection.collectionId !== collectionId,
+          ),
+        }));
+      } else {
+        // 저장 추가: 저장한 컬렉션 목록에 추가 (saveCount도 업데이트된 상태로)
+        setMarkedCollectionsState((prev) => ({
+          ...prev,
+          collections: [
+            ...prev.collections,
+            {
+              ...currentCollection,
+              isMarked: true,
+              saveCount: Math.max(0, currentCollection.saveCount + countChange),
+            },
+          ],
+        }));
+      }
     },
     [
       user.isLoggedIn,
       accessToken,
       toggleMark,
-      fetchMyCollectionsData,
-      fetchMyMarkedCollectionsData,
       message,
+      collectionsState.collections,
+      markedCollectionsState.collections,
     ],
   );
 
+  // Swiper 핸들러들 최적화
   const handleSwiperInit = useCallback((swiper: SwiperType) => {
-    setSwiperInstance(swiper);
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
+    setSwiperState({
+      instance: swiper,
+      isBeginning: swiper.isBeginning,
+      isEnd: swiper.isEnd,
+    });
   }, []);
 
   const handleSlideChange = useCallback((swiper: SwiperType) => {
-    setIsBeginning(swiper.isBeginning);
-    setIsEnd(swiper.isEnd);
+    setSwiperState((prev) => ({
+      ...prev,
+      isBeginning: swiper.isBeginning,
+      isEnd: swiper.isEnd,
+    }));
   }, []);
 
-  // Movie 데이터를 ReviewCard가 요구하는 ReviewCardData 형태로 변환
-  const convertMovieToReviewCardData = (movie: Movie): ReviewCardData => {
-    return {
-      // === 추후 수정 필요함!!!!!!! import도 수정!! ===
-      reviewId: movie.reviewId,
-      contentId: movie.contentId,
-      contentType: movie.contentType,
-      contentTitle: movie.title,
-      authorNickname: user.nickname || "익명",
-      score: movie.score,
-      reviewText: movie.reviewText,
-      status: "COMMON",
-      likeCount: 0,
-      isLiked: false,
-      isOwnReview: true,
-      hasAlreadyReported: false,
-      posterPath: movie.poster,
-    };
-  };
+  // Movie to ReviewCardData 변환 함수 최적화
+  const convertMovieToReviewCardData = useCallback(
+    (movie: Movie): ReviewCardData => {
+      return {
+        reviewId: movie.reviewId,
+        contentId: movie.contentId,
+        contentType: movie.contentType,
+        contentTitle: movie.title,
+        authorNickname: user.nickname || "익명",
+        score: movie.score,
+        reviewText: movie.reviewText,
+        status: "COMMON",
+        likeCount: movie.likeCount || 0,
+        isLiked: movie.isLiked || false,
+        isOwnReview: true,
+        hasAlreadyReported: false,
+        posterPath: movie.poster,
+        reviewDate: movie.date,
+      };
+    },
+    [user.nickname],
+  );
 
-  // 컴포넌트 마운트 시 및 로그인 상태 변경 시 현재 월 데이터 가져오기
-  useEffect(() => {
-    const initialMonth = formatMonthForApi(new Date());
-    setCurrentMonth(initialMonth);
-    fetchMonthlyReviews(initialMonth);
-  }, [fetchMonthlyReviews]);
-
-  useEffect(() => {
-    if (
-      activeTab === 1 &&
-      isLoggedIn &&
-      collectionsState.collections.length === 0
-    ) {
-      fetchMyCollectionsData(true);
-      fetchMyMarkedCollectionsData();
-    }
-  }, [
-    activeTab,
-    isLoggedIn,
-    collectionsState.collections.length,
-    fetchMyCollectionsData,
-    fetchMyMarkedCollectionsData,
-  ]);
-
+  // 렌더링 함수들 최적화
   const renderEmptyState = useCallback(
     (message: string) => (
       <div className="flex h-32 items-center justify-center text-gray-500">
@@ -381,23 +678,69 @@ const PageContents: React.FC<PageContentsProps> = ({
     [],
   );
 
-  const handleTabChange = (index: number) => {
+  // 이벤트 핸들러들
+  const handleTabChange = useCallback((index: number) => {
     setActiveTab(index);
-  };
+  }, []);
 
-  const handleMonthChange = (activeStartDate: Date | null) => {
-    if (activeStartDate) {
-      const newMonth = formatMonthForApi(activeStartDate);
-      if (newMonth !== currentMonth) {
-        setCurrentMonth(newMonth);
-        fetchMonthlyReviews(newMonth);
+  const handleMonthChange = useCallback(
+    (activeStartDate: Date | null) => {
+      if (activeStartDate) {
+        const newMonth = formatMonthForApi(activeStartDate);
+        if (newMonth !== currentMonth) {
+          setCurrentMonth(newMonth);
+          fetchMonthlyReviews(newMonth);
+        }
       }
-    }
-  };
+    },
+    [currentMonth, fetchMonthlyReviews],
+  );
 
-  const handleCreateCollection = () => {
-    navigate("/collections/create"); // 새 컬렉션 만들기 페이지로 이동
-  };
+  const handleCreateCollection = useCallback(() => {
+    navigate("/collections/create");
+  }, [navigate]);
+
+  // 초기 데이터 로딩 - 한 번만 실행
+  useEffect(() => {
+    if (!isInitializedRef.current && isLoggedIn) {
+      fetchMonthlyReviews(currentMonth);
+      isInitializedRef.current = true;
+    }
+  }, [isLoggedIn, currentMonth, fetchMonthlyReviews]);
+
+  // 컬렉션 탭 활성화 시 데이터 로딩 - 조건 최적화
+  useEffect(() => {
+    if (
+      activeTab === 1 &&
+      isLoggedIn &&
+      collectionsState.collections.length === 0 &&
+      !collectionsState.loading &&
+      !collectionsRequestRef.current &&
+      !markedCollectionsRequestRef.current
+    ) {
+      const timer = setTimeout(() => {
+        fetchMyCollectionsData(true);
+        fetchMyMarkedCollectionsData();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [
+    activeTab,
+    isLoggedIn,
+    collectionsState.collections.length,
+    collectionsState.loading,
+    fetchMyCollectionsData,
+    fetchMyMarkedCollectionsData,
+  ]);
+
+  // 컴포넌트 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      collectionsRequestRef.current = false;
+      markedCollectionsRequestRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="pretendard">
@@ -437,9 +780,9 @@ const PageContents: React.FC<PageContentsProps> = ({
                     이달엔 이런 리뷰를 남겼어요
                   </h1>
                   <SwiperNavigation
-                    swiper={swiperInstance}
-                    isBeginning={isBeginning}
-                    isEnd={isEnd}
+                    swiper={swiperState.instance}
+                    isBeginning={swiperState.isBeginning}
+                    isEnd={swiperState.isEnd}
                   />
                 </div>
 
@@ -468,12 +811,30 @@ const PageContents: React.FC<PageContentsProps> = ({
                         <SwiperSlide key={movie.reviewId} className="!h-auto">
                           <ReviewCard
                             {...convertMovieToReviewCardData(movie)}
-                            // MyPage에서는 리뷰 카드에 대한 상호작용이 없으므로,
-                            // 빈 함수를 전달하여 필수 prop 조건을 만족시킵니다.
-                            onLikeClick={() => {}}
-                            onReport={() => {}}
-                            onEdit={() => {}}
-                            onDelete={() => {}}
+                            onLikeClick={() =>
+                              handleLikeToggle(
+                                movie.reviewId,
+                                movie.contentId,
+                                movie.contentType,
+                              )
+                            }
+                            onReport={() =>
+                              handleReport(
+                                movie.reviewId,
+                                movie.contentId,
+                                movie.contentType,
+                              )
+                            }
+                            onEdit={() =>
+                              handleEdit(convertMovieToReviewCardData(movie))
+                            }
+                            onDelete={() =>
+                              handleDelete(
+                                movie.reviewId,
+                                movie.contentId,
+                                movie.contentType,
+                              )
+                            }
                           />
                         </SwiperSlide>
                       ))}
@@ -501,9 +862,9 @@ const PageContents: React.FC<PageContentsProps> = ({
                     </button>
                   </div>
                   <SwiperNavigation
-                    swiper={swiperInstance}
-                    isBeginning={isBeginning}
-                    isEnd={isEnd}
+                    swiper={swiperState.instance}
+                    isBeginning={swiperState.isBeginning}
+                    isEnd={swiperState.isEnd}
                   />
                 </div>
 
@@ -546,7 +907,7 @@ const PageContents: React.FC<PageContentsProps> = ({
                                   (poster) => poster.posterPath,
                                 )}
                                 saveCount={collection.saveCount || 0}
-                                isSaved={collection.isMarked || false} // 실제 저장 상태 사용
+                                isSaved={collection.isMarked || false}
                                 href={`/collections/${collection.collectionId}`}
                                 onSaveToggle={() =>
                                   handleSaveToggle(collection.collectionId)
@@ -566,9 +927,9 @@ const PageContents: React.FC<PageContentsProps> = ({
                     내가 저장한 컬렉션
                   </h1>
                   <SwiperNavigation
-                    swiper={swiperInstance}
-                    isBeginning={isBeginning}
-                    isEnd={isEnd}
+                    swiper={swiperState.instance}
+                    isBeginning={swiperState.isBeginning}
+                    isEnd={swiperState.isEnd}
                   />
                 </div>
 
@@ -612,7 +973,7 @@ const PageContents: React.FC<PageContentsProps> = ({
                                     (poster) => poster.posterPath,
                                   )}
                                   saveCount={collection.saveCount || 0}
-                                  isSaved={collection.isMarked || true} // 저장한 컬렉션은 항상 저장됨
+                                  isSaved={collection.isMarked || true}
                                   href={`/collections/${collection.collectionId}`}
                                   onSaveToggle={() =>
                                     handleSaveToggle(collection.collectionId)
@@ -658,6 +1019,26 @@ const PageContents: React.FC<PageContentsProps> = ({
           )}
         </div>
       </div>
+
+      {/* 리뷰 모달 추가 */}
+      {reviewModalState.isOpen && reviewModalState.editingData && (
+        <ReviewModal
+          isModalOpen={reviewModalState.isOpen}
+          setIsModalOpen={closeReviewModal}
+          isWriting={reviewModalState.isWriting}
+          isAuthor={true}
+          contentId={reviewModalState.editingData.contentId}
+          contentType={reviewModalState.editingData.contentType}
+          contentsTitle={reviewModalState.editingData.contentTitle}
+          contentsImg={reviewModalState.editingData.posterPath || ""}
+          popcorn={reviewModalState.editingData.score}
+          reviewDetail={reviewModalState.editingData.reviewText}
+          author={reviewModalState.editingData.authorNickname}
+          token={accessToken}
+          reviewId={reviewModalState.editingData.reviewId}
+          onUpdateSuccess={handleReviewUpdateSuccess}
+        />
+      )}
     </div>
   );
 };
