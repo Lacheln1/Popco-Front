@@ -4,30 +4,35 @@ import Header from "@/components/common/Header";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import Spinner from "@/components/common/Spinner";
 import { useEffect, useState } from "react";
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 const Layout = () => {
   const [notification, setNotification] = useState<null | string>(null);
-  const { user, isLoading, logout } = useAuthCheck();
+  const { user, isLoading, logout, accessToken } = useAuthCheck();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    navigate("/login");
-  };
-
-  const handleLogout = () => {
-    logout();
-  };
+  const handleLogin = () => navigate("/login");
+  const handleLogout = () => logout();
 
   useEffect(() => {
-    if (!user?.userId) return;
+    if (!accessToken) return;
 
-    const eventSource = new EventSource(
-      `${import.meta.env.VITE_BACK_URL}/notifications/stream?clientId=${user.userId}`,
-    );
+    const url = `${import.meta.env.VITE_BACK_URL}/notifications/stream`;
+
+    const eventSource = new EventSourcePolyfill(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      withCredentials: true, // 필요 없으면 제거 가능
+    });
 
     eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setNotification(data.message);
+      try {
+        const data = JSON.parse(event.data);
+        setNotification(data.message);
+      } catch (e) {
+        console.error("SSE message parse error", e);
+      }
     };
 
     eventSource.onerror = (error) => {
@@ -35,10 +40,8 @@ const Layout = () => {
       eventSource.close();
     };
 
-    return () => {
-      eventSource.close();
-    };
-  }, [user?.userId]);
+    return () => eventSource.close();
+  }, [accessToken]);
 
   if (isLoading) {
     return (

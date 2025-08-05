@@ -68,10 +68,7 @@ export const Question = () => {
       setTimeout(() => {
         const { step, setQuestionId, setStep, setHasSubmitted } =
           useQuizStore.getState();
-        if (step !== "waiting") {
-          console.log("무시된 NEXT_QUESTION (현재 step:", step, ")");
-          return;
-        }
+        if (step !== "waiting") return;
         console.log("📢 다음 문제로 이동:", data.questionId);
         setHasSubmitted(false);
         setQuestionId(data.questionId);
