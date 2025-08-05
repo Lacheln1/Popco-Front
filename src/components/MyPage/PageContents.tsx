@@ -993,6 +993,11 @@ const PageContents: React.FC<PageContentsProps> = ({
           {activeTab === 2 && (
             <div>
               <div>
+                <Suspense fallback={<Spinner />}>
+                  <MyPageChart accessToken={accessToken} />
+                </Suspense>
+              </div>
+              <div>
                 {isLoggedIn ? (
                   <Suspense fallback={<Spinner />}>
                     <WantWatching userId={user.userId} />
