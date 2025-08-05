@@ -40,6 +40,14 @@ const GenderChart = ({ genderPercent }: GenderChartProps) => {
           },
         },
       },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const value = context.parsed || 0;
+            return `${value}명`;
+          },
+        },
+      },
     },
   };
 
