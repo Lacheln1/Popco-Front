@@ -1,13 +1,16 @@
+import Spinner from "../common/Spinner";
+
 interface AnalysisHeroSectionProps {
   mainPersonaImgPath: string;
   mainPersonaName: string;
   mainPersonaPercent: number;
-  //myPersonaDescription 두개로 나뉘어지는거 개발 완료되면 추가해야함
   myPersonaImgPath: string; // 왼쪽 역할 이미지
   myPersonaName: string; //왼쪽 역할 설명
   subPersonaImgPath: string;
   subPersonaName: string;
   subPersonaPercent: number;
+  personaText1: string;
+  personaText2: string;
 }
 
 const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
@@ -19,7 +22,17 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
   subPersonaImgPath,
   subPersonaName,
   subPersonaPercent,
+  personaText1,
+  personaText2,
 }) => {
+  const isPersonaTextReady = personaText1 && personaText2;
+  if (!isPersonaTextReady) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
   return (
     <div className="pretendard">
       <div className="relative h-[400px] overflow-hidden md:h-[445px] lg:h-[500px]">
@@ -40,9 +53,9 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
           {/* 캐릭터 이미지 및 텍스트 */}
           <div className="flex pt-56">
             <div className="mx-auto flex">
-              <div className="absolute flex -translate-x-[97px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[500px]">
+              <div className="absolute flex -translate-x-[107px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[500px]">
                 <span className="gmarket-medium lg:bg-popco-main mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
-                  심장 쫄깃한 전개와 스케일 없는 세계관 없이는 못참아!
+                  {personaText1}
                 </span>
                 <img
                   src="/images/persona/Persona-text-line.svg"
@@ -50,9 +63,9 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
                   className="hidden object-cover lg:ml-36 lg:inline lg:w-52 xl:ml-56 xl:w-64"
                 />
               </div>
-              <div className="absolute flex -translate-x-[98px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-190px] lg:-translate-y-[-30px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
+              <div className="absolute flex -translate-x-[107px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-190px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
                 <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl">
-                  하지만 웃음과 따뜻함이 있는 영화도 필요해!!
+                  {personaText2}
                 </span>
                 <img
                   src="/images/persona/Persona-text-line.svg"

@@ -1,7 +1,7 @@
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
-import loginPopcoImg from "@/assets/login-popco.svg";
-import kakaoSymbolImg from "@/assets/kakao-symbol.svg";
+import loginPopcoImg from "@/assets/login-popco.webp";
+import kakaoSymbolImg from "@/assets/kakao-symbol.webp";
 import LoginForm from "@/components/LoginResgisterPage/LoginForm";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
