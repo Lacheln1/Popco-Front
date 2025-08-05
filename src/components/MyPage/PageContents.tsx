@@ -33,6 +33,7 @@ import {
   useDeleteReview,
   useFetchDeclarationTypes,
   usePostReviewDeclaration,
+  useToggleReviewReaction,
 } from "@/hooks/useReviews";
 // 리뷰 모달 추가
 import ReviewModal from "@/components/ReviewModal/ReviewModal";
@@ -57,6 +58,8 @@ interface Movie {
   contentId: number;
   contentType: string;
   reviewId: number;
+  likeCount?: number; // 좋아요 수 추가
+  isLiked?: boolean; // 좋아요 상태 추가
 }
 
 interface ContentPoster {
@@ -133,6 +136,9 @@ const PageContents: React.FC<PageContentsProps> = ({
 
   const { mutate: toggleMark } = useToggleMarkCollection();
 
+  // 리뷰별 좋아요 상태를 로컬에서 관리 (위치 이동)
+  const [likedReviews, setLikedReviews] = useState<Set<number>>(new Set());
+
   // 리뷰 관련 훅들 추가
   const { data: declarationTypes, isLoading: isDeclarationTypesLoading } =
     useFetchDeclarationTypes();
@@ -143,17 +149,29 @@ const PageContents: React.FC<PageContentsProps> = ({
     contentType: string;
   } | null>(null);
 
-  // 동적으로 contentId와 contentType을 사용하는 훅들
+  // 각 리뷰별로 독립적인 훅을 사용하지 않고, 동적으로 API 호출하는 방식으로 변경
   const { mutate: deleteReview, isPending: isDeleting } = useDeleteReview(
-    currentReviewContext?.contentId || 0,
-    currentReviewContext?.contentType || "",
+    currentReviewContext?.contentId || 1, // 0 대신 1 사용 (유효한 기본값)
+    currentReviewContext?.contentType || "movie",
   );
 
   const { mutate: reportReview, isPending: isReporting } =
     usePostReviewDeclaration(
-      currentReviewContext?.contentId || 0,
-      currentReviewContext?.contentType || "",
+      currentReviewContext?.contentId || 1,
+      currentReviewContext?.contentType || "movie",
     );
+
+  // 리뷰 좋아요 토글을 위한 별도의 훅 (기본값으로 초기화)
+  const [likeContext, setLikeContext] = useState({
+    contentId: 1,
+    contentType: "movie",
+  });
+
+  const { mutate: toggleLikeReaction } = useToggleReviewReaction(
+    likeContext.contentId,
+    likeContext.contentType,
+    "recent",
+  );
 
   const tabTitles = useMemo(() => ["Calendar", "Collection", "MY"], []);
 
@@ -202,6 +220,7 @@ const PageContents: React.FC<PageContentsProps> = ({
         setLoading(true);
         const response = await getMonthlyReviews({ month }, accessToken);
         console.log("월별영화api응답==", response);
+        console.log("첫 번째 리뷰 데이터 구조:", response.data?.[0]); // 데이터 구조 확인
 
         if (response.data) {
           const movieData: Movie[] = response.data.map((review) => ({
@@ -215,6 +234,8 @@ const PageContents: React.FC<PageContentsProps> = ({
             contentId: review.contentId || 0,
             contentType: review.contentType || "",
             reviewId: review.reviewId || 0,
+            likeCount: review.likeCount || 0, // API 응답의 likeCount
+            isLiked: review.liked || false, // API 응답의 liked 필드 (not isLiked)
           }));
 
           setMovies(movieData);
@@ -368,6 +389,40 @@ const PageContents: React.FC<PageContentsProps> = ({
     setEditingReviewData(null);
   }, [queryClient, currentMonth, fetchMonthlyReviews]);
 
+  // 리뷰 좋아요 토글 핸들러
+  const handleLikeToggle = useCallback(
+    (reviewId: number, contentId: number, contentType: string) => {
+      handleAuthRequiredAction(() => {
+        // 좋아요용 컨텍스트 업데이트
+        setLikeContext({ contentId, contentType });
+
+        // 상태 업데이트 후 API 호출
+        setTimeout(() => {
+          toggleLikeReaction(
+            { reviewId, token: accessToken },
+            {
+              onSuccess: () => {
+                message.success("좋아요가 처리되었습니다.");
+                // 현재 월의 리뷰 목록을 다시 불러오기
+                fetchMonthlyReviews(currentMonth);
+              },
+              onError: () => {
+                message.error("좋아요 처리에 실패했습니다.");
+              },
+            },
+          );
+        }, 100);
+      });
+    },
+    [
+      handleAuthRequiredAction,
+      toggleLikeReaction,
+      accessToken,
+      message,
+      fetchMonthlyReviews,
+      currentMonth,
+    ],
+  );
   // 리뷰 신고 핸들러
   const handleReport = useCallback(
     (reviewId: number, contentId: number, contentType: string) => {
@@ -555,6 +610,13 @@ const PageContents: React.FC<PageContentsProps> = ({
 
   // Movie 데이터를 ReviewCard가 요구하는 ReviewCardData 형태로 변환
   const convertMovieToReviewCardData = (movie: Movie): ReviewCardData => {
+    // 로컬 상태에서 토글된 적이 있는지 확인
+    const hasBeenToggled = likedReviews.has(movie.reviewId);
+    // 토글된 적이 있으면 원래 상태의 반대, 없으면 서버 상태 그대로
+    const currentLikedState = hasBeenToggled
+      ? !(movie.isLiked || false)
+      : movie.isLiked || false;
+
     return {
       reviewId: movie.reviewId,
       contentId: movie.contentId,
@@ -564,11 +626,12 @@ const PageContents: React.FC<PageContentsProps> = ({
       score: movie.score,
       reviewText: movie.reviewText,
       status: "COMMON",
-      likeCount: 0,
-      isLiked: false,
+      likeCount: movie.likeCount || 0,
+      isLiked: currentLikedState,
       isOwnReview: true,
       hasAlreadyReported: false,
       posterPath: movie.poster,
+      reviewDate: movie.date,
     };
   };
 
@@ -719,7 +782,13 @@ const PageContents: React.FC<PageContentsProps> = ({
                           <ReviewCard
                             {...convertMovieToReviewCardData(movie)}
                             // 실제 기능을 가진 핸들러들로 교체
-                            onLikeClick={() => {}} // MyPage에서는 좋아요 기능 비활성화
+                            onLikeClick={() =>
+                              handleLikeToggle(
+                                movie.reviewId,
+                                movie.contentId,
+                                movie.contentType,
+                              )
+                            }
                             onReport={() =>
                               handleReport(
                                 movie.reviewId,
