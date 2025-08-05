@@ -55,7 +55,7 @@ const ListPage = () => {
   const searchQuery = useSearchContents({
     keyword: isKeywordSearch ? searchKeyword : undefined,
     actors: isActorSearch ? searchActors : undefined,
-    size: 30,
+    size: 28,
     enabled: isSearching,
   });
 
@@ -261,7 +261,6 @@ const ListPage = () => {
           // 중복 호출 방지를 위한 재확인
           const currentConfig = getInfiniteScrollConfig();
           if (currentConfig.hasNext && !currentConfig.isFetching) {
-            console.log("Triggering infinite scroll"); // 디버깅용
             currentConfig.fetchNext();
           }
         }
@@ -322,23 +321,6 @@ const ListPage = () => {
   const error = getCurrentErrorState();
 
   const isEmpty = displayContents.length === 0 && !isLoading;
-
-  // 디버깅용 로그
-  useEffect(() => {
-    console.log("Infinite scroll config:", {
-      hasNext: config.hasNext,
-      isFetching: config.isFetching,
-      isSearching,
-      hasActiveFilter,
-      contentsLength: displayContents.length,
-    });
-  }, [
-    config.hasNext,
-    config.isFetching,
-    isSearching,
-    hasActiveFilter,
-    displayContents.length,
-  ]);
 
   return (
     <PageLayout

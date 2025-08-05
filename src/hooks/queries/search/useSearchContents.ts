@@ -64,15 +64,8 @@ export const useSearchContents = ({
       }
     },
     getNextPageParam: (lastPage, allPages) => {
-      console.log("🧩 lastPage.number:", lastPage.number);
-      console.log("🧩 lastPage.totalPages:", lastPage.totalPages);
-      console.log("🧩 lastPage.content.length:", lastPage.content?.length);
-      console.log("🧩 allPages.length:", allPages.length);
-
       const nextPage = lastPage.number + 1;
       const hasNext = nextPage < lastPage.totalPages;
-
-      console.log("➡️ nextPage:", nextPage, " | hasNext:", hasNext);
 
       return hasNext ? nextPage : undefined;
     },
@@ -85,7 +78,6 @@ export const useSearchContents = ({
       ),
     // 에러 발생 시 재시도 설정
     retry: (failureCount, error) => {
-      console.log("에러 발생으로 재시도 설정:", failureCount, error);
       return failureCount < 3;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),

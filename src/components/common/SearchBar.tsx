@@ -37,7 +37,7 @@ const SearchBar = <T,>({
     useDebouncedAutocomplete();
 
   // onSearch 콜백을 useCallback으로 메모이제이션
-  const memoizedOnSearch = useCallback(onSearch, []);
+  const memoizedOnSearch = useCallback(onSearch, [onSearch]);
 
   // searchType에 따른 아이콘 반환
   const getSearchTypeIcon = () => {
@@ -134,12 +134,22 @@ const SearchBar = <T,>({
     memoizedOnSearch(option.value, [option.data] as unknown as T[]);
   };
 
+  const handleSearch = () => {
+    console.log(searchType);
+    if (searchType === "actors") {
+      memoizedOnSearch(searchValue, [searchValue] as unknown as T[]);
+    } else {
+      memoizedOnSearch(searchValue, [] as unknown as T[]);
+    }
+    setShowDropdown(false);
+    clearResults();
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!showDropdown || suggestions.length === 0) {
       if (e.key === "Enter") {
-        // 드롭다운이 없을 때 엔터 시 실제 검색
-        memoizedOnSearch(searchValue, results as unknown as T[]);
-        setShowDropdown(false);
+        e.preventDefault();
+        handleSearch();
       }
       return;
     }
@@ -196,10 +206,7 @@ const SearchBar = <T,>({
   };
 
   const handleSearchButtonClick = () => {
-    // 검색 버튼 클릭 시에만 실제 검색 실행
-    memoizedOnSearch(searchValue, results as unknown as T[]);
-    setShowDropdown(false);
-    clearResults();
+    handleSearch();
   };
 
   // 검색 타입 변경 시 결과 초기화
