@@ -1,4 +1,3 @@
-import useAuthCheck from "@/hooks/useAuthCheck";
 import React, { useRef, useState } from "react";
 import { App } from "antd";
 import { updateUserProfile } from "@/apis/userApi";
