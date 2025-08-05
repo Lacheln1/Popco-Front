@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { Dropdown, Empty } from "antd";
+import { Dropdown, Empty, App } from "antd";
 import type { MenuProps } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -45,7 +45,7 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
   const [isEnd, setIsEnd] = useState(true);
   const [sortType, setSortType] = useState<"latest" | "popular">("latest");
   const navigate = useNavigate();
-
+  const { message } = App.useApp();
   const { accessToken } = useAuthCheck();
   const {
     data: apiData,
@@ -62,8 +62,7 @@ const CollectionSection: React.FC<CollectionSectionProps> = ({
   const handleSaveToggle = useCallback(
     (collectionId: number) => {
       if (!accessToken) {
-        alert("로그인이 필요한 기능입니다.");
-        navigate("/login");
+        message.info("로그인 먼저 진행해주세요!", 1.5);
         return;
       }
       toggleMark({ collectionId: String(collectionId), accessToken });

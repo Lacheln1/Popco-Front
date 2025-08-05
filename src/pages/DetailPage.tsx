@@ -25,6 +25,7 @@ import ReviewSection from "@/components/detail/ReviewSection";
 import CollectionSection from "@/components/detail/CollectionSection";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import Spinner from "@/components/common/Spinner";
+import { App } from "antd";
 
 // ======================================================================
 // 1. UI 담당 프레젠테이셔널 컴포넌트
@@ -35,6 +36,7 @@ interface DetailContentsProps {
   contentType: string;
   myCurrentRating: number;
   setMyCurrentRating: (rating: number | null) => void;
+  isLoggedIn: boolean;
   isWished: boolean;
   handleWishClick: () => void;
   isLiked: boolean;
@@ -42,8 +44,8 @@ interface DetailContentsProps {
   isHated: boolean;
   handleHateClick: () => void;
   onEditReview: (reviewData: ReviewCardData) => void;
-  onReviewClick: () => void; // '리뷰' 버튼 클릭 핸들러
-  reviewButtonLabel: string; // '리뷰' 버튼 텍스트
+  onReviewClick: () => void;
+  reviewButtonLabel: string;
 }
 
 const DetailContents = ({
@@ -51,6 +53,7 @@ const DetailContents = ({
   contentId,
   contentType,
   myCurrentRating,
+  isLoggedIn,
   setMyCurrentRating,
   isWished,
   handleWishClick,
@@ -122,11 +125,13 @@ const DetailContents = ({
                 rating={contents.ratingAverage}
                 size={36}
               />
+
               <RatingDisplay
                 label="나의 팝콘"
                 rating={myCurrentRating}
                 onRatingChange={setMyCurrentRating}
                 size={36}
+                disabled={!isLoggedIn}
               />
             </div>
             <ActionButtons
@@ -190,6 +195,7 @@ const DetailContents = ({
                     rating={myCurrentRating}
                     onRatingChange={setMyCurrentRating}
                     size={28}
+                    disabled={!isLoggedIn}
                   />
                 </div>
               </div>
@@ -245,6 +251,7 @@ const DetailContents = ({
 // 2. 메인 페이지 로직 컨테이너 컴포넌트
 // ======================================================================
 export default function DetailPage() {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { user, accessToken } = useAuthCheck();
   const { contents, loading, error, contentId, contentType } =
@@ -271,6 +278,16 @@ export default function DetailPage() {
   // 화면에 최종적으로 표시될 평점 계산
   const displayRating = interactiveRating ?? myReviewData?.myReview?.score ?? 0;
 
+  const handleRatingChange = useCallback(
+    (rating: number | null) => {
+      if (!user.isLoggedIn) {
+        message.info("로그인 먼저 진행해주세요!", 1.5);
+        return;
+      }
+      setInteractiveRating(rating);
+    },
+    [user.isLoggedIn],
+  );
   // 리뷰 작성 모달 열기
   const handleOpenWriteModal = useCallback(() => {
     if (!user.isLoggedIn) return; // TODO: 로그인 필요 메시지
@@ -395,7 +412,8 @@ export default function DetailPage() {
         contentId={Number(contentId)}
         contentType={contentType}
         myCurrentRating={displayRating}
-        setMyCurrentRating={setInteractiveRating}
+        setMyCurrentRating={handleRatingChange}
+        isLoggedIn={user.isLoggedIn}
         isWished={isWished}
         handleWishClick={handleWishClick}
         isLiked={isLiked}
