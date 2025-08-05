@@ -34,7 +34,6 @@ export const refreshTokens = async () => {
 // 페이지 렌더링 시 토큰 상태 확인 및 갱신
 export const validateAndRefreshTokens = async () => {
   try {
-    console.log("🔍 validateAndRefreshTokens 시작");
     const checkRefreshToken = await refreshTokens();
     console.log("🔍 checkRefreshToken:", checkRefreshToken);
     return checkRefreshToken;
@@ -47,22 +46,12 @@ export const validateAndRefreshTokens = async () => {
 //로그아웃 시 토큰 정리
 export const clearTokens = async (accessToken?: string): Promise<void> => {
   try {
-    console.log("🔍 clearTokens 시작, 토큰:", accessToken);
-
-    await axios.post(
-      `${API_URL}/auth/logout`,
-      {},
-      {
-        headers: accessToken
-          ? {
-              Authorization: `Bearer ${accessToken}`,
-            }
-          : {},
-        withCredentials: true,
+    await axios.post(`${API_URL}/auth/logout`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
-    console.log("✅ 로그아웃 성공");
-    console.log("로그아웃 액세스토큰", accessToken);
+      withCredentials: true,
+    });
   } catch (error) {
     console.error("로그아웃 요청 실패", error);
   }
