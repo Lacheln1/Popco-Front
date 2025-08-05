@@ -59,11 +59,7 @@ const ListPage = () => {
     enabled: isSearching,
   });
 
-  const {
-    data: filteredData,
-    isPending: isFilterLoading,
-    error: filterError,
-  } = useFilteredContents({
+  const filteredContentsQuery = useFilteredContents({
     enabled: hasActiveFilter && !isSearching,
     size: 30,
   });
@@ -140,10 +136,12 @@ const ListPage = () => {
   );
 
   const getFilteredResults = useCallback((): AllContentItem[] => {
-    return filteredData
-      ? mapFilteredResultsToAllContentItems(filteredData.contents)
-      : [];
-  }, [filteredData, mapFilteredResultsToAllContentItems]);
+    if (!filteredContentsQuery.data?.pages) return [];
+    return filteredContentsQuery.data.pages
+      .filter((page) => page?.contents)
+      .flatMap((page) => mapFilteredResultsToAllContentItems(page.contents))
+      .filter(Boolean);
+  }, [filteredContentsQuery.data?.pages, mapFilteredResultsToAllContentItems]);
 
   // 로딩 상태 체크
   const getCurrentLoadingState = useCallback(() => {
@@ -151,14 +149,16 @@ const ListPage = () => {
       return searchQuery.isLoading || searchQuery.isFetching;
     }
     if (hasActiveFilter) {
-      return isFilterLoading;
+      return (
+        filteredContentsQuery.isLoading || filteredContentsQuery.isFetching
+      );
     }
     return allContentsQuery.isLoading || allContentsQuery.isFetching;
   }, [
     isSearching,
     hasActiveFilter,
     searchQuery,
-    isFilterLoading,
+    filteredContentsQuery,
     allContentsQuery,
   ]);
 
@@ -168,14 +168,14 @@ const ListPage = () => {
       return searchQuery.error;
     }
     if (hasActiveFilter) {
-      return filterError;
+      return filteredContentsQuery.error;
     }
     return allContentsQuery.error;
   }, [
     isSearching,
     hasActiveFilter,
     searchQuery.error,
-    filterError,
+    filteredContentsQuery.error,
     allContentsQuery.error,
   ]);
 
@@ -192,11 +192,11 @@ const ListPage = () => {
     getAllContents,
   ]);
 
-  // 무한 스크롤 설정
+  // 무한 스크롤 설정 - 수정된 부분
   const getInfiniteScrollConfig = useCallback(() => {
     if (isSearching) {
       return {
-        hasNext: searchQuery.hasNextPage && !searchQuery.isFetching,
+        hasNext: Boolean(searchQuery.hasNextPage), // isFetching 조건 제거
         isFetching: searchQuery.isFetchingNextPage,
         fetchNext: () => {
           if (searchQuery.hasNextPage && !searchQuery.isFetching) {
@@ -206,43 +206,84 @@ const ListPage = () => {
       };
     }
 
-    if (!hasActiveFilter) {
+    if (hasActiveFilter) {
       return {
-        hasNext: allContentsQuery.hasNextPage && !allContentsQuery.isFetching,
-        isFetching: allContentsQuery.isFetchingNextPage,
+        hasNext: Boolean(filteredContentsQuery.hasNextPage), // isFetching 조건 제거
+        isFetching: filteredContentsQuery.isFetchingNextPage,
         fetchNext: () => {
-          if (allContentsQuery.hasNextPage && !allContentsQuery.isFetching) {
-            allContentsQuery.fetchNextPage();
+          if (
+            filteredContentsQuery.hasNextPage &&
+            !filteredContentsQuery.isFetching
+          ) {
+            filteredContentsQuery.fetchNextPage();
           }
         },
       };
     }
 
-    return { hasNext: false, isFetching: false, fetchNext: () => {} };
-  }, [isSearching, hasActiveFilter, searchQuery, allContentsQuery]);
+    return {
+      hasNext: Boolean(allContentsQuery.hasNextPage), // isFetching 조건 제거
+      isFetching: allContentsQuery.isFetchingNextPage,
+      fetchNext: () => {
+        if (allContentsQuery.hasNextPage && !allContentsQuery.isFetching) {
+          allContentsQuery.fetchNextPage();
+        }
+      },
+    };
+  }, [
+    isSearching,
+    hasActiveFilter,
+    searchQuery.hasNextPage,
+    searchQuery.isFetchingNextPage,
+    searchQuery.isFetching,
+    filteredContentsQuery.hasNextPage,
+    filteredContentsQuery.isFetchingNextPage,
+    filteredContentsQuery.isFetching,
+    allContentsQuery.hasNextPage,
+    allContentsQuery.isFetchingNextPage,
+    allContentsQuery.isFetching,
+  ]);
 
-  // 무한 스크롤 IntersectionObserver - 최적화
+  // 무한 스크롤 IntersectionObserver - 수정된 부분
   useEffect(() => {
     const target = observerRef.current;
     if (!target) return;
 
-    const { hasNext, isFetching, fetchNext } = getInfiniteScrollConfig();
+    const config = getInfiniteScrollConfig();
 
-    // 이미 모든 데이터를 불러왔거나 로딩 중이면 옵저버 설정하지 않음
-    if (!hasNext || isFetching) return;
+    // hasNext가 false이면 observer 설정하지 않음
+    if (!config.hasNext) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNext && !isFetching) {
-          fetchNext();
+        const entry = entries[0];
+        if (entry && entry.isIntersecting) {
+          // 중복 호출 방지를 위한 재확인
+          const currentConfig = getInfiniteScrollConfig();
+          if (currentConfig.hasNext && !currentConfig.isFetching) {
+            console.log("Triggering infinite scroll"); // 디버깅용
+            currentConfig.fetchNext();
+          }
         }
       },
-      { threshold: 0.1, rootMargin: "50px" },
+      {
+        threshold: 0.1,
+        rootMargin: "100px", // rootMargin 증가
+      },
     );
 
     observer.observe(target);
-    return () => observer.unobserve(target);
-  }, [getInfiniteScrollConfig]);
+    return () => {
+      observer.unobserve(target);
+    };
+  }, [
+    // 의존성 단순화
+    isSearching,
+    hasActiveFilter,
+    searchQuery.hasNextPage,
+    filteredContentsQuery.hasNextPage,
+    allContentsQuery.hasNextPage,
+  ]);
 
   // 이벤트 핸들러 - actors 검색 개선
   const handleSearch = useCallback(
@@ -276,11 +317,28 @@ const ListPage = () => {
 
   // 렌더링 데이터 - 메모이제이션
   const displayContents = getDisplayContents();
-  const { hasNext, isFetching } = getInfiniteScrollConfig();
+  const config = getInfiniteScrollConfig();
   const isLoading = getCurrentLoadingState();
   const error = getCurrentErrorState();
 
   const isEmpty = displayContents.length === 0 && !isLoading;
+
+  // 디버깅용 로그
+  useEffect(() => {
+    console.log("Infinite scroll config:", {
+      hasNext: config.hasNext,
+      isFetching: config.isFetching,
+      isSearching,
+      hasActiveFilter,
+      contentsLength: displayContents.length,
+    });
+  }, [
+    config.hasNext,
+    config.isFetching,
+    isSearching,
+    hasActiveFilter,
+    displayContents.length,
+  ]);
 
   return (
     <PageLayout
@@ -345,10 +403,14 @@ const ListPage = () => {
       </div>
 
       {/* 무한 스크롤 트리거 & 로딩 스피너 */}
-      {hasNext && (
+      {config.hasNext && (
         <>
-          <div ref={observerRef} className="h-10" />
-          {isFetching && (
+          <div
+            ref={observerRef}
+            className="h-10 w-full"
+            style={{ backgroundColor: "transparent" }} // 디버깅용
+          />
+          {config.isFetching && (
             <div className="flex justify-center py-6">
               <span className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-transparent" />
             </div>

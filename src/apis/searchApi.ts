@@ -39,11 +39,20 @@ export const fetchSearchContents = async ({
   };
   if (hasKeyword) params.keyword = keyword;
   if (hasActors) params.actors = actors;
+
   try {
-    const response = await axiosInstance.get(`/search/contents/advanced`, {
+    const res = await axiosInstance.get(`/search/contents/advanced`, {
       params,
     });
-    return response.data;
+    const data = res.data;
+    return {
+      content: data.content,
+      number: data.page?.number ?? 0,
+      totalPages: data.page?.totalPages ?? 1,
+      totalElements: data.page?.totalElements ?? 0,
+      size: data.page?.size ?? 30,
+      last: (data.page?.number ?? 0) + 1 >= (data.page?.totalPages ?? 1),
+    };
   } catch (error) {
     console.error("검색 API 오류:", error);
     return {

@@ -64,22 +64,17 @@ export const useSearchContents = ({
       }
     },
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage) {
-        console.warn("lastPage is undefined in getNextPageParam");
-        return undefined;
-      }
-      if (typeof lastPage.last !== "boolean") {
-        console.warn("lastPage.last is not a boolean:", lastPage);
-        // content가 비어있거나 size보다 작으면 마지막으로 간주
-        const hasMoreContent =
-          lastPage.content && lastPage.content.length === size;
-        return hasMoreContent
-          ? (lastPage.number ?? allPages.length - 1) + 1
-          : undefined;
-      }
+      console.log("🧩 lastPage.number:", lastPage.number);
+      console.log("🧩 lastPage.totalPages:", lastPage.totalPages);
+      console.log("🧩 lastPage.content.length:", lastPage.content?.length);
+      console.log("🧩 allPages.length:", allPages.length);
 
-      // 정상적인 경우
-      return lastPage.last ? undefined : lastPage.number + 1;
+      const nextPage = lastPage.number + 1;
+      const hasNext = nextPage < lastPage.totalPages;
+
+      console.log("➡️ nextPage:", nextPage, " | hasNext:", hasNext);
+
+      return hasNext ? nextPage : undefined;
     },
     initialPageParam: 0,
     enabled:
