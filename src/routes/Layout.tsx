@@ -22,7 +22,7 @@ const Layout = () => {
     if (!user?.userId) return;
 
     const eventSource = new EventSource(
-      `/notifications/stream?clientId=${user.userId}`,
+      `${import.meta.env.VITE_BACK_URL}/notifications/stream?clientId=${user.userId}`,
     );
 
     eventSource.onmessage = (event) => {
