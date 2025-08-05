@@ -133,9 +133,13 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
         {/* 헤더 섹션 */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="gmarket text-lg text-gray-800">
-              <span className="gmarket-bold">'{personaName}'</span>
-              <span className="ml-1">들이 장르불문 좋아하는</span>
+            <div className="gmarket break-keep text-base text-gray-800">
+              <span className="gmarket-bold text-base md:text-2xl">
+                '{personaName}'
+              </span>
+              <span className="ml-1 text-base md:text-2xl">
+                들이 장르불문 좋아하는
+              </span>
 
               <Dropdown
                 menu={{
@@ -232,9 +236,6 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                             {genre}
                           </span>
                         ))}
-                      </div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        평점: {item.predicted_rating.toFixed(1)}
                       </div>
                     </div>
                   </div>

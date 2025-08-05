@@ -5,6 +5,7 @@ import "swiper/swiper-bundle.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { fetchWishlist } from "@/apis/contentsApi";
+import { useNavigate } from "react-router-dom";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 interface WishlistItem {
@@ -30,6 +31,8 @@ const WantWatching: React.FC<WantWatchingProps> = ({ userId }) => {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -142,7 +145,12 @@ const WantWatching: React.FC<WantWatchingProps> = ({ userId }) => {
             >
               {wishlistItems.map((item) => (
                 <SwiperSlide key={item.wishlistId} className="!h-auto">
-                  <div className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div
+                    className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+                    onClick={() =>
+                      navigate(`/detail/${item.contentType}/${item.contentId}`)
+                    }
+                  >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
                         src={`${TMDB_IMAGE_BASE_URL}${item.contentPosterUrl}`}

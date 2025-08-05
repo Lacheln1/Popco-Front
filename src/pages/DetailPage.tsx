@@ -367,7 +367,7 @@ export default function DetailPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner />
+        <Spinner/>
       </div>
     );
   }
