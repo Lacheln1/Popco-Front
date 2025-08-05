@@ -5,7 +5,6 @@ import {
   PostFilterResponse,
   SearchContentsParams,
   SearchResponse,
-  SearchResult,
 } from "@/types/Search.types";
 import axiosInstance from "./axiosInstance";
 

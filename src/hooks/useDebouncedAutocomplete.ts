@@ -1,6 +1,7 @@
 import { useCallback, useState, useEffect, useRef } from "react";
 import debounce from "lodash/debounce";
-import { fetchAutocomplete, AutocompleteItem } from "@/apis/searchApi";
+import { fetchAutocomplete } from "@/apis/searchApi";
+import { AutocompleteItem } from "@/types/Search.types";
 
 interface UseDebouncedAutocompleteParams {
   prefix: string;
