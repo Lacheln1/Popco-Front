@@ -101,7 +101,7 @@ const SearchBar = <T,>({
       setSuggestions(options);
       setShowDropdown(options.length > 0);
     }
-  }, [results, searchValue, showSuggestions, searchType]);
+  }, [results, searchValue, showSuggestions, searchType, suggestions]);
 
   const triggerAutocomplete = useCallback(
     (value: string) => {
@@ -130,7 +130,11 @@ const SearchBar = <T,>({
     clearResults();
     onSelect?.(option.value, option);
     // 선택 시에만 실제 검색 실행
-    memoizedOnSearch(option.value, [option.data] as unknown as T[]);
+    const searchData =
+      searchType === "keyword"
+        ? ([option.data] as T[])
+        : ([option.data] as T[]);
+    memoizedOnSearch(option.value, searchData);
   };
 
   const handleSearch = () => {

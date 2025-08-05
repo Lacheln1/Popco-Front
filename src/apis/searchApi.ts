@@ -1,19 +1,13 @@
 import {
+  AutocompleteItem,
+  AutocompleteResponse,
   PostFilterRequest,
   PostFilterResponse,
   SearchContentsParams,
+  SearchResponse,
   SearchResult,
 } from "@/types/Search.types";
 import axiosInstance from "./axiosInstance";
-
-interface SearchResponse {
-  content: SearchResult[];
-  last: boolean;
-  totalPages: number;
-  totalElements: number;
-  number: number;
-  size: number;
-}
 
 export const fetchSearchContents = async ({
   keyword = "",
@@ -55,14 +49,7 @@ export const fetchSearchContents = async ({
     };
   } catch (error) {
     console.error("검색 API 오류:", error);
-    return {
-      content: [],
-      last: true,
-      totalPages: 0,
-      totalElements: 0,
-      number: page,
-      size,
-    };
+    throw error;
   }
 };
 
@@ -77,20 +64,6 @@ export const postFilteredContents = async (
   );
   return response.data.data;
 };
-
-export interface AutocompleteItem {
-  value: string;
-  type: string;
-  contentId: number;
-  contentType: string;
-}
-
-export interface AutocompleteResponse {
-  code: number;
-  result: string;
-  message: string;
-  data: AutocompleteItem[];
-}
 
 // 자동완성 API 함수
 export const fetchAutocomplete = async (

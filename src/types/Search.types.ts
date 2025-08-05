@@ -1,5 +1,3 @@
-import { AutocompleteItem } from "@/apis/searchApi";
-
 interface Cast {
   actorName: string;
   characterName: string;
@@ -23,19 +21,6 @@ interface SearchResult {
   crew: Crew[];
 }
 
-export interface Pageable {
-  offset: number;
-  pageNumber: number;
-  pageSize: number;
-  paged: boolean;
-  unpaged: boolean;
-  sort: {
-    sorted: boolean;
-    unsorted: boolean;
-    empty: boolean;
-  };
-}
-
 export interface SearchResponse {
   content: SearchResult[];
   last: boolean;
@@ -47,7 +32,6 @@ export interface SearchResponse {
   first?: boolean;
   empty?: boolean;
   numberOfElements?: number;
-  pageable?: any;
 }
 
 //자동완성 옵션 타입(글자 입력시 그에 맞는 검색어 나오는 기능 ex:안녕을 입력하면 아래에 자동완성으로 안녕하세요가 나오는 그런 기능)
@@ -55,6 +39,20 @@ interface AutoResult {
   value: string;
   label: React.ReactNode;
   data?: AutocompleteItem;
+}
+
+export interface AutocompleteItem {
+  value: string;
+  type: string;
+  contentId: number;
+  contentType: string;
+}
+
+export interface AutocompleteResponse {
+  code: number;
+  result: string;
+  message: string;
+  data: AutocompleteItem[];
 }
 
 interface SearchBarProps<T = any> {

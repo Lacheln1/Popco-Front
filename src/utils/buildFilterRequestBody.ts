@@ -1,3 +1,5 @@
+import { PERSONA_NAME_TO_ID } from "@/constants/persona";
+
 export const buildFilterRequestBody = ({
   basicInfo,
   usageEnv,
@@ -55,6 +57,9 @@ export const buildFilterRequestBody = ({
       limit: 100,
     };
   }
+  const mapPersonaToId = (name: string): number => {
+    return PERSONA_NAME_TO_ID[name] ?? 0;
+  };
 
   // persona가 있을 때만 포함
   if (personalization.persona && personalization.persona.length > 0) {
@@ -73,17 +78,4 @@ export const buildFilterRequestBody = ({
   }
 
   return body;
-};
-
-const mapPersonaToId = (name: string): number => {
-  const map: Record<string, number> = {
-    액션헌터: 1,
-    무비셜록: 2,
-    시네파울보: 3,
-    온기수집가: 4,
-    이세계유랑자: 5,
-    무서워도본다맨: 6,
-    레트로캡틴: 7,
-  };
-  return map[name] ?? 0;
 };

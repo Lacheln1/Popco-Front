@@ -21,7 +21,7 @@ export const useFilterStore = create<FilterStore>((set) => ({
     ageGroupFilter: {},
   },
   isTouched: false,
-  setFilter: (val) => set({ filter: val, isTouched: true }),
+  setFilter: (val, touch = true) => set({ filter: val, isTouched: touch }),
   resetFilter: () =>
     set({
       filter: {
