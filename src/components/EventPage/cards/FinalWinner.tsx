@@ -3,21 +3,29 @@ import { disconnectSocket } from "@/utils/socket";
 import { useQuizStore } from "@/stores/useQuizStore";
 
 export const FinalWinner = () => {
-  const { reset } = useQuizStore();
+  const { isConnected, setConnected } = useQuizStore();
 
   useEffect(() => {
-    disconnectSocket();
-    // 퀴즈 종료 후 상태 초기화
-    reset();
-  }, []);
+    if (isConnected) {
+      disconnectSocket();
+      setConnected(false);
+    }
+  }, [isConnected]);
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 pt-20 text-center">
-      <h2 className="mb-4 text-2xl font-bold text-green-600">🏆 축하합니다!</h2>
-      <p className="mb-2 text-lg">당신은 최후의 1인입니다 🎉</p>
-      <p className="text-sm text-gray-600">
-        상품 수령 안내는 별도 공지로 드릴 예정입니다.
+    <div className="flex flex-col items-center justify-center px-4 pt-24 text-center">
+      <h2 className="mb-4 text-2xl font-bold text-green-600">
+        🎉 우승을 축하합니다!
+      </h2>
+      <p className="mb-6 text-lg">
+        마지막 문제까지 생존하셨어요. <br />
+        오늘의 POPCO 챔피언입니다!
       </p>
+      <img
+        src="/images/popco/winner-popco.png"
+        alt="winner popco"
+        className="h-auto w-40"
+      />
     </div>
   );
 };

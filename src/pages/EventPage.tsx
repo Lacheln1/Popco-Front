@@ -46,7 +46,6 @@ const EventPage = () => {
   }
 
   const renderStepComponent = () => {
-    console.log("🎭 renderStepComponent - Current step:", step);
     switch (step) {
       case "entry":
         console.log("→ Rendering EventInfoCard");

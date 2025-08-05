@@ -1,28 +1,41 @@
 import { useQuizStore } from "@/stores/useQuizStore";
+import { subscribeToQuestion } from "@/utils/socket";
 import { useEffect } from "react";
 
-export const WaitingRoom = () => {
-  const { survivors, nextQuestion, setStep, questionId, quizId } =
-    useQuizStore();
+const WaitingRoom = () => {
+  const { quizId, questionId } = useQuizStore();
 
   useEffect(() => {
-    if (survivors.current >= survivors.max) {
-      nextQuestion();
-      setStep("question");
-    }
-  }, [survivors]);
+    if (!quizId || !questionId) return;
+
+    const handleServerMessage = (data: any) => {
+      if (data.type === "NEXT_QUESTION") {
+        const { setQuestionId, setStep, setHasSubmitted } =
+          useQuizStore.getState();
+        console.log("📢 다음 문제로 이동 (waiting):", data.questionId);
+        setHasSubmitted(false);
+        setQuestionId(data.questionId);
+        setStep("question");
+      }
+    };
+
+    const unsubscribe = subscribeToQuestion(
+      quizId,
+      questionId,
+      handleServerMessage,
+    );
+
+    return () => {
+      unsubscribe?.(); // 언마운트 시 정리
+    };
+  }, [quizId, questionId]);
 
   return (
-    <div className="flex flex-col items-center justify-center pt-20 text-center">
-      <h2 className="mb-4 text-xl font-semibold">
-        🎯 다음 라운드를 준비 중입니다
-      </h2>
-      <p className="text-lg">
-        현재 정답자 {survivors.current} / {survivors.max}
-      </p>
-      <p className="mt-2 text-sm text-gray-500">
-        다음 문제로 자동 이동됩니다...
-      </p>
+    <div className="mt-20 text-center">
+      <p className="text-lg">결과 확인 중입니다...</p>
+      <p className="mt-2 text-sm text-gray-500">다음 문제가 곧 시작됩니다.</p>
     </div>
   );
 };
+
+export { WaitingRoom };

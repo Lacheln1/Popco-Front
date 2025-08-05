@@ -27,26 +27,12 @@ export const Question = () => {
   } = useQuizStore();
 
   const { accessToken } = useAuthCheck();
-  console.log("📋 Question component:", {
-    quizId,
-    questionId,
-    accessToken: !!accessToken,
-    questionData: !!questionData,
-    hasSubmitted,
-  });
-
   // 1. 문제 데이터 불러오기
   const loadQuestionData = async () => {
     if (!quizId || !accessToken) {
-      console.log("❌ loadQuestionData 조건 미충족:", {
-        quizId,
-        accessToken: !!accessToken,
-      });
       return;
     }
-
     console.log("🚀 API 호출 시작:", { quizId, questionId });
-
     try {
       const res = await axiosInstance.get<ApiResponse<RawQuestionResponse>>(
         `/quizzes/${quizId}/questions/${questionId}`,
@@ -68,6 +54,7 @@ export const Question = () => {
     if (data.remainingTime !== undefined) {
       updateTimer(data.remainingTime);
     }
+
     if (
       data.currentSurvivors !== undefined &&
       data.maxSurvivors !== undefined
@@ -78,24 +65,24 @@ export const Question = () => {
       setStep("eliminated");
     }
     if (data.type === "NEXT_QUESTION") {
-      const { setQuestionId, setStep, setHasSubmitted } =
-        useQuizStore.getState();
-      console.log("📢 다음 문제로 이동:", data.questionId);
-
-      setHasSubmitted(false);
-      setQuestionId(data.questionId);
-      setStep("question");
+      setTimeout(() => {
+        const { step, setQuestionId, setStep, setHasSubmitted } =
+          useQuizStore.getState();
+        if (step !== "waiting") {
+          console.log("무시된 NEXT_QUESTION (현재 step:", step, ")");
+          return;
+        }
+        console.log("📢 다음 문제로 이동:", data.questionId);
+        setHasSubmitted(false);
+        setQuestionId(data.questionId);
+        setStep("question");
+      }, 50);
     }
   };
 
   // 3. 초기 로드 및 소켓 구독
   useEffect(() => {
     if (!quizId || !questionId || !accessToken) {
-      console.log("❌ Missing dependencies:", {
-        quizId,
-        questionId,
-        accessToken: !!accessToken,
-      });
       return;
     }
     loadQuestionData();
@@ -134,10 +121,8 @@ export const Question = () => {
   };
 
   if (!questionData) {
-    console.log("No questionData - showing loading");
     return <div>문제 불러오는 중...</div>;
   }
-  console.log("Rendering question:", questionData.content);
 
   return (
     <div className="flex flex-col items-center justify-center px-4 pt-12 text-center">
