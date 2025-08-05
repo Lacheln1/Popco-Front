@@ -113,7 +113,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
 
   const handleLikeToggle = (reviewId: number) => {
     handleAuthRequiredAction(() => {
-      toggleReaction({ reviewId, token: accessToken ?? undefined });
+      toggleReaction({ reviewId, token: accessToken! });
     });
   };
 
@@ -157,7 +157,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                   declarationType: String(values.declarationType),
                   content: "",
                 },
-                token: accessToken ?? undefined,
+                token: accessToken!,
               },
               {
                 onSuccess: () => {
@@ -195,7 +195,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
         okButtonProps: { loading: isDeleting },
         async onOk() {
           deleteReview(
-            { reviewId, token: accessToken ?? undefined },
+            { reviewId, token: accessToken! },
             {
               onSuccess: () => {
                 message.success("리뷰가 삭제되었습니다.");

@@ -56,7 +56,7 @@ export const useFetchInfiniteReviews = (
     initialPageParam: 0,
     queryFn: ({ pageParam }) =>
       fetchContentReviews(
-        { contentId, contentType, page: pageParam, size: 10, sort },
+        { contentId, contentType, page: pageParam as number, size: 10, sort },
         token,
       ),
     getNextPageParam: (lastPage: PaginatedReviewsResponse) => {
