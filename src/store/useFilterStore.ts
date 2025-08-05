@@ -2,6 +2,7 @@ import { PostFilterRequest } from "@/types/Search.types";
 import { create } from "zustand";
 
 interface FilterStore {
+  contentType?: undefined;
   filter: PostFilterRequest;
   setFilter: (val: PostFilterRequest) => void;
   resetFilter: () => void;
@@ -12,6 +13,7 @@ interface FilterStore {
 
 export const useFilterStore = create<FilterStore>((set) => ({
   filter: {
+    contentType: undefined,
     genres: [],
     platforms: [],
     personaFilter: {},
@@ -23,6 +25,7 @@ export const useFilterStore = create<FilterStore>((set) => ({
   resetFilter: () =>
     set({
       filter: {
+        contentType: "",
         genres: [],
         platforms: [],
         personaFilter: {},

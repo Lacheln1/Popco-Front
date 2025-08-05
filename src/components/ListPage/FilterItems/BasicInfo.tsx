@@ -12,11 +12,7 @@ const BasicInfo = ({
 }) => {
   const [form] = Form.useForm();
   const [rating, setRating] = useState<[number, number]>([0, 5]);
-  const [basicInfo, setBasicInfo] = useState({
-    type: "",
-    genre: [] as string[],
-    rating: [0, 5] as [number, number],
-  });
+  const [isRatingTouched, setIsRatingTouched] = useState(false); // 슬라이더 터치 여부 추적
 
   useEffect(() => {
     if (value) {
@@ -24,8 +20,14 @@ const BasicInfo = ({
         type: value.type,
         genre: value.genre,
       });
-      if (Array.isArray(value.rating)) {
+
+      // value에서 rating이 null이 아닌 실제 값이 있을 때만 설정
+      if (value.rating && Array.isArray(value.rating)) {
         setRating(value.rating as [number, number]);
+        setIsRatingTouched(true);
+      } else {
+        // null이면 터치되지 않은 상태로 초기화
+        setIsRatingTouched(false);
       }
     }
   }, [form, value]);
@@ -33,20 +35,14 @@ const BasicInfo = ({
   const handleFormChange = (_: unknown, allValues: Record<string, unknown>) => {
     const final = {
       ...allValues,
-      rating, // 현재 상태에서 가져온 값 사용
+      rating: isRatingTouched ? rating : null, // 터치된 경우에만 rating 포함
     };
     onChange("기본정보", final);
   };
 
-  useEffect(() => {
-    if (value?.rating && Array.isArray(value.rating)) {
-      setRating(value.rating as [number, number]);
-    }
-  }, [value?.rating]);
-
   return (
     <motion.div
-      key="filter-이용환경"
+      key="filter-기본정보"
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: "auto", opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
@@ -97,6 +93,7 @@ const BasicInfo = ({
             value={rating}
             onChange={(val: number[]) => setRating(val as [number, number])}
             onChangeComplete={(val) => {
+              setIsRatingTouched(true); // 사용자가 조작했음을 표시
               const current = form.getFieldsValue();
               onChange("기본정보", {
                 ...current,

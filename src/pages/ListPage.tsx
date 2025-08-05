@@ -26,26 +26,32 @@ const ListPage = () => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const { filter } = useFilterStore();
 
-  // 상태 계산 - 더 엄격한 검증
+  // 상태 계산
   const isKeywordSearch =
     searchType === "keyword" && searchKeyword.trim().length > 0;
   const isActorSearch = searchType === "actors" && searchActors.length > 0;
   const isSearching = isKeywordSearch || isActorSearch;
 
-  const hasActiveFilter = Object.values(filter).some((filterGroup) =>
-    Object.values(filterGroup).some((value) =>
-      Array.isArray(value) ? value.length > 0 : value !== undefined,
-    ),
-  );
+  const hasActiveFilter =
+    filter && typeof filter === "object"
+      ? Object.values(filter).some((value) => {
+          if (value === null || value === undefined) return false;
+          if (Array.isArray(value)) return value.length > 0;
+          if (typeof value === "object") {
+            return Object.keys(value).length > 0;
+          }
+          return value !== undefined && value !== null && value !== "";
+        })
+      : false;
 
-  // API 훅들 - 조건부 실행 최적화
+  // API 훅
   const allContentsQuery = useAllContents({
     size: 28,
     sort,
     enabled: !isSearching && !hasActiveFilter,
   });
 
-  // actors 검색 수정 - 빈 배열이 아닌 실제 값만 전달
+  // actors 검색
   const searchQuery = useSearchContents({
     keyword: isKeywordSearch ? searchKeyword : undefined,
     actors: isActorSearch ? searchActors : undefined,
@@ -53,8 +59,14 @@ const ListPage = () => {
     enabled: isSearching,
   });
 
-  const { data: filteredData, isPending: isFilterLoading } =
-    useFilteredContents();
+  const {
+    data: filteredData,
+    isPending: isFilterLoading,
+    error: filterError,
+  } = useFilteredContents({
+    enabled: hasActiveFilter && !isSearching,
+    size: 30,
+  });
 
   // 무한 로딩 방지 - dependency 최적화
   useEffect(() => {
@@ -150,16 +162,22 @@ const ListPage = () => {
     allContentsQuery,
   ]);
 
-  // 에러 상태 체크
+  // 에러 상태 체크 - 중복 조건 수정
   const getCurrentErrorState = useCallback(() => {
     if (isSearching) {
       return searchQuery.error;
     }
-    if (!hasActiveFilter) {
-      return allContentsQuery.error;
+    if (hasActiveFilter) {
+      return filterError;
     }
-    return null;
-  }, [isSearching, hasActiveFilter, searchQuery.error, allContentsQuery.error]);
+    return allContentsQuery.error;
+  }, [
+    isSearching,
+    hasActiveFilter,
+    searchQuery.error,
+    filterError,
+    allContentsQuery.error,
+  ]);
 
   // 표시할 콘텐츠 결정
   const getDisplayContents = useCallback((): AllContentItem[] => {
@@ -174,7 +192,7 @@ const ListPage = () => {
     getAllContents,
   ]);
 
-  // 무한 스크롤 설정 - 안정성 개선
+  // 무한 스크롤 설정
   const getInfiniteScrollConfig = useCallback(() => {
     if (isSearching) {
       return {

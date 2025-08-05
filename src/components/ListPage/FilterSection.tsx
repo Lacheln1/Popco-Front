@@ -12,25 +12,24 @@ import { useFilterStore } from "@/store/useFilterStore";
 const FilterSection = () => {
   const [activeKey, setActiveKey] = useState<number | null>(null);
 
-  // 초기값을 상수로 정의
+  // 초기값
   const INITIAL_BASIC_INFO = {
     type: "" as string,
     genre: [] as string[],
-    rating: [0, 5] as [number, number],
+    rating: null as [number, number] | null,
   };
 
   const INITIAL_USAGE_ENV = {
     platform: [] as string[],
-    year: [1980, 2025] as [number, number],
+    year: null as [number, number] | null,
   };
 
   const INITIAL_PERSONALIZATION = {
-    age: [0, 65] as [number, number],
+    age: null as [number, number] | null,
     persona: [] as string[],
     algorithm: [] as string[],
   };
 
-  // 개별 상태
   const [basicInfo, setBasicInfo] = useState(INITIAL_BASIC_INFO);
   const [usageEnv, setUsageEnv] = useState(INITIAL_USAGE_ENV);
   const [personalization, setPersonalization] = useState(
@@ -39,68 +38,132 @@ const FilterSection = () => {
 
   const { setFilter, markTouched } = useFilterStore();
 
-  // 값이 초기값과 다른지 체크하는 함수
-  const isValueChanged = (current: any, initial: any): boolean => {
-    return JSON.stringify(current) !== JSON.stringify(initial);
-  };
-
-  const hasAnyChange = () => {
-    return (
-      isValueChanged(basicInfo, INITIAL_BASIC_INFO) ||
-      isValueChanged(usageEnv, INITIAL_USAGE_ENV) ||
-      isValueChanged(personalization, INITIAL_PERSONALIZATION)
-    );
-  };
-
-  useEffect(() => {
-    const newBody = buildFilterRequestBody({
-      basicInfo,
-      usageEnv,
-      personalization,
-    });
-    if (hasAnyChange()) {
-      setFilter(newBody);
-      markTouched();
+  const isValidValue = (value: any): boolean => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === "string") {
+      // 빈 문자열이 아닌 문자열은 유효
+      return value.trim() !== "";
     }
-  }, [basicInfo, usageEnv, personalization, setFilter, markTouched]);
+    if (Array.isArray(value)) {
+      if (value.length === 0) return false;
+      // 슬라이더 범위값인 경우 (숫자 배열이고 길이가 2)
+      if (value.length === 2 && value.every((v) => typeof v === "number")) {
+        return true; // 슬라이더 값은 항상 유효
+      }
+      return value.length > 0;
+    }
+    return true;
+  };
+
+  const getChangedValues = () => {
+    const changedBasicInfo: any = {};
+    const changedUsageEnv: any = {};
+    const changedPersonalization: any = {};
+
+    // basicInfo 처리
+    Object.entries(basicInfo).forEach(([key, value]) => {
+      const initialValue =
+        INITIAL_BASIC_INFO[key as keyof typeof INITIAL_BASIC_INFO];
+      const isDifferent =
+        JSON.stringify(value) !== JSON.stringify(initialValue);
+      const isValid = isValidValue(value);
+
+      if (isDifferent && isValid) {
+        changedBasicInfo[key] = value;
+      }
+    });
+
+    // usageEnv 처리
+    Object.entries(usageEnv).forEach(([key, value]) => {
+      const initialValue =
+        INITIAL_USAGE_ENV[key as keyof typeof INITIAL_USAGE_ENV];
+      const isDifferent =
+        JSON.stringify(value) !== JSON.stringify(initialValue);
+      const isValid = isValidValue(value);
+
+      if (isDifferent && isValid) {
+        changedUsageEnv[key] = value;
+      }
+    });
+
+    // personalization 처리
+    Object.entries(personalization).forEach(([key, value]) => {
+      const initialValue =
+        INITIAL_PERSONALIZATION[key as keyof typeof INITIAL_PERSONALIZATION];
+      const isDifferent =
+        JSON.stringify(value) !== JSON.stringify(initialValue);
+      const isValid = isValidValue(value);
+
+      if (isDifferent && isValid) {
+        changedPersonalization[key] = value;
+      }
+    });
+
+    const result = {
+      basicInfo: changedBasicInfo,
+      usageEnv: changedUsageEnv,
+      personalization: changedPersonalization,
+    };
+
+    return result;
+  };
 
   const filterComponentMap: Record<TabKey, React.ReactNode> = {
     기본정보: (
       <BasicInfo
-        onChange={(_, val) =>
-          setBasicInfo({
+        onChange={(_, val) => {
+          const newBasicInfo = {
             type: val.type as string,
             genre: val.genre as string[],
-            rating: val.rating as [number, number],
-          })
-        }
+            rating: val.rating as [number, number] | null,
+          };
+          setBasicInfo(newBasicInfo);
+        }}
         value={basicInfo}
       />
     ),
     이용환경: (
       <UsageEnvironment
-        onChange={(_, val) =>
-          setUsageEnv({
+        onChange={(_, val) => {
+          const newUsageEnv = {
             platform: val.platform as string[],
-            year: val.year as [number, number],
-          })
-        }
+            year: val.year as [number, number] | null,
+          };
+          setUsageEnv(newUsageEnv);
+        }}
         value={usageEnv}
       />
     ),
     개인화: (
       <Personalization
-        onChange={(_, val) =>
-          setPersonalization({
-            age: val.age as [number, number],
+        onChange={(_, val) => {
+          const newPersonalization = {
+            age: val.age as [number, number] | null,
             persona: val.persona as string[],
             algorithm: val.algorithm as string[],
-          })
-        }
+          };
+          setPersonalization(newPersonalization);
+        }}
         value={personalization}
       />
     ),
   };
+
+  useEffect(() => {
+    const changedValues = getChangedValues();
+    const hasChanges =
+      Object.keys(changedValues.basicInfo).length > 0 ||
+      Object.keys(changedValues.usageEnv).length > 0 ||
+      Object.keys(changedValues.personalization).length > 0;
+
+    if (hasChanges) {
+      const newBody = buildFilterRequestBody(changedValues);
+      setFilter(newBody);
+      markTouched();
+    } else {
+      setFilter({});
+    }
+  }, [basicInfo, usageEnv, personalization, setFilter, markTouched]);
 
   return (
     <div className="m-auto mt-6 px-4 md:w-[700px]">
