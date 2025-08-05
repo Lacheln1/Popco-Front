@@ -10,10 +10,7 @@ import FullLikeIcon from "@/assets/full-like.png";
 import FullPopcornIcon from "@/assets/full-popcorn.svg";
 import HalfPopcornIcon from "@/assets/half-popcorn.svg";
 
-interface ReviewCardProps {
-  reviewData: ReviewCardData;
-  contentId: number;
-  contentType: string;
+interface ReviewCardProps extends ReviewCardData {
   onLikeClick: () => void;
   onReport: () => void;
   onEdit: () => void;
@@ -22,7 +19,16 @@ interface ReviewCardProps {
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({
-  reviewData,
+  // ✅ 필요한 모든 속성을 파라미터에서 직접 받음
+  score,
+  reviewText,
+  authorNickname,
+  likeCount,
+  status,
+  isOwnReview,
+  isLiked,
+  hasAlreadyReported,
+  contentTitle,
   contentId,
   contentType,
   onLikeClick,
@@ -31,18 +37,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({
   onDelete,
   onCardClick,
 }) => {
-  const {
-    score,
-    reviewText,
-    authorNickname,
-    likeCount,
-    status,
-    isOwnReview,
-    isLiked,
-    hasAlreadyReported,
-    contentTitle,
-  } = reviewData;
-
   const navigate = useNavigate();
   const [isSpoilerRevealed, setIsSpoilerRevealed] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);

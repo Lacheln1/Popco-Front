@@ -254,7 +254,7 @@ export default function DetailPage() {
   const { data: myReviewData } = useMyReview(
     Number(contentId),
     contentType ?? "",
-    accessToken,
+    accessToken ?? undefined,
   );
 
   // 리뷰 모달 상태
@@ -288,6 +288,7 @@ export default function DetailPage() {
 
   // ActionButtons의 '리뷰' 버튼 클릭 통합 핸들러
   const handleReviewButtonClick = useCallback(() => {
+    if (!contentType || !contents) return;
     if (myReviewData?.existUserReview && myReviewData.myReview) {
       const reviewToEdit: ReviewCardData = {
         reviewId: myReviewData.myReview.reviewId,
@@ -308,7 +309,14 @@ export default function DetailPage() {
     } else {
       handleOpenWriteModal();
     }
-  }, [myReviewData, user, contents, handleOpenEditModal, handleOpenWriteModal]);
+  }, [
+    myReviewData,
+    user,
+    contents,
+    contentType,
+    handleOpenEditModal,
+    handleOpenWriteModal,
+  ]);
 
   // 리뷰 등록/수정 성공 콜백
   const handleReviewUpdateSuccess = () => {
@@ -367,7 +375,7 @@ export default function DetailPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner/>
+        <Spinner />
       </div>
     );
   }
@@ -406,6 +414,7 @@ export default function DetailPage() {
           isModalOpen={isReviewModalOpen}
           setIsModalOpen={setIsReviewModalOpen}
           isWriting={isWritingReview}
+          isAuthor={true}
           contentId={Number(contentId)}
           contentType={contentType}
           contentsTitle={contents.title}
@@ -413,7 +422,7 @@ export default function DetailPage() {
           popcorn={editingReviewData?.score ?? displayRating}
           reviewDetail={editingReviewData?.reviewText ?? ""}
           author={editingReviewData?.authorNickname ?? user.nickname ?? "익명"}
-          token={accessToken ?? undefined} 
+          token={accessToken ?? undefined}
           reviewId={editingReviewData?.reviewId ?? 0}
           onUpdateSuccess={handleReviewUpdateSuccess}
         />

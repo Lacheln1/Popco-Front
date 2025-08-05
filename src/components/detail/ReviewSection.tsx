@@ -68,7 +68,8 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useFetchInfiniteReviews(contentId, contentType, sortOrder, accessToken);
+} = useFetchInfiniteReviews(contentId, contentType, sortOrder, accessToken ?? undefined);
+
 
   const { mutate: toggleReaction } = useToggleReviewReaction(
     contentId,
@@ -313,7 +314,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                 className="!h-auto !w-[150px] md:!w-[250px]"
               >
                 <ReviewCard
-                  reviewData={reviewCardData}
+                   {...reviewCardData}
                   onLikeClick={() => handleLikeToggle(reviewCardData.reviewId)}
                   onReport={() => handleReport(reviewCardData.reviewId)}
                   onEdit={() => handleEdit(reviewCardData)}

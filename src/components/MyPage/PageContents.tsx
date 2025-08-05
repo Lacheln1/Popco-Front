@@ -381,6 +381,24 @@ const PageContents: React.FC<PageContentsProps> = ({
     [],
   );
 
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+  };
+
+  const handleMonthChange = (activeStartDate: Date | null) => {
+    if (activeStartDate) {
+      const newMonth = formatMonthForApi(activeStartDate);
+      if (newMonth !== currentMonth) {
+        setCurrentMonth(newMonth);
+        fetchMonthlyReviews(newMonth);
+      }
+    }
+  };
+
+  const handleCreateCollection = () => {
+    navigate("/collections/create"); // 새 컬렉션 만들기 페이지로 이동
+  };
+
   return (
     <div className="pretendard">
       <div>
@@ -449,8 +467,13 @@ const PageContents: React.FC<PageContentsProps> = ({
                       {movies.map((movie) => (
                         <SwiperSlide key={movie.reviewId} className="!h-auto">
                           <ReviewCard
-                            // 리뷰카드 호출!!
-                            reviewData={convertMovieToReviewCardData(movie)}
+                            {...convertMovieToReviewCardData(movie)}
+                            // MyPage에서는 리뷰 카드에 대한 상호작용이 없으므로,
+                            // 빈 함수를 전달하여 필수 prop 조건을 만족시킵니다.
+                            onLikeClick={() => {}}
+                            onReport={() => {}}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
                           />
                         </SwiperSlide>
                       ))}
