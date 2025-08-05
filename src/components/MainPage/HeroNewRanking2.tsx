@@ -1,70 +1,69 @@
-import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
-import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
-import { ContentCategory, ReactionType } from "@/types/Contents.types";
-import { MenuProps } from "antd";
-import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import Spinner from "../common/Spinner";
-import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import React, { useState, useEffect } from "react";
 
-interface HeroRankingProps {
-  onTop1Change: (type: ContentCategory, title: string) => void;
-  accessToken: string;
-  userId: number;
-  type: ContentCategory;
+interface MovieData {
+  id: number;
+  title: string;
+  hours: string;
+  image: string;
+  numberImage: string;
 }
 
-const HeroNewRanking = ({
-  accessToken,
-  userId,
-  type,
-  onTop1Change,
-}: HeroRankingProps) => {
+const HeroNewRanking: React.FC = () => {
   const [expandedIndex, setExpandedIndex] = useState<number>(0);
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [selected, setSelected] = useState<ContentCategory>(type);
-  const navigate = useNavigate();
 
-  const categoryMap = {
-    all: "전체",
-    tv: "시리즈",
-    movie: "영화",
-  } as const;
-
-  const items: MenuProps["items"] = Object.entries(categoryMap).map(
-    ([key, label]) => ({
-      key,
-      label,
-    }),
-  );
-  const { data = [], isLoading } = useContentsRanking(
-    selected,
-    accessToken,
-    userId,
-  );
+  const movies: MovieData[] = [
+    {
+      id: 1,
+      title: "Red Notice",
+      hours: "148.72 million hours",
+      image:
+        "https://assets.codepen.io/1890963/AAAABeyXW3mUTPqrK4NtKn2vJlcYmKVJU5XCn6Zeis_EdNEjMmhs5rRudqWRYo2Pj7R2_pYwHviXeOrP1GKgaC4flMu_QndVSRQ8Fk-B_al3ZGz5JOXyZ28ZK7I49UdxrQ.jpg?format=auto",
+      numberImage: "https://assets.codepen.io/1890963/1.png?format=auto",
+    },
+    {
+      id: 2,
+      title: "Love Hard",
+      hours: "58.56 million hours",
+      image:
+        "https://assets.codepen.io/1890963/AAAABSlWYPUcQisKQat0S8WDXkwPjfU4yEbFT4eDXJLnL5noLRdZCre_pm3Amq11WKXU9hC3VciJLwAWf8z0nsI-rTlRTnAkpeo5iBLhbO-SMpRM0NUXzVQsllo89bYFzg.jpg?format=auto",
+      numberImage: "https://assets.codepen.io/1890963/2.png?format=auto",
+    },
+    {
+      id: 3,
+      title: "The Harder They Fall",
+      hours: "33.03 million hours",
+      image:
+        "https://assets.codepen.io/1890963/AAAABdSTtEWX51HK0gQNLxoNCEHAdcJDUj-IUIqc0Ho4FheR3nlfyIxSRtFNWx7X9y3HAM5JsrwNSqE__YY0-EHwDMhBiwLgrbnDLx-KLlbWUtogt9K9ThtthZeMJsFBXQA.jpg?format=auto",
+      numberImage: "https://assets.codepen.io/1890963/3.png?format=auto",
+    },
+    {
+      id: 4,
+      title: "Army of Thieves",
+      hours: "20.56 million hours",
+      image:
+        "https://assets.codepen.io/1890963/AAAABSd4YiRI4akxOnkCqC2Aqn8MrtGgluXvN3vbSakGx2ejrClryI0hkNYjoqRt2Owl0ySiE4-sNKiq7o6nAg7gRhD8hYGcCoPqChvTygrWfaKR7bKld5zsLWQ6kxlZaQ.jpg",
+      numberImage: "https://assets.codepen.io/1890963/4.png?format=auto",
+    },
+    {
+      id: 5,
+      title: "Father Christmas is Back",
+      hours: "13.78 million hours",
+      image:
+        "https://assets.codepen.io/1890963/AAAABVxH2_5AGGX3jcwy6y0rbYzHvWkzJQY0EiWpFvdrhg5x4wPfU4Xl472rNUrRzqjcpqOUNvdyKLcDlG1pPa8v804Dtb2bDzqZes2_AntdOElfr7FKsl6xV9nw5YMSdA.jpg?format=auto",
+      numberImage: "https://assets.codepen.io/1890963/5.png?format=auto",
+    },
+  ];
 
   useEffect(() => {
     if (!isHovered) {
       const interval = setInterval(() => {
-        setExpandedIndex((prev) => (prev + 1) % data.length);
+        setExpandedIndex((prev) => (prev + 1) % movies.length);
       }, 4000);
 
       return () => clearInterval(interval);
     }
-  }, [isHovered, data.length]);
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      onTop1Change(selected, data[0].title);
-    }
-  }, [data, selected, onTop1Change]);
-
-  if (isLoading || !data?.length) return <Spinner />;
-
-  if (!Array.isArray(data)) {
-    console.error("HeroRanking Error", data);
-    return <div>데이터가 없습니다.</div>;
-  }
+  }, [isHovered, movies.length]);
 
   const handleItemClick = (index: number) => {
     setExpandedIndex(index);
@@ -85,12 +84,12 @@ const HeroNewRanking = ({
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black">
       {/* Content */}
-      <div className="relative z-10 mx-auto w-full max-w-[1200px]">
+      <div className="relative z-10 mx-auto w-full max-w-7xl">
         {/* Heading */}
         <div className="mb-8 text-center">
-          <h1 className="gmarket text-6xl font-bold text-white md:text-4xl lg:text-5xl">
+          <h1 className="gmarket text-6xl font-bold text-white md:text-6xl lg:text-7xl">
             POPCO Top 5
           </h1>
         </div>
@@ -103,13 +102,13 @@ const HeroNewRanking = ({
             onMouseLeave={handleContainerMouseLeave}
           >
             <div className="absolute inset-0 flex">
-              {data.map((movie, index) => (
+              {movies.map((movie, index) => (
                 <div
-                  key={movie.contentId}
+                  key={movie.id}
                   className={`relative h-full cursor-pointer transition-all duration-300 ${
                     expandedIndex === index ? "flex-[3] pl-64" : "flex-1"
                   } `}
-                  style={{ zIndex: data.length - index }}
+                  style={{ zIndex: movies.length - index }}
                   onClick={() => handleItemClick(index)}
                   onMouseEnter={() => handleItemMouseEnter(index)}
                 >
@@ -123,7 +122,7 @@ const HeroNewRanking = ({
                       className="text-2xl font-bold text-white md:text-3xl"
                       style={{ textShadow: "0px 0px 4px black" }}
                     >
-                      {index + 1}
+                      {movie.id}
                     </span>
                   </div>
                   {/* 포스터 */}
@@ -135,7 +134,7 @@ const HeroNewRanking = ({
                     }}
                   >
                     <img
-                      src={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
+                      src={movie.image}
                       alt={movie.title}
                       className={`h-full w-full object-cover transition-opacity duration-300 ${
                         expandedIndex === index ? "opacity-100" : "opacity-40"
