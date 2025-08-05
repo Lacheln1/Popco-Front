@@ -229,8 +229,8 @@ const Header: React.FC<HeaderProps> = ({
                     <button
                       className={`flex min-w-[90px] items-center justify-center rounded-full border-2 border-gray-200 font-medium text-black hover:bg-gray-100 ${
                         isScrolled
-                          ? "h-8 px-4 text-base transition-all duration-500 ease-out"
-                          : "h-10 px-4 text-lg"
+                          ? "h-8 px-4 pt-1 text-base transition-all duration-500 ease-out"
+                          : "h-10 px-4 pt-1 text-lg"
                       }`}
                       onClick={handleUserClick}
                     >
