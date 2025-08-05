@@ -19,8 +19,8 @@ const IntroPage = () => {
   ];
 
   const textIndexRef = useRef<number>(texts.length - 1);
-  const morphTime = 1.1;
-  const cooldownTime = 1.3;
+  const morphTime = 0.7;
+  const cooldownTime = 1.0;
 
   const morphRef = useRef<number>(0);
   const cooldownRef = useRef<number>(cooldownTime);
