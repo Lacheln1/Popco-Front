@@ -1,4 +1,4 @@
-import { QuestionData, QuizStatus } from "@/types/Quiz.types";
+import { QuestionData, QuizStatus, WinnerInfo } from "@/types/Quiz.types";
 import { create } from "zustand";
 
 type QuizStep = "entry" | "question" | "waiting" | "eliminated" | "winner";
@@ -18,6 +18,7 @@ interface QuizStore {
     max: number;
   };
   quizStatus: QuizStatus | null;
+  winnerInfo: WinnerInfo | null;
 
   // Actions
   setQuizStatus: (status: QuizStatus) => void;
@@ -30,6 +31,7 @@ interface QuizStore {
   setHasSubmitted: (flag: boolean) => void;
   updateTimer: (time: number) => void;
   updateSurvivors: (current: number, max: number) => void;
+  setWinnerInfo: (info: WinnerInfo) => void;
   reset: () => void;
 }
 
@@ -48,6 +50,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
     max: 0,
   },
   quizStatus: null,
+  winnerInfo: null,
 
   // Actions
   setStep: (step) => set({ step }),
@@ -81,6 +84,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
   updateTimer: (time) => set({ timer: time }),
   updateSurvivors: (current, max) => set({ survivors: { current, max } }),
   setQuizStatus: (status) => set({ quizStatus: status }),
+  setWinnerInfo: (info) => set({ winnerInfo: info }),
   reset: () =>
     set({
       quizId: null,
@@ -93,5 +97,6 @@ export const useQuizStore = create<QuizStore>((set) => ({
       timer: 0,
       survivors: { current: 0, max: 0 },
       quizStatus: null,
+      winnerInfo: null,
     }),
 }));

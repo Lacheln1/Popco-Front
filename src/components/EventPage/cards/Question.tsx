@@ -3,7 +3,11 @@ import { useQuizStore } from "@/stores/useQuizStore";
 import axiosInstance from "@/apis/axiosInstance";
 import { connectSocket, subscribeToQuestion } from "@/utils/socket";
 import useAuthCheck from "@/hooks/useAuthCheck";
-import { QuizStatusSocketData, RawQuestionResponse } from "@/types/Quiz.types";
+import {
+  QuizResponseData,
+  QuizStatusSocketData,
+  RawQuestionResponse,
+} from "@/types/Quiz.types";
 import { mapRawQuestionToClientFormat } from "@/utils/mapper";
 import { IoTimeOutline } from "react-icons/io5";
 import { FiUsers } from "react-icons/fi";
@@ -29,11 +33,14 @@ export const Question = () => {
     timer: remainingTime,
     survivors,
     setQuestionId,
+    setWinnerInfo,
+    step,
   } = useQuizStore();
 
   const { accessToken } = useAuthCheck();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCorrectOverlay, setShowCorrectOverlay] = useState(false); // 추가된 상태
 
   // 구독 관리를 위한 ref
   const subscriptionRef = useRef<(() => void) | null>(null);
@@ -57,61 +64,83 @@ export const Question = () => {
   };
 
   // 소켓 메시지 처리
-  const handleSocketMessage = (data: QuizStatusSocketData) => {
-    console.log("🔄 QuizStatusSocketData 수신:", data);
-
-    // 타이머 업데이트
-    if (typeof data.remainingTime === "number") {
+  const handleSocketMessage = (
+    data: QuizStatusSocketData | QuizResponseData,
+  ) => {
+    // 공통 처리: 타이머/생존자
+    if ("remainingTime" in data && typeof data.remainingTime === "number") {
       updateTimer(data.remainingTime);
     }
 
     // 생존자 수 업데이트
     if (
+      "currentSurvivors" in data &&
       typeof data.currentSurvivors === "number" &&
       typeof data.maxSurvivors === "number"
     ) {
       updateSurvivors(data.currentSurvivors, data.maxSurvivors);
     }
 
-    // 상태별 처리
-    switch (data.type) {
+    // 상태 결정
+    const status = "status" in data ? data.status : data.type;
+
+    switch (status) {
       case "FINISHED":
-        console.log("🏁 퀴즈 종료 상태");
-        if (!data.isActive) {
-          console.log("🏆 퀴즈 완전 종료 - 우승자 화면으로");
+        if (questionId === 3) {
+          // 우승자 정보 처리
           setStep("winner");
+          // 소켓 연결 해제
+          if (subscriptionRef.current) {
+            subscriptionRef.current();
+            subscriptionRef.current = null;
+          }
         } else {
-          console.log("⏰ 라운드 종료 - 탈락 또는 대기");
           setStep(hasSubmitted ? "waiting" : "eliminated");
         }
         break;
 
       case "ACTIVE":
-        console.log("🚀 퀴즈 활성 상태");
-        if (data.questionId && data.questionId !== questionId) {
-          console.log("📢 다음 문제로 이동:", data.questionId);
-          // 새 문제 초기화
+        if ("questionId" in data && data.questionId !== questionId) {
           setQuestionId(data.questionId);
           setSelectedAnswer(null);
           setHasSubmitted(false);
+          setShowCorrectOverlay(false); // 새 문제 시작시 오버레이 숨김
           setStep("question");
         }
         break;
 
       case "WAITING":
-        console.log("⏳ 대기 상태");
+        setStep("waiting");
         break;
 
       case "QUESTION_TIMEOUT":
         setStep("eliminated");
         break;
 
+      case "WINNER_ANNOUNCED":
+        // 우승자 정보 저장
+        if ("winnerName" in data && "winnerRank" in data && "message" in data) {
+          setWinnerInfo({
+            type: "WINNER_ANNOUNCED",
+            winnerName: data.winnerName,
+            winnerRank: data.winnerRank,
+            message: data.message,
+          });
+          setStep("winner");
+
+          // 소켓 연결 해제
+          if (subscriptionRef.current) {
+            subscriptionRef.current();
+            subscriptionRef.current = null;
+          }
+        }
+        break;
       default:
-        console.log("❓ 알 수 없는 상태:", data.status);
+        console.warn("알 수 없는 상태:", status);
     }
 
-    // 퀴즈 상태 업데이트
-    if (data.status) {
+    // 상태 저장 (QuizStore 전용)
+    if ("status" in data && data.status) {
       useQuizStore.getState().setQuizStatus(data.status);
     }
   };
@@ -134,12 +163,12 @@ export const Question = () => {
       );
       if (unsubscribe) {
         subscriptionRef.current = unsubscribe;
-        console.log("✅ 소켓 구독 성공");
+        console.log("소켓 구독 성공");
       } else {
-        console.error("❌ 소켓 구독 실패 - unsubscribe 함수가 반환되지 않음");
+        console.error("소켓 구독 실패 - unsubscribe 함수가 반환되지 않음");
       }
     } catch (error) {
-      console.error("❌ 소켓 구독 중 오류:", error);
+      console.error("소켓 구독 중 오류:", error);
     }
   };
 
@@ -174,7 +203,15 @@ export const Question = () => {
   useEffect(() => {
     setSelectedAnswer(null);
     setIsSubmitting(false);
+    setShowCorrectOverlay(false); // 새 문제 시작시 오버레이도 초기화
   }, [questionId]);
+
+  // 타이머가 0이 되면 오버레이 숨김 (추가된 effect)
+  useEffect(() => {
+    if (remainingTime === 0 && showCorrectOverlay) {
+      setShowCorrectOverlay(false);
+    }
+  }, [remainingTime, showCorrectOverlay]);
 
   // 답안 선택
   const selectAnswer = (optionId: number) => {
@@ -199,9 +236,12 @@ export const Question = () => {
       );
 
       const { survived } = res.data.data;
-      console.log(`📝 답안 제출 결과: ${survived ? "생존" : "탈락"}`);
-
-      // 제출 후 결과에 따라 상태 변경은 소켓 메시지로 처리됨
+      if (survived) {
+        // 정답이면 오버레이 표시
+        setShowCorrectOverlay(true);
+      } else {
+        setStep("eliminated");
+      }
     } catch (err) {
       console.error("답안 제출 실패", err);
       setHasSubmitted(false);
@@ -210,6 +250,46 @@ export const Question = () => {
       setIsSubmitting(false);
     }
   };
+
+  const CorrectOverlay = () => (
+    <div className="absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
+      <div className="rounded-xl bg-white/95 p-8 text-center shadow-xl">
+        <img
+          src="/images/popco/correct.svg"
+          alt="correct"
+          className="mx-auto mb-4 h-32 w-32"
+        />
+        <p className="mb-2 text-xl font-bold text-green-600">정답입니다! 🎉</p>
+        <p className="mb-4 text-sm text-gray-600">
+          다른 참가자들을 기다리는 중입니다...
+        </p>
+        <div className="flex items-center justify-center gap-2">
+          <IoTimeOutline className="h-5 w-5" />
+          <span className="text-base font-medium">
+            {remainingTime > 0 ? `${remainingTime}초 남음` : "대기 중"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (step === "waiting") {
+    return (
+      <aside className="absolute left-1/2 top-[31%] z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-xl bg-white/90 px-4 py-8 shadow-xl backdrop-blur-md md:h-[520px] md:w-[800px] md:px-8">
+        <div className="flex flex-col items-center gap-4">
+          <img
+            src="/images/popco/next_waiting.svg"
+            alt="waiting"
+            className="h-40 w-40"
+          />
+          <p className="text-lg font-semibold text-gray-700">
+            다음 문제를 준비 중입니다...
+          </p>
+          <p className="text-sm text-gray-500">잠시만 기다려 주세요.</p>
+        </div>
+      </aside>
+    );
+  }
 
   // 로딩 상태
   if (!questionData) {
@@ -231,6 +311,8 @@ export const Question = () => {
 
   return (
     <aside className="absolute left-1/2 top-[31%] z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-2xl bg-white/95 px-4 py-8 shadow-2xl backdrop-blur-lg md:h-[520px] md:w-[800px] md:px-8">
+      {showCorrectOverlay && <CorrectOverlay />}
+
       <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
         {/* 상단 정보바 */}
         <div className="flex w-full items-center justify-between">

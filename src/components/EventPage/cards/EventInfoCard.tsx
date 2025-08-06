@@ -76,7 +76,6 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
           return newTimerData;
         });
       }
-
       // 퀴즈 시작 신호
       if (data.type === "quiz-start" || data.remainingTime === 0) {
         onCountdownEnd();

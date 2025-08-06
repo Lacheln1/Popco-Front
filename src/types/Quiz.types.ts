@@ -64,3 +64,41 @@ export interface QuizStatusSocketData {
   timerStartedAt: number;
   status: QuizStatus;
 }
+
+export interface WinnerInfo {
+  type: "WINNER_ANNOUNCED";
+  winnerName: string;
+  winnerRank: number;
+  message: string;
+}
+
+export interface WinnerAnnouncedData {
+  type: "WINNER_ANNOUNCED";
+  winnerName: string;
+  winnerRank: number;
+  message: string;
+  remainingTime?: number;
+  currentSurvivors?: number;
+  maxSurvivors?: number;
+}
+
+// 우승자 정보 (Store용 - type 필드 없음)
+export interface WinnerInfo {
+  winnerName: string;
+  winnerRank: number;
+  message: string;
+}
+
+// 기존 QuizResponseData 수정 (기본 응답 데이터)
+export interface BaseQuizResponseData {
+  quizId: number;
+  questionId: number;
+  type: string;
+  message: string;
+  remainingTime?: number;
+  currentSurvivors?: number;
+  maxSurvivors?: number;
+}
+
+// Union 타입으로 모든 응답 데이터 통합
+export type QuizResponseData = BaseQuizResponseData | WinnerAnnouncedData;
