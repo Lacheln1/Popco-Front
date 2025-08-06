@@ -5,7 +5,6 @@ import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { fetchHeroPersona } from "@/apis/personaApi";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import "swiper/swiper-bundle.css";
 import axios from "axios";
