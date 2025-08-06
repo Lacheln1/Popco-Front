@@ -2,6 +2,9 @@ import LikePopcorn from "@/components/popcorn/LikePopcorn";
 import HatePopcorn from "@/components/popcorn/HatePopcorn";
 import { HiCursorClick } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import { useLikeStore } from "@/store/useLikeStore";
+import useAuthCheck from "@/hooks/useAuthCheck";
+import { App } from "antd";
 
 type LikeState = "LIKE" | "DISLIKE" | "NEUTRAL";
 
@@ -10,8 +13,6 @@ type PosterProps = {
   posterUrl: string;
   id: number;
   contentType: string;
-  likeState: LikeState;
-  onLikeChange: (newState: LikeState) => void;
   disableHover?: boolean;
   className?: string;
 };
@@ -21,18 +22,38 @@ const Poster = ({
   posterUrl,
   id,
   contentType,
-  likeState,
-  onLikeChange,
   disableHover,
   className = "",
 }: PosterProps) => {
   const navigator = useNavigate();
+  const { message } = App.useApp();
+  const { user, accessToken } = useAuthCheck();
+
+  const { getReaction, updateReaction } = useLikeStore();
+  const likeState = getReaction(id, contentType);
 
   const handlePosterClick = () => navigator(`/detail/${contentType}/${id}`);
 
-  const toggleState = (e: React.MouseEvent, target: LikeState) => {
+  const toggleState = async (e: React.MouseEvent, target: LikeState) => {
     e.stopPropagation();
-    onLikeChange(likeState === target ? "NEUTRAL" : target);
+
+    if (!user.isLoggedIn) {
+      message.info("로그인이 필요합니다.", 1.5);
+      return;
+    }
+
+    if (!accessToken) {
+      message.error("인증 토큰이 없습니다.");
+      return;
+    }
+
+    try {
+      await updateReaction(id, contentType, target, user.userId, accessToken);
+
+    } catch (error) {
+      console.error("좋아요/싫어요 처리 실패:", error);
+      message.error("처리에 실패했습니다.");
+    }
   };
 
   const isLiked = likeState === "LIKE";
@@ -62,7 +83,6 @@ const Poster = ({
     <div
       className={`group flex w-[35vw] min-w-[100px] max-w-[210px] flex-col gap-1 md:w-[210px] ${className}`}
     >
-      {" "}
       <div
         onClick={handlePosterClick}
         role="button"
