@@ -79,7 +79,7 @@ const useAuthCheck = () => {
 
         if (token) {
           // 토큰 만료 시간 확인 및 필요시 갱신
-          const decodedForExp = jwtDecode<JwtPayload>(token!);
+          const decodedForExp = jwtDecode<JwtPayload>(token as string);
           if (decodedForExp.exp && decodedForExp.exp < Date.now() / 1000) {
             localStorage.removeItem("accessToken");
             const refreshResult = await validateAndRefreshTokens();
@@ -94,7 +94,7 @@ const useAuthCheck = () => {
           }
 
           setAccessToken(token);
-          const decoded = jwtDecode<JwtPayload>(token!);
+          const decoded = jwtDecode<JwtPayload>(token as string);
           const userIdFromToken = Number(decoded.sub);
 
           if (!userIdFromToken || isNaN(userIdFromToken)) {
@@ -115,7 +115,7 @@ const useAuthCheck = () => {
           profileComplete = justCompleted || loginProfileComplete;
 
           try {
-            const userInfo = await getUserDetail(token!);
+            const userInfo = await getUserDetail(token as string);
 
             if (userInfo && userInfo.data) {
               setUser({
