@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useQuizStore } from "@/stores/useQuizStore";
-import { connectSocket, subscribeToWaiting } from "@/utils/socket";
+import {
+  connectSocket,
+  disconnectSocket,
+  subscribeToWaiting,
+} from "@/utils/socket";
 import { App, Spin } from "antd";
 import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
 import dayjs from "dayjs";
 import axiosInstance from "@/apis/axiosInstance";
 import TimeBlock from "../TimeBlock";
-
-// 카운트다운 렌더러의 props 타입 정의
-interface CountdownRenderProps {
-  hours: number;
-  minutes: number;
-  seconds: number;
-  milliseconds: number;
-  completed: boolean;
-  total: number;
-}
 
 // 소켓 타이머 데이터 타입 정의
 interface SocketTimerData {
@@ -32,13 +26,12 @@ interface Props {
   onCountdownEnd: () => void;
 }
 
-const formatTime = (n: number) => String(n).padStart(2, "0");
-
 export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
   const { accessToken } = useAuthCheck();
-  const { setConnected, setStep } = useQuizStore();
+  const { setConnected, setStep, quizId } = useQuizStore();
   const { message } = App.useApp();
   const { data, isLoading } = useQuizInfo(accessToken);
+
   // 소켓으로 받을 실시간 데이터
   const [socketTimer, setSocketTimer] = useState<{
     remainingTime: number;
@@ -47,42 +40,73 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
     remainingSec: number;
   } | null>(null);
 
+  // 초기화 상태 관리 (중복 실행 방지)
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // 퀴즈 시작 버튼 로딩 상태
+  const [isStarting, setIsStarting] = useState(false);
+
   const quizDetail = data?.quizDetail;
 
+  // 소켓 데이터 핸들러를 useCallback으로 메모이제이션
+  const handleSocketData = useCallback(
+    (data: SocketTimerData) => {
+      console.log("🔄 소켓 타이머 데이터 수신:", data);
+
+      // 백엔드에서 계산해준 시간 데이터 저장
+      if (typeof data.remainingTime === "number") {
+        const newTimerData = {
+          remainingTime: data.remainingTime,
+          remainingHour: data.remainingHour || 0,
+          remainingMin: data.remainingMin || 0,
+          remainingSec: data.remainingSec || 0,
+        };
+
+        setSocketTimer((prev) => {
+          // 모든 값이 동일한지 확인하여 불필요한 업데이트 방지
+          if (
+            prev &&
+            prev.remainingTime === newTimerData.remainingTime &&
+            prev.remainingHour === newTimerData.remainingHour &&
+            prev.remainingMin === newTimerData.remainingMin &&
+            prev.remainingSec === newTimerData.remainingSec
+          ) {
+            return prev;
+          }
+          return newTimerData;
+        });
+      }
+
+      // 퀴즈 시작 신호
+      if (data.type === "quiz-start" || data.remainingTime === 0) {
+        onCountdownEnd();
+      }
+    },
+    [onCountdownEnd],
+  );
+
   useEffect(() => {
-    if (!accessToken || !quizDetail?.quizId) return;
+    // accessToken이나 quizId가 없거나 이미 초기화되었으면 실행하지 않음
+    if (!accessToken || !quizDetail?.quizId || isInitialized) return;
+
+    let isCancelled = false; // 클린업을 위한 플래그
 
     const initializeQuiz = async () => {
+      if (isCancelled) return; // 이미 취소되었으면 실행하지 않음
+
       try {
         // 1. 소켓 연결 (페이지 진입 시)
         await connectSocket(accessToken);
-        console.log("소켓 연결 완료");
+        if (isCancelled) return;
 
         // 2. 대기 채널 구독 - 실시간 타이머 수신
         const subscription = subscribeToWaiting(
           quizDetail.quizId,
-          (data: SocketTimerData) => {
-            // 백엔드에서 계산해준 시간 데이터 저장
-            if (typeof data.remainingTime === "number") {
-              setSocketTimer((prev) => {
-                if (prev?.remainingTime === data.remainingTime) return prev;
-                return {
-                  remainingTime: data.remainingTime!, // 비-null 단언 연산자 추가
-                  remainingHour: data.remainingHour || 0,
-                  remainingMin: data.remainingMin || 0,
-                  remainingSec: data.remainingSec || 0,
-                };
-              });
-            }
-
-            // 퀴즈 시작 신호
-            if (data.type === "quiz-start" || data.remainingTime === 0) {
-              onCountdownEnd();
-            }
-          },
+          handleSocketData,
         );
 
         if (!subscription) throw new Error("대기 채널 구독에 실패했습니다");
+        if (isCancelled) return;
 
         // 3. 브로드캐스트 트리거
         await axiosInstance.post(
@@ -92,22 +116,75 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
             headers: { Authorization: `Bearer ${accessToken}` },
           },
         );
+        if (isCancelled) return;
         setConnected(true);
-        console.log("퀴즈 초기화 성공");
-      } catch (err) {
-        console.error("퀴즈 초기화 실패", err);
+        setIsInitialized(true);
+      } catch (error) {
+        if (!isCancelled) {
+          message.error("퀴즈 초기화에 실패했습니다.");
+        }
       }
     };
-    initializeQuiz();
-  }, [accessToken, quizDetail?.quizId, onCountdownEnd, setConnected, message]);
 
-  const handleEnter = () => {
+    initializeQuiz();
+
+    // 클린업 함수
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    accessToken,
+    quizDetail?.quizId,
+    isInitialized,
+    handleSocketData,
+    setConnected,
+    message,
+  ]);
+
+  // 퀴즈 시작 API 호출
+  const startQuiz = async () => {
+    if (!accessToken) {
+      message.error("로그인이 필요합니다.");
+      return;
+    }
+
+    if (!quizId) {
+      message.error("퀴즈 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    setIsStarting(true);
+
+    try {
+      const response = await axiosInstance.post(
+        `/quizzes/${quizId}/start`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (response.data.code === 200) {
+        message.success("퀴즈가 시작되었습니다!");
+        setStep("question");
+      } else {
+        throw new Error(response.data.message || "퀴즈 시작에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("퀴즈 시작 실패:", error);
+    }
+  };
+
+  const handleEnter = useCallback(() => {
     if (!accessToken) {
       message.error("회원만 참여 가능한 이벤트입니다.");
       return;
     }
-    setStep("question");
-  };
+    disconnectSocket();
+    startQuiz();
+  }, [accessToken, isButtonActive, message, quizId]);
 
   if (isLoading) {
     return (
@@ -146,11 +223,12 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
             </div>
           ) : (
             <div className="mb-8 flex gap-2">
-              <TimeBlock label="HOURS" value="0" />
-              <TimeBlock label="MINUTES" value="0" />
-              <TimeBlock label="SECONDS" value="0" />
+              <TimeBlock label="HOURS" value="--" />
+              <TimeBlock label="MINUTES" value="--" />
+              <TimeBlock label="SECONDS" value="--" />
             </div>
           )}
+
           {/* 퀴즈 정보 및 안내 */}
           <div className="flex flex-col gap-2">
             <InfoRow label="이번주 작품" value={quizDetail.quizName} />
@@ -179,13 +257,33 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
                 있어요!
               </span>
             </div>
-
             <button
               onClick={handleEnter}
               className="mt-4 w-fit cursor-pointer self-center rounded-full bg-[#222] px-14 py-3 text-white shadow-md transition hover:bg-black"
             >
               이벤트 입장하기
             </button>
+
+            {/* <button
+              onClick={handleEnter}
+              disabled={!isButtonActive || isStarting}
+              className={`mt-4 w-fit self-center rounded-full px-14 py-3 text-white shadow-md transition ${
+                isButtonActive || isStarting
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "cursor-pointer bg-[#222] hover:bg-black"
+              }`}
+            >
+              {isStarting ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  퀴즈 시작 중...
+                </div>
+              ) : !isButtonActive ? (
+                "이벤트 입장하기"
+              ) : (
+                "시작 시간을 기다려주세요"
+              )}
+            </button> */}
           </div>
         </>
       ) : (
