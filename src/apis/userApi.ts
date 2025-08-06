@@ -189,7 +189,6 @@ export const getRoleDashBoardData = async (accessToken: string) => {
       withCredentials: true,
     });
 
-
     return response.data;
   } catch (error) {
     console.log("getDashboardData실패", error);

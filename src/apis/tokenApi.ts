@@ -16,7 +16,7 @@ export const refreshTokens = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("❌ refreshTokens 실패", error);
+    console.error("refreshTokens 실패", error);
   }
 };
 
