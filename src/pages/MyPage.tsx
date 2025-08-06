@@ -31,11 +31,9 @@ const MyPage: React.FC = () => {
       setError(null);
 
       const userDetailResponse = await getUserDetail(accessToken);
-      console.log("사용자 상세 정보:", userDetailResponse);
       setUserData(userDetailResponse);
 
       const userPersonaResponse = await getUserPersonas(accessToken);
-      console.log("사용자 페르소나 정보:", userPersonaResponse);
       setUserPersonaData(userPersonaResponse);
     } catch (err) {
       console.error("사용자 정보 조회 실패:", err);

@@ -70,7 +70,6 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
         },
       );
 
-      console.log(`${contentType} 응답:`, response.data);
       setRecommendations(response.data.recommendations || []);
     } catch (err) {
       console.error("추천 데이터 가져오기 실패:", err);

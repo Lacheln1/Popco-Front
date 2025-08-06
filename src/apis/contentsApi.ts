@@ -97,7 +97,6 @@ export const fetchLikeContents = async (
         withCredentials: true,
       },
     );
-    console.log("좋아요한 컨텐츠 api 성공", response.data);
     return response.data; // 응답 데이터를 반환
   } catch (error) {
     console.error("contents/liked실패", error);
@@ -113,7 +112,6 @@ export const fetchWishlist = async (
     const response = await axios.get<WishlistResponse>(
       `${API_URL}/wishlists/users/${userId}`,
     );
-    console.log("위시리스트 api 성공", response.data);
     return response.data;
   } catch (error) {
     console.error("위시리스트 조회 실패", error);

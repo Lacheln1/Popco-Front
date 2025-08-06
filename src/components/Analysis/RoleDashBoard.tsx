@@ -105,7 +105,6 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
   useEffect(() => {
     const fetchRecommendations = async () => {
       if (!userId) {
-        console.log("userId가 없어서 기본 데이터를 사용합니다.");
         setMovieData(defaultMovieList);
         setSeriesData(defaultMovieList);
         return;
