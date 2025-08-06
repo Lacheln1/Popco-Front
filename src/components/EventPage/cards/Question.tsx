@@ -74,7 +74,7 @@ export const Question = () => {
     }
 
     // 상태별 처리
-    switch (data.status) {
+    switch (data.type) {
       case "FINISHED":
         console.log("🏁 퀴즈 종료 상태");
         if (!data.isActive) {
@@ -100,6 +100,10 @@ export const Question = () => {
 
       case "WAITING":
         console.log("⏳ 대기 상태");
+        break;
+
+      case "QUESTION_TIMEOUT":
+        setStep("eliminated");
         break;
 
       default:
@@ -146,12 +150,12 @@ export const Question = () => {
     const setup = async () => {
       try {
         await connectSocket(accessToken); // 1. 연결
-        console.log("✅ 소켓 연결됨");
+        console.log("소켓 연결됨");
 
         setupSubscription(); // 2. 구독 시작
         loadQuestionData(); // 3. 문제 데이터 불러오기
       } catch (e) {
-        console.error("❌ 소켓 연결 실패", e);
+        console.error("소켓 연결 실패", e);
       }
     };
 

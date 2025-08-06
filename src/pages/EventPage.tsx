@@ -11,11 +11,7 @@ import { useNavigate } from "react-router-dom";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
 import { App } from "antd";
-
-const image = {
-  src: "https://image.tmdb.org/t/p/original/bvVoP1t2gNvmE9ccSrqR1zcGHGM.jpg",
-  alt: "F1 더 무비",
-};
+import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 
 const EventPage = () => {
   const { message } = App.useApp();
@@ -64,6 +60,11 @@ const EventPage = () => {
       default:
         return <div>알 수 없는 단계입니다.</div>;
     }
+  };
+
+  const image = {
+    src: `${TMDB_IMAGE_BASE_URL}${data?.quizDetail.quizContentPosterUrl}`,
+    alt: `${data?.quizDetail.quizName}`,
   };
 
   return (

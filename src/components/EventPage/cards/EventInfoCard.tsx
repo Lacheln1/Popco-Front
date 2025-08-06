@@ -11,6 +11,7 @@ import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
 import dayjs from "dayjs";
 import axiosInstance from "@/apis/axiosInstance";
 import TimeBlock from "../TimeBlock";
+import { useLocation } from "react-router-dom";
 
 // 소켓 타이머 데이터 타입 정의
 interface SocketTimerData {
@@ -31,6 +32,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
   const { setConnected, setStep, quizId } = useQuizStore();
   const { message } = App.useApp();
   const { data, isLoading } = useQuizInfo(accessToken);
+  const location = useLocation();
 
   // 소켓으로 받을 실시간 데이터
   const [socketTimer, setSocketTimer] = useState<{
@@ -51,8 +53,6 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
   // 소켓 데이터 핸들러를 useCallback으로 메모이제이션
   const handleSocketData = useCallback(
     (data: SocketTimerData) => {
-      console.log("🔄 소켓 타이머 데이터 수신:", data);
-
       // 백엔드에서 계산해준 시간 데이터 저장
       if (typeof data.remainingTime === "number") {
         const newTimerData = {
@@ -86,7 +86,10 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
   );
 
   useEffect(() => {
-    // accessToken이나 quizId가 없거나 이미 초기화되었으면 실행하지 않음
+    if (location.pathname !== "/event") disconnectSocket();
+  }, []);
+
+  useEffect(() => {
     if (!accessToken || !quizDetail?.quizId || isInitialized) return;
 
     let isCancelled = false; // 클린업을 위한 플래그
@@ -125,10 +128,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
         }
       }
     };
-
     initializeQuiz();
-
-    // 클린업 함수
     return () => {
       isCancelled = true;
     };
@@ -147,14 +147,11 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
       message.error("로그인이 필요합니다.");
       return;
     }
-
     if (!quizId) {
       message.error("퀴즈 정보를 찾을 수 없습니다.");
       return;
     }
-
     setIsStarting(true);
-
     try {
       const response = await axiosInstance.post(
         `/quizzes/${quizId}/start`,
@@ -169,6 +166,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
       if (response.data.code === 200) {
         message.success("퀴즈가 시작되었습니다!");
         setStep("question");
+        disconnectSocket();
       } else {
         throw new Error(response.data.message || "퀴즈 시작에 실패했습니다.");
       }
@@ -182,7 +180,6 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
       message.error("회원만 참여 가능한 이벤트입니다.");
       return;
     }
-    disconnectSocket();
     startQuiz();
   }, [accessToken, isButtonActive, message, quizId]);
 
@@ -259,17 +256,10 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
             </div>
             <button
               onClick={handleEnter}
-              className="mt-4 w-fit cursor-pointer self-center rounded-full bg-[#222] px-14 py-3 text-white shadow-md transition hover:bg-black"
-            >
-              이벤트 입장하기
-            </button>
-
-            {/* <button
-              onClick={handleEnter}
-              disabled={!isButtonActive || isStarting}
+              disabled={isButtonActive || isStarting}
               className={`mt-4 w-fit self-center rounded-full px-14 py-3 text-white shadow-md transition ${
-                isButtonActive || isStarting
-                  ? "cursor-not-allowed bg-gray-400"
+                !isButtonActive || isStarting
+                  ? "cursor-not-allowed bg-gray-300"
                   : "cursor-pointer bg-[#222] hover:bg-black"
               }`}
             >
@@ -278,12 +268,12 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                   퀴즈 시작 중...
                 </div>
-              ) : !isButtonActive ? (
+              ) : isButtonActive ? (
                 "이벤트 입장하기"
               ) : (
                 "시작 시간을 기다려주세요"
               )}
-            </button> */}
+            </button>
           </div>
         </>
       ) : (
