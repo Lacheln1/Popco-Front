@@ -256,9 +256,9 @@ export const Question = () => {
 
   // 정답 제출
   const submitAnswer = async () => {
-    if (selectedAnswer === null || !quizId || !accessToken || hasSubmitted) {
+    if (selectedAnswer === null || !quizId || !accessToken || hasSubmitted)
       return;
-    }
+
     setIsSubmitting(true);
     setHasSubmitted(true);
 
@@ -273,7 +273,15 @@ export const Question = () => {
       setIsSurvived(survived);
 
       if (survived) {
-        setShowCorrectOverlay(true);
+        const nextQuestionId = questionId + 1;
+        setSelectedAnswer(null);
+        setHasSubmitted(false);
+        setShowCorrectOverlay(false);
+        setIsSubmitting(false);
+        setIsSurvived(false);
+
+        setQuestionId(nextQuestionId);
+        setStep("question");
       } else {
         setStep("eliminated");
       }
