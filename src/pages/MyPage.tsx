@@ -22,7 +22,6 @@ const MyPage: React.FC = () => {
 
   const fetchUserData = useCallback(async () => {
     if (!accessToken) {
-      console.log("accessToken이 없습니다");
       return;
     }
 

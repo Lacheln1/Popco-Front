@@ -37,7 +37,6 @@ export const getMyScoreDistribution = async (accessToken: string) => {
         withCredentials: true,
       },
     );
-    console.log("score평균 가져오기 성공", response.data);
 
     return response.data;
   } catch (error) {

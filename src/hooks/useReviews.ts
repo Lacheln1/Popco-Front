@@ -29,9 +29,6 @@ const invalidateReviewQueries = (
   contentId: number,
   contentType: string,
 ) => {
-  console.log(
-    `[Query Invalidate] key: ['reviews', ${contentId}, ${contentType}]`,
-  );
   // ReviewSection이 사용하는 리뷰 목록 쿼리를 모두 무효화 (최신순, 인기순 포함)
   queryClient.invalidateQueries({
     queryKey: ["reviews", contentId, contentType],

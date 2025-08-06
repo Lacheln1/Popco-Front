@@ -6,4 +6,5 @@ export interface PopcornButtonProps {
   color: "green" | "red";
   label: string;
   iconSrc: string;
+  disabled?: boolean; 
 }

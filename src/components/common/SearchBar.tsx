@@ -141,7 +141,6 @@ const SearchBar = <T,>({
   };
 
   const handleSearch = () => {
-    console.log(searchType);
     if (searchType === "actors") {
       memoizedOnSearch(searchValue, [searchValue] as unknown as T[]);
     } else {

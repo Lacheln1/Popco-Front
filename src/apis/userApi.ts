@@ -130,6 +130,7 @@ export const getUserPersonas = async (accessToken: string) => {
       withCredentials: true,
     });
 
+
     return response.data;
   } catch (error) {
     console.log("getPersonas실패", error);
@@ -171,6 +172,7 @@ export const getMonthlyReviews = async (
       },
       withCredentials: true,
     });
+
     return response.data;
   } catch (error) {
     console.error("getMonthlyReviews 실패:", error);
