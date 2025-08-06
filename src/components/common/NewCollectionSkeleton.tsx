@@ -8,7 +8,6 @@ const NewCollectionSkeleton: React.FC<NewCollectionSkeletonProps> = ({
   size = "large" 
 }) => {
   const maxWidth = size === "small" ? "max-w-[350px]" : "max-w-[540px]";
-  const translateX = size === "large" ? 86 : 62;
 
   return (
     <div className={`w-full rounded-xl bg-white shadow-lg md:rounded-2xl ${maxWidth}`}>

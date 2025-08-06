@@ -60,13 +60,16 @@ const useAuthCheck = () => {
 
       const currentPath = location.pathname;
       const needsAuth = isProtectedRoute(currentPath);
-      
+
       try {
         let token = localStorage.getItem("accessToken");
 
         if (!token) {
           const result = await validateAndRefreshTokens();
-          if (result?.result === "INVALID_REFRESH_TOKEN" || !result?.data?.accessToken) {
+          if (
+            result?.result === "INVALID_REFRESH_TOKEN" ||
+            !result?.data?.accessToken
+          ) {
             if (needsAuth) navigate("/login", { state: { from: currentPath } });
             return;
           }
@@ -84,7 +87,8 @@ const useAuthCheck = () => {
               token = refreshResult.data.accessToken;
               localStorage.setItem("accessToken", token);
             } else {
-              if (needsAuth) navigate("/login", { state: { from: currentPath } });
+              if (needsAuth)
+                navigate("/login", { state: { from: currentPath } });
               return;
             }
           }
@@ -92,46 +96,56 @@ const useAuthCheck = () => {
           setAccessToken(token);
           const decoded = jwtDecode<JwtPayload>(token);
           const userIdFromToken = Number(decoded.sub);
-          
+
           if (!userIdFromToken || isNaN(userIdFromToken)) {
-            throw new Error("토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.");
+            throw new Error(
+              "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
+            );
           }
 
           // --- 3. 프로필 완료 상태 확인 (로그인 시 저장된 정보 사용) ---
           let profileComplete = false;
-          
-          const justCompleted = sessionStorage.getItem("profileJustCompleted") === "true";
-          
-          const loginProfileComplete = localStorage.getItem("profileComplete") === "true";
-          
+
+          const justCompleted =
+            sessionStorage.getItem("profileJustCompleted") === "true";
+
+          const loginProfileComplete =
+            localStorage.getItem("profileComplete") === "true";
+
           profileComplete = justCompleted || loginProfileComplete;
-          
+
           try {
-            const userInfo = await getUserDetail(token);
-            
-            if (userInfo && userInfo.data) {
-              setUser({
-                userId: userIdFromToken,
-                email: userInfo.data.email || "",
-                nickname: userInfo.data.nickname || "",
-                profileImageUrl: userInfo.data.profileImageUrl || "",
-                isLoggedIn: true,
-                profileComplete: profileComplete
-              });
-            } else {
-              // getUserDetail 실패해도 토큰 기반으로 기본 정보 설정
-              setUser({
-                userId: userIdFromToken,
-                email: "",
-                nickname: "",
-                profileImageUrl: "",
-                isLoggedIn: true,
-                profileComplete: profileComplete
-              });
+            //  타입 체크 추가: token이 null이 아님을 보장
+            if (token) {
+              const userInfo = await getUserDetail(token);
+
+              if (userInfo && userInfo.data) {
+                setUser({
+                  userId: userIdFromToken,
+                  email: userInfo.data.email || "",
+                  nickname: userInfo.data.nickname || "",
+                  profileImageUrl: userInfo.data.profileImageUrl || "",
+                  isLoggedIn: true,
+                  profileComplete: profileComplete,
+                });
+              } else {
+                // getUserDetail 실패해도 토큰 기반으로 기본 정보 설정
+                setUser({
+                  userId: userIdFromToken,
+                  email: "",
+                  nickname: "",
+                  profileImageUrl: "",
+                  isLoggedIn: true,
+                  profileComplete: profileComplete,
+                });
+              }
             }
           } catch (userDetailError) {
-            console.error("🔍 사용자 상세 정보 가져오기 실패:", userDetailError);
-            
+            console.error(
+              "🔍 사용자 상세 정보 가져오기 실패:",
+              userDetailError,
+            );
+
             // getUserDetail 실패해도 토큰과 프로필 완료 상태는 유지
             setUser({
               userId: userIdFromToken,
@@ -139,7 +153,7 @@ const useAuthCheck = () => {
               nickname: "",
               profileImageUrl: "",
               isLoggedIn: true,
-              profileComplete: profileComplete
+              profileComplete: profileComplete,
             });
           }
 
@@ -150,7 +164,7 @@ const useAuthCheck = () => {
               navigate("/");
               return;
             }
-            
+
             // 임시 상태 정리
             sessionStorage.removeItem("profileJustCompleted");
           } else {
@@ -168,7 +182,7 @@ const useAuthCheck = () => {
       } catch (error) {
         console.error("❌ 인증 체크 중 오류:", error);
         localStorage.removeItem("accessToken");
-        
+
         setUser({
           userId: 0,
           email: "",
@@ -178,7 +192,7 @@ const useAuthCheck = () => {
           profileComplete: false,
         });
         setAccessToken(null);
-        
+
         if (needsAuth) navigate("/login", { state: { from: currentPath } });
       } finally {
         setIsLoading(false);
@@ -191,9 +205,9 @@ const useAuthCheck = () => {
   // 경로가 변경될 때 추가 체크
   useEffect(() => {
     if (!hasInitialized.current || isLoading) return;
-    
+
     const currentPath = location.pathname;
-    
+
     if (user.isLoggedIn) {
       if (user.profileComplete && currentPath === "/test") {
         message.info("이미 취향 진단을 완료했습니다.");
@@ -203,10 +217,18 @@ const useAuthCheck = () => {
         navigate("/test");
       }
     }
-  }, [location.pathname, user.isLoggedIn, user.profileComplete, navigate, message, isLoading]);
+  }, [
+    location.pathname,
+    user.isLoggedIn,
+    user.profileComplete,
+    navigate,
+    message,
+    isLoading,
+  ]);
 
   const logout = async () => {
     try {
+      // 타입 체크 추가: accessToken이 null이 아닐 때만 호출
       if (accessToken) {
         await clearTokens(accessToken);
       }
@@ -217,7 +239,7 @@ const useAuthCheck = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userId");
       sessionStorage.removeItem("profileJustCompleted");
-      
+
       setUser({
         userId: 0,
         email: "",
@@ -228,7 +250,7 @@ const useAuthCheck = () => {
       });
       setAccessToken(null);
       hasInitialized.current = false;
-      
+
       sessionStorage.setItem("manualLogout", "true");
       message.success("로그아웃되었습니다.");
 

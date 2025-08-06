@@ -173,7 +173,7 @@ const CollectionDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner size="large" />
+        <Spinner /> {/* ✅ size prop 제거 */}
       </div>
     );
   }
@@ -244,7 +244,7 @@ const CollectionDetailPage: React.FC = () => {
                             disabled={isUpdating}
                           >
                             {isUpdating ? (
-                              <Spinner size="small" />
+                              <Spinner /> 
                             ) : (
                               "저장 완료"
                             )}
@@ -323,8 +323,6 @@ const CollectionDetailPage: React.FC = () => {
                     title={content.title}
                     contentType={content.contentType}
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
-                    likeState={"NEUTRAL"}
-                    onLikeChange={() => {}}
                   />
                 ),
               )}

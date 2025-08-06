@@ -11,7 +11,6 @@ import "swiper/css/navigation";
 
 // --- 컴포넌트 & 훅 ---
 import PageLayout from "@/layout/PageLayout";
-import Spinner from "@/components/common/Spinner";
 import SectionHeader from "@/components/common/SectionHeader";
 import HotCollection from "@/components/common/HotCollection";
 import NewCollection from "@/components/common/NewCollection";
@@ -39,11 +38,9 @@ const CollectionPage: React.FC = () => {
   const { isBeginning, isEnd } = useSwiperResize(swiper);
 
   // --- 데이터 페칭 ---
-  // 1. HOT 컬렉션 데이터 (주간 인기)
   const { data: hotCollections, isLoading: isLoadingHot } =
     useFetchCollectionsWeekly(10, accessToken);
 
-  // 2. NEW 컬렉션 데이터 (최신순, 무한 스크롤)
   const {
     data: newCollectionsData,
     fetchNextPage,
@@ -52,7 +49,6 @@ const CollectionPage: React.FC = () => {
     isFetchingNextPage,
   } = useFetchCollections(10, accessToken);
 
-  // 3. 컬렉션 저장(마크) 토글 뮤테이션
   const { mutate: toggleMark } = useToggleMarkCollection();
 
   // --- 무한 스크롤 로직 ---
@@ -79,7 +75,7 @@ const CollectionPage: React.FC = () => {
         accessToken: accessToken!,
       });
     },
-    [user.isLoggedIn, accessToken, toggleMark],
+    [user.isLoggedIn, accessToken, toggleMark, message],
   );
 
   return (

@@ -282,7 +282,7 @@ export default function DetailPage() {
   const handleLikeChange = useCallback(
     async (targetState: LikeState) => {
       if (!user.isLoggedIn) {
-        message.info("로그인이 필요합니다.", 1.5);
+        message.info("로그인 먼저 진행해주세요!", 1.5);
         return;
       }
 
@@ -312,7 +312,6 @@ export default function DetailPage() {
         }
       } catch (error) {
         console.error("좋아요/싫어요 처리 실패:", error);
-        message.error("처리에 실패했습니다. 다시 시도해주세요.");
       }
     },
     [
@@ -354,7 +353,10 @@ export default function DetailPage() {
 
   // 리뷰 작성 모달 열기
   const handleOpenWriteModal = useCallback(() => {
-    if (!user.isLoggedIn) return;
+    if (!user.isLoggedIn) {
+      message.info("로그인 먼저 진행해주세요!", 1.5);
+      return;
+    }
     setIsWritingReview(true);
     setEditingReviewData(null);
     setIsReviewModalOpen(true);
