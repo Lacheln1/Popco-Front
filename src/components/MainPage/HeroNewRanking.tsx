@@ -98,68 +98,105 @@ const HeroNewRanking = ({
         {/* Carousel Container */}
         <div className="w-full overflow-hidden">
           <div
-            className="relative h-96 w-full md:h-[500px]"
+            className="relative h-96 w-full md:h-[700px]"
             onMouseEnter={handleContainerMouseEnter}
             onMouseLeave={handleContainerMouseLeave}
           >
             <div className="absolute inset-0 flex">
-              {data.map((movie, index) => (
-                <div
-                  key={movie.contentId}
-                  className={`relative h-full cursor-pointer transition-all duration-300 ${
-                    expandedIndex === index ? "flex-[3] pl-64" : "flex-1"
-                  } `}
-                  style={{ zIndex: data.length - index }}
-                  onClick={() => handleItemClick(index)}
-                  onMouseEnter={() => handleItemMouseEnter(index)}
-                >
-                  {/* 미니 랭킹 */}
+              <div className="z-50 mr-4 hidden h-full w-64 flex-shrink-0 rounded-lg bg-black sm:block">
+                <div className="info_container_inner flex h-full flex-col p-6">
+                  {/* Number Image */}
                   <div
-                    className={`absolute right-4 top-4 z-50 transition-opacity duration-300 ${
-                      expandedIndex === index ? "opacity-0" : "opacity-90"
-                    }`}
+                    className="flex items-center justify-center"
+                    style={{ height: "60%" }}
                   >
-                    <span
-                      className="text-2xl font-bold text-white md:text-3xl"
-                      style={{ textShadow: "0px 0px 4px black" }}
-                    >
-                      {index + 1}
-                    </span>
+                    <div className="rounded-lg bg-gray-800 p-6 text-9xl font-bold text-white shadow-2xl"></div>
                   </div>
-                  {/* 포스터 */}
-                  <div
-                    className="absolute left-0 top-0 h-full w-full overflow-hidden"
-                    style={{
-                      background: "linear-gradient(0deg, transparent, #000)",
-                      boxShadow: "0 0 10px 5px rgb(0 0 0 / 70%)",
-                    }}
-                  >
-                    <img
-                      src={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
-                      alt={movie.title}
-                      className={`h-full w-full object-cover transition-opacity duration-300 ${
-                        expandedIndex === index ? "opacity-100" : "opacity-40"
-                      } `}
-                    />
+
+                  {/* Info Text */}
+                  <div className="flex flex-1 flex-col justify-center px-4 text-center">
                     <div
-                      className="absolute bottom-0 left-0 w-full py-6 text-center"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(transparent 0px, rgba(0, 0, 0, 0.8) 100%)",
-                        textShadow: "black 0px 0px 4px, black 0px 0px 15px",
-                      }}
+                      className="mb-4 text-xl font-semibold leading-relaxed text-white"
+                      style={{ color: "rgba(255,255,255,.9)" }}
                     >
-                      <div
-                        className={`text-base font-bold uppercase tracking-wider text-white transition-opacity duration-300 md:text-lg ${
-                          expandedIndex === index ? "opacity-100" : "opacity-0"
-                        } `}
+                      Watched for{" "}
+                      <strong className="mt-2 block text-2xl font-extrabold"></strong>
+                      this week.
+                      <a
+                        href="#"
+                        className="mt-4 block text-lg font-light transition-colors duration-200 hover:text-white"
+                        style={{
+                          color: "rgba(229,9,20,.9)",
+                          fontWeight: "300",
+                        }}
                       >
-                        {movie.title}
-                      </div>
+                        Watch now
+                      </a>
                     </div>
                   </div>
                 </div>
-              ))}
+              </div>
+              <div className="flex flex-1">
+                {data.map((movie, index) => (
+                  <div
+                    key={movie.contentId}
+                    className={`relative h-full cursor-pointer transition-all duration-300 ${
+                      expandedIndex === index ? "flex-[3] pl-64" : "flex-1"
+                    } `}
+                    style={{ zIndex: data.length - index }}
+                    onClick={() => handleItemClick(index)}
+                    onMouseEnter={() => handleItemMouseEnter(index)}
+                  >
+                    {/* 미니 랭킹 */}
+                    <div
+                      className={`absolute right-4 top-4 z-50 transition-opacity duration-300 ${
+                        expandedIndex === index ? "opacity-0" : "opacity-90"
+                      }`}
+                    >
+                      <span
+                        className="text-2xl font-bold text-white md:text-3xl"
+                        style={{ textShadow: "0px 0px 4px black" }}
+                      >
+                        {index + 1}
+                      </span>
+                    </div>
+                    {/* 포스터 */}
+                    <div
+                      className="absolute left-0 top-0 h-full w-full overflow-hidden"
+                      style={{
+                        background: "linear-gradient(0deg, transparent, #000)",
+                        boxShadow: "0 0 10px 5px rgb(0 0 0 / 70%)",
+                      }}
+                    >
+                      <img
+                        src={`${TMDB_IMAGE_BASE_URL}${movie.posterPath}`}
+                        alt={movie.title}
+                        className={`h-full w-full object-cover transition-opacity duration-300 ${
+                          expandedIndex === index ? "opacity-100" : "opacity-40"
+                        } `}
+                      />
+                      <div
+                        className="absolute bottom-0 left-0 w-full py-6 text-center"
+                        style={{
+                          backgroundImage:
+                            "linear-gradient(transparent 0px, rgba(0, 0, 0, 0.8) 100%)",
+                          textShadow: "black 0px 0px 4px, black 0px 0px 15px",
+                        }}
+                      >
+                        <div
+                          className={`text-base font-bold uppercase tracking-wider text-white transition-opacity duration-300 md:text-lg ${
+                            expandedIndex === index
+                              ? "opacity-100"
+                              : "opacity-0"
+                          } `}
+                        >
+                          {movie.title}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
