@@ -130,9 +130,9 @@ const ListPage = () => {
         .map((result) => ({
           id: result.contentId,
           type: result.contentType as ContentCategory,
-          title: result.title || "",
-          releaseDate: result.releaseDate || "",
-          posterPath: result.posterPath || "",
+          title: result.title ?? "", // || 대신 ?? 로 통일
+          releaseDate: result.releaseDate ?? "", // || 대신 ?? 로 통일
+          posterPath: result.posterPath ?? "", // || 대신 ?? 로 통일
           reaction: convertToReactionType(
             (result as any).userLiked,
             (result as any).userDisliked,
@@ -174,10 +174,10 @@ const ListPage = () => {
       if (!results) return [];
       return results.map((result) => ({
         id: result.contentId,
-        title: result.title,
+        title: result.title ?? "", // undefined일 경우 빈 문자열로 대체
         type: result.contentType as ContentCategory,
-        releaseDate: result.releaseDate,
-        posterPath: result.posterPath,
+        releaseDate: result.releaseDate ?? "", // releaseDate도 안전하게 처리
+        posterPath: result.posterPath ?? "", // undefined일 경우 빈 문자열로 대체
         reaction: convertToReactionType(
           (result as any).userLiked,
           (result as any).userDisliked,

@@ -162,13 +162,13 @@ const DetailContents = ({
               <div className="mb-4 flex items-start justify-between">
                 <h2 className="text-3xl font-bold">{contents.title}</h2>
                 <div className="ml-4 flex flex-shrink-0 items-center gap-4">
-                  <LikePopcorn 
-                    onClick={handleLikeClick} 
+                  <LikePopcorn
+                    onClick={handleLikeClick}
                     isSelected={isLiked}
                     disabled={isReactionLoading} // 로딩 상태 추가
                   />
-                  <HatePopcorn 
-                    onClick={handleHateClick} 
+                  <HatePopcorn
+                    onClick={handleHateClick}
                     isSelected={isHated}
                     disabled={isReactionLoading} // 로딩 상태 추가
                   />
@@ -194,13 +194,13 @@ const DetailContents = ({
             </div>
             <div className="col-span-2 flex flex-col justify-between">
               <div className="flex w-full justify-around border-b border-gray-200 pb-2">
-                <LikePopcorn 
-                  onClick={handleLikeClick} 
+                <LikePopcorn
+                  onClick={handleLikeClick}
                   isSelected={isLiked}
                   disabled={isReactionLoading}
                 />
-                <HatePopcorn 
-                  onClick={handleHateClick} 
+                <HatePopcorn
+                  onClick={handleHateClick}
                   isSelected={isHated}
                   disabled={isReactionLoading}
                 />
@@ -278,7 +278,8 @@ export default function DetailPage() {
   const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { user, accessToken } = useAuthCheck();
-  const { contents, loading, error, contentId, contentType } = useContentsDetail(accessToken); // accessToken 전달
+  const { contents, loading, error, contentId, contentType } =
+    useContentsDetail(accessToken); // accessToken 전달
 
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
@@ -290,21 +291,32 @@ export default function DetailPage() {
   // useContentReaction 훅 사용 - 디버깅 추가
   const contentList = useMemo(() => {
     if (!contents || !contentId) return [];
-    
-    return [{
-      id: Number(contentId),
-      reaction: contents.userReaction as "LIKE" | "DISLIKE" | "NEUTRAL" | undefined
-    }];
+
+    return [
+      {
+        id: Number(contentId),
+        reaction: contents.userReaction as
+          | "LIKE"
+          | "DISLIKE"
+          | "NEUTRAL"
+          | undefined,
+      },
+    ];
   }, [contents, contentId]);
 
-  const { reactionMap, handleReaction, isLoading: isReactionLoading } = useContentReaction({
+  const {
+    reactionMap,
+    handleReaction,
+    isLoading: isReactionLoading,
+  } = useContentReaction({
     userId: user.userId ?? undefined,
     accessToken: accessToken ?? "",
     contentList,
   });
 
   // 현재 좋아요/싫어요 상태 - contents에서 직접 가져오기 (fallback)
-  const likeState = reactionMap[Number(contentId)] || contents?.userReaction || "NEUTRAL";
+  const likeState =
+    reactionMap[Number(contentId)] || contents?.userReaction || "NEUTRAL";
 
   // 좋아요/싫어요 상태 변경 핸들러
   const handleLikeChange = useCallback(
@@ -321,11 +333,12 @@ export default function DetailPage() {
 
       try {
         await handleReaction(Number(contentId), targetState, contentType);
-        
+
         // 성공 메시지
         const currentState = likeState;
-        const finalState = currentState === targetState ? "NEUTRAL" : targetState;
-        
+        const finalState =
+          currentState === targetState ? "NEUTRAL" : targetState;
+
         if (finalState === "LIKE") {
           message.success("좋아요를 등록했습니다!", 1);
         } else if (finalState === "DISLIKE") {
@@ -442,7 +455,10 @@ export default function DetailPage() {
   };
 
   // 위시리스트 상태 및 핸들러
-  const { data: wishlistData } = useFetchWishlist(user.userId, accessToken);
+  const { data: wishlistData } = useFetchWishlist(
+    user.userId ?? undefined,
+    accessToken ?? undefined,
+  );
   const { mutate: toggleWishlist } = useToggleWishlist();
   const isWished = useMemo(
     () =>
@@ -453,10 +469,12 @@ export default function DetailPage() {
   );
 
   const handleWishClick = useCallback(() => {
-    if (!user.isLoggedIn || !contentType || !accessToken) return;
+    if (!user.isLoggedIn || !contentType || !accessToken || !user.userId)
+      return;
+
     toggleWishlist({
       isWished,
-      userId: user.userId,
+      userId: user.userId, 
       contentId: Number(contentId),
       contentType: contentType,
       accessToken: accessToken,
