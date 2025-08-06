@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { App, Avatar, Input } from "antd";
 
@@ -24,9 +24,11 @@ import {
   useToggleMarkCollection,
   useManageCollectionContents,
 } from "@/hooks/useCollections";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 
 // Types & Constants
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { ReactionType } from "@/types/Contents.types"; // 추가
 
 // SearchContentModal에서 추가할 콘텐츠의 타입
 interface ContentToAdd {
@@ -58,6 +60,24 @@ const CollectionDetailPage: React.FC = () => {
   const { addContent, removeContent } = useManageCollectionContents(
     collectionId!,
   );
+
+  // --- 좋아요/싫어요 기능 추가 ---
+  // contentList 생성 - collection.contentPosters에서 변환
+  const contentList = useMemo(() => {
+    if (!user.isLoggedIn || !collection?.contentPosters) return [];
+    
+    return collection.contentPosters.map((content: any) => ({
+      id: content.contentId,
+      reaction: (content.userReaction as ReactionType) || "NEUTRAL", // API에서 userReaction 필드가 있다고 가정
+    }));
+  }, [collection?.contentPosters, user.isLoggedIn]);
+
+  // useContentReaction 훅 사용
+  const { reactionMap, handleReaction, isLoading: isReactionLoading } = useContentReaction({
+    userId: user.userId,
+    accessToken: accessToken ?? "",
+    contentList,
+  });
 
   // --- UI 상태 관리 ---
   const [isEditing, setIsEditing] = useState(false);
@@ -173,7 +193,7 @@ const CollectionDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner /> {/* ✅ size prop 제거 */}
+        <Spinner />
       </div>
     );
   }
@@ -323,6 +343,14 @@ const CollectionDetailPage: React.FC = () => {
                     title={content.title}
                     contentType={content.contentType}
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
+                    likeState={user.isLoggedIn 
+                      ? (reactionMap[content.contentId] || content.userReaction || "NEUTRAL")
+                      : "NEUTRAL"
+                    }
+                    onLikeChange={(newState) =>
+                      handleReaction(content.contentId, newState, content.contentType)
+                    }
+                    disabled={isReactionLoading}
                   />
                 ),
               )}

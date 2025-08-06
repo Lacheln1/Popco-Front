@@ -108,16 +108,6 @@ const ReviewModal = ({
   };
 
   const handleSave = () => {
-    // 디버깅용 로그
-    console.log("handleSave 호출:", {
-      review: review.trim(),
-      contentType,
-      token,
-      contentId,
-      reviewId,
-      isWriting,
-    });
-
     if (!review.trim()) {
       message.warning("리뷰 내용을 입력해주세요.");
       return;
@@ -162,15 +152,8 @@ const ReviewModal = ({
     };
 
     if (isWriting) {
-      console.log("리뷰 등록 요청:", { body, contentId, contentType });
       postReview({ body, token }, commonOptions);
     } else if (reviewId) {
-      console.log("리뷰 수정 요청:", {
-        reviewId,
-        body,
-        contentId,
-        contentType,
-      });
       putReview({ reviewId, body, token }, commonOptions);
     }
   };

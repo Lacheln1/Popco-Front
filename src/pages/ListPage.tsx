@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Select } from "antd";
 import PageLayout from "@/layout/PageLayout";
 import SectionHeader from "@/components/common/SectionHeader";
@@ -6,17 +6,25 @@ import SearchBar from "@/components/common/SearchBar";
 import FilterSection from "@/components/ListPage/FilterSection";
 import Poster from "@/components/common/Poster";
 import { useAllContents } from "@/hooks/queries/contents/useAllContents";
-import { AllContentItem, ContentCategory } from "@/types/Contents.types";
+import {
+  AllContentItem,
+  ContentCategory,
+  ReactionType,
+} from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useSearchContents } from "@/hooks/queries/search/useSearchContents";
 import { FilteredContentResponse, SearchResult } from "@/types/Search.types";
 import { useFilterStore } from "@/store/useFilterStore";
 import { useFilteredContents } from "@/hooks/queries/search/useFilteredContents";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
+import useAuthCheck from "@/hooks/useAuthCheck";
 
 type SearchType = "keyword" | "actors";
 type SortType = "recent" | "popular";
 
 const ListPage = () => {
+  const { user, accessToken } = useAuthCheck();
+
   // 기본 상태
   const [sort, setSort] = useState<SortType>("recent");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -44,12 +52,22 @@ const ListPage = () => {
         })
       : false;
 
-  // API 훅
+  // API 훅 - userId와 accessToken 전달, 페이지 로드시 최신 데이터 보장
   const allContentsQuery = useAllContents({
     size: 28,
     sort,
     enabled: !isSearching && !hasActiveFilter,
+    userId: user.isLoggedIn ? user.userId : undefined, // 로그인된 경우에만 userId 전달
+    accessToken: user.isLoggedIn ? accessToken : undefined, // 로그인된 경우에만 accessToken 전달
   });
+
+  // 페이지 로드시 최신 데이터 보장을 위한 리프레시
+  useEffect(() => {
+    if (!isSearching && !hasActiveFilter && user.isLoggedIn) {
+      // 리스트페이지 진입시 캐시된 데이터가 오래되었을 수 있으므로 백그라운드에서 리프레시
+      allContentsQuery.refetch();
+    }
+  }, [user.isLoggedIn]); // 로그인 상태 변경시에만 실행
 
   // actors 검색
   const searchQuery = useSearchContents({
@@ -89,9 +107,21 @@ const ListPage = () => {
     allContentsQuery,
   ]);
 
-  // 검색 결과 변환 함수
+  // userLiked, userDisliked를 ReactionType으로 변환하는 함수
+  const convertToReactionType = useCallback(
+    (userLiked?: boolean, userDisliked?: boolean): ReactionType => {
+      if (userLiked) return "LIKE";
+      if (userDisliked) return "DISLIKE";
+      return "NEUTRAL";
+    },
+    [],
+  );
+
+  // 검색 결과 변환 함수 - reaction 추가
   const mapSearchResultsToAllContentItems = useCallback(
-    (results: SearchResult[] | undefined): AllContentItem[] => {
+    (
+      results: SearchResult[] | undefined,
+    ): (AllContentItem & { reaction: ReactionType })[] => {
       if (!results || !Array.isArray(results)) {
         return [];
       }
@@ -103,17 +133,33 @@ const ListPage = () => {
           title: result.title || "",
           releaseDate: result.releaseDate || "",
           posterPath: result.posterPath || "",
+          reaction: convertToReactionType(
+            (result as any).userLiked,
+            (result as any).userDisliked,
+          ), // 검색 결과에서도 userLiked/userDisliked 확인
         }));
     },
-    [],
+    [convertToReactionType],
   );
 
-  // 콘텐츠 데이터 가져오기 함수들 - 메모이제이션
-  const getAllContents = useCallback((): AllContentItem[] => {
-    return allContentsQuery.data?.pages.flatMap((page) => page.contents) ?? [];
-  }, [allContentsQuery.data?.pages]);
+  // 콘텐츠 데이터 가져오기 함수들 - 메모이제이션 및 reaction 추가
+  const getAllContents = useCallback((): (AllContentItem & {
+    reaction: ReactionType;
+  })[] => {
+    const contents =
+      allContentsQuery.data?.pages.flatMap((page) => page.contents) ?? [];
+    return contents.map((content) => ({
+      ...content,
+      reaction: convertToReactionType(
+        (content as any).userLiked,
+        (content as any).userDisliked,
+      ),
+    }));
+  }, [allContentsQuery.data?.pages, convertToReactionType]);
 
-  const getSearchResults = useCallback((): AllContentItem[] => {
+  const getSearchResults = useCallback((): (AllContentItem & {
+    reaction: ReactionType;
+  })[] => {
     if (!searchQuery.data?.pages) return [];
     return searchQuery.data.pages
       .filter((page) => page?.content)
@@ -122,7 +168,9 @@ const ListPage = () => {
   }, [searchQuery.data?.pages, mapSearchResultsToAllContentItems]);
 
   const mapFilteredResultsToAllContentItems = useCallback(
-    (results: FilteredContentResponse[] | undefined): AllContentItem[] => {
+    (
+      results: FilteredContentResponse[] | undefined,
+    ): (AllContentItem & { reaction: ReactionType })[] => {
       if (!results) return [];
       return results.map((result) => ({
         id: result.contentId,
@@ -130,12 +178,18 @@ const ListPage = () => {
         type: result.contentType as ContentCategory,
         releaseDate: result.releaseDate,
         posterPath: result.posterPath,
+        reaction: convertToReactionType(
+          (result as any).userLiked,
+          (result as any).userDisliked,
+        ),
       }));
     },
-    [],
+    [convertToReactionType],
   );
 
-  const getFilteredResults = useCallback((): AllContentItem[] => {
+  const getFilteredResults = useCallback((): (AllContentItem & {
+    reaction: ReactionType;
+  })[] => {
     if (!filteredContentsQuery.data?.pages) return [];
     return filteredContentsQuery.data.pages
       .filter((page) => page?.contents)
@@ -180,7 +234,9 @@ const ListPage = () => {
   ]);
 
   // 표시할 콘텐츠 결정
-  const getDisplayContents = useCallback((): AllContentItem[] => {
+  const getDisplayContents = useCallback((): (AllContentItem & {
+    reaction: ReactionType;
+  })[] => {
     if (isSearching) return getSearchResults();
     if (hasActiveFilter) return getFilteredResults();
     return getAllContents();
@@ -192,11 +248,40 @@ const ListPage = () => {
     getAllContents,
   ]);
 
+  // 표시할 콘텐츠 결정 - contentList보다 먼저 선언
+  const displayContents = getDisplayContents();
+
+  // useContentReaction을 위한 contentList 생성 - 안정적인 memoization
+  const contentList = useMemo(() => {
+    if (!user.isLoggedIn || displayContents.length === 0) return [];
+
+    return displayContents.map((content) => ({
+      id: content.id,
+      reaction: content.reaction,
+    }));
+  }, [
+    // displayContents 대신 필요한 값들만 의존성으로 사용
+    displayContents.map((item) => `${item.id}-${item.reaction}`).join(","),
+    user.isLoggedIn,
+    user.userId,
+  ]);
+
+  // useContentReaction 훅 사용
+  const {
+    reactionMap,
+    handleReaction,
+    isLoading: isReactionLoading,
+  } = useContentReaction({
+    userId: user.userId,
+    accessToken: accessToken ?? "",
+    contentList,
+  });
+
   // 무한 스크롤 설정 - 수정된 부분
   const getInfiniteScrollConfig = useCallback(() => {
     if (isSearching) {
       return {
-        hasNext: Boolean(searchQuery.hasNextPage), // isFetching 조건 제거
+        hasNext: Boolean(searchQuery.hasNextPage),
         isFetching: searchQuery.isFetchingNextPage,
         fetchNext: () => {
           if (searchQuery.hasNextPage && !searchQuery.isFetching) {
@@ -208,7 +293,7 @@ const ListPage = () => {
 
     if (hasActiveFilter) {
       return {
-        hasNext: Boolean(filteredContentsQuery.hasNextPage), // isFetching 조건 제거
+        hasNext: Boolean(filteredContentsQuery.hasNextPage),
         isFetching: filteredContentsQuery.isFetchingNextPage,
         fetchNext: () => {
           if (
@@ -222,7 +307,7 @@ const ListPage = () => {
     }
 
     return {
-      hasNext: Boolean(allContentsQuery.hasNextPage), // isFetching 조건 제거
+      hasNext: Boolean(allContentsQuery.hasNextPage),
       isFetching: allContentsQuery.isFetchingNextPage,
       fetchNext: () => {
         if (allContentsQuery.hasNextPage && !allContentsQuery.isFetching) {
@@ -267,7 +352,7 @@ const ListPage = () => {
       },
       {
         threshold: 0.1,
-        rootMargin: "100px", // rootMargin 증가
+        rootMargin: "100px",
       },
     );
 
@@ -309,13 +394,7 @@ const ListPage = () => {
     setSearchActors([]);
   }, []);
 
-  const handleLikeChange = useCallback((contentId: number) => {
-    // TODO: 좋아요 상태 변경 로직 구현
-    console.log("Like changed for content:", contentId);
-  }, []);
-
   // 렌더링 데이터 - 메모이제이션
-  const displayContents = getDisplayContents();
   const config = getInfiniteScrollConfig();
   const isLoading = getCurrentLoadingState();
   const error = getCurrentErrorState();
@@ -345,7 +424,6 @@ const ListPage = () => {
       {/* 정렬 옵션 */}
       <div className="self-right justify-self-end py-4 pr-4 xl:pr-0">
         <Select
-          style={{ width: 80 }}
           onChange={handleSortChange}
           value={sort}
           options={[
@@ -372,8 +450,15 @@ const ListPage = () => {
               title={content.title}
               contentType={content.type}
               posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
-              likeState="NEUTRAL"
-              onLikeChange={() => handleLikeChange(content.id)}
+              likeState={
+                user.isLoggedIn
+                  ? reactionMap[content.id] || content.reaction || "NEUTRAL"
+                  : "NEUTRAL"
+              }
+              onLikeChange={(newState) =>
+                handleReaction(content.id, newState, content.type)
+              }
+              disabled={isReactionLoading}
               className="max-w-[260px] md:w-[260px]"
             />
           ))
@@ -390,7 +475,7 @@ const ListPage = () => {
           <div
             ref={observerRef}
             className="h-10 w-full"
-            style={{ backgroundColor: "transparent" }} // 디버깅용
+            style={{ backgroundColor: "transparent" }}
           />
           {config.isFetching && (
             <div className="flex justify-center py-6">

@@ -357,7 +357,6 @@ const Header: React.FC<HeaderProps> = ({
                       setIsMobileMenuOpen(false);
                       onLogin?.();
                       navigateToLogin();
-                      console.log("로그인클릭됨");
                     }}
                     style={
                       isScrolled

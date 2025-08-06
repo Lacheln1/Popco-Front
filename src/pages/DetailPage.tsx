@@ -8,12 +8,10 @@ import { ReviewCardData } from "@/types/Reviews.types";
 
 // --- 훅 임포트 ---
 import { useContentsDetail } from "@/hooks/useContentsDetail";
-import { useMyReview } from "@/hooks/queries/review/useMyReview"; // 내 리뷰 조회 훅
+import { useMyReview } from "@/hooks/queries/review/useMyReview";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useFetchWishlist, useToggleWishlist } from "@/hooks/useWishlist";
-
-// --- Zustand 스토어 임포트 ---
-import { useLikeStore } from "@/store/useLikeStore";
+import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 
 // --- 컴포넌트 임포트 ---
 import ReviewModal from "@/components/ReviewModal/ReviewModal";
@@ -49,6 +47,7 @@ interface DetailContentsProps {
   onEditReview: (reviewData: ReviewCardData) => void;
   onReviewClick: () => void;
   reviewButtonLabel: string;
+  isReactionLoading: boolean; // 추가
 }
 
 const DetailContents = ({
@@ -65,6 +64,7 @@ const DetailContents = ({
   onEditReview,
   onReviewClick,
   reviewButtonLabel,
+  isReactionLoading, // 추가
 }: DetailContentsProps) => {
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -162,8 +162,16 @@ const DetailContents = ({
               <div className="mb-4 flex items-start justify-between">
                 <h2 className="text-3xl font-bold">{contents.title}</h2>
                 <div className="ml-4 flex flex-shrink-0 items-center gap-4">
-                  <LikePopcorn onClick={handleLikeClick} isSelected={isLiked} />
-                  <HatePopcorn onClick={handleHateClick} isSelected={isHated} />
+                  <LikePopcorn 
+                    onClick={handleLikeClick} 
+                    isSelected={isLiked}
+                    disabled={isReactionLoading} // 로딩 상태 추가
+                  />
+                  <HatePopcorn 
+                    onClick={handleHateClick} 
+                    isSelected={isHated}
+                    disabled={isReactionLoading} // 로딩 상태 추가
+                  />
                 </div>
               </div>
               <MovieInfo movie={movieInfoProps} isDesktop />
@@ -186,8 +194,16 @@ const DetailContents = ({
             </div>
             <div className="col-span-2 flex flex-col justify-between">
               <div className="flex w-full justify-around border-b border-gray-200 pb-2">
-                <LikePopcorn onClick={handleLikeClick} isSelected={isLiked} />
-                <HatePopcorn onClick={handleHateClick} isSelected={isHated} />
+                <LikePopcorn 
+                  onClick={handleLikeClick} 
+                  isSelected={isLiked}
+                  disabled={isReactionLoading}
+                />
+                <HatePopcorn 
+                  onClick={handleHateClick} 
+                  isSelected={isHated}
+                  disabled={isReactionLoading}
+                />
               </div>
               <div className="flex flex-grow flex-col justify-center gap-2">
                 <div className="flex items-center justify-center">
@@ -262,14 +278,7 @@ export default function DetailPage() {
   const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { user, accessToken } = useAuthCheck();
-  const { contents, loading, error, contentId, contentType } =
-    useContentsDetail();
-
-  // Zustand 스토어 사용
-  const { getReaction, updateReaction } = useLikeStore();
-
-  // 현재 좋아요/싫어요 상태 (Zustand에서 자동으로 관리됨)
-  const likeState = getReaction(Number(contentId), contentType ?? "");
+  const { contents, loading, error, contentId, contentType } = useContentsDetail(accessToken); // accessToken 전달
 
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
@@ -277,6 +286,25 @@ export default function DetailPage() {
     contentType ?? "",
     accessToken ?? undefined,
   );
+
+  // useContentReaction 훅 사용 - 디버깅 추가
+  const contentList = useMemo(() => {
+    if (!contents || !contentId) return [];
+    
+    return [{
+      id: Number(contentId),
+      reaction: contents.userReaction as "LIKE" | "DISLIKE" | "NEUTRAL" | undefined
+    }];
+  }, [contents, contentId]);
+
+  const { reactionMap, handleReaction, isLoading: isReactionLoading } = useContentReaction({
+    userId: user.userId,
+    accessToken: accessToken ?? "",
+    contentList,
+  });
+
+  // 현재 좋아요/싫어요 상태 - contents에서 직접 가져오기 (fallback)
+  const likeState = reactionMap[Number(contentId)] || contents?.userReaction || "NEUTRAL";
 
   // 좋아요/싫어요 상태 변경 핸들러
   const handleLikeChange = useCallback(
@@ -286,23 +314,18 @@ export default function DetailPage() {
         return;
       }
 
-      if (!accessToken || !contentId || !contentType) {
+      if (!contentId || !contentType) {
         message.error("필요한 정보가 부족합니다.");
         return;
       }
 
       try {
-        // Zustand 스토어의 updateReaction 사용
-        await updateReaction(
-          Number(contentId),
-          contentType,
-          targetState,
-          user.userId,
-          accessToken,
-        );
-
+        await handleReaction(Number(contentId), targetState, contentType);
+        
         // 성공 메시지
-        const finalState = likeState === targetState ? "NEUTRAL" : targetState;
+        const currentState = likeState;
+        const finalState = currentState === targetState ? "NEUTRAL" : targetState;
+        
         if (finalState === "LIKE") {
           message.success("좋아요를 등록했습니다!", 1);
         } else if (finalState === "DISLIKE") {
@@ -312,17 +335,16 @@ export default function DetailPage() {
         }
       } catch (error) {
         console.error("좋아요/싫어요 처리 실패:", error);
+        message.error("처리 중 오류가 발생했습니다.");
       }
     },
     [
       user.isLoggedIn,
-      user.userId,
-      accessToken,
       contentId,
       contentType,
-      message,
+      handleReaction,
       likeState,
-      updateReaction,
+      message,
     ],
   );
 
@@ -479,6 +501,7 @@ export default function DetailPage() {
         reviewButtonLabel={
           myReviewData?.existUserReview ? "리뷰 수정" : "리뷰 쓰기"
         }
+        isReactionLoading={isReactionLoading}
       />
 
       {isReviewModalOpen && (

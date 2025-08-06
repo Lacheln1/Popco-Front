@@ -12,14 +12,12 @@ const SwiperButtonExamplePage: React.FC = () => {
 
     //swiper 초기화 완료 시 실행되는 콜백함수. 초기화 안하면 undefined 상태가 되어 작동안함
     const handleSwiperInit = (swiper: SwiperType) => {
-        console.log("초기화됨:", swiper);
         setSwiperInstance(swiper);
         setIsBeginning(swiper.isBeginning);
         setIsEnd(swiper.isEnd);
     };
 
     const handleSlideChange = (swiper: SwiperType) => {
-        console.log("슬라이드 변경:", swiper.activeIndex);
         setIsBeginning(swiper.isBeginning);
         setIsEnd(swiper.isEnd);
     };
