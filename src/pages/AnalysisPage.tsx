@@ -100,25 +100,39 @@ const AnalysisPage = () => {
         // 데이터 가져오기 시작 표시
         hasFetched.current = true;
 
-        const response = await getUserPersonas(accessToken);
-        const dashboardResponse = await getRoleDashBoardData(accessToken);
-        const personaTextResponse = await getPersonaText(accessToken);
+        // 기본 데이터부터 먼저 가져오기
+        const [response, dashboardResponse] = await Promise.all([
+          getUserPersonas(accessToken),
+          getRoleDashBoardData(accessToken),
+        ]);
+
         if (
           !response ||
           !response.data ||
           !dashboardResponse ||
-          !dashboardResponse.data ||
-          !personaTextResponse
+          !dashboardResponse.data
         ) {
           throw new Error("유효하지 않은 응답 데이터");
         }
+
         console.log("API 응답:", response);
         setUserData(response.data);
         setDashBoardData(dashboardResponse.data);
-        setPersonaText(personaTextResponse.data);
         console.log("userdata 설정 후:", response.data);
         console.log("대쉬보드 설정 후:", dashboardResponse.data);
-        console.log("페르소나 텍스트:", personaTextResponse.data);
+
+        // 페르소나 텍스트는 별도로 비동기 처리
+        getPersonaText(accessToken)
+          .then((personaTextResponse) => {
+            if (personaTextResponse) {
+              setPersonaText(personaTextResponse.data);
+              console.log("페르소나 텍스트:", personaTextResponse.data);
+            }
+          })
+          .catch((error) => {
+            console.error("페르소나 텍스트 가져오기 실패:", error);
+            // 페르소나 텍스트 실패는 전체 렌더링을 막지 않음
+          });
       } catch (error) {
         console.error("페르소나 데이터 가져오기 실패:", error);
         setError("데이터를 불러오는데 실패했습니다.");
@@ -163,7 +177,7 @@ const AnalysisPage = () => {
     );
   }
 
-  // 로딩 중일 때
+  // 기본 데이터 로딩 중일 때
   if (loading) {
     return (
       <main className="pretendard">
@@ -188,8 +202,8 @@ const AnalysisPage = () => {
     );
   }
 
-  // userData가 null일 때
-  if (!userData || !dashBoardData || !personaText || !accessToken) {
+  // 기본 userData와 dashBoardData가 없을 때
+  if (!userData || !dashBoardData || !accessToken) {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
@@ -199,7 +213,7 @@ const AnalysisPage = () => {
     );
   }
 
-  // 정상적으로 데이터가 있을 때만 렌더링
+  // 기본 데이터가 있으면 바로 렌더링 (personaText는 없어도 됨)
   return (
     <main className="pretendard">
       <Suspense fallback={<Spinner />}>
@@ -212,8 +226,8 @@ const AnalysisPage = () => {
           subPersonaImgPath={userData.subPersonaImgPath}
           subPersonaName={userData.subPersonaName}
           subPersonaPercent={userData.subPersonaPercent}
-          personaText1={personaText.text1}
-          personaText2={personaText.text2}
+          personaText1={personaText?.text1}
+          personaText2={personaText?.text2}
         />
       </Suspense>
 

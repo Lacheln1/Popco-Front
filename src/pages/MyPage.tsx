@@ -102,7 +102,7 @@ const MyPage: React.FC = () => {
       <PageLayout
         header={
           <SectionHeader
-            title="나의 기록"
+            title="나의 활동"
             description="내가 봤던 작품들과 리뷰 그리고 보고싶은 작품들까지 한눈에!"
           />
         }

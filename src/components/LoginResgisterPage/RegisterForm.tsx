@@ -159,7 +159,7 @@ const RegisterForm: React.FC = () => {
     setPassword(value);
 
     if (value && !validatePassword(value)) {
-      setPasswordError("비밀번호는 4~6자 영문, 숫자 혼합으로 입력해주세요.");
+      setPasswordError("비밀번호는 4자 이상 영문, 숫자 혼합으로 입력해주세요.");
     } else {
       setPasswordError("");
     }

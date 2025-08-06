@@ -12,6 +12,7 @@ const Personalization = ({
 }) => {
   const [form] = Form.useForm();
   const [age, setAge] = useState<[number, number]>([0, 65]);
+  const [isAgeTouched, setIsAgeTouched] = useState(false); // 슬라이더 터치 여부 추적
 
   useEffect(() => {
     if (value) {
@@ -19,8 +20,14 @@ const Personalization = ({
         algorithm: value.algorithm,
         persona: value.persona,
       });
-      if (Array.isArray(value.age)) {
+
+      // value에서 age가 null이 아닌 실제 값이 있을 때만 설정
+      if (value.age && Array.isArray(value.age)) {
         setAge(value.age as [number, number]);
+        setIsAgeTouched(true);
+      } else {
+        // null이면 터치되지 않은 상태로 초기화
+        setIsAgeTouched(false);
       }
     }
   }, [form, value]);
@@ -28,16 +35,10 @@ const Personalization = ({
   const handleFormChange = (_: unknown, allValues: Record<string, unknown>) => {
     const final = {
       ...allValues,
-      age: value?.age,
+      age: isAgeTouched ? age : null, // 터치된 경우에만 age 포함
     };
     onChange("개인화", final);
   };
-
-  useEffect(() => {
-    if (value?.age && Array.isArray(value.age)) {
-      setAge(value.age as [number, number]);
-    }
-  }, [value?.age]);
 
   return (
     <motion.div
@@ -63,6 +64,7 @@ const Personalization = ({
             value={age}
             onChange={(val: number[]) => setAge(val as [number, number])}
             onChangeComplete={(val) => {
+              setIsAgeTouched(true); // 사용자가 조작했음을 표시
               const current = form.getFieldsValue();
               onChange("개인화", {
                 ...current,

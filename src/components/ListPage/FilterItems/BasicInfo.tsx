@@ -1,5 +1,5 @@
 import { TabKey } from "@/constants/FilterTabs";
-import { Form, Checkbox, Slider } from "antd";
+import { Form, Checkbox, Slider, Radio } from "antd";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
@@ -12,6 +12,7 @@ const BasicInfo = ({
 }) => {
   const [form] = Form.useForm();
   const [rating, setRating] = useState<[number, number]>([0, 5]);
+  const [isRatingTouched, setIsRatingTouched] = useState(false); // 슬라이더 터치 여부 추적
 
   useEffect(() => {
     if (value) {
@@ -19,8 +20,14 @@ const BasicInfo = ({
         type: value.type,
         genre: value.genre,
       });
-      if (Array.isArray(value.rating)) {
+
+      // value에서 rating이 null이 아닌 실제 값이 있을 때만 설정
+      if (value.rating && Array.isArray(value.rating)) {
         setRating(value.rating as [number, number]);
+        setIsRatingTouched(true);
+      } else {
+        // null이면 터치되지 않은 상태로 초기화
+        setIsRatingTouched(false);
       }
     }
   }, [form, value]);
@@ -28,20 +35,14 @@ const BasicInfo = ({
   const handleFormChange = (_: unknown, allValues: Record<string, unknown>) => {
     const final = {
       ...allValues,
-      rating: value?.rating, // 슬라이더는 따로 처리됨
+      rating: isRatingTouched ? rating : null, // 터치된 경우에만 rating 포함
     };
     onChange("기본정보", final);
   };
 
-  useEffect(() => {
-    if (value?.rating && Array.isArray(value.rating)) {
-      setRating(value.rating as [number, number]);
-    }
-  }, [value?.rating]);
-
   return (
     <motion.div
-      key="filter-이용환경"
+      key="filter-기본정보"
       initial={{ height: 0, opacity: 0 }}
       animate={{ height: "auto", opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
@@ -58,7 +59,12 @@ const BasicInfo = ({
           label={<span className="text-gray-400">타입</span>}
           name="type"
         >
-          <Checkbox.Group options={["영화", "시리즈/드라마"]} />
+          <Radio.Group
+            options={[
+              { label: "영화", value: "movie" },
+              { label: "시리즈/드라마", value: "tv" },
+            ]}
+          />
         </Form.Item>
 
         <Form.Item
@@ -87,6 +93,7 @@ const BasicInfo = ({
             value={rating}
             onChange={(val: number[]) => setRating(val as [number, number])}
             onChangeComplete={(val) => {
+              setIsRatingTouched(true); // 사용자가 조작했음을 표시
               const current = form.getFieldsValue();
               onChange("기본정보", {
                 ...current,

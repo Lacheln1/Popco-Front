@@ -5,9 +5,9 @@ import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { fetchHeroPersona } from "@/apis/personaApi";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import "swiper/swiper-bundle.css";
+import axios from "axios";
 
 interface LikeContentSectionProps {
   userId: number;
@@ -50,43 +50,26 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   ];
 
   // API 호출 함수
+  // 수정된 API 호출 함수
   const fetchRecommendations = async (contentType: "movie" | "tv") => {
-    if (!accessToken) {
-      return;
-    }
+    if (!accessToken) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      // contentType을 "all"로 먼저 시도해보기
-      const response = await fetchHeroPersona(userId, accessToken, contentType);
-
-      // 만약 "all"로도 데이터가 없다면 contentType 파라미터 없이 시도
-      if (!response.recommendations || response.recommendations.length === 0) {
-        const fallbackResponse = await fetchHeroPersona(userId, accessToken);
-
-        if (
-          fallbackResponse.recommendations &&
-          fallbackResponse.recommendations.length > 0
-        ) {
-          // 선택된 타입에 맞는 데이터만 필터링
-          const filteredRecommendations =
-            fallbackResponse.recommendations.filter(
-              (item) => item.type === contentType,
-            );
-
-          setRecommendations(filteredRecommendations);
-          return;
-        }
-      }
-
-      // 선택된 타입에 맞는 데이터만 필터링
-      const filteredRecommendations = response.recommendations.filter(
-        (item) => item.type === contentType,
+      // axios로 직접 호출
+      const response = await axios.get(
+        `http://3.37.182.52:8000/recommends/personas/users/${userId}/recommendations?content_type=${contentType}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
       );
 
-      setRecommendations(filteredRecommendations);
+      console.log(`${contentType} 응답:`, response.data);
+      setRecommendations(response.data.recommendations || []);
     } catch (err) {
       console.error("추천 데이터 가져오기 실패:", err);
       setError("데이터를 불러오는데 실패했습니다.");
@@ -228,7 +211,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                         {item.title}
                       </h3>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {item.genres.slice(0, 2).map((genre, index) => (
+                        {item.genres.map((genre, index) => (
                           <span
                             key={index}
                             className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"

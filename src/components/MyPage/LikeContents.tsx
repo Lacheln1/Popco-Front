@@ -81,7 +81,7 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
 
   return (
     <div>
-      <div>
+      <div className="pb-5">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="gmarket-bold py-2 text-base md:text-2xl">
             내가 좋아해요

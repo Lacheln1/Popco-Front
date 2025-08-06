@@ -64,12 +64,12 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
               <AverageDoubleDonutChart
                 customerScore={reviewPercent[0]}
                 averageScore={reviewPercent[1]}
-                maxScore={reviewPercent[2]}
+                maxScore={reviewPercent[1]}
                 personaName={personaName}
               />
               <div className="flex justify-center">
                 <span className="text-base md:text-2xl">
-                  {reviewPercent[0]}개
+                  {reviewPercent[0]}/{reviewPercent[1]}개
                 </span>
               </div>
             </div>
