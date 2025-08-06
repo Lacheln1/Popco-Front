@@ -89,7 +89,7 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
                 />
               </div>
 
-              <div className="absolute flex -translate-x-[80px] translate-y-[-45px] flex-col pt-3 md:-translate-x-[120px] md:translate-y-[-40px] lg:-translate-x-[-220px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
+              <div className="absolute flex -translate-x-[80px] translate-y-[-45px] flex-col pt-3 md:-translate-x-[122px] md:translate-y-[-40px] lg:-translate-x-[-220px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
                 {personaText2 ? (
                   <motion.span
                     className="gmarket-medium mb-2 translate-x-6 whitespace-nowrap px-1 py-1 text-white md:translate-x-10 md:text-xl"
