@@ -6,6 +6,36 @@ import { useQuizStore } from "@/stores/useQuizStore";
 let stompClient: Client | null = null;
 let currentSubscription: any = null;
 
+// stompClient getter 함수 추가 - 다른 컴포넌트에서 접근할 수 있도록
+export const getStompClient = (): Client | null => {
+  return stompClient;
+};
+
+// 대기 채널 구독 함수 추가
+export const subscribeToWaiting = (
+  quizId: number,
+  onMessage: (data: any) => void,
+) => {
+  if (!stompClient || !stompClient.connected) {
+    console.warn("소켓이 아직 연결되지 않았습니다.");
+    return null;
+  }
+
+  const topic = `/topic/quiz/${quizId}/waiting`;
+
+  const subscription = stompClient.subscribe(topic, (message: IMessage) => {
+    try {
+      const data = JSON.parse(message.body);
+      onMessage(data);
+    } catch (e) {
+      console.error("대기 채널 메시지 파싱 실패", e);
+    }
+  });
+
+  console.log(`대기 채널 구독 시작: ${topic}`);
+  return subscription;
+};
+
 // 1. 소켓 연결
 export const connectSocket = (token: string): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -17,9 +47,6 @@ export const connectSocket = (token: string): Promise<void> => {
         Authorization: `Bearer ${token}`,
       },
       reconnectDelay: 5000, // 자동 재연결 옵션
-      debug: (str) => {
-        console.log("[STOMP DEBUG]:", str);
-      },
       onConnect: () => {
         console.log("소켓 연결 성공");
         stompClient = client;

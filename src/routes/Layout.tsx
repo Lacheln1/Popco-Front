@@ -16,15 +16,16 @@ const Layout = () => {
 
   useEffect(() => {
     if (!accessToken) return;
-
     const url = `${import.meta.env.VITE_BACK_URL}/notifications/stream`;
-
     const eventSource = new EventSourcePolyfill(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-      withCredentials: true, // 필요 없으면 제거 가능
     });
+
+    eventSource.onopen = () => {
+      console.log("SSE 연결 성공");
+    };
 
     eventSource.onmessage = (event) => {
       try {
