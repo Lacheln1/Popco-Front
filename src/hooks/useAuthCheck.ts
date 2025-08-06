@@ -83,7 +83,7 @@ const useAuthCheck = () => {
         }
 
         // 토큰 만료 시간 확인 및 필요시 갱신
-        const decodedForExp = jwtDecode<JwtPayload>(token);
+        const decodedForExp = jwtDecode<JwtPayload>(token as string);
         if (decodedForExp.exp && decodedForExp.exp < Date.now() / 1000) {
           localStorage.removeItem("accessToken");
           const refreshResult = await validateAndRefreshTokens();
@@ -91,7 +91,8 @@ const useAuthCheck = () => {
             token = refreshResult.data.accessToken;
             localStorage.setItem("accessToken", token);
           } else {
-            if (needsAuth) navigate("/login", { state: { from: currentPath } });
+            if (needsAuth)
+              navigate("/login", { state: { from: currentPath } });
             return;
           }
         }
@@ -102,11 +103,13 @@ const useAuthCheck = () => {
         }
 
         setAccessToken(token);
-        const decoded = jwtDecode<JwtPayload>(token);
+        const decoded = jwtDecode<JwtPayload>(token as string);
         const userIdFromToken = Number(decoded.sub);
 
         if (!userIdFromToken || isNaN(userIdFromToken)) {
-          throw new Error("토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.");
+          throw new Error(
+            "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
+          );
         }
 
         // --- 3. 프로필 완료 상태 확인 (로그인 시 저장된 정보 사용) ---
@@ -144,7 +147,10 @@ const useAuthCheck = () => {
             });
           }
         } catch (userDetailError) {
-          console.error("🔍 사용자 상세 정보 가져오기 실패:", userDetailError);
+          console.error(
+            "🔍 사용자 상세 정보 가져오기 실패:",
+            userDetailError,
+          );
 
           // getUserDetail 실패해도 토큰과 프로필 완료 상태는 유지
           setUser({
