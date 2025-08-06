@@ -1,15 +1,6 @@
 import Spinner from "../common/Spinner";
 import { motion } from "framer-motion";
-import {
-  pageVariants,
-  characterVariants,
-  headerVariants,
-  linkVariants,
-  socialContainerVariants,
-  socialButtonVariants,
-  itemVariants,
-  formVariants,
-} from "@/components/LoginResgisterPage/Animation";
+import { pageVariants } from "@/components/LoginResgisterPage/Animation";
 
 interface AnalysisHeroSectionProps {
   mainPersonaImgPath: string;

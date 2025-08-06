@@ -23,8 +23,6 @@ import {
   useToggleMarkCollection,
 } from "@/hooks/useCollections";
 import { useSwiperResize } from "@/hooks/useSwiperResize";
-import { motion } from "framer-motion";
-import { pageVariants } from "@/components/LoginResgisterPage/Animation";
 
 // TMDB 이미지 기본 URL
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
@@ -137,11 +135,7 @@ const CollectionPage: React.FC = () => {
         </section>
       }
     >
-      <motion.section
-        variants={pageVariants}
-        initial="hidden"
-        whileInView="visible"
-      >
+      <section>
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold sm:text-2xl">NEW</h2>
           <button
@@ -189,7 +183,7 @@ const CollectionPage: React.FC = () => {
 
         {/* 로딩 텍스트를 Spinner 컴포넌트로 교체 */}
         {isFetchingNextPage && <Spinner />}
-      </motion.section>
+      </section>
     </PageLayout>
   );
 };

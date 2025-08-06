@@ -46,10 +46,10 @@ const MyStyleSection: React.FC<MyStyleSectionProps> = ({
         </motion.div>
 
         <motion.div
-          className="flex w-full justify-center gap-6 pt-4 md:text-xl"
+          className="flex w-full justify-center gap-3 px-2 pt-4 md:text-xl"
           variants={formVariants}
         >
-          {myPersonaGenres.slice(0, 4).map((data, index) => (
+          {myPersonaGenres.slice(0, 4).map((data) => (
             <motion.div
               key={data}
               className="bg-popco-main flex h-8 w-20 items-center justify-center rounded-lg md:w-28 lg:h-10 lg:w-28"
