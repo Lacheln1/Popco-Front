@@ -191,7 +191,6 @@ const CollectionPage: React.FC = () => {
 
           {/* 무한 스크롤 감지를 위한 요소 */}
           <div ref={ref} style={{ height: "50px" }} />
-
           {/* 추가 로딩 시 스켈레톤 표시 */}
           {isFetchingNextPage && (
             <div className="mt-16 grid grid-cols-1 justify-items-center gap-x-24 gap-y-16 lg:grid-cols-2">
