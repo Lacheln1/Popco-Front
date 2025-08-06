@@ -77,75 +77,67 @@ const useAuthCheck = () => {
           if (token) localStorage.setItem("accessToken", token);
         }
 
-        // 타입 가드: token이 null이 아님을 보장
-        if (token) {
-          // 토큰 만료 시간 확인 및 필요시 갱신
-          const decodedForExp = jwtDecode<JwtPayload>(token);
-          if (decodedForExp.exp && decodedForExp.exp < Date.now() / 1000) {
-            localStorage.removeItem("accessToken");
-            const refreshResult = await validateAndRefreshTokens();
-            if (refreshResult?.data?.accessToken) {
-              token = refreshResult.data.accessToken;
-              localStorage.setItem("accessToken", token);
-            } else {
-              if (needsAuth)
-                navigate("/login", { state: { from: currentPath } });
-              return;
-            }
+        // token이 존재하는 경우에만 처리
+        if (!token) {
+          if (needsAuth) navigate("/login", { state: { from: currentPath } });
+          return;
+        }
+
+        // 토큰 만료 시간 확인 및 필요시 갱신
+        const decodedForExp = jwtDecode<JwtPayload>(token);
+        if (decodedForExp.exp && decodedForExp.exp < Date.now() / 1000) {
+          localStorage.removeItem("accessToken");
+          const refreshResult = await validateAndRefreshTokens();
+          if (refreshResult?.data?.accessToken) {
+            token = refreshResult.data.accessToken;
+            localStorage.setItem("accessToken", token);
+          } else {
+            if (needsAuth)
+              navigate("/login", { state: { from: currentPath } });
+            return;
           }
+        }
 
-          setAccessToken(token);
-          const decoded = jwtDecode<JwtPayload>(token);
-          const userIdFromToken = Number(decoded.sub);
+        if (!token) {
+          if (needsAuth) navigate("/login", { state: { from: currentPath } });
+          return;
+        }
 
-          if (!userIdFromToken || isNaN(userIdFromToken)) {
-            throw new Error(
-              "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
-            );
-          }
+        setAccessToken(token);
+        const decoded = jwtDecode<JwtPayload>(token);
+        const userIdFromToken = Number(decoded.sub);
 
-          // --- 3. 프로필 완료 상태 확인 (로그인 시 저장된 정보 사용) ---
-          let profileComplete = false;
+        if (!userIdFromToken || isNaN(userIdFromToken)) {
+          throw new Error(
+            "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
+          );
+        }
 
-          const justCompleted =
-            sessionStorage.getItem("profileJustCompleted") === "true";
+        // --- 3. 프로필 완료 상태 확인 (로그인 시 저장된 정보 사용) ---
+        let profileComplete = false;
 
-          const loginProfileComplete =
-            localStorage.getItem("profileComplete") === "true";
+        const justCompleted =
+          sessionStorage.getItem("profileJustCompleted") === "true";
 
-          profileComplete = justCompleted || loginProfileComplete;
+        const loginProfileComplete =
+          localStorage.getItem("profileComplete") === "true";
 
-          try {
-            // token은 이미 타입 가드를 통과했으므로 string 타입 보장됨
-            const userInfo = await getUserDetail(token);
+        profileComplete = justCompleted || loginProfileComplete;
 
-            if (userInfo && userInfo.data) {
-              setUser({
-                userId: userIdFromToken,
-                email: userInfo.data.email || "",
-                nickname: userInfo.data.nickname || "",
-                profileImageUrl: userInfo.data.profileImageUrl || "",
-                isLoggedIn: true,
-                profileComplete: profileComplete,
-              });
-            } else {
-              // getUserDetail 실패해도 토큰 기반으로 기본 정보 설정
-              setUser({
-                userId: userIdFromToken,
-                email: "",
-                nickname: "",
-                profileImageUrl: "",
-                isLoggedIn: true,
-                profileComplete: profileComplete,
-              });
-            }
-          } catch (userDetailError) {
-            console.error(
-              "🔍 사용자 상세 정보 가져오기 실패:",
-              userDetailError,
-            );
+        try {
+          const userInfo = await getUserDetail(token);
 
-            // getUserDetail 실패해도 토큰과 프로필 완료 상태는 유지
+          if (userInfo && userInfo.data) {
+            setUser({
+              userId: userIdFromToken,
+              email: userInfo.data.email || "",
+              nickname: userInfo.data.nickname || "",
+              profileImageUrl: userInfo.data.profileImageUrl || "",
+              isLoggedIn: true,
+              profileComplete: profileComplete,
+            });
+          } else {
+            // getUserDetail 실패해도 토큰 기반으로 기본 정보 설정
             setUser({
               userId: userIdFromToken,
               email: "",
@@ -155,28 +147,41 @@ const useAuthCheck = () => {
               profileComplete: profileComplete,
             });
           }
+        } catch (userDetailError) {
+          console.error(
+            "🔍 사용자 상세 정보 가져오기 실패:",
+            userDetailError,
+          );
 
-          if (profileComplete) {
-            // 프로필 완료된 사용자
-            if (currentPath === "/test") {
-              message.info("이미 취향 진단을 완료했습니다.");
-              navigate("/");
-              return;
-            }
+          // getUserDetail 실패해도 토큰과 프로필 완료 상태는 유지
+          setUser({
+            userId: userIdFromToken,
+            email: "",
+            nickname: "",
+            profileImageUrl: "",
+            isLoggedIn: true,
+            profileComplete: profileComplete,
+          });
+        }
 
-            // 임시 상태 정리
-            sessionStorage.removeItem("profileJustCompleted");
-          } else {
-            // 프로필 미완료된 사용자
-            if (currentPath !== "/test") {
-              console.log("🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동");
-              message.info("취향 진단을 먼저 완료해주세요.");
-              navigate("/test");
-              return;
-            }
+        if (profileComplete) {
+          // 프로필 완료된 사용자
+          if (currentPath === "/test") {
+            message.info("이미 취향 진단을 완료했습니다.");
+            navigate("/");
+            return;
           }
+
+          // 임시 상태 정리
+          sessionStorage.removeItem("profileJustCompleted");
         } else {
-          if (needsAuth) navigate("/login", { state: { from: currentPath } });
+          // 프로필 미완료된 사용자
+          if (currentPath !== "/test") {
+            console.log("🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동");
+            message.info("취향 진단을 먼저 완료해주세요.");
+            navigate("/test");
+            return;
+          }
         }
       } catch (error) {
         console.error("❌ 인증 체크 중 오류:", error);
@@ -227,7 +232,6 @@ const useAuthCheck = () => {
 
   const logout = async () => {
     try {
-      // 타입 체크 추가: accessToken이 null이 아닐 때만 호출
       if (accessToken) {
         await clearTokens(accessToken);
       }
