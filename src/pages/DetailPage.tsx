@@ -278,7 +278,8 @@ export default function DetailPage() {
   const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { user, accessToken } = useAuthCheck();
-+  const { contents, loading, error, contentId, contentType } = useContentsDetail(accessToken ?? undefined); // accessToken 전달
+  const { contents, loading, error, contentId, contentType } =
+    useContentsDetail(accessToken ?? undefined); // accessToken 전달
 
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
@@ -473,7 +474,7 @@ export default function DetailPage() {
 
     toggleWishlist({
       isWished,
-      userId: user.userId, 
+      userId: user.userId,
       contentId: Number(contentId),
       contentType: contentType,
       accessToken: accessToken,
