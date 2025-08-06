@@ -77,6 +77,7 @@ const useAuthCheck = () => {
           if (token) localStorage.setItem("accessToken", token);
         }
 
+        // 타입 가드: token이 null이 아님을 보장
         if (token) {
           // 토큰 만료 시간 확인 및 필요시 갱신
           const decodedForExp = jwtDecode<JwtPayload>(token);
@@ -115,30 +116,28 @@ const useAuthCheck = () => {
           profileComplete = justCompleted || loginProfileComplete;
 
           try {
-            //  타입 체크 추가: token이 null이 아님을 보장
-            if (token) {
-              const userInfo = await getUserDetail(token);
+            // token은 이미 타입 가드를 통과했으므로 string 타입 보장됨
+            const userInfo = await getUserDetail(token);
 
-              if (userInfo && userInfo.data) {
-                setUser({
-                  userId: userIdFromToken,
-                  email: userInfo.data.email || "",
-                  nickname: userInfo.data.nickname || "",
-                  profileImageUrl: userInfo.data.profileImageUrl || "",
-                  isLoggedIn: true,
-                  profileComplete: profileComplete,
-                });
-              } else {
-                // getUserDetail 실패해도 토큰 기반으로 기본 정보 설정
-                setUser({
-                  userId: userIdFromToken,
-                  email: "",
-                  nickname: "",
-                  profileImageUrl: "",
-                  isLoggedIn: true,
-                  profileComplete: profileComplete,
-                });
-              }
+            if (userInfo && userInfo.data) {
+              setUser({
+                userId: userIdFromToken,
+                email: userInfo.data.email || "",
+                nickname: userInfo.data.nickname || "",
+                profileImageUrl: userInfo.data.profileImageUrl || "",
+                isLoggedIn: true,
+                profileComplete: profileComplete,
+              });
+            } else {
+              // getUserDetail 실패해도 토큰 기반으로 기본 정보 설정
+              setUser({
+                userId: userIdFromToken,
+                email: "",
+                nickname: "",
+                profileImageUrl: "",
+                isLoggedIn: true,
+                profileComplete: profileComplete,
+              });
             }
           } catch (userDetailError) {
             console.error(
