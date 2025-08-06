@@ -60,40 +60,25 @@ const AnalysisPage = () => {
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    console.log(
-      "useEffect 실행됨, accessToken:",
-      accessToken,
-      "authLoading:",
-      authLoading,
-      "user.isLoggedIn:",
-      user.isLoggedIn,
-    );
-
     const getUserPersonasData = async () => {
       // 인증 로딩 중이면 대기
       if (authLoading) {
-        console.log("인증 처리 중이므로 대기");
         return;
       }
 
       // 이미 데이터를 가져왔으면 중복 실행 방지
       if (hasFetched.current) {
-        console.log("이미 데이터를 가져왔으므로 실행하지 않음");
         return;
       }
 
       // 로그인되지 않은 상태면 에러 설정하고 리턴
       if (!user.isLoggedIn || !accessToken) {
-        console.log("로그인되지 않은 상태");
         setError("로그인이 필요합니다.");
         setLoading(false);
         return;
       }
 
-      console.log("getUserPersonasData 함수 시작, accessToken:", accessToken);
-
       try {
-        console.log("API 호출 시작");
         setLoading(true);
         setError(null);
 
@@ -115,18 +100,14 @@ const AnalysisPage = () => {
           throw new Error("유효하지 않은 응답 데이터");
         }
 
-        console.log("API 응답:", response);
         setUserData(response.data);
         setDashBoardData(dashboardResponse.data);
-        console.log("userdata 설정 후:", response.data);
-        console.log("대쉬보드 설정 후:", dashboardResponse.data);
 
         // 페르소나 텍스트는 별도로 비동기 처리
         getPersonaText(accessToken)
           .then((personaTextResponse) => {
             if (personaTextResponse) {
               setPersonaText(personaTextResponse.data);
-              console.log("페르소나 텍스트:", personaTextResponse.data);
             }
           })
           .catch((error) => {
