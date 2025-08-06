@@ -35,6 +35,8 @@ import {
   useToggleReviewReaction,
 } from "@/hooks/useReviews";
 import ReviewModal from "@/components/ReviewModal/ReviewModal";
+import { motion } from "framer-motion";
+import { pageVariants } from "@/components/LoginResgisterPage/Animation";
 
 interface PageContentsProps {
   accessToken: string;
@@ -743,7 +745,13 @@ const PageContents: React.FC<PageContentsProps> = ({
   }, []);
 
   return (
-    <div className="pretendard">
+    <motion.div
+      className="pretendard"
+      variants={pageVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       <div>
         <div className="flex space-x-2 rounded-lg">
           {tabTitles.map((title, i) => (
@@ -763,7 +771,12 @@ const PageContents: React.FC<PageContentsProps> = ({
 
         <div className="rounded-b-[8px] border border-gray-200 bg-white p-6">
           {activeTab === 0 && (
-            <div>
+            <motion.div
+              variants={pageVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+            >
               <h1 className="gmarket-bold py-2 text-base md:text-2xl">
                 이 달엔 이런 작품을 봤어요
               </h1>
@@ -842,11 +855,16 @@ const PageContents: React.FC<PageContentsProps> = ({
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {activeTab === 1 && (
-            <div>
+            <motion.div
+              variants={pageVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+            >
               <div className="mt-6">
                 <div className="mb-4 flex items-center justify-between">
                   <div className="flex flex-col items-center gap-3 text-center sm:flex-row">
@@ -987,11 +1005,16 @@ const PageContents: React.FC<PageContentsProps> = ({
                     </div>
                   )}
               </div>
-            </div>
+            </motion.div>
           )}
 
           {activeTab === 2 && (
-            <div>
+            <motion.div
+              variants={pageVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+            >
               <div>
                 <Suspense fallback={<Spinner />}>
                   <MyPageChart accessToken={accessToken} />
@@ -1015,7 +1038,7 @@ const PageContents: React.FC<PageContentsProps> = ({
                   renderEmptyState("로그인이 필요합니다.")
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -1039,7 +1062,7 @@ const PageContents: React.FC<PageContentsProps> = ({
           onUpdateSuccess={handleReviewUpdateSuccess}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 
