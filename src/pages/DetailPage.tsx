@@ -12,6 +12,9 @@ import { useMyReview } from "@/hooks/queries/review/useMyReview"; // 내 리뷰 
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useFetchWishlist, useToggleWishlist } from "@/hooks/useWishlist";
 
+// --- Zustand 스토어 임포트 ---
+import { useLikeStore } from "@/store/useLikeStore";
+
 // --- 컴포넌트 임포트 ---
 import ReviewModal from "@/components/ReviewModal/ReviewModal";
 import LikePopcorn from "@/components/popcorn/LikePopcorn";
@@ -27,6 +30,8 @@ import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import Spinner from "@/components/common/Spinner";
 import { App } from "antd";
 
+type LikeState = "LIKE" | "DISLIKE" | "NEUTRAL";
+
 // ======================================================================
 // 1. UI 담당 프레젠테이셔널 컴포넌트
 // ======================================================================
@@ -39,10 +44,8 @@ interface DetailContentsProps {
   isLoggedIn: boolean;
   isWished: boolean;
   handleWishClick: () => void;
-  isLiked: boolean;
-  handleLikeClick: () => void;
-  isHated: boolean;
-  handleHateClick: () => void;
+  likeState: LikeState;
+  onLikeChange: (targetState: LikeState) => void;
   onEditReview: (reviewData: ReviewCardData) => void;
   onReviewClick: () => void;
   reviewButtonLabel: string;
@@ -57,10 +60,8 @@ const DetailContents = ({
   setMyCurrentRating,
   isWished,
   handleWishClick,
-  isLiked,
-  handleLikeClick,
-  isHated,
-  handleHateClick,
+  likeState,
+  onLikeChange,
   onEditReview,
   onReviewClick,
   reviewButtonLabel,
@@ -95,6 +96,13 @@ const DetailContents = ({
     runtime: contents.runtime ? `${contents.runtime}분` : "정보 없음",
     synopsis: contents.overview,
   };
+
+  // 좋아요/싫어요 버튼 클릭 핸들러
+  const isLiked = likeState === "LIKE";
+  const isHated = likeState === "DISLIKE";
+
+  const handleLikeClick = () => onLikeChange("LIKE");
+  const handleHateClick = () => onLikeChange("DISLIKE");
 
   return (
     <div ref={scrollRef} className="bg-white">
@@ -257,11 +265,65 @@ export default function DetailPage() {
   const { contents, loading, error, contentId, contentType } =
     useContentsDetail();
 
+  // Zustand 스토어 사용
+  const { getReaction, updateReaction } = useLikeStore();
+
+  // 현재 좋아요/싫어요 상태 (Zustand에서 자동으로 관리됨)
+  const likeState = getReaction(Number(contentId), contentType ?? "");
+
   // 내 리뷰 데이터 조회
   const { data: myReviewData } = useMyReview(
     Number(contentId),
     contentType ?? "",
     accessToken ?? undefined,
+  );
+
+  // 좋아요/싫어요 상태 변경 핸들러
+  const handleLikeChange = useCallback(
+    async (targetState: LikeState) => {
+      if (!user.isLoggedIn) {
+        message.info("로그인 먼저 진행해주세요!", 1.5);
+        return;
+      }
+
+      if (!accessToken || !contentId || !contentType) {
+        message.error("필요한 정보가 부족합니다.");
+        return;
+      }
+
+      try {
+        // Zustand 스토어의 updateReaction 사용
+        await updateReaction(
+          Number(contentId),
+          contentType,
+          targetState,
+          user.userId,
+          accessToken,
+        );
+
+        // 성공 메시지
+        const finalState = likeState === targetState ? "NEUTRAL" : targetState;
+        if (finalState === "LIKE") {
+          message.success("좋아요를 등록했습니다!", 1);
+        } else if (finalState === "DISLIKE") {
+          message.success("싫어요를 등록했습니다!", 1);
+        } else {
+          message.success("반응을 취소했습니다.", 1);
+        }
+      } catch (error) {
+        console.error("좋아요/싫어요 처리 실패:", error);
+      }
+    },
+    [
+      user.isLoggedIn,
+      user.userId,
+      accessToken,
+      contentId,
+      contentType,
+      message,
+      likeState,
+      updateReaction,
+    ],
   );
 
   // 리뷰 모달 상태
@@ -286,11 +348,15 @@ export default function DetailPage() {
       }
       setInteractiveRating(rating);
     },
-    [user.isLoggedIn],
+    [user.isLoggedIn, message],
   );
+
   // 리뷰 작성 모달 열기
   const handleOpenWriteModal = useCallback(() => {
-    if (!user.isLoggedIn) return; // TODO: 로그인 필요 메시지
+    if (!user.isLoggedIn) {
+      message.info("로그인 먼저 진행해주세요!", 1.5);
+      return;
+    }
     setIsWritingReview(true);
     setEditingReviewData(null);
     setIsReviewModalOpen(true);
@@ -331,6 +397,7 @@ export default function DetailPage() {
     user,
     contents,
     contentType,
+    contentId,
     handleOpenEditModal,
     handleOpenWriteModal,
   ]);
@@ -362,6 +429,7 @@ export default function DetailPage() {
       ) ?? false,
     [wishlistData, contentId],
   );
+
   const handleWishClick = useCallback(() => {
     if (!user.isLoggedIn || !contentType || !accessToken) return;
     toggleWishlist({
@@ -372,18 +440,6 @@ export default function DetailPage() {
       accessToken: accessToken,
     });
   }, [isWished, user, contentId, contentType, accessToken, toggleWishlist]);
-
-  // 좋아요/싫어요 로컬 상태 (추후 서버 연동 필요)
-  const [isLiked, setIsLiked] = useState(false);
-  const [isHated, setIsHated] = useState(false);
-  const handleLikeClick = () => {
-    setIsLiked((prev) => !prev);
-    if (isHated) setIsHated(false);
-  };
-  const handleHateClick = () => {
-    setIsHated((prev) => !prev);
-    if (isLiked) setIsLiked(false);
-  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -416,10 +472,8 @@ export default function DetailPage() {
         isLoggedIn={user.isLoggedIn}
         isWished={isWished}
         handleWishClick={handleWishClick}
-        isLiked={isLiked}
-        handleLikeClick={handleLikeClick}
-        isHated={isHated}
-        handleHateClick={handleHateClick}
+        likeState={likeState}
+        onLikeChange={handleLikeChange}
         onEditReview={handleOpenEditModal}
         onReviewClick={handleReviewButtonClick}
         reviewButtonLabel={
