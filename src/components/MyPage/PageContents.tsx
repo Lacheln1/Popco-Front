@@ -769,7 +769,7 @@ const PageContents: React.FC<PageContentsProps> = ({
           ))}
         </div>
 
-        <div className="rounded-b-[8px] border border-gray-200 bg-white p-6">
+        <div className="mb-6 rounded-b-[8px] border border-gray-200 bg-white p-6">
           {activeTab === 0 && (
             <motion.div
               variants={pageVariants}
