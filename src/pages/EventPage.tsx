@@ -3,7 +3,6 @@ import { useIsMediumUp } from "@/hooks/useMediaQuery";
 import { PosterImage } from "@/components/EventPage/PosterImage";
 import { EventInfoCard } from "@/components/EventPage/cards/EventInfoCard";
 import { Question } from "@/components/EventPage/cards/Question";
-import { WaitingRoom } from "@/components/EventPage/cards/WaitingRoom";
 import { Eliminated } from "@/components/EventPage/cards/Eliminated";
 import { FinalWinner } from "@/components/EventPage/cards/FinalWinner";
 import { useQuizStore } from "@/stores/useQuizStore";
@@ -66,7 +65,6 @@ const EventPage = () => {
     src: `${TMDB_IMAGE_BASE_URL}${data?.quizDetail.quizContentPosterUrl}`,
     alt: `${data?.quizDetail.quizName}`,
   };
-
   return (
     <div className="bg-[#eee]">
       <div
