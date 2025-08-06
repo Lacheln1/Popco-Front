@@ -66,7 +66,61 @@ export const connectSocket = (token: string): Promise<void> => {
   });
 };
 
-// 2. 문제 채널 구독
+// 개별 이벤트 핸들러 함수들
+const handleQuestionStart = (data: any) => {
+  const { setQuestionId, setStep, setHasSubmitted } = useQuizStore.getState();
+
+  console.log("📢 문제 시작:", data.questionId);
+
+  // 문제 시작 시 상태 초기화
+  setHasSubmitted(false);
+  if (data.questionId) {
+    setQuestionId(data.questionId);
+  }
+  setStep("question");
+};
+
+const handleWinnerAnnounced = (data: any) => {
+  const { setWinnerInfo, setStep } = useQuizStore.getState();
+
+  console.log("🏆 우승자 발표:", data);
+
+  if (data.winnerName && data.winnerRank) {
+    setWinnerInfo({
+      type: "WINNER_ANNOUNCED",
+      winnerName: data.winnerName,
+      winnerRank: data.winnerRank,
+      message: data.message ?? "우승자가 결정되었습니다!",
+    });
+  }
+  setStep("winner");
+
+  // 구독 해제
+  if (currentSubscription) {
+    currentSubscription.unsubscribe();
+    currentSubscription = null;
+  }
+};
+
+const handleQuestionTimeout = (data: any) => {
+  console.log("⏰ 문제 시간 종료 - Question 컴포넌트에서 처리하도록 위임");
+
+  // QUESTION_TIMEOUT은 복잡한 로직이 필요하므로
+  // socket에서 직접 처리하지 않고 Question 컴포넌트의 onMessage 콜백으로 위임
+  // (isSurvived 상태를 socket.ts에서 접근할 수 없기 때문)
+};
+
+const handleQuizStatus = (data: any) => {
+  console.log("📊 퀴즈 상태 업데이트:", data);
+
+  if (data.quizId && data.questionId) {
+    // QuizStatusResponseDto로 간주
+    const { setStep } = useQuizStore.getState();
+    // 필요한 경우 추가 로직 구현
+  }
+};
+
+// 2. 문제 채널 구독 (개선된 버전)
 export const subscribeToQuestion = (
   quizId: number,
   questionId: number,
@@ -74,7 +128,6 @@ export const subscribeToQuestion = (
 ) => {
   if (!stompClient || !stompClient.connected) {
     console.warn("소켓이 아직 연결되지 않았습니다.");
-    // null 대신 빈 함수를 반환
     return () => {
       console.log("소켓이 연결되지 않아 구독 해제할 것이 없습니다.");
     };
@@ -91,25 +144,34 @@ export const subscribeToQuestion = (
   currentSubscription = stompClient.subscribe(topic, (message: IMessage) => {
     try {
       const data = JSON.parse(message.body);
+      console.log("소켓 메시지 수신:", data);
 
-      if (data.status === "ACTIVE") {
-        const { setQuestionId, setStep, setHasSubmitted } =
-          useQuizStore.getState();
+      // type 필드로 먼저 구분
+      switch (data.type) {
+        case "QUESTION_START":
+          handleQuestionStart(data);
+          break;
 
-        console.log("📢 다음 문제로 이동:", data.questionId);
+        case "WINNER_ANNOUNCED":
+          handleWinnerAnnounced(data);
+          break;
 
-        setHasSubmitted(false);
-        setQuestionId(data.questionId);
-        setStep("question");
+        case "QUESTION_TIMEOUT":
+          handleQuestionTimeout(data);
+          break;
+
+        default:
+          // type이 없으면 QuizStatusResponseDto로 간주
+          if (data.quizId && data.questionId) {
+            handleQuizStatus(data);
+          }
+          break;
       }
 
-      if (data.status === "FINISHED") {
-        const { setStep } = useQuizStore.getState();
-        console.log("🎉 퀴즈 종료!");
-        setStep("winner");
-      }
+      // 🚨 ACTIVE/FINISHED 상태 처리를 제거 - Question.tsx에서만 처리하도록
+      // 기존 status 기반 처리 제거 (중복 방지)
 
-      // 추가적으로 onMessage 콜백도 호출
+      // 추가적으로 onMessage 콜백도 호출 (Question 컴포넌트의 세부 로직)
       onMessage(data);
     } catch (e) {
       console.error("이벤트 메시지 파싱 실패", e);
@@ -118,7 +180,6 @@ export const subscribeToQuestion = (
 
   console.log(`문제 구독 시작: ${topic}`);
 
-  // unsubscribe 함수 반환 (항상 함수를 반환)
   return () => {
     if (currentSubscription) {
       currentSubscription.unsubscribe();

@@ -40,8 +40,8 @@ export const Question = () => {
   const { accessToken } = useAuthCheck();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showCorrectOverlay, setShowCorrectOverlay] = useState(false); // 추가된 상태
-
+  const [showCorrectOverlay, setShowCorrectOverlay] = useState(false);
+  const [isSurvived, setIsSurvived] = useState(false);
   // 구독 관리를 위한 ref
   const subscriptionRef = useRef<(() => void) | null>(null);
 
@@ -63,16 +63,47 @@ export const Question = () => {
     }
   };
 
-  // 소켓 메시지 처리
+  // 소켓 구독 설정
+  const setupSubscription = () => {
+    if (!quizId || !questionId || !accessToken) return;
+
+    try {
+      // 기존 구독 해제
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+        subscriptionRef.current = null;
+        console.log(`🔄 기존 구독 해제`);
+      }
+
+      console.log(`🔗 새 구독 시작: question/${questionId}`);
+      const unsubscribe = subscribeToQuestion(
+        quizId,
+        questionId,
+        handleSocketMessage,
+      );
+
+      if (unsubscribe) {
+        subscriptionRef.current = unsubscribe;
+        console.log(
+          `✅ 구독 성공: /topic/quiz/${quizId}/question/${questionId}`,
+        );
+      }
+    } catch (error) {
+      console.error("소켓 구독 중 오류:", error);
+    }
+  };
+
+  // 소켓 메시지 처리 (개선된 버전)
   const handleSocketMessage = (
     data: QuizStatusSocketData | QuizResponseData,
   ) => {
+    console.log("소켓 메시지 수신:", data);
+
     // 공통 처리: 타이머/생존자
     if ("remainingTime" in data && typeof data.remainingTime === "number") {
       updateTimer(data.remainingTime);
     }
 
-    // 생존자 수 업데이트
     if (
       "currentSurvivors" in data &&
       typeof data.currentSurvivors === "number" &&
@@ -81,60 +112,97 @@ export const Question = () => {
       updateSurvivors(data.currentSurvivors, data.maxSurvivors);
     }
 
-    // 상태 결정
     const status = "status" in data ? data.status : data.type;
+    console.log(
+      "처리할 상태:",
+      status,
+      "isSurvived:",
+      isSurvived,
+      "hasSubmitted:",
+      hasSubmitted,
+    );
 
     switch (status) {
-      case "FINISHED":
-        if (questionId === 3) {
-          // 우승자 정보 처리
-          setStep("winner");
-          // 소켓 연결 해제
-          if (subscriptionRef.current) {
-            subscriptionRef.current();
-            subscriptionRef.current = null;
-          }
-        } else {
-          setStep(hasSubmitted ? "waiting" : "eliminated");
-        }
-        break;
-
       case "ACTIVE":
         if ("questionId" in data && data.questionId !== questionId) {
-          setQuestionId(data.questionId);
+          console.log(`🔄 문제 변경: ${questionId} → ${data.questionId + 1}`);
+          const newQuestionId = data.questionId + 1;
+
+          // 상태 초기화
           setSelectedAnswer(null);
           setHasSubmitted(false);
-          setShowCorrectOverlay(false); // 새 문제 시작시 오버레이 숨김
+          setShowCorrectOverlay(false);
+          setIsSubmitting(false);
+          setIsSurvived(false); // 생존 상태도 초기화
+
+          // 새 문제 ID 설정
+          setQuestionId(newQuestionId);
+          setStep("question");
+        } else {
+          // 현재 문제가 활성화된 경우
           setStep("question");
         }
         break;
 
+      case "QUESTION_START":
+        console.log("📢 문제 시작");
+        // socket.ts에서 이미 처리되므로 추가 로직 없음
+        break;
+
+      case "FINISHED":
+        console.log("🎉 퀴즈 완료");
+        if (questionId === 3) {
+          // 마지막 문제 완료
+          setStep("winner");
+        } else {
+          // 다음 문제 대기
+          console.log("다음 문제 대기 상태로 전환");
+          setStep("waiting");
+        }
+        break;
+
       case "WAITING":
+        console.log("⏳ 대기 상태");
         setStep("waiting");
         break;
 
       case "QUESTION_TIMEOUT":
-        setStep("eliminated");
+        console.log(
+          "⏰ 문제 시간 종료 - isSurvived:",
+          isSurvived,
+          "hasSubmitted:",
+          hasSubmitted,
+        );
+
+        if (isSurvived) {
+          // 정답자는 상태 변경 없음 - 오버레이가 자동으로 사라지고 다음 단계를 기다림
+          console.log("✅ 정답자 - 현재 상태 유지, 오버레이는 타이머로 제어됨");
+          // setStep을 건드리지 않음
+        } else if (!hasSubmitted) {
+          // 답 안낸 사람은 탈락
+          console.log("❌ 미제출자 - 탈락 처리");
+          setStep("eliminated");
+        } else {
+          // 답은 냈지만 틀린 사람은 이미 eliminated 상태일 것
+          console.log("❌ 오답자 - 이미 탈락 처리됨");
+          // 이미 submitAnswer에서 eliminated로 처리되었을 것
+        }
         break;
 
       case "WINNER_ANNOUNCED":
-        // 우승자 정보 저장
-        if ("winnerName" in data && "winnerRank" in data && "message" in data) {
+        console.log("🏆 우승자 발표");
+        if ("winnerName" in data && "winnerRank" in data) {
           setWinnerInfo({
             type: "WINNER_ANNOUNCED",
             winnerName: data.winnerName,
             winnerRank: data.winnerRank,
-            message: data.message,
+            message: data.message ?? "우승자가 결정되었습니다!",
           });
           setStep("winner");
-
-          // 소켓 연결 해제
-          if (subscriptionRef.current) {
-            subscriptionRef.current();
-            subscriptionRef.current = null;
-          }
         }
+        // 구독 해제는 socket.ts에서 처리됨
         break;
+
       default:
         console.warn("알 수 없는 상태:", status);
     }
@@ -145,44 +213,17 @@ export const Question = () => {
     }
   };
 
-  // 소켓 구독 설정
-  const setupSubscription = () => {
-    if (!quizId || !questionId || !accessToken) return;
-
-    try {
-      // 기존 구독 해제
-      if (subscriptionRef.current) {
-        subscriptionRef.current();
-        subscriptionRef.current = null;
-      }
-
-      const unsubscribe = subscribeToQuestion(
-        quizId,
-        questionId,
-        handleSocketMessage,
-      );
-      if (unsubscribe) {
-        subscriptionRef.current = unsubscribe;
-        console.log("소켓 구독 성공");
-      } else {
-        console.error("소켓 구독 실패 - unsubscribe 함수가 반환되지 않음");
-      }
-    } catch (error) {
-      console.error("소켓 구독 중 오류:", error);
-    }
-  };
-
-  // 초기 로드 및 소켓 구독
+  // 🔥 중복 제거: 하나의 useEffect만 사용
   useEffect(() => {
     if (!quizId || !questionId || !accessToken) return;
 
     const setup = async () => {
       try {
-        await connectSocket(accessToken); // 1. 연결
+        await connectSocket(accessToken);
         console.log("소켓 연결됨");
 
-        setupSubscription(); // 2. 구독 시작
-        loadQuestionData(); // 3. 문제 데이터 불러오기
+        setupSubscription();
+        loadQuestionData();
       } catch (e) {
         console.error("소켓 연결 실패", e);
       }
@@ -201,21 +242,24 @@ export const Question = () => {
 
   // 새 문제 시작시 상태 초기화
   useEffect(() => {
+    console.log(`문제 ${questionId} 시작 - 상태 초기화`);
     setSelectedAnswer(null);
     setIsSubmitting(false);
-    setShowCorrectOverlay(false); // 새 문제 시작시 오버레이도 초기화
+    setShowCorrectOverlay(false);
+    setIsSurvived(false); // 생존 상태도 초기화
   }, [questionId]);
 
-  // 타이머가 0이 되면 오버레이 숨김 (추가된 effect)
+  // 타이머가 0이 되면 오버레이 숨김
   useEffect(() => {
     if (remainingTime === 0 && showCorrectOverlay) {
+      console.log("⏰ 타이머 종료 - 정답 오버레이 숨김");
       setShowCorrectOverlay(false);
     }
   }, [remainingTime, showCorrectOverlay]);
 
   // 답안 선택
   const selectAnswer = (optionId: number) => {
-    if (hasSubmitted || isSubmitting) return; // 제출 후에는 선택 불가
+    if (hasSubmitted || isSubmitting) return;
     setSelectedAnswer(optionId);
   };
 
@@ -224,7 +268,6 @@ export const Question = () => {
     if (selectedAnswer === null || !quizId || !accessToken || hasSubmitted) {
       return;
     }
-
     setIsSubmitting(true);
     setHasSubmitted(true);
 
@@ -236,16 +279,20 @@ export const Question = () => {
       );
 
       const { survived } = res.data.data;
+      setIsSurvived(survived);
+
       if (survived) {
-        // 정답이면 오버레이 표시
+        console.log("✅ 정답! 오버레이 표시");
         setShowCorrectOverlay(true);
       } else {
+        console.log("❌ 오답! 탈락 처리");
         setStep("eliminated");
       }
     } catch (err) {
       console.error("답안 제출 실패", err);
       setHasSubmitted(false);
       setSelectedAnswer(null);
+      setIsSurvived(false);
     } finally {
       setIsSubmitting(false);
     }
