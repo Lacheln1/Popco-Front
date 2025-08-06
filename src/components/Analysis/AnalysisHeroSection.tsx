@@ -45,29 +45,29 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
           {/* 캐릭터 이미지 및 텍스트 */}
           <div className="flex pt-56">
             <div className="mx-auto flex">
-              <div className="absolute flex -translate-x-[107px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[500px]">
+              <div className="absolute flex -translate-x-[107px] -translate-y-10 flex-col pt-4 md:-translate-x-[150px] lg:-translate-x-96 lg:-translate-y-[5px] xl:-translate-x-[450px]">
                 {personaText1 ? (
-                  <span className="gmarket-medium lg:bg-popco-main mb-2 inline whitespace-nowrap px-1 py-1 text-white md:text-xl lg:text-black">
+                  <span className="gmarket-medium lg:bg-popco-main mb-2 inline translate-x-16 whitespace-nowrap px-1 py-1 text-white md:translate-x-20 md:text-xl lg:mb-5 lg:text-black xl:translate-x-10">
                     {personaText1}
                   </span>
                 ) : (
-                  <div className="mb-2 flex h-8 items-center px-1 py-1 md:h-10">
+                  <div className="mb-2 flex h-8 translate-x-40 items-center px-1 py-1 md:h-10 md:translate-x-56 lg:translate-x-36">
                     <Spinner />
                   </div>
                 )}
                 <img
                   src="/images/persona/Persona-text-line.svg"
                   alt="텍스트 라인"
-                  className="hidden object-cover lg:ml-36 lg:inline lg:w-52 xl:ml-56 xl:w-64"
+                  className="hidden object-cover lg:inline lg:w-52 lg:translate-x-40 xl:w-64"
                 />
               </div>
-              <div className="absolute flex -translate-x-[107px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-151px] md:translate-y-[-8px] lg:-translate-x-[-220px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
+              <div className="absolute flex -translate-x-[67px] translate-y-[-15px] flex-col pt-3 md:translate-x-[-111px] md:translate-y-[-8px] lg:-translate-x-[-220px] lg:-translate-y-[-70px] xl:ml-10 xl:-translate-y-[10px] xl:translate-x-[230px] xl:pt-12">
                 {personaText2 ? (
-                  <span className="gmarket-medium mb-2 whitespace-nowrap px-1 py-1 text-white md:text-xl">
+                  <span className="gmarket-medium mb-2 translate-x-6 whitespace-nowrap px-1 py-1 text-white md:translate-x-10 md:text-xl">
                     {personaText2}
                   </span>
                 ) : (
-                  <div className="mb-2 flex h-8 items-center px-1 py-1 md:h-10">
+                  <div className="mb-2 flex h-8 translate-x-[122px] items-center px-1 py-1 md:h-10 md:translate-x-[185px] lg:translate-x-0">
                     <Spinner />
                   </div>
                 )}
@@ -130,10 +130,10 @@ const AnalysisHeroSection: React.FC<AnalysisHeroSectionProps> = ({
       </div>
       <div className="flex justify-center">
         <div className="relative -top-5 flex w-full justify-around px-3 md:max-w-[700px] md:px-1 lg:max-w-[1200px]">
-          <div className="md:text-lg lg:text-xl xl:text-2xl">
+          <div className="pl-4 md:text-lg lg:text-xl xl:text-2xl">
             {mainPersonaPercent}%
           </div>
-          <div className="md:text-lg lg:text-xl xl:text-2xl">
+          <div className="pr-4 md:text-lg lg:text-xl xl:text-2xl">
             {subPersonaPercent}%
           </div>
         </div>
