@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { App, Spin, Avatar, Input } from "antd";
+import { App, Avatar, Input } from "antd";
 
 // Layout 및 공용 컴포넌트
 import PageLayout from "@/layout/PageLayout";
 import SectionHeader from "@/components/common/SectionHeader";
 import Poster from "@/components/common/Poster";
+import Spinner from "@/components/common/Spinner";
 import AddContentCard from "@/components/collection/AddContentCard";
 import EditablePoster from "@/components/collection/EditablePoster";
 import SearchContentModal from "@/components/collection/SearchContentModal";
@@ -22,8 +23,6 @@ import {
   useDeleteCollection,
   useToggleMarkCollection,
   useManageCollectionContents,
-  useFetchCollectionContents,
-  useFetchCollectionContentCount,
 } from "@/hooks/useCollections";
 
 // Types & Constants
@@ -49,10 +48,6 @@ const CollectionDetailPage: React.FC = () => {
     isLoading: isLoadingDetails,
     isError,
   } = useFetchCollectionById(collectionId, accessToken);
-  const { data: contents, isLoading: isLoadingContents } =
-    useFetchCollectionContents(collectionId);
-  const { data: contentCount, isLoading: isLoadingCount } =
-    useFetchCollectionContentCount(collectionId);
 
   const { mutate: updateCollection, isPending: isUpdating } =
     useUpdateCollection(collectionId!);
@@ -78,7 +73,7 @@ const CollectionDetailPage: React.FC = () => {
   }, [collection]);
 
   const isOwner = collection?.userId === user.userId && user.isLoggedIn;
-  const isLoading = isLoadingDetails || isLoadingContents || isLoadingCount;
+  const isLoading = isLoadingDetails;
 
   // --- Handlers ---
   const handleSaveToggle = useCallback(() => {
@@ -150,8 +145,8 @@ const CollectionDetailPage: React.FC = () => {
 
   const handleRemoveContent = useCallback(
     (contentIdToRemove: number) => {
-      if (!accessToken || !contents) return;
-      const contentToRemove = contents.find(
+      if (!accessToken || !collection?.contentPosters) return;
+      const contentToRemove = collection.contentPosters.find(
         (c: any) => c.contentId === contentIdToRemove,
       );
       if (!contentToRemove) {
@@ -165,14 +160,20 @@ const CollectionDetailPage: React.FC = () => {
         accessToken,
       });
     },
-    [accessToken, collectionId, removeContent, contents, message],
+    [
+      accessToken,
+      collectionId,
+      removeContent,
+      collection?.contentPosters,
+      message,
+    ],
   );
 
   // --- 로딩 및 에러 처리 ---
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spin size="large" />
+        <Spinner /> {/* ✅ size prop 제거 */}
       </div>
     );
   }
@@ -197,7 +198,7 @@ const CollectionDetailPage: React.FC = () => {
                 <div className="flex min-h-[120px] flex-1 flex-col justify-center md:min-h-[140px]">
                   <div className="mb-2 flex items-center gap-3">
                     <Avatar
-                      src={collection.userProfileImageUrl}
+                      src={collection.userProfileUrl}
                       size={{ xs: 25, sm: 28, md: 30 }}
                     />
                     <span className="gmarket-medium text-xs text-white">
@@ -205,7 +206,6 @@ const CollectionDetailPage: React.FC = () => {
                     </span>
                   </div>
                   {isEditing ? (
-                    // 수정 모드 디자인: 일반적인 Input 형태로 변경
                     <div className="flex flex-col gap-2 pr-4">
                       <Input
                         value={editedTitle}
@@ -243,7 +243,11 @@ const CollectionDetailPage: React.FC = () => {
                             className={primaryHeaderButtonClass}
                             disabled={isUpdating}
                           >
-                            {isUpdating ? <Spin size="small" /> : "저장 완료"}
+                            {isUpdating ? (
+                              <Spinner /> 
+                            ) : (
+                              "저장 완료"
+                            )}
                           </button>
                           <button
                             type="button"
@@ -296,13 +300,13 @@ const CollectionDetailPage: React.FC = () => {
         floatingBoxContent={
           <div className="px-8 py-12 md:px-24">
             <div className="mb-4 text-right text-gray-500">
-              총 {contentCount ?? 0}개의 작품
+              총 {collection.contentCount ?? 0}개의 작품
             </div>
-            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+            <div className="grid grid-cols-2 justify-items-center gap-4 md:flex md:flex-wrap md:justify-center md:gap-6 lg:gap-8">
               {isOwner && isEditing && (
                 <AddContentCard onClick={() => setIsSearchModalOpen(true)} />
               )}
-              {contents?.map((content: any) =>
+              {collection.contentPosters?.map((content: any) =>
                 isEditing && isOwner ? (
                   <EditablePoster
                     key={content.contentId}
@@ -319,8 +323,6 @@ const CollectionDetailPage: React.FC = () => {
                     title={content.title}
                     contentType={content.contentType}
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
-                    likeState={"NEUTRAL"}
-                    onLikeChange={() => {}}
                   />
                 ),
               )}
@@ -332,7 +334,9 @@ const CollectionDetailPage: React.FC = () => {
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
         onAddContent={handleAddContent}
-        existingContentIds={contents?.map((c: any) => c.contentId) || []}
+        existingContentIds={
+          collection.contentPosters?.map((c: any) => c.contentId) || []
+        }
       />
     </>
   );

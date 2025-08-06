@@ -18,7 +18,7 @@ import useAuthCheck from "@/hooks/useAuthCheck";
 import ReviewCard from "@/components/common/ReviewCard";
 import { ReviewCardData, ContentReview } from "@/types/Reviews.types";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
-import AiReviewSummaryBg from "@/assets/AiReviewPopco.png";
+import AiReviewSummaryBg from "@/assets/AiReviewPopco-mobile.png";
 import Spinner from "@/components/common/Spinner";
 
 interface ReviewSectionProps {
@@ -61,14 +61,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
   const { mutate: reportReview, isPending: isReporting } =
     usePostReviewDeclaration(contentId, contentType);
 
-  const {
-    data,
-    isLoading,
-    error,
-    // fetchNextPage,      // 삭제
-    // hasNextPage,        // 삭제
-    // isFetchingNextPage, // 삭제
-  } = useFetchInfiniteReviews(
+  const { data, isLoading, error } = useFetchInfiniteReviews(
     contentId,
     contentType,
     sortOrder,
@@ -241,11 +234,11 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
 
         {/* AI 리뷰 요약 섹션 */}
         <div
-          className="relative mx-auto mb-10 h-32 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-40"
+          className="relative mx-auto mb-10 h-40 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-60"
           style={{ backgroundImage: `url(${AiReviewSummaryBg})` }}
         >
-          <div className="absolute left-1/2 top-1/2 ml-3 flex w-full max-w-md -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center text-center">
-            <p className="mt-1 text-[0.6rem] leading-relaxed text-gray-400 md:mb-2 md:text-xs">
+          <div className="absolute left-1/2 top-1/2 ml-3 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center px-4 text-center md:max-w-md md:px-8">
+            <p className="mb-2 text-[0.55rem] leading-relaxed text-gray-400 md:mb-2 md:text-xs">
               리뷰에서 많이 언급된 특징을 AI가 분석했어요.
             </p>
             {isSummaryLoading ? (
@@ -253,12 +246,13 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
                 <Spinner />
               </div>
             ) : summaryData?.hasSummary ? (
-              <p className="text-xs leading-relaxed text-gray-600 md:text-base">
+              <p className="mt-0 break-words text-[0.6rem] leading-relaxed text-gray-600 md:mt-4 md:text-sm">
                 {summaryData.summary}
               </p>
             ) : (
-              <p className="text-xs leading-relaxed text-gray-400 md:text-base">
-                아직 충분한 리뷰가 없어 분석할 수 없습니다.
+              <p className="mt-0 break-words text-[0.6rem] leading-relaxed text-gray-400 md:mt-4 md:text-sm">
+                아직 충분한 리뷰가 모이지 않았어요. 더 많은 이용자들의 후기가
+                쌓이면, 추천 리뷰를 보여드릴게요!
               </p>
             )}
           </div>
@@ -333,7 +327,6 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
             작성된 리뷰가 없습니다.
           </div>
         )}
-        
       </section>
     </>
   );
