@@ -16,7 +16,7 @@ type PosterProps = {
   disableHover?: boolean;
   className?: string;
 
-  // 🚀 하위호환성을 위한 기존 props 추가 (선택적)
+  // 하위호환성을 위한 기존 props 추가
   likeState?: LikeState | string; // string도 허용 (기존 컴포넌트에서 문자열로 전달할 수 있음)
   onLikeChange?: (newState: LikeState) => void;
 };
@@ -29,7 +29,7 @@ const Poster = ({
   disableHover,
   className = "",
 
-  // 🚀 기존 props
+  ///기존 props
   likeState: propLikeState,
   onLikeChange: propOnLikeChange,
 }: PosterProps) => {
@@ -40,7 +40,7 @@ const Poster = ({
   // Zustand 스토어
   const { getReaction, updateReaction } = useLikeStore();
 
-  // 🎯 핵심: props가 있으면 props 사용, 없으면 Zustand 사용
+  // props가 있으면 props 사용, 없으면 Zustand 사용
   const useZustand =
     propLikeState === undefined && propOnLikeChange === undefined;
 
@@ -59,7 +59,7 @@ const Poster = ({
       return;
     }
 
-    // 🎯 핵심: props 핸들러가 있으면 그걸 사용, 없으면 Zustand 사용
+    // props 핸들러가 있으면 그걸 사용, 없으면 Zustand 사용
     if (propOnLikeChange) {
       // 기존 방식: props로 받은 핸들러 사용
       propOnLikeChange(target);
