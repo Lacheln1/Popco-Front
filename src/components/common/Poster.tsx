@@ -15,6 +15,10 @@ type PosterProps = {
   contentType: string;
   disableHover?: boolean;
   className?: string;
+
+  // 🚀 하위호환성을 위한 기존 props 추가 (선택적)
+  likeState?: LikeState | string; // string도 허용 (기존 컴포넌트에서 문자열로 전달할 수 있음)
+  onLikeChange?: (newState: LikeState) => void;
 };
 
 const Poster = ({
@@ -24,13 +28,26 @@ const Poster = ({
   contentType,
   disableHover,
   className = "",
+
+  // 🚀 기존 props
+  likeState: propLikeState,
+  onLikeChange: propOnLikeChange,
 }: PosterProps) => {
   const navigator = useNavigate();
   const { message } = App.useApp();
   const { user, accessToken } = useAuthCheck();
 
+  // Zustand 스토어
   const { getReaction, updateReaction } = useLikeStore();
-  const likeState = getReaction(id, contentType);
+
+  // 🎯 핵심: props가 있으면 props 사용, 없으면 Zustand 사용
+  const useZustand =
+    propLikeState === undefined && propOnLikeChange === undefined;
+
+  // likeState 결정: props 우선, 없으면 Zustand
+  const likeState = useZustand
+    ? getReaction(id, contentType)
+    : (propLikeState as LikeState) || "NEUTRAL";
 
   const handlePosterClick = () => navigator(`/detail/${contentType}/${id}`);
 
@@ -42,17 +59,23 @@ const Poster = ({
       return;
     }
 
-    if (!accessToken) {
-      message.error("인증 토큰이 없습니다.");
-      return;
-    }
+    // 🎯 핵심: props 핸들러가 있으면 그걸 사용, 없으면 Zustand 사용
+    if (propOnLikeChange) {
+      // 기존 방식: props로 받은 핸들러 사용
+      propOnLikeChange(target);
+    } else {
+      // 새 방식: Zustand 사용
+      if (!accessToken) {
+        message.error("인증 토큰이 없습니다.");
+        return;
+      }
 
-    try {
-      await updateReaction(id, contentType, target, user.userId, accessToken);
-
-    } catch (error) {
-      console.error("좋아요/싫어요 처리 실패:", error);
-      message.error("처리에 실패했습니다.");
+      try {
+        await updateReaction(id, contentType, target, user.userId, accessToken);
+      } catch (error) {
+        console.error("좋아요/싫어요 처리 실패:", error);
+        message.error("처리에 실패했습니다.");
+      }
     }
   };
 
