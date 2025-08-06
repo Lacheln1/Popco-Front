@@ -298,7 +298,7 @@ export default function DetailPage() {
   }, [contents, contentId]);
 
   const { reactionMap, handleReaction, isLoading: isReactionLoading } = useContentReaction({
-    userId: user.userId,
+    userId: user.userId ?? undefined,
     accessToken: accessToken ?? "",
     contentList,
   });

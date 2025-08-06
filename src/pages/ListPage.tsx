@@ -273,7 +273,7 @@ const ListPage = () => {
     isLoading: isReactionLoading,
   } = useContentReaction({
     userId: user.userId,
-    accessToken: accessToken ?? "",
+    accessToken: user.isLoggedIn ? (accessToken ?? undefined) : undefined,
     contentList,
   });
 
