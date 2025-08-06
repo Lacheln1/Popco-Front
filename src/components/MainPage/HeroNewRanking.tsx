@@ -113,7 +113,7 @@ const HeroNewRanking = ({
         {/* Carousel Container */}
         <div className="w-full overflow-hidden">
           <div
-            className="relative h-96 w-full md:h-[700px]"
+            className="relative aspect-[7/10] w-full md:h-[600px]"
             onMouseEnter={handleContainerMouseEnter}
             onMouseLeave={handleContainerMouseLeave}
           >
