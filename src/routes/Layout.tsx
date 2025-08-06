@@ -6,57 +6,113 @@ import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
 
 const Layout = () => {
-  const [notification, setNotification] = useState<null | string>(null);
-  const lastNotificationRef = useRef<string | null>(null);
+  const [notification, setNotification] = useState(false);
   const { user, isLoading, logout, accessToken } = useAuthCheck();
   const navigate = useNavigate();
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const notificationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const handleLogin = () => navigate("/login");
   const handleLogout = () => logout();
+
+  // 알림 타이머를 설정하는 함수
+  const setNotificationTimer = (remainMin: number) => {
+    // 기존 타이머 클리어
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+    }
+
+    let timeoutDuration;
+    if (remainMin > 0) {
+      timeoutDuration = remainMin * 60 * 1000; // 분을 밀리초로 변환
+    } else {
+      timeoutDuration = 30 * 1000; // 30초
+    }
+
+    notificationTimerRef.current = setTimeout(() => {
+      setNotification(false);
+    }, timeoutDuration);
+  };
+
+  // 메시지 처리 함수 (단순화)
+  const handleNotificationMessage = (data: any) => {
+    if (data.type === "QUIZ_NOTIFICATION" || data.type === "EVENT_REMINDER") {
+      setNotification(true);
+      // 타이머 설정
+      if (data.remainMin !== undefined) {
+        setNotificationTimer(data.remainMin);
+      } else {
+        setNotificationTimer(0);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!accessToken) return;
 
     const url = `${import.meta.env.VITE_SOCKET_URL}/notifications/stream?token=${accessToken}`;
+
+    // 기존 연결 정리
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
     const eventSource = new EventSource(url);
-    console.log("📡 SSE 요청 보냄:", url);
+    eventSourceRef.current = eventSource;
 
-    eventSource.onopen = () => {
-      console.log("SSE 연결 성공");
-    };
-
+    // 단일 메시지 핸들러로 통합
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        const { title, remainMin, message } = data;
-
-        if (title !== "퀴즈 시작 알림") return;
-
-        const remain = Number(remainMin);
-
-        if (remain === 0) {
-          setNotification(null);
-          lastNotificationRef.current = null;
-        } else if (remain <= 10 && message !== lastNotificationRef.current) {
-          setNotification(message);
-          lastNotificationRef.current = message;
-        }
-      } catch (e) {
-        console.error("SSE message parse error:", e);
+        handleNotificationMessage(data);
+      } catch (err) {
+        console.error("이벤트 데이터 파싱 오류:", err);
       }
     };
 
-    eventSource.onerror = (error) => {
-      console.error("SSE 연결 오류:", error);
-      eventSource.close();
+    // 커스텀 이벤트도 같은 핸들러 사용
+    eventSource.addEventListener("notification", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        handleNotificationMessage(data);
+      } catch (err) {
+        console.error("notification 데이터 파싱 오류:", err);
+      }
+    });
+
+    // 연결 상태 관리
+    eventSource.onopen = () => {
+      console.log("알림 연결이 열렸습니다");
     };
 
-    return () => eventSource.close();
+    eventSource.onerror = (error) => {
+      console.error("EventSource 오류:", error);
+      if (eventSource.readyState === EventSource.CLOSED) {
+        console.log("연결이 닫혔습니다");
+      } else if (eventSource.readyState === EventSource.CONNECTING) {
+        console.log("재연결 시도 중...");
+      }
+    };
+
+    return () => {
+      // 클린업
+      if (notificationTimerRef.current) {
+        clearTimeout(notificationTimerRef.current);
+        notificationTimerRef.current = null;
+      }
+
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
   }, [accessToken]);
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center">
         <Spinner />
       </div>
     );
@@ -64,7 +120,13 @@ const Layout = () => {
 
   const handleGoToEvent = () => {
     navigate("/event");
-    setNotification(null); // 이동 시 수동으로도 제거 가능
+    setNotification(false);
+
+    // 타이머 클리어
+    if (notificationTimerRef.current) {
+      clearTimeout(notificationTimerRef.current);
+      notificationTimerRef.current = null;
+    }
   };
 
   return (
