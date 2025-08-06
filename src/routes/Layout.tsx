@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/common/Footer";
 import Header from "@/components/common/Header";
 import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
+import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
+import dayjs from "dayjs";
 
 const Layout = () => {
   const [notification, setNotification] = useState(false);
   const { user, isLoading, logout, accessToken } = useAuthCheck();
   const navigate = useNavigate();
+  const location = useLocation();
   const eventSourceRef = useRef<EventSource | null>(null);
   const notificationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
@@ -16,6 +19,22 @@ const Layout = () => {
 
   const handleLogin = () => navigate("/login");
   const handleLogout = () => logout();
+
+  const { data: quizInfo } = useQuizInfo(accessToken);
+
+  useEffect(() => {
+    if (!quizInfo?.quizDetail) return;
+    const { quizStartTime, serverTime } = quizInfo.quizDetail;
+
+    const start = dayjs(quizStartTime);
+    const server = dayjs(serverTime);
+    const diffMin = start.diff(server, "minute");
+
+    // 오늘 퀴즈고, 10분 미만 남았을 때 알림 표시
+    if (diffMin >= 0 && diffMin < 10) {
+      setNotification(true);
+    }
+  }, [quizInfo]);
 
   // 알림 타이머를 설정하는 함수
   const setNotificationTimer = (remainMin: number) => {
@@ -36,7 +55,7 @@ const Layout = () => {
     }, timeoutDuration);
   };
 
-  // 메시지 처리 함수 (단순화)
+  // 메시지 처리 함수
   const handleNotificationMessage = (data: any) => {
     if (data.type === "QUIZ_NOTIFICATION" || data.type === "EVENT_REMINDER") {
       setNotification(true);
@@ -135,7 +154,7 @@ const Layout = () => {
       <main className="flex-grow">
         <Outlet />
       </main>
-      {notification && (
+      {notification && location.pathname !== "/event" && (
         <button
           onClick={handleGoToEvent}
           className="fixed bottom-10 right-0 z-50 w-[80px] animate-bounce-chatbot sm:bottom-12 sm:right-10 sm:w-[130px] lg:right-28"
