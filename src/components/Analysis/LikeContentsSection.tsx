@@ -6,6 +6,8 @@ import { SwiperNavigation } from "@/components/common/SwiperButton";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { PersonaRecommendation } from "@/types/Persona.types";
+import { motion } from "framer-motion";
+import { pageVariants } from "@/components/LoginResgisterPage/Animation";
 import "swiper/swiper-bundle.css";
 import axios from "axios";
 
@@ -68,7 +70,6 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
         },
       );
 
-      console.log(`${contentType} 응답:`, response.data);
       setRecommendations(response.data.recommendations || []);
     } catch (err) {
       console.error("추천 데이터 가져오기 실패:", err);
@@ -111,7 +112,13 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   };
 
   return (
-    <div className="pretendard flex justify-center px-3 py-8 md:px-8">
+    <motion.div
+      className="pretendard flex justify-center px-3 py-8 md:px-8"
+      variants={pageVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       <div className="flex w-full max-w-[1200px] flex-col bg-slate-50 px-4 py-5">
         {/* 헤더 섹션 */}
         <div className="mb-6 flex items-center justify-between">
@@ -228,7 +235,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

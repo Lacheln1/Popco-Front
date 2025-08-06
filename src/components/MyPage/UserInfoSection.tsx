@@ -109,8 +109,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
         accessToken,
       );
 
-      console.log("닉네임 업데이트 성공:", response);
-
       if (response.code === 200 && response.result === "SUCCESS") {
         setIsEditingNickname(false);
         message.success("닉네임이 성공적으로 변경되었습니다.");
@@ -200,8 +198,6 @@ const UserInfoSection: React.FC<UserInfoSectionProps> = ({
         { nickname: nickname, profileImageUrl: selectedImage },
         accessToken,
       );
-
-      console.log("프로필 업데이트 성공:", response);
 
       if (response.code === 200 && response.result === "SUCCESS") {
         onProfileUpdate?.("refresh");
