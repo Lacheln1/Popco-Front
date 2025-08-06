@@ -123,65 +123,83 @@ const TestPage = () => {
     }
   }, [step, accessToken, movies.length, fetchedQuizzes, message, setStep]);
 
-  // 최종 정보 제출 함수
-  const handleSubmit = async () => {
-    if (!accessToken || !user || user.userId === 0) {
-      message.error(
-        "사용자 정보가 올바르지 않습니다. 잠시 후 다시 시도해주세요.",
+// TestPage의 handleSubmit 함수 수정 부분
+const handleSubmit = async () => {
+  if (!accessToken || !user || user.userId === 0) {
+    message.error(
+      "사용자 정보가 올바르지 않습니다. 잠시 후 다시 시도해주세요.",
+    );
+    return;
+  }
+
+  setIsSubmitting(true);
+  try {
+    const userDetails = {
+      nickname: nickname,
+      birthday: birthDate!.format("YYYY-MM-DD"),
+      gender: gender,
+    };
+    const personaPayload = {
+      user_id: user.userId,
+      feedback_items: selectedMovies.map((movie) => ({
+        content_id: Number(movie.id),
+        content_type: movie.type,
+      })),
+      reaction_type: "좋아요" as const,
+      initial_answers: Object.entries(quizAnswers).reduce(
+        (acc, [questionId, optionId]) => {
+          acc[questionId] = String(optionId);
+          return acc;
+        },
+        {} as { [key: string]: string },
+      ),
+    };
+
+    const [_, personaAnalysisResult] = await Promise.all([
+      updateUserDetails(userDetails, accessToken),
+      getOnboardingPersona(personaPayload, accessToken),
+    ]);
+
+    if (personaAnalysisResult && personaAnalysisResult.main_persona) {
+      setPersonaResult(personaAnalysisResult);
+      message.success("취향 분석이 완료되었습니다!");
+
+      // 테스트 완료 시 프로필 완료 상태 업데이트
+      sessionStorage.setItem("profileJustCompleted", "true");
+      localStorage.setItem("profileComplete", "true"); // 영구 저장도 업데이트
+
+      setStep((prev: number) => prev + 1);
+    } else {
+      throw new Error(
+        (personaAnalysisResult as any)?.message ||
+          "페르소나 분석에 실패했습니다.",
       );
-      return;
     }
+  } catch (error: any) {
+    console.error("최종 정보 제출 실패:", error);
+    message.error(error.message || "정보 저장 또는 분석에 실패했습니다.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-    setIsSubmitting(true);
-    try {
-      const userDetails = {
-        nickname: nickname,
-        birthday: birthDate!.format("YYYY-MM-DD"),
-        gender: gender,
-      };
-      const personaPayload = {
-        user_id: user.userId,
-        feedback_items: selectedMovies.map((movie) => ({
-          content_id: Number(movie.id),
-          content_type: movie.type,
-        })),
-        reaction_type: "좋아요" as const,
-        initial_answers: Object.entries(quizAnswers).reduce(
-          (acc, [questionId, optionId]) => {
-            acc[questionId] = String(optionId);
-            return acc;
-          },
-          {} as { [key: string]: string },
-        ),
-      };
+// 메인페이지로 이동하는 함수 수정
+const handleGoToMain = () => {
+  // 프로필 완료 임시 상태 제거
+  sessionStorage.removeItem("profileJustCompleted");
+  
+  // 메인페이지로 이동
+  navigate("/");
+};
 
-      const [_, personaAnalysisResult] = await Promise.all([
-        updateUserDetails(userDetails, accessToken),
-        getOnboardingPersona(personaPayload, accessToken),
-      ]);
-
-      console.log("페르소나 분석 직후 API 응답:", personaAnalysisResult);
-
-      if (personaAnalysisResult && personaAnalysisResult.main_persona) {
-        setPersonaResult(personaAnalysisResult);
-        message.success("취향 분석이 완료되었습니다!");
-
-        sessionStorage.setItem("profileJustCompleted", "true");
-
-        setStep((prev: number) => prev + 1);
-      } else {
-        throw new Error(
-          (personaAnalysisResult as any)?.message ||
-            "페르소나 분석에 실패했습니다.",
-        );
-      }
-    } catch (error: any) {
-      console.error("최종 정보 제출 실패:", error);
-      message.error(error.message || "정보 저장 또는 분석에 실패했습니다.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+// 취향 분석 페이지로 이동하는 함수 수정
+const handleGoToAnalysis = () => {
+  // 프로필 완료 임시 상태 제거  
+  sessionStorage.removeItem("profileJustCompleted");
+  
+  // 분석 페이지로 이동
+  navigate("/analysis");
+};
 
   // 다음 단계로 이동 및 유효성 검사
   const handleNext = () => {
@@ -273,8 +291,8 @@ const TestPage = () => {
                 7가지 캐릭터로 보여줘요
               </h3>
               <p className={`${paragraphStyle} mt-4`}>
-                사용자님의 취향 선명도에 따라 ‘아기 팝코’와{" "}
-                <br className="md:hidden" /> ‘어른 팝코’로 표현돼요.
+                사용자님의 취향 선명도에 따라 '아기 팝코'와{" "}
+                <br className="md:hidden" /> '어른 팝코'로 표현돼요.
                 <br />
                 앞으로 사용자님의 작품 평가에 따라 <br className="md:hidden" />{" "}
                 캐릭터는 언제든 바뀔 수 있답니다.
@@ -449,13 +467,13 @@ const TestPage = () => {
 
                 <div className="mt-8 flex w-full max-w-xs gap-4">
                   <button
-                    onClick={() => navigate("/analysis")}
+                    onClick={handleGoToAnalysis}
                     className="text-popco-foot flex-1 rounded-full border border-[var(--color-popcoFootColor)] bg-white py-3 font-semibold transition-colors hover:bg-yellow-50"
                   >
                     취향 분석 보기
                   </button>
                   <button
-                    onClick={() => navigate("/")}
+                    onClick={handleGoToMain}
                     className="bg-popco-foot flex-1 rounded-full py-3 font-semibold text-white transition-colors hover:brightness-95"
                   >
                     POPCO 시작하기
