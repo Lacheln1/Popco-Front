@@ -1,11 +1,12 @@
 import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 import { useContentsRanking } from "@/hooks/queries/contents/useContentsRanking";
 import { ContentCategory, ReactionType } from "@/types/Contents.types";
-import { MenuProps } from "antd";
+import { Dropdown, MenuProps } from "antd";
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../common/Spinner";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { DownOutlined } from "@ant-design/icons";
 
 interface HeroRankingProps {
   onTop1Change: (type: ContentCategory, title: string) => void;
@@ -85,13 +86,27 @@ const HeroNewRanking = ({
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
+    <div className="relative mt-40 flex flex-col items-center justify-center overflow-hidden px-3 md:px-6">
       {/* Content */}
       <div className="relative z-10 mx-auto w-full max-w-[1200px]">
         {/* Heading */}
         <div className="mb-8 text-center">
-          <h1 className="gmarket text-6xl font-bold text-white md:text-4xl lg:text-5xl">
+          <h1 className="gmarket relative text-6xl font-bold text-white md:text-4xl lg:text-5xl">
             POPCO Top 5
+            <Dropdown
+              menu={{
+                items,
+                onClick: ({ key }) => setSelected(key as ContentCategory),
+              }}
+              placement="bottomLeft"
+              arrow
+              className="absolute bottom-0 right-0"
+            >
+              <button className="inline-flex items-center rounded-md bg-[#ffffff9c] px-3 py-1 text-sm sm:text-xl">
+                {categoryMap[selected]}{" "}
+                <DownOutlined className="ml-1 text-lg" />
+              </button>
+            </Dropdown>
           </h1>
         </div>
 
@@ -150,11 +165,11 @@ const HeroNewRanking = ({
                     {/* 미니 랭킹 */}
                     <div
                       className={`absolute right-4 top-4 z-50 transition-opacity duration-300 ${
-                        expandedIndex === index ? "opacity-0" : "opacity-90"
+                        expandedIndex === index ? "md:opacity-0" : "opacity-90"
                       }`}
                     >
                       <span
-                        className="text-2xl font-bold text-white md:text-3xl"
+                        className="text-5xl font-bold text-white md:text-2xl md:text-3xl"
                         style={{ textShadow: "0px 0px 4px black" }}
                       >
                         {index + 1}

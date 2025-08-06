@@ -21,11 +21,11 @@ import EntryRouter from "@/pages/EntryPage";
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/entry",
     element: <EntryRouter />,
   },
   {
-    path: "/main",
+    path: "/",
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },

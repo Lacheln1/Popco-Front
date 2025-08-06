@@ -13,21 +13,18 @@ const EntryRouter = () => {
     const visitedDate = localStorage.getItem("visitedDate");
 
     if (visitedDate === today) {
-      navigate("/main", { replace: true });
+      navigate("/", { replace: true });
     } else {
       navigate("/intro", { replace: true });
 
       // 즉시 프리페치 시작 (await 없이)
       const startPrefetch = async () => {
         try {
-          console.log("프리페치 시작...");
-
           // 병렬로 실행
           const prefetchPromises = [
             queryClient.prefetchQuery({
               queryKey: ["contentsRanking", "all", 0],
               queryFn: () => {
-                console.log("랭킹 데이터 요청 중...");
                 return fetchContentsRanking("all");
               },
               staleTime: 5 * 60 * 1000,
@@ -45,12 +42,10 @@ const EntryRouter = () => {
             }),
           ];
           await Promise.all(prefetchPromises);
-          console.log("프리페치 완료");
         } catch (error) {
           console.error("프리페치 실패", error);
         }
       };
-
       // 즉시 실행하되 await 하지 않음 (블로킹 방지)
       startPrefetch();
     }

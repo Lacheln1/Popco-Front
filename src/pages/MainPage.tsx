@@ -3,7 +3,6 @@ import HeroCollection from "@/components/MainPage/HeroCollection";
 import HeroPersona from "@/components/MainPage/HeroPersona";
 import HeroPersonaBanner from "@/components/MainPage/HeroPersonaBanner";
 import HeroPopcorithm from "@/components/MainPage/HeroPopcorithm";
-import HeroRanking from "@/components/MainPage/HeroRanking";
 import HeroTop1 from "@/components/MainPage/HeroTop1";
 import HeroReview from "@/components/MainPage/HeroReview";
 import useAuthCheck from "@/hooks/useAuthCheck";
@@ -28,15 +27,6 @@ const MainPage = () => {
             setTop1Title(title);
           }}
         />
-        {/* <HeroRanking
-          accessToken={accessToken ?? ""}
-          userId={user?.userId}
-          type={top1Type}
-          onTop1Change={(type, title) => {
-            setTop1Type(type);
-            setTop1Title(title);
-          }}
-        /> */}
       </div>
       <HeroTop1
         accessToken={accessToken ?? ""}
