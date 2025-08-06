@@ -58,7 +58,7 @@ const ListPage = () => {
     sort,
     enabled: !isSearching && !hasActiveFilter,
     userId: user.isLoggedIn ? user.userId : undefined, // 로그인된 경우에만 userId 전달
-    accessToken: user.isLoggedIn ? accessToken : undefined, // 로그인된 경우에만 accessToken 전달
+    accessToken: user.isLoggedIn && accessToken ? accessToken : undefined,
   });
 
   // 페이지 로드시 최신 데이터 보장을 위한 리프레시
