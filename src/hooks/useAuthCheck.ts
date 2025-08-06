@@ -77,7 +77,6 @@ const useAuthCheck = () => {
           if (token) localStorage.setItem("accessToken", token);
         }
 
-        // token이 존재하는 경우에만 처리
         if (!token) {
           if (needsAuth) navigate("/login", { state: { from: currentPath } });
           return;
@@ -92,8 +91,7 @@ const useAuthCheck = () => {
             token = refreshResult.data.accessToken;
             localStorage.setItem("accessToken", token);
           } else {
-            if (needsAuth)
-              navigate("/login", { state: { from: currentPath } });
+            if (needsAuth) navigate("/login", { state: { from: currentPath } });
             return;
           }
         }
@@ -108,9 +106,7 @@ const useAuthCheck = () => {
         const userIdFromToken = Number(decoded.sub);
 
         if (!userIdFromToken || isNaN(userIdFromToken)) {
-          throw new Error(
-            "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
-          );
+          throw new Error("토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.");
         }
 
         // --- 3. 프로필 완료 상태 확인 (로그인 시 저장된 정보 사용) ---
@@ -125,7 +121,7 @@ const useAuthCheck = () => {
         profileComplete = justCompleted || loginProfileComplete;
 
         try {
-          const userInfo = await getUserDetail(token);
+          const userInfo = await getUserDetail(token as string);
 
           if (userInfo && userInfo.data) {
             setUser({
@@ -148,10 +144,7 @@ const useAuthCheck = () => {
             });
           }
         } catch (userDetailError) {
-          console.error(
-            "🔍 사용자 상세 정보 가져오기 실패:",
-            userDetailError,
-          );
+          console.error("🔍 사용자 상세 정보 가져오기 실패:", userDetailError);
 
           // getUserDetail 실패해도 토큰과 프로필 완료 상태는 유지
           setUser({
