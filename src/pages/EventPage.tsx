@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useIsMediumUp } from "@/hooks/useMediaQuery";
 import { PosterImage } from "@/components/EventPage/PosterImage";
 import { EventInfoCard } from "@/components/EventPage/cards/EventInfoCard";
-import { renderCount } from "@/components/EventPage/Countdown";
 import { Question } from "@/components/EventPage/cards/Question";
 import { WaitingRoom } from "@/components/EventPage/cards/WaitingRoom";
 import { Eliminated } from "@/components/EventPage/cards/Eliminated";
@@ -48,25 +47,19 @@ const EventPage = () => {
   const renderStepComponent = () => {
     switch (step) {
       case "entry":
-        console.log("→ Rendering EventInfoCard");
         return (
           <EventInfoCard
             isButtonActive={isButtonActive}
             onCountdownEnd={() => setIsButtonActive(true)}
-            renderCount={renderCount}
           />
         );
       case "question":
-        console.log("→ Rendering Question");
         return <Question />;
       case "waiting":
-        console.log("→ Rendering WaitingRoom");
         return <WaitingRoom />;
       case "eliminated":
-        console.log("→ Rendering Eliminated");
         return <Eliminated />;
       case "winner":
-        console.log("→ Rendering FinalWinner");
         return <FinalWinner />;
       default:
         return <div>알 수 없는 단계입니다.</div>;

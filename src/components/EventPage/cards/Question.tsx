@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useQuizStore } from "@/stores/useQuizStore";
 import axiosInstance from "@/apis/axiosInstance";
-import { subscribeToQuestion } from "@/utils/socket";
+import { connectSocket, subscribeToQuestion } from "@/utils/socket";
 import useAuthCheck from "@/hooks/useAuthCheck";
-import { RawQuestionResponse } from "@/types/Quiz.types";
+import { QuizStatusSocketData, RawQuestionResponse } from "@/types/Quiz.types";
 import { mapRawQuestionToClientFormat } from "@/utils/mapper";
 import { IoTimeOutline } from "react-icons/io5";
 import { FiUsers } from "react-icons/fi";
@@ -26,30 +26,27 @@ export const Question = () => {
     updateTimer,
     updateSurvivors,
     setStep,
-    remainingTime,
-    currentSurvivors,
-    maxSurvivors,
-    currentQuestionIndex,
-    totalQuestions,
+    timer: remainingTime,
+    survivors,
+    setQuestionId,
   } = useQuizStore();
 
   const { accessToken } = useAuthCheck();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // 1. 문제 데이터 불러오기
+  // 구독 관리를 위한 ref
+  const subscriptionRef = useRef<(() => void) | null>(null);
+
+  // 문제 데이터 불러오기
   const loadQuestionData = async () => {
-    if (!quizId || !accessToken) {
-      return;
-    }
-    console.log("🚀 API 호출 시작:", { quizId, questionId });
+    if (!quizId || !questionId || !accessToken) return;
+
     try {
       const res = await axiosInstance.get<ApiResponse<RawQuestionResponse>>(
         `/quizzes/${quizId}/questions/${questionId}`,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: { Authorization: `Bearer ${accessToken}` },
         },
       );
       const formatted = mapRawQuestionToClientFormat(res.data.data);
@@ -59,72 +56,133 @@ export const Question = () => {
     }
   };
 
-  // 2. 서버 브로드캐스트 수신 처리
-  const handleServerMessage = (data: any) => {
-    if (data.remainingTime !== undefined) {
+  // 소켓 메시지 처리
+  const handleSocketMessage = (data: QuizStatusSocketData) => {
+    console.log("🔄 QuizStatusSocketData 수신:", data);
+
+    // 타이머 업데이트
+    if (typeof data.remainingTime === "number") {
       updateTimer(data.remainingTime);
     }
 
+    // 생존자 수 업데이트
     if (
-      data.currentSurvivors !== undefined &&
-      data.maxSurvivors !== undefined
+      typeof data.currentSurvivors === "number" &&
+      typeof data.maxSurvivors === "number"
     ) {
       updateSurvivors(data.currentSurvivors, data.maxSurvivors);
     }
 
-    if (data.type === "QUESTION_TIMEOUT") {
-      setStep("eliminated");
+    // 상태별 처리
+    switch (data.status) {
+      case "FINISHED":
+        console.log("🏁 퀴즈 종료 상태");
+        if (!data.isActive) {
+          console.log("🏆 퀴즈 완전 종료 - 우승자 화면으로");
+          setStep("winner");
+        } else {
+          console.log("⏰ 라운드 종료 - 탈락 또는 대기");
+          setStep(hasSubmitted ? "waiting" : "eliminated");
+        }
+        break;
+
+      case "ACTIVE":
+        console.log("🚀 퀴즈 활성 상태");
+        if (data.questionId && data.questionId !== questionId) {
+          console.log("📢 다음 문제로 이동:", data.questionId);
+          // 새 문제 초기화
+          setQuestionId(data.questionId);
+          setSelectedAnswer(null);
+          setHasSubmitted(false);
+          setStep("question");
+        }
+        break;
+
+      case "WAITING":
+        console.log("⏳ 대기 상태");
+        break;
+
+      default:
+        console.log("❓ 알 수 없는 상태:", data.status);
     }
 
-    if (data.type === "NEXT_QUESTION") {
-      setTimeout(() => {
-        const { step, setQuestionId, setStep, setHasSubmitted } =
-          useQuizStore.getState();
-        if (step !== "waiting") return;
-        console.log("📢 다음 문제로 이동:", data.questionId);
-        setHasSubmitted(false);
-        setSelectedAnswer(null); // 선택 초기화
-        setQuestionId(data.questionId);
-        setStep("question");
-      }, 50);
+    // 퀴즈 상태 업데이트
+    if (data.status) {
+      useQuizStore.getState().setQuizStatus(data.status);
     }
   };
 
-  // 3. 초기 로드 및 소켓 구독
-  useEffect(() => {
-    if (!quizId || !questionId || !accessToken) {
-      return;
-    }
-    loadQuestionData();
+  // 소켓 구독 설정
+  const setupSubscription = () => {
+    if (!quizId || !questionId || !accessToken) return;
 
-    // 소켓 메시지 수신 설정
-    const unsubscribe = subscribeToQuestion(
-      quizId,
-      questionId,
-      handleServerMessage,
-    );
+    try {
+      // 기존 구독 해제
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+        subscriptionRef.current = null;
+      }
+
+      const unsubscribe = subscribeToQuestion(
+        quizId,
+        questionId,
+        handleSocketMessage,
+      );
+      if (unsubscribe) {
+        subscriptionRef.current = unsubscribe;
+        console.log("✅ 소켓 구독 성공");
+      } else {
+        console.error("❌ 소켓 구독 실패 - unsubscribe 함수가 반환되지 않음");
+      }
+    } catch (error) {
+      console.error("❌ 소켓 구독 중 오류:", error);
+    }
+  };
+
+  // 초기 로드 및 소켓 구독
+  useEffect(() => {
+    if (!quizId || !questionId || !accessToken) return;
+
+    const setup = async () => {
+      try {
+        await connectSocket(accessToken); // 1. 연결
+        console.log("✅ 소켓 연결됨");
+
+        setupSubscription(); // 2. 구독 시작
+        loadQuestionData(); // 3. 문제 데이터 불러오기
+      } catch (e) {
+        console.error("❌ 소켓 연결 실패", e);
+      }
+    };
+
+    setup();
+
     return () => {
-      unsubscribe?.();
+      // cleanup (기존 구독 해제)
+      if (subscriptionRef.current) {
+        subscriptionRef.current();
+        subscriptionRef.current = null;
+      }
     };
   }, [quizId, questionId, accessToken]);
 
-  // 4. 답안 선택
+  // 새 문제 시작시 상태 초기화
+  useEffect(() => {
+    setSelectedAnswer(null);
+    setIsSubmitting(false);
+  }, [questionId]);
+
+  // 답안 선택
   const selectAnswer = (optionId: number) => {
-    if (!hasSubmitted && !isSubmitting) {
-      setSelectedAnswer(optionId);
-    }
+    if (hasSubmitted || isSubmitting) return; // 제출 후에는 선택 불가
+    setSelectedAnswer(optionId);
   };
 
-  // 5. 정답 제출
+  // 정답 제출
   const submitAnswer = async () => {
-    if (
-      hasSubmitted ||
-      selectedAnswer === null ||
-      !quizId ||
-      !accessToken ||
-      isSubmitting
-    )
+    if (selectedAnswer === null || !quizId || !accessToken || hasSubmitted) {
       return;
+    }
 
     setIsSubmitting(true);
     setHasSubmitted(true);
@@ -132,15 +190,14 @@ export const Question = () => {
     try {
       const res = await axiosInstance.post(
         `/quizzes/${quizId}/questions/${questionId}`,
-        { optionId: selectedAnswer },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
+        { optionId: selectedAnswer + 1 },
+        { headers: { Authorization: `Bearer ${accessToken}` } },
       );
+
       const { survived } = res.data.data;
-      setStep(survived ? "waiting" : "eliminated");
+      console.log(`📝 답안 제출 결과: ${survived ? "생존" : "탈락"}`);
+
+      // 제출 후 결과에 따라 상태 변경은 소켓 메시지로 처리됨
     } catch (err) {
       console.error("답안 제출 실패", err);
       setHasSubmitted(false);
@@ -162,121 +219,95 @@ export const Question = () => {
     );
   }
 
+  const currentSurvivors = survivors.current;
+  const maxSurvivors = survivors.max;
   const survivorPercentage =
     maxSurvivors > 0 ? (currentSurvivors / maxSurvivors) * 100 : 0;
-  const eliminationRate =
-    maxSurvivors > 0
-      ? Math.round(((maxSurvivors - currentSurvivors) / maxSurvivors) * 100)
-      : 0;
+  const isTimerActive = remainingTime > 0;
 
   return (
     <aside className="absolute left-1/2 top-[31%] z-10 flex w-[85%] -translate-x-1/2 -translate-y-1/3 flex-col items-center justify-center break-keep rounded-2xl bg-white/95 px-4 py-8 shadow-2xl backdrop-blur-lg md:h-[520px] md:w-[800px] md:px-8">
       <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
+        {/* 상단 정보바 */}
         <div className="flex w-full items-center justify-between">
-          {/* 왼쪽 - 타이머 */}
-          <div className="flex w-1/3 flex-1 justify-start">
-            <div
-              className={`flex items-center gap-3 rounded-full px-4 py-2 shadow-lg transition-all duration-300 ${
-                remainingTime <= 5
-                  ? "animate-pulse bg-gradient-to-r from-red-500 to-red-600"
-                  : remainingTime <= 10
-                    ? "bg-gradient-to-r from-orange-500 to-red-500"
-                    : "bg-gradient-to-r from-blue-500 to-purple-500"
-              }`}
-            >
-              <IoTimeOutline className="h-6 w-6 text-white" />
-              <span className="text-lg text-white">{remainingTime}초</span>
+          {/* 타이머 */}
+          <div className="flex items-center gap-3 rounded-full px-4 py-2 transition-all duration-300">
+            <IoTimeOutline className="h-6 w-6" />
+            <span className="text-lg font-bold">
+              {isTimerActive ? `${remainingTime}초` : "대기 중"}
+            </span>
+          </div>
+
+          {/* 문제 번호 */}
+          <div className="text-2xl font-bold text-gray-800">
+            Quiz {questionId} / 3
+          </div>
+
+          {/* 생존자 정보 */}
+          <div className="flex flex-col items-end">
+            <div className="mb-2 flex items-center gap-2">
+              <FiUsers className="h-5 w-5 text-indigo-600" />
+              <span className="text-lg font-semibold text-gray-700">
+                생존자
+              </span>
+              <span className="text-2xl font-bold text-indigo-600">
+                {currentSurvivors.toLocaleString()}
+              </span>
+              <span className="text-sm text-gray-500">
+                / {maxSurvivors.toLocaleString()}
+              </span>
             </div>
-          </div>
-
-          {/* 가운데 - 퀴즈 진행상황 */}
-          <div className="flex w-1/3 flex-1 justify-center text-2xl font-bold text-gray-800">
-            Quiz {questionId} / {totalQuestions}
-          </div>
-
-          {/* 오른쪽 - 생존자 정보 */}
-          <div className="flex w-1/3 flex-1 justify-end">
-            <div className="flex w-full flex-col items-end">
-              <div className="mb-2 flex items-center gap-2">
-                <FiUsers className="h-5 w-5 text-indigo-600" />
-                <span className="text-lg font-semibold text-gray-700">
-                  생존자
-                </span>
-                <span className="text-2xl font-bold text-indigo-600">
-                  {currentSurvivors}
-                </span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ease-out ${
-                    survivorPercentage > 70
-                      ? "bg-gradient-to-r from-green-400 to-green-600"
-                      : survivorPercentage > 40
-                        ? "bg-gradient-to-r from-yellow-400 to-orange-500"
-                        : "bg-gradient-to-r from-red-400 to-red-600"
-                  }`}
-                  style={{ width: `${survivorPercentage}%` }}
-                />
-              </div>
-              <div className="mt-1 text-sm text-gray-500">
-                {survivorPercentage.toFixed(0)}% 남음
-              </div>
+            <div className="h-3 w-32 overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-1000 ease-out"
+                style={{ width: `${survivorPercentage}%` }}
+              />
+            </div>
+            <div className="mt-1 text-sm text-gray-500">
+              {survivorPercentage.toFixed(1)}% 남음
             </div>
           </div>
         </div>
 
-        {/* 질문 텍스트 */}
-        <h3 className="text-xl leading-snug text-gray-800 lg:text-2xl">
+        {/* 문제 */}
+        <h3 className="mb-6 text-xl leading-snug text-gray-800 lg:text-2xl">
           {questionData.content}
         </h3>
 
-        {/* 답변 선택지 */}
-        <div className="mb-8 grid w-full max-w-2xl gap-3">
+        {/* 선택지 */}
+        <div className="mb-8 grid w-full max-w-2xl gap-3 md:w-2/3">
           {questionData?.options?.map((opt, index) => (
             <button
               key={opt.id}
-              disabled={hasSubmitted || isSubmitting}
               onClick={() => selectAnswer(opt.id)}
-              className={`group relative transform overflow-hidden rounded-xl p-4 text-left font-medium transition-all duration-300 focus:scale-[1.02] ${
-                hasSubmitted || isSubmitting
-                  ? "cursor-not-allowed bg-gray-200 text-gray-500"
-                  : selectedAnswer === opt.id
-                    ? "bg-popco-main text-white shadow-lg"
-                    : "bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-md"
-              } ${
-                !hasSubmitted &&
-                !isSubmitting &&
-                selectedAnswer !== opt.id &&
-                "hover:from-gray-600"
+              disabled={hasSubmitted || isSubmitting}
+              className={`group relative transform overflow-hidden rounded-xl p-4 text-left font-medium transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 ${
+                selectedAnswer === opt.id
+                  ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg"
+                  : "bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-md hover:from-purple-500 hover:to-purple-600 hover:shadow-lg"
               }`}
             >
               <div className="flex items-center gap-4">
                 <div
-                  className={`flex h-6 w-6 items-center justify-center rounded-full text-sm font-bold ${
-                    hasSubmitted || isSubmitting
-                      ? "bg-gray-300"
-                      : selectedAnswer === opt.id
-                        ? "bg-white/30"
-                        : "bg-white/20"
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-all ${
+                    selectedAnswer === opt.id
+                      ? "scale-110 bg-white/30"
+                      : "bg-white/20 group-hover:scale-105 group-hover:bg-white/30"
                   }`}
                 >
                   {String.fromCharCode(65 + index)}
                 </div>
-                <span className="text-base">{opt.content}</span>
+                <span className="text-base font-medium">{opt.content}</span>
               </div>
             </button>
           ))}
         </div>
 
-        {/* 정답 제출 버튼 */}
+        {/* 제출 버튼 */}
         <button
           onClick={submitAnswer}
           disabled={selectedAnswer === null || hasSubmitted || isSubmitting}
-          className={`transform rounded-full px-12 py-4 text-base transition-all duration-300 ${
-            selectedAnswer === null || hasSubmitted || isSubmitting
-              ? "cursor-not-allowed bg-gray-200 text-gray-400"
-              : "bg-footerBlue cursor-pointer text-white hover:bg-black"
-          }`}
+          className="transform rounded-full bg-gradient-to-r from-blue-600 to-blue-700 px-12 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">
@@ -286,7 +317,7 @@ export const Question = () => {
           ) : hasSubmitted ? (
             "제출 완료!"
           ) : selectedAnswer === null ? (
-            "답 선택 후 제출"
+            "답을 선택해주세요"
           ) : (
             "정답 제출하기"
           )}

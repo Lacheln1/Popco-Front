@@ -1,4 +1,4 @@
-import { QuestionData } from "@/types/Quiz.types";
+import { QuestionData, QuizStatus } from "@/types/Quiz.types";
 import { create } from "zustand";
 
 type QuizStep = "entry" | "question" | "waiting" | "eliminated" | "winner";
@@ -17,7 +17,10 @@ interface QuizStore {
     current: number;
     max: number;
   };
+  quizStatus: QuizStatus | null;
 
+  // Actions
+  setQuizStatus: (status: QuizStatus) => void;
   setQuizId: (id: number) => void;
   nextQuestion: () => void;
   setQuestionId: (id: number) => void;
@@ -31,6 +34,7 @@ interface QuizStore {
 }
 
 export const useQuizStore = create<QuizStore>((set) => ({
+  // Initial state
   quizId: 1,
   questionId: 1,
   step: "entry",
@@ -43,14 +47,18 @@ export const useQuizStore = create<QuizStore>((set) => ({
     current: 0,
     max: 0,
   },
+  quizStatus: null,
 
+  // Actions
   setStep: (step) => set({ step }),
   setQuizId: (id) => set({ quizId: id }),
   setQuestionId: (id: number) => set({ questionId: id }),
   nextQuestion: () =>
     set((state) => {
       const nextId = state.questionId + 1;
-      if (nextId > 3) {
+      const totalQuestions = 3;
+
+      if (nextId > totalQuestions) {
         return {
           questionId: state.questionId,
           step: "winner", // 최종 우승 상태
@@ -72,6 +80,7 @@ export const useQuizStore = create<QuizStore>((set) => ({
   setHasSubmitted: (flag) => set({ hasSubmitted: flag }),
   updateTimer: (time) => set({ timer: time }),
   updateSurvivors: (current, max) => set({ survivors: { current, max } }),
+  setQuizStatus: (status) => set({ quizStatus: status }),
   reset: () =>
     set({
       quizId: null,
@@ -83,5 +92,6 @@ export const useQuizStore = create<QuizStore>((set) => ({
       hasSubmitted: false,
       timer: 0,
       survivors: { current: 0, max: 0 },
+      quizStatus: null,
     }),
 }));

@@ -50,3 +50,17 @@ export interface FetchQuizResponse {
   quizDetail: QuizDetail;
   quizPageAccess: boolean;
 }
+
+export type QuizStatus = "WAITING" | "FINISHED" | "ACTIVE";
+
+export interface QuizStatusSocketData {
+  quizId: number;
+  questionId: number;
+  currentSurvivors: number;
+  maxSurvivors: number;
+  isActive: boolean;
+  remainingTime: number;
+  isTimerRunning: boolean;
+  timerStartedAt: number;
+  status: QuizStatus;
+}

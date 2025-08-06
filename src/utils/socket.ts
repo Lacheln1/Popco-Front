@@ -74,7 +74,10 @@ export const subscribeToQuestion = (
 ) => {
   if (!stompClient || !stompClient.connected) {
     console.warn("소켓이 아직 연결되지 않았습니다.");
-    return;
+    // null 대신 빈 함수를 반환
+    return () => {
+      console.log("소켓이 연결되지 않아 구독 해제할 것이 없습니다.");
+    };
   }
 
   const topic = `/topic/quiz/${quizId}/question/${questionId}`;
@@ -89,7 +92,7 @@ export const subscribeToQuestion = (
     try {
       const data = JSON.parse(message.body);
 
-      if (data.type === "NEXT_QUESTION") {
+      if (data.status === "ACTIVE") {
         const { setQuestionId, setStep, setHasSubmitted } =
           useQuizStore.getState();
 
@@ -100,17 +103,29 @@ export const subscribeToQuestion = (
         setStep("question");
       }
 
-      if (data.type === "QUIZ_ENDED") {
+      if (data.status === "FINISHED") {
         const { setStep } = useQuizStore.getState();
         console.log("🎉 퀴즈 종료!");
         setStep("winner");
       }
+
+      // 추가적으로 onMessage 콜백도 호출
+      onMessage(data);
     } catch (e) {
       console.error("이벤트 메시지 파싱 실패", e);
     }
   });
 
   console.log(`문제 구독 시작: ${topic}`);
+
+  // unsubscribe 함수 반환 (항상 함수를 반환)
+  return () => {
+    if (currentSubscription) {
+      currentSubscription.unsubscribe();
+      currentSubscription = null;
+      console.log(`구독 해제: ${topic}`);
+    }
+  };
 };
 
 // 3. 소켓 해제

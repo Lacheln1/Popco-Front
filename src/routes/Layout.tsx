@@ -4,7 +4,6 @@ import Footer from "../components/common/Footer";
 import Header from "@/components/common/Header";
 import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
-import { EventSourcePolyfill } from "event-source-polyfill";
 
 const Layout = () => {
   const [notification, setNotification] = useState<null | string>(null);
@@ -18,13 +17,9 @@ const Layout = () => {
   useEffect(() => {
     if (!accessToken) return;
 
-    const url = `${import.meta.env.VITE_BACK_URL}/notifications/stream`;
-    const eventSource = new EventSourcePolyfill(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      withCredentials: true,
-    });
+    const url = `${import.meta.env.VITE_SOCKET_URL}/notifications/stream?token=${accessToken}`;
+    const eventSource = new EventSource(url);
+    console.log("📡 SSE 요청 보냄:", url);
 
     eventSource.onopen = () => {
       console.log("SSE 연결 성공");
