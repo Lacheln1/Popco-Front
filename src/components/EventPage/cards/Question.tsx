@@ -167,13 +167,6 @@ export const Question = () => {
         break;
 
       case "QUESTION_TIMEOUT":
-        console.log(
-          "⏰ 문제 시간 종료 - isSurvived:",
-          isSurvived,
-          "hasSubmitted:",
-          hasSubmitted,
-        );
-
         if (isSurvived) {
           // 정답자는 상태 변경 없음 - 오버레이가 자동으로 사라지고 다음 단계를 기다림
           console.log("✅ 정답자 - 현재 상태 유지, 오버레이는 타이머로 제어됨");
@@ -200,14 +193,12 @@ export const Question = () => {
           });
           setStep("winner");
         }
-        // 구독 해제는 socket.ts에서 처리됨
         break;
 
       default:
         console.warn("알 수 없는 상태:", status);
     }
-
-    // 상태 저장 (QuizStore 전용)
+    // 상태 저장
     if ("status" in data && data.status) {
       useQuizStore.getState().setQuizStatus(data.status);
     }
@@ -282,10 +273,8 @@ export const Question = () => {
       setIsSurvived(survived);
 
       if (survived) {
-        console.log("✅ 정답! 오버레이 표시");
         setShowCorrectOverlay(true);
       } else {
-        console.log("❌ 오답! 탈락 처리");
         setStep("eliminated");
       }
     } catch (err) {
@@ -293,8 +282,6 @@ export const Question = () => {
       setHasSubmitted(false);
       setSelectedAnswer(null);
       setIsSurvived(false);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

@@ -103,15 +103,11 @@ const handleWinnerAnnounced = (data: any) => {
 };
 
 const handleQuestionTimeout = (data: any) => {
-  console.log("⏰ 문제 시간 종료 - Question 컴포넌트에서 처리하도록 위임");
-
-  // QUESTION_TIMEOUT은 복잡한 로직이 필요하므로
-  // socket에서 직접 처리하지 않고 Question 컴포넌트의 onMessage 콜백으로 위임
-  // (isSurvived 상태를 socket.ts에서 접근할 수 없기 때문)
+  console.log("문제 시간 종료 ");
 };
 
 const handleQuizStatus = (data: any) => {
-  console.log("📊 퀴즈 상태 업데이트:", data);
+  console.log("퀴즈 상태 업데이트:", data);
 
   if (data.quizId && data.questionId) {
     // QuizStatusResponseDto로 간주

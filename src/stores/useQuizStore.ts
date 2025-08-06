@@ -38,7 +38,7 @@ interface QuizStore {
 export const useQuizStore = create<QuizStore>((set) => ({
   // Initial state
   quizId: 1,
-  questionId: 2,
+  questionId: 1,
   step: "entry",
   questionData: null,
   isConnected: false,
@@ -72,7 +72,6 @@ export const useQuizStore = create<QuizStore>((set) => ({
         return {
           questionId: nextId,
           step: "question",
-          hasSubmitted: false,
           timer: 0,
         };
       }

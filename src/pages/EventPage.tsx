@@ -11,6 +11,7 @@ import useAuthCheck from "@/hooks/useAuthCheck";
 import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
 import { App } from "antd";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
+import { WaitingRoom } from "@/components/EventPage/cards/WaitingRoom";
 
 const EventPage = () => {
   const { message } = App.useApp();
