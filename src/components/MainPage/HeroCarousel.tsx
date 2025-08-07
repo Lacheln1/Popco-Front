@@ -9,10 +9,10 @@ import { useState } from "react";
 const banners = [
   { src: "/images/main/banner-popco.png", link: "/" },
   { src: "/images/main/banner-event.png", link: "/event" },
-  { src: "/images/main/banner-chat.png", link: "/chat" }, // 챗봇 연결은 추후 수정
+  { src: "/images/main/banner-persona.png", link: "/persona" },
   { src: "/images/main/banner-popco.png", link: "/" },
   { src: "/images/main/banner-event.png", link: "/event" },
-  { src: "/images/main/banner-chat.png", link: "/chat" },
+  { src: "/images/main/banner-persona.png", link: "/persona" },
 ];
 
 const HeroCarousel = () => {
@@ -71,7 +71,7 @@ const HeroCarousel = () => {
             <img
               src={src}
               alt={`banner-${idx}`}
-              className="aspect-video rounded-2xl object-cover md:aspect-auto"
+              className="aspect-video rounded-2xl object-cover md:aspect-[1200/520]"
             />
           </SwiperSlide>
         ))}

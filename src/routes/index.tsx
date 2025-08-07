@@ -4,22 +4,25 @@ import Layout from "./Layout";
 import TestLayout from "@/layout/TestLayout";
 import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
-const LoginPage = lazy(() => import("@/pages/LoginPage"));
-const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
 import EventPage from "@/pages/EventPage";
 import CollectionPage from "@/pages/CollectionPage";
+import IntroPage from "@/pages/IntroPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
+import CollectionDetailPage from "@/pages/CollectionDetailPage";
+import CollectionCreatePage from "@/pages/CollectionCreatePage";
+import EntryRouter from "@/pages/EntryPage";
+
+import Spinner from "@/components/common/Spinner";
+
+const LoginPage = lazy(() => import("@/pages/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
 const AnalysisPage = lazy(() => import("@/pages/AnalysisPage"));
 const KakaoCallback = lazy(() => import("@/pages/KakaoCallback"));
 const MyPage = lazy(() => import("@/pages/MyPage"));
-import CollectionDetailPage from "@/pages/CollectionDetailPage";
-import CollectionCreatePage from "@/pages/CollectionCreatePage";
-
-import Spinner from "@/components/common/Spinner";
 
 const PageLoading = () => {
   return (
@@ -34,7 +37,8 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <MainPage /> },
+      { index: true, element: <EntryRouter /> },
+      { path: "/home", element: <MainPage /> },
       { path: "/list", element: <ListPage /> },
       { path: "/event", element: <EventPage /> },
       { path: "/detail/:type/:id", element: <DetailPage /> },
@@ -62,6 +66,14 @@ const router = createBrowserRouter([
   {
     element: <WithoutHeaderFooterLayout />,
     children: [
+      {
+        path: "/intro",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <IntroPage />
+          </Suspense>
+        ),
+      },
       {
         path: "/login",
         element: (

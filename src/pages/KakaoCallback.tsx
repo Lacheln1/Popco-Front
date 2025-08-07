@@ -52,7 +52,7 @@ const KakaoCallback: React.FC = () => {
             navigate("/test");
           } else {
             message.success("카카오로 로그인되었습니다!");
-            navigate("/");
+            navigate("/home");
           }
         } else {
           throw new Error(

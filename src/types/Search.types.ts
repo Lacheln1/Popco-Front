@@ -80,7 +80,7 @@ export interface PostFilterRequest {
   genres?: string[];
   minRating?: number;
   maxRating?: number;
-  platforms?: string[];
+  platform?: string[];
   minReleaseYear?: number;
   maxReleaseYear?: number;
   ageGroupFilter?: Record<string, unknown>;
@@ -93,7 +93,7 @@ export interface FilteredContentResponse {
   contentType: string;
   title: string;
   genres: string[];
-  platforms: string[];
+  platform: string[];
   ratingAverage: number;
   releaseDate: string;
   posterPath: string;

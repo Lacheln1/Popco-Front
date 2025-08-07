@@ -3,12 +3,12 @@ import HeroCollection from "@/components/MainPage/HeroCollection";
 import HeroPersona from "@/components/MainPage/HeroPersona";
 import HeroPersonaBanner from "@/components/MainPage/HeroPersonaBanner";
 import HeroPopcorithm from "@/components/MainPage/HeroPopcorithm";
-import HeroRanking from "@/components/MainPage/HeroRanking";
 import HeroTop1 from "@/components/MainPage/HeroTop1";
 import HeroReview from "@/components/MainPage/HeroReview";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { ContentCategory } from "@/types/Contents.types";
 import { useState } from "react";
+import HeroRanking from "@/components/MainPage/HeroRanking";
 
 const MainPage = () => {
   const { user, accessToken } = useAuthCheck();

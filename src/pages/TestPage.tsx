@@ -123,83 +123,83 @@ const TestPage = () => {
     }
   }, [step, accessToken, movies.length, fetchedQuizzes, message, setStep]);
 
-// TestPage의 handleSubmit 함수 수정 부분
-const handleSubmit = async () => {
-  if (!accessToken || !user || user.userId === 0) {
-    message.error(
-      "사용자 정보가 올바르지 않습니다. 잠시 후 다시 시도해주세요.",
-    );
-    return;
-  }
-
-  setIsSubmitting(true);
-  try {
-    const userDetails = {
-      nickname: nickname,
-      birthday: birthDate!.format("YYYY-MM-DD"),
-      gender: gender,
-    };
-    const personaPayload = {
-      user_id: user.userId,
-      feedback_items: selectedMovies.map((movie) => ({
-        content_id: Number(movie.id),
-        content_type: movie.type,
-      })),
-      reaction_type: "좋아요" as const,
-      initial_answers: Object.entries(quizAnswers).reduce(
-        (acc, [questionId, optionId]) => {
-          acc[questionId] = String(optionId);
-          return acc;
-        },
-        {} as { [key: string]: string },
-      ),
-    };
-
-    const [_, personaAnalysisResult] = await Promise.all([
-      updateUserDetails(userDetails, accessToken),
-      getOnboardingPersona(personaPayload, accessToken),
-    ]);
-
-    if (personaAnalysisResult && personaAnalysisResult.main_persona) {
-      setPersonaResult(personaAnalysisResult);
-      message.success("취향 분석이 완료되었습니다!");
-
-      // 테스트 완료 시 프로필 완료 상태 업데이트
-      sessionStorage.setItem("profileJustCompleted", "true");
-      localStorage.setItem("profileComplete", "true"); // 영구 저장도 업데이트
-
-      setStep((prev: number) => prev + 1);
-    } else {
-      throw new Error(
-        (personaAnalysisResult as any)?.message ||
-          "페르소나 분석에 실패했습니다.",
+  // TestPage의 handleSubmit 함수 수정 부분
+  const handleSubmit = async () => {
+    if (!accessToken || !user || user.userId === 0) {
+      message.error(
+        "사용자 정보가 올바르지 않습니다. 잠시 후 다시 시도해주세요.",
       );
+      return;
     }
-  } catch (error: any) {
-    console.error("최종 정보 제출 실패:", error);
-    message.error(error.message || "정보 저장 또는 분석에 실패했습니다.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
 
-// 메인페이지로 이동하는 함수 수정
-const handleGoToMain = () => {
-  // 프로필 완료 임시 상태 제거
-  sessionStorage.removeItem("profileJustCompleted");
-  
-  // 메인페이지로 이동
-  navigate("/");
-};
+    setIsSubmitting(true);
+    try {
+      const userDetails = {
+        nickname: nickname,
+        birthday: birthDate!.format("YYYY-MM-DD"),
+        gender: gender,
+      };
+      const personaPayload = {
+        user_id: user.userId,
+        feedback_items: selectedMovies.map((movie) => ({
+          content_id: Number(movie.id),
+          content_type: movie.type,
+        })),
+        reaction_type: "좋아요" as const,
+        initial_answers: Object.entries(quizAnswers).reduce(
+          (acc, [questionId, optionId]) => {
+            acc[questionId] = String(optionId);
+            return acc;
+          },
+          {} as { [key: string]: string },
+        ),
+      };
 
-// 취향 분석 페이지로 이동하는 함수 수정
-const handleGoToAnalysis = () => {
-  // 프로필 완료 임시 상태 제거  
-  sessionStorage.removeItem("profileJustCompleted");
-  
-  // 분석 페이지로 이동
-  navigate("/analysis");
-};
+      const [_, personaAnalysisResult] = await Promise.all([
+        updateUserDetails(userDetails, accessToken),
+        getOnboardingPersona(personaPayload, accessToken),
+      ]);
+
+      if (personaAnalysisResult && personaAnalysisResult.main_persona) {
+        setPersonaResult(personaAnalysisResult);
+        message.success("취향 분석이 완료되었습니다!");
+
+        // 테스트 완료 시 프로필 완료 상태 업데이트
+        sessionStorage.setItem("profileJustCompleted", "true");
+        localStorage.setItem("profileComplete", "true"); // 영구 저장도 업데이트
+
+        setStep((prev: number) => prev + 1);
+      } else {
+        throw new Error(
+          (personaAnalysisResult as any)?.message ||
+            "페르소나 분석에 실패했습니다.",
+        );
+      }
+    } catch (error: any) {
+      console.error("최종 정보 제출 실패:", error);
+      message.error(error.message || "정보 저장 또는 분석에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 메인페이지로 이동하는 함수 수정
+  const handleGoToMain = () => {
+    // 프로필 완료 임시 상태 제거
+    sessionStorage.removeItem("profileJustCompleted");
+
+    // 메인페이지로 이동
+    navigate("/home");
+  };
+
+  // 취향 분석 페이지로 이동하는 함수 수정
+  const handleGoToAnalysis = () => {
+    // 프로필 완료 임시 상태 제거
+    sessionStorage.removeItem("profileJustCompleted");
+
+    // 분석 페이지로 이동
+    navigate("/analysis");
+  };
 
   // 다음 단계로 이동 및 유효성 검사
   const handleNext = () => {

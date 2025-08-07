@@ -1,9 +1,11 @@
-import axios from "axios";
+import { logger } from "@/utils/logger";
+import axios, { AxiosError } from "axios";
 
 const API_URL = "/api/client";
 
 //토큰 갱신 시도(성공: 새로운 토큰 발급, 실패: 재로그인)
 export const refreshTokens = async () => {
+  if (!localStorage.getItem("userId")) return;
   try {
     const response = await axios.post(
       `${API_URL}/auth/refresh`,
@@ -15,8 +17,11 @@ export const refreshTokens = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("refreshTokens 실패", error);
-    throw error; 
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.status === 401) {
+      logger.info("refreshTokens: 로그인 안 된 상태");
+    }
+    return null;
   }
 };
 
@@ -26,12 +31,8 @@ export const validateAndRefreshTokens = async () => {
     const checkRefreshToken = await refreshTokens();
     return checkRefreshToken;
   } catch (error) {
-    console.error("validateAndRefreshTokens 실패:", error);
-    // 에러가 발생하면 INVALID_REFRESH_TOKEN 형태로 반환
-    return {
-      result: "INVALID_REFRESH_TOKEN",
-      data: null
-    };
+    logger.debug("validateAndRefreshTokens 실패:", error);
+    return "validateAndRefreshTokens 실패";
   }
 };
 
@@ -49,6 +50,6 @@ export const clearTokens = async (accessToken?: string): Promise<void> => {
       },
     );
   } catch (error) {
-    console.error("로그아웃 요청 실패", error);
+    logger.debug("로그아웃 요청 실패", error);
   }
 };

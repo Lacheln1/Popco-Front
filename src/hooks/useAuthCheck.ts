@@ -63,10 +63,10 @@ const useAuthCheck = () => {
 
       try {
         localStorage.removeItem("accessToken");
-        
+
         // 새로고침 시 리프레시 토큰으로 새 액세스 토큰 발급
         const refreshResult = await validateAndRefreshTokens();
-        
+
         if (
           refreshResult?.result === "INVALID_REFRESH_TOKEN" ||
           !refreshResult?.data?.accessToken
@@ -76,7 +76,7 @@ const useAuthCheck = () => {
         }
 
         const token = refreshResult.data.accessToken;
-        
+
         if (!token) {
           if (needsAuth) navigate("/login", { state: { from: currentPath } });
           return;
@@ -84,21 +84,21 @@ const useAuthCheck = () => {
 
         // 메모리에만 토큰 저장 (localStorage 사용 안함)
         setAccessToken(token);
-        
+
         // 토큰에서 사용자 ID 추출
         const decoded = jwtDecode<JwtPayload>(token);
         const userIdFromToken = Number(decoded.sub);
 
         if (!userIdFromToken || isNaN(userIdFromToken)) {
-          throw new Error(
-            "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
-          );
+          throw new Error("토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.");
         }
 
         // 프로필 완료 상태 확인
         let profileComplete = false;
-        const justCompleted = sessionStorage.getItem("profileJustCompleted") === "true";
-        const loginProfileComplete = localStorage.getItem("profileComplete") === "true";
+        const justCompleted =
+          sessionStorage.getItem("profileJustCompleted") === "true";
+        const loginProfileComplete =
+          localStorage.getItem("profileComplete") === "true";
         profileComplete = justCompleted || loginProfileComplete;
 
         try {
@@ -181,7 +181,7 @@ const useAuthCheck = () => {
     if (user.isLoggedIn) {
       if (user.profileComplete && currentPath === "/test") {
         message.info("이미 취향 진단을 완료했습니다.");
-        navigate("/");
+        navigate("/home");
       } else if (!user.profileComplete && currentPath !== "/test") {
         message.info("취향 진단을 먼저 완료해주세요.");
         navigate("/test");
