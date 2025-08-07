@@ -6,6 +6,9 @@ import svgr from "vite-plugin-svgr";
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [react(), svgr()],
+  define: {
+    global: "globalThis",
+  },
   resolve: { alias: { "@": path.resolve(dirname, "./src") } },
   server: {
     proxy: {

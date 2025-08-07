@@ -62,163 +62,58 @@ const useAuthCheck = () => {
       const needsAuth = isProtectedRoute(currentPath);
 
       try {
-        let token = localStorage.getItem("accessToken");
+        localStorage.removeItem("accessToken");
 
-        if (!token) {
-          const result = await validateAndRefreshTokens();
-          if (
-            result?.result === "INVALID_REFRESH_TOKEN" ||
-            !result?.data?.accessToken
-          ) {
-            if (needsAuth) navigate("/login", { state: { from: currentPath } });
-            return;
-          }
-          token = result.data.accessToken;
-          if (token) localStorage.setItem("accessToken", token);
+        // 새로고침 시 리프레시 토큰으로 새 액세스 토큰 발급
+        const refreshResult = await validateAndRefreshTokens();
+
+        if (
+          refreshResult?.result === "INVALID_REFRESH_TOKEN" ||
+          !refreshResult?.data?.accessToken
+        ) {
+          if (needsAuth) navigate("/login", { state: { from: currentPath } });
+          return;
         }
 
-        //  token이 존재하는 경우만 처리
+        const token = refreshResult.data.accessToken;
+
         if (!token) {
           if (needsAuth) navigate("/login", { state: { from: currentPath } });
           return;
         }
 
-        //  새 변수에 string 타입으로 저장
-        const validToken: string = token;
+        // 메모리에만 토큰 저장 (localStorage 사용 안함)
+        setAccessToken(token);
 
-        // 토큰 만료 시간 확인 및 필요시 갱신
-        const decodedForExp = jwtDecode<JwtPayload>(validToken);
-        if (decodedForExp.exp && decodedForExp.exp < Date.now() / 1000) {
-          localStorage.removeItem("accessToken");
-          const refreshResult = await validateAndRefreshTokens();
-          if (refreshResult?.data?.accessToken) {
-            const newToken = refreshResult.data.accessToken;
-            localStorage.setItem("accessToken", newToken);
+        // 토큰에서 사용자 ID 추출
+        const decoded = jwtDecode<JwtPayload>(token);
+        const userIdFromToken = Number(decoded.sub);
 
-            //  새 토큰으로 계속 진행
-            setAccessToken(newToken);
-            const decoded = jwtDecode<JwtPayload>(newToken);
-            const userIdFromToken = Number(decoded.sub);
+        if (!userIdFromToken || isNaN(userIdFromToken)) {
+          throw new Error("토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.");
+        }
 
-            if (!userIdFromToken || isNaN(userIdFromToken)) {
-              throw new Error(
-                "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
-              );
-            }
+        // 프로필 완료 상태 확인
+        let profileComplete = false;
+        const justCompleted =
+          sessionStorage.getItem("profileJustCompleted") === "true";
+        const loginProfileComplete =
+          localStorage.getItem("profileComplete") === "true";
+        profileComplete = justCompleted || loginProfileComplete;
 
-            // 프로필 완료 상태 확인
-            let profileComplete = false;
-            const justCompleted =
-              sessionStorage.getItem("profileJustCompleted") === "true";
-            const loginProfileComplete =
-              localStorage.getItem("profileComplete") === "true";
-            profileComplete = justCompleted || loginProfileComplete;
+        try {
+          const userInfo = await getUserDetail(token);
 
-            try {
-              const userInfo = await getUserDetail(newToken);
-
-              if (userInfo && userInfo.data) {
-                setUser({
-                  userId: userIdFromToken,
-                  email: userInfo.data.email || "",
-                  nickname: userInfo.data.nickname || "",
-                  profileImageUrl: userInfo.data.profileImageUrl || "",
-                  isLoggedIn: true,
-                  profileComplete: profileComplete,
-                });
-              } else {
-                setUser({
-                  userId: userIdFromToken,
-                  email: "",
-                  nickname: "",
-                  profileImageUrl: "",
-                  isLoggedIn: true,
-                  profileComplete: profileComplete,
-                });
-              }
-            } catch (userDetailError) {
-              console.error(
-                "🔍 사용자 상세 정보 가져오기 실패:",
-                userDetailError,
-              );
-              setUser({
-                userId: userIdFromToken,
-                email: "",
-                nickname: "",
-                profileImageUrl: "",
-                isLoggedIn: true,
-                profileComplete: profileComplete,
-              });
-            }
-
-            if (profileComplete) {
-              if (currentPath === "/test") {
-                message.info("이미 취향 진단을 완료했습니다.");
-                navigate("/home");
-                return;
-              }
-              sessionStorage.removeItem("profileJustCompleted");
-            } else {
-              if (currentPath !== "/test") {
-                console.log(
-                  "🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동",
-                );
-                message.info("취향 진단을 먼저 완료해주세요.");
-                navigate("/test");
-                return;
-              }
-            }
+          if (userInfo && userInfo.data) {
+            setUser({
+              userId: userIdFromToken,
+              email: userInfo.data.email || "",
+              nickname: userInfo.data.nickname || "",
+              profileImageUrl: userInfo.data.profileImageUrl || "",
+              isLoggedIn: true,
+              profileComplete: profileComplete,
+            });
           } else {
-            if (needsAuth) navigate("/login", { state: { from: currentPath } });
-            return;
-          }
-        } else {
-          //  토큰이 유효한 경우
-          setAccessToken(validToken);
-          const decoded = jwtDecode<JwtPayload>(validToken);
-          const userIdFromToken = Number(decoded.sub);
-
-          if (!userIdFromToken || isNaN(userIdFromToken)) {
-            throw new Error(
-              "토큰에서 유효한 사용자 ID(sub)를 찾을 수 없습니다.",
-            );
-          }
-
-          // 프로필 완료 상태 확인
-          let profileComplete = false;
-          const justCompleted =
-            sessionStorage.getItem("profileJustCompleted") === "true";
-          const loginProfileComplete =
-            localStorage.getItem("profileComplete") === "true";
-          profileComplete = justCompleted || loginProfileComplete;
-
-          try {
-            const userInfo = await getUserDetail(validToken);
-
-            if (userInfo && userInfo.data) {
-              setUser({
-                userId: userIdFromToken,
-                email: userInfo.data.email || "",
-                nickname: userInfo.data.nickname || "",
-                profileImageUrl: userInfo.data.profileImageUrl || "",
-                isLoggedIn: true,
-                profileComplete: profileComplete,
-              });
-            } else {
-              setUser({
-                userId: userIdFromToken,
-                email: "",
-                nickname: "",
-                profileImageUrl: "",
-                isLoggedIn: true,
-                profileComplete: profileComplete,
-              });
-            }
-          } catch (userDetailError) {
-            console.error(
-              "🔍 사용자 상세 정보 가져오기 실패:",
-              userDetailError,
-            );
             setUser({
               userId: userIdFromToken,
               email: "",
@@ -228,26 +123,35 @@ const useAuthCheck = () => {
               profileComplete: profileComplete,
             });
           }
+        } catch (userDetailError) {
+          console.error("🔍 사용자 상세 정보 가져오기 실패:", userDetailError);
+          setUser({
+            userId: userIdFromToken,
+            email: "",
+            nickname: "",
+            profileImageUrl: "",
+            isLoggedIn: true,
+            profileComplete: profileComplete,
+          });
+        }
 
-          if (profileComplete) {
-            if (currentPath === "/test") {
-              message.info("이미 취향 진단을 완료했습니다.");
-              navigate("/home");
-              return;
-            }
-            sessionStorage.removeItem("profileJustCompleted");
-          } else {
-            if (currentPath !== "/test") {
-              console.log("🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동");
-              message.info("취향 진단을 먼저 완료해주세요.");
-              navigate("/test");
-              return;
-            }
+        if (profileComplete) {
+          if (currentPath === "/test") {
+            message.info("이미 취향 진단을 완료했습니다.");
+            navigate("/");
+            return;
+          }
+          sessionStorage.removeItem("profileJustCompleted");
+        } else {
+          if (currentPath !== "/test") {
+            console.log("🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동");
+            message.info("취향 진단을 먼저 완료해주세요.");
+            navigate("/test");
+            return;
           }
         }
       } catch (error) {
         console.error("❌ 인증 체크 중 오류:", error);
-        localStorage.removeItem("accessToken");
 
         setUser({
           userId: 0,
@@ -300,7 +204,7 @@ const useAuthCheck = () => {
     } catch (error) {
       console.error("서버 로그아웃 실패:", error);
     } finally {
-      // 모든 상태 초기화
+      // 모든 상태 초기화 및 localStorage accessToken 제거
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userId");
       sessionStorage.removeItem("profileJustCompleted");

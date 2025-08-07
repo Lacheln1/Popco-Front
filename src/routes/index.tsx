@@ -6,6 +6,7 @@ import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
+import EventPage from "@/pages/EventPage";
 import CollectionPage from "@/pages/CollectionPage";
 import IntroPage from "@/pages/IntroPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
       { index: true, element: <EntryRouter /> },
       { path: "/home", element: <MainPage /> },
       { path: "/list", element: <ListPage /> },
+      { path: "/event", element: <EventPage /> },
       { path: "/detail/:type/:id", element: <DetailPage /> },
       { path: "/collections", element: <CollectionPage /> },
       { path: "/collections/create", element: <CollectionCreatePage /> },

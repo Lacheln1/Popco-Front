@@ -8,6 +8,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import { motion } from "framer-motion";
 import { pageVariants } from "@/components/LoginResgisterPage/Animation";
+import { useNavigate } from "react-router-dom";
 import "swiper/swiper-bundle.css";
 import axios from "axios";
 
@@ -22,6 +23,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   personaName,
   accessToken,
 }) => {
+  const navigate = useNavigate();
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
@@ -104,6 +106,12 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
     setIsEnd(swiper.isEnd);
   };
 
+  // 포스터 클릭 핸들러
+  const handlePosterClick = (contentId: number, contentType: string) => {
+    const type = contentType.toLowerCase() === "movie" ? "movie" : "tv";
+    navigate(`/detail/${type}/${contentId}`);
+  };
+
   // 포스터 이미지 URL 생성
   const getImageUrl = (posterPath: string) => {
     return posterPath.startsWith("http")
@@ -139,7 +147,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                 placement="bottomLeft"
                 arrow
               >
-                <button className="ml-2 inline-flex items-center rounded-md bg-white py-1 text-sm sm:text-xl">
+                <button className="ml-2 inline-flex items-center rounded-md bg-white px-2 py-1 text-base md:text-2xl">
                   {categoryMap[selected]} <DownOutlined className="ml-1" />
                 </button>
               </Dropdown>
@@ -200,7 +208,10 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
             >
               {recommendations.map((item) => (
                 <SwiperSlide key={item.contentId}>
-                  <div className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div
+                    className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+                    onClick={() => handlePosterClick(item.contentId, item.type)}
+                  >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
                         src={getImageUrl(item.poster_path)}
@@ -213,19 +224,40 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                         }}
                       />
                     </div>
-                    <div className="p-3">
-                      <h3 className="truncate text-sm font-medium text-gray-800">
+                    {/* 고정 높이를 가진 텍스트 영역 */}
+                    <div className="flex h-20 flex-col justify-between p-2 sm:p-3">
+                      <h3 className="line-clamp-2 text-xs font-medium leading-tight text-gray-800 sm:text-sm">
                         {item.title}
                       </h3>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {item.genres.map((genre, index) => (
-                          <span
-                            key={index}
-                            className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
-                          >
-                            {genre}
-                          </span>
-                        ))}
+                      <div className="mt-1">
+                        {/* 모바일용 장르 */}
+                        <div className="flex flex-nowrap gap-1 overflow-hidden sm:hidden">
+                          {item.genres.slice(0, 2).map((genre, index) => (
+                            <span
+                              key={index}
+                              className="flex-shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                          {item.genres.length > 2 && (
+                            <span className="flex-shrink-0 rounded-full bg-gray-200 px-1.5 py-0.5 text-[11px] text-gray-500">
+                              +{item.genres.length - 2}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* PC용 장르*/}
+                        <div className="hidden sm:flex sm:flex-wrap sm:gap-1">
+                          {item.genres.map((genre, index) => (
+                            <span
+                              key={index}
+                              className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>

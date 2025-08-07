@@ -237,7 +237,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({
           className="relative mx-auto mb-10 h-40 w-full max-w-3xl bg-contain bg-center bg-no-repeat md:h-60"
           style={{ backgroundImage: `url(${AiReviewSummaryBg})` }}
         >
-          <div className="absolute left-1/2 top-1/2 ml-3 flex w-full max-w-xs -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center px-4 text-center md:max-w-md md:px-8">
+          <div className="absolute left-1/2 top-1/2 ml-3 flex w-full max-w-[280px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center px-4 text-center md:max-w-md md:px-8">
             <p className="mb-2 text-[0.55rem] leading-relaxed text-gray-400 md:mb-2 md:text-xs">
               리뷰에서 많이 언급된 특징을 AI가 분석했어요.
             </p>

@@ -200,7 +200,7 @@ const Header: React.FC<HeaderProps> = ({
                   >
                     <Link
                       to={item.path}
-                      className={`flex min-w-[90px] items-center justify-center rounded-full px-4 pt-1 font-medium text-black hover:bg-gray-100 hover:!text-black ${
+                      className={`flex min-w-10 items-center justify-center rounded-full px-4 pt-1 font-medium text-black hover:bg-gray-100 hover:!text-black ${
                         isScrolled
                           ? "h-8 text-base transition-all duration-500 ease-out"
                           : "h-10 text-lg"
