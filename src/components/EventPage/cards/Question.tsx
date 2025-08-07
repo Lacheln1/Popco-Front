@@ -205,18 +205,8 @@ export const Question = () => {
         { headers: { Authorization: `Bearer ${accessToken}` } },
       );
 
-      const { survived, rank, nickname } = res.data.data;
+      const { survived, nickname } = res.data.data;
       setNickname(nickname);
-
-      // 마지막 문제(3번째)인 경우
-      if (questionId === 3) {
-        if (rank === 1) {
-          setStep("winner");
-        } else {
-          setStep("eliminated");
-        }
-        return;
-      }
 
       // 일반 문제인 경우
       if (survived) {
