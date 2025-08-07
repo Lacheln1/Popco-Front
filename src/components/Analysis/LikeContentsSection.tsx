@@ -8,6 +8,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { PersonaRecommendation } from "@/types/Persona.types";
 import { motion } from "framer-motion";
 import { pageVariants } from "@/components/LoginResgisterPage/Animation";
+import { useNavigate } from "react-router-dom";
 import "swiper/swiper-bundle.css";
 import axios from "axios";
 
@@ -22,6 +23,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   personaName,
   accessToken,
 }) => {
+  const navigate = useNavigate();
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | undefined>(
     undefined,
   );
@@ -102,6 +104,12 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   const handleSlideChange = (swiper: SwiperType) => {
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
+  };
+
+  // 포스터 클릭 핸들러
+  const handlePosterClick = (contentId: number, contentType: string) => {
+    const type = contentType.toLowerCase() === "movie" ? "movie" : "tv";
+    navigate(`/detail/${type}/${contentId}`);
   };
 
   // 포스터 이미지 URL 생성
@@ -200,7 +208,10 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
             >
               {recommendations.map((item) => (
                 <SwiperSlide key={item.contentId}>
-                  <div className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div
+                    className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+                    onClick={() => handlePosterClick(item.contentId, item.type)}
+                  >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
                         src={getImageUrl(item.poster_path)}
