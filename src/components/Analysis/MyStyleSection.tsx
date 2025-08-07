@@ -52,7 +52,7 @@ const MyStyleSection: React.FC<MyStyleSectionProps> = ({
           {myPersonaGenres.slice(0, 4).map((data) => (
             <motion.div
               key={data}
-              className="bg-popco-main flex h-8 items-center justify-center rounded-lg px-5 lg:h-10"
+              className="bg-popco-main flex h-8 items-center justify-center whitespace-nowrap rounded-lg px-4 text-xs sm:text-base lg:h-10 lg:text-lg"
               variants={itemVariants}
               whileHover={{
                 backgroundColor: "#ffcf20",
