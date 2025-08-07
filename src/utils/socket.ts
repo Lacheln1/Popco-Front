@@ -147,7 +147,7 @@ export const subscribeToQuestion = (
           break;
 
         case "QUESTION_TIMEOUT":
-          handleQuestionTimeout(data);
+          handleQuestionTimeout();
           break;
 
         default:
