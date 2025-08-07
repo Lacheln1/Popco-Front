@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <motion.main
-      className="pretendard relative h-full bg-[#0F1525]"
+      className="pretendard relative min-h-screen bg-[#0F1525]"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -136,7 +136,7 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* 모바일 레이아웃 */}
-      <div className="flex h-screen flex-col lg:hidden">
+      <div className="flex min-h-screen flex-col lg:hidden">
         {/* 상단 - 스포트라이트와 로고 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
           <Link to="/">
@@ -215,7 +215,7 @@ const LoginPage: React.FC = () => {
         </div>
 
         {/* 하단 - 캐릭터들 */}
-        <div className="flex justify-center pb-8">
+        <div className="flex flex-shrink-0 justify-center pb-8">
           <img src={loginPopcoImg} alt="" className="w-[600px]" />
         </div>
       </div>
