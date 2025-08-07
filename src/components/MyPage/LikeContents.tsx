@@ -5,6 +5,8 @@ import "swiper/swiper-bundle.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { fetchLikeContents } from "@/apis/contentsApi";
+import Spinner from "./../common/Spinner";
+import { useNavigate } from "react-router-dom";
 
 interface LikeContent {
   contentId: number;
@@ -34,6 +36,8 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
   const [likeContents, setLikeContents] = useState<LikeContent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   const handleSwiperInit = (swiper: SwiperType) => {
     setSwiperInstance(swiper);
@@ -77,7 +81,7 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
 
   return (
     <div>
-      <div>
+      <div className="pb-5">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="gmarket-bold py-2 text-base md:text-2xl">
             내가 좋아해요
@@ -92,6 +96,7 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
         {/* 로딩 상태 */}
         {loading && (
           <div className="flex h-32 items-center justify-center text-gray-500">
+            <Spinner />
             좋아요한 컨텐츠를 불러오는 중...
           </div>
         )}
@@ -145,7 +150,14 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
             >
               {likeContents.map((content) => (
                 <SwiperSlide key={content.contentId} className="!h-auto">
-                  <div className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div
+                    className="group cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+                    onClick={() =>
+                      navigate(
+                        `/detail/${content.contentType}/${content.contentId}`,
+                      )
+                    }
+                  >
                     <div className="aspect-[3/4] overflow-hidden">
                       <img
                         src={`https://image.tmdb.org/t/p/original/${content.posterPath}`}
@@ -157,6 +169,9 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
                       <h3 className="truncate text-sm font-medium text-gray-800">
                         {content.title}
                       </h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {content.contentType === "movie" ? "영화" : "TV 시리즈"}
+                      </p>
                     </div>
                   </div>
                 </SwiperSlide>

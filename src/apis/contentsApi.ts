@@ -97,7 +97,6 @@ export const fetchLikeContents = async (
         withCredentials: true,
       },
     );
-    console.log("좋아요한 컨텐츠 api 성공", response.data);
     return response.data; // 응답 데이터를 반환
   } catch (error) {
     console.error("contents/liked실패", error);
@@ -113,7 +112,6 @@ export const fetchWishlist = async (
     const response = await axios.get<WishlistResponse>(
       `${API_URL}/wishlists/users/${userId}`,
     );
-    console.log("위시리스트 api 성공", response.data);
     return response.data;
   } catch (error) {
     console.error("위시리스트 조회 실패", error);
@@ -121,28 +119,73 @@ export const fetchWishlist = async (
   }
 };
 
-// 전체 컨텐츠 조회
+// 위시리스트에 추가 (POST /wishlists/users/{userId})
+export const addToWishlist = async (params: {
+  userId: number;
+  contentId: number;
+  contentType: string;
+  accessToken: string;
+}) => {
+  const { userId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.post(
+    `/wishlists/users/${userId}`,
+    { contentId, contentType },
+    { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+  return data;
+};
+
+// 위시리스트에서 삭제 (DELETE /wishlists/users/{userId})
+export const removeFromWishlist = async (params: {
+  userId: number;
+  contentId: number;
+  contentType: string;
+  accessToken: string;
+}) => {
+  const { userId, contentId, contentType, accessToken } = params;
+  const { data } = await axiosInstance.delete(`/wishlists/users/${userId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    data: { contentId, contentType },
+  });
+  return data;
+};
+
+// API 호출 파일 수정
 export const fetchAllContents = async ({
-  pageNumber = 0,
-  pageSize,
+  page = 0,
+  size,
   sort = "recent",
+  userId, // 타입 정의에 따라 userId를 받음
 }: FetchAllContentsParams): Promise<FetchAllContentsResponse> => {
+  
+  // userId가 있을 경우에만 헤더를 추가
+  const headers = userId ? { "X-User-Id": userId } : {};
+
   const { data } = await axiosInstance.get(`/contents`, {
     params: {
-      pageNumber: pageNumber,
-      pageSize: pageSize,
+      page: page,
+      size: size,
       sort,
     },
+    headers: headers, // headers를 요청에 포함
   });
   return data.data;
 };
 
-// 콘텐츠 상세 정보 조회
+// 콘텐츠 상세 정보 조회 - 인증 헤더 추가
 export const getContentsDetail = async (
   id: string,
   type: string,
+  accessToken?: string, // accessToken 매개변수 추가
 ): Promise<ContentsDetail> => {
-  const { data } = await axiosInstance.get(`/contents/ids/${id}/types/${type}`);
+  const headers = {
+    "Content-Type": "application/json",
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+  };
+  
+  const { data } = await axiosInstance.get(`/contents/ids/${id}/types/${type}`, {
+    headers,
+  });
   return data.data;
 };
 

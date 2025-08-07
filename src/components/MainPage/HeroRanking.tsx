@@ -79,16 +79,21 @@ const HeroRanking = ({
   const first = data[0];
   const contentsRank = data.slice(1);
 
+  // useContentReaction을 위한 contentList 생성 - userReaction 필드 사용
   const contentList = useMemo(
     () =>
       data?.map((item) => ({
         id: item.contentId,
-        reaction: (item.userReaction as ReactionType) ?? "NEUTRAL",
+        reaction: item.userReaction as ReactionType, // API 응답의 userReaction 필드 직접 사용
       })) ?? [],
     [data],
   );
 
-  const { reactionMap, handleReaction } = useContentReaction({
+  const {
+    reactionMap,
+    handleReaction,
+    isLoading: isReactionLoading,
+  } = useContentReaction({
     userId,
     accessToken,
     contentList,
@@ -220,7 +225,7 @@ const HeroRanking = ({
                       posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
                       id={content.contentId}
                       contentType={content.type}
-                      likeState={reactionMap[content.contentId]}
+                      likeState={reactionMap[content.contentId] || "NEUTRAL"}
                       onLikeChange={(newState) =>
                         handleReaction(
                           content.contentId,
@@ -228,6 +233,7 @@ const HeroRanking = ({
                           content.type,
                         )
                       }
+                      disabled={isReactionLoading} // 로딩 상태 전달
                     />
                   </SwiperSlide>
                 ))}
@@ -248,10 +254,11 @@ const HeroRanking = ({
                     posterUrl={`${TMDB_IMAGE_BASE_URL}${content.posterPath}`}
                     id={content.contentId}
                     contentType={content.type}
-                    likeState={reactionMap[content.contentId]}
+                    likeState={reactionMap[content.contentId] || "NEUTRAL"}
                     onLikeChange={(newState) =>
                       handleReaction(content.contentId, newState, content.type)
                     }
+                    disabled={isReactionLoading} // 로딩 상태 전달
                   />
                 </li>
               ))}

@@ -1,5 +1,11 @@
 import { Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  TooltipItem,
+} from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -7,12 +13,14 @@ interface AverageDoubleDonutChartProps {
   customerScore: number;
   averageScore: number;
   maxScore: number;
+  personaName?: string;
 }
 
 const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
   customerScore,
   averageScore,
   maxScore,
+  personaName,
 }) => {
   // 최소값을 설정하여 0이어도 그래프가 보이도록 함
   const minValue = 0.1;
@@ -29,10 +37,10 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
   const averageValues = getAdjustedValues(averageScore);
 
   const data = {
-    labels: ["고객님", "액션 헌터 평균"],
+    labels: ["평균", "평균"],
     datasets: [
       {
-        label: "고객님",
+        label: "나",
         data: customerValues,
         backgroundColor: ["#3BA8F0", "#E5E5E5"],
         borderWidth: 0,
@@ -40,7 +48,7 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
         radius: "90%", // 외부 링
       },
       {
-        label: "액션 헌터 평균",
+        label: personaName,
         data: averageValues,
         backgroundColor: ["#FD6B94", "#E5E5E5"],
         borderWidth: 0,
@@ -58,7 +66,12 @@ const AverageDoubleDonutChart: React.FC<AverageDoubleDonutChartProps> = ({
         display: false, // 범례 숨김
       },
       tooltip: {
-        enabled: true, // 툴팁도 숨김
+        enabled: true,
+        filter: (tooltipItem: TooltipItem<"doughnut">) => {
+          const { dataset, dataIndex } = tooltipItem;
+          const backgroundColor = dataset.backgroundColor as string[];
+          return backgroundColor[dataIndex] !== "#E5E5E5";
+        },
       },
     },
   };

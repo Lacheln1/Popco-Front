@@ -1,11 +1,21 @@
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { getRoleDashBoardData, getUserPersonas } from "@/apis/userApi";
-import AnalysisHeroSection from "@/components/Analysis/AnalysisHeroSection";
-import LikeContentSection from "@/components/Analysis/LikeContentsSection";
-import MyStyleSection from "@/components/Analysis/MyStyleSection";
-import MyWatchingStyleBoard from "@/components/Analysis/MyWatchingStyleBoard";
-import RoleDashBoard from "@/components/Analysis/RoleDashBoard";
+const AnalysisHeroSection = lazy(
+  () => import("@/components/Analysis/AnalysisHeroSection"),
+);
+const LikeContentSection = lazy(
+  () => import("@/components/Analysis/LikeContentsSection"),
+);
+const MyStyleSection = lazy(
+  () => import("@/components/Analysis/MyStyleSection"),
+);
+const MyWatchingStyleBoard = lazy(
+  () => import("@/components/Analysis/MyWatchingStyleBoard"),
+);
+const RoleDashBoard = lazy(() => import("@/components/Analysis/RoleDashBoard"));
+import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
-import { useEffect, useState, useRef } from "react";
+import { getPersonaText } from "@/apis/personaApi";
 
 interface UserPersonaData {
   mainPersonaImgPath: string;
@@ -31,11 +41,17 @@ interface RoleDashBoardData {
   myLikePercent: number[];
 }
 
+interface PersonaText {
+  text1: string;
+  text2: string;
+}
+
 const AnalysisPage = () => {
   const [userData, setUserData] = useState<UserPersonaData | null>(null);
   const [dashBoardData, setDashBoardData] = useState<RoleDashBoardData | null>(
     null,
   );
+  const [personaText, setPersonaText] = useState<PersonaText | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { accessToken, isLoading: authLoading, user } = useAuthCheck();
@@ -44,48 +60,37 @@ const AnalysisPage = () => {
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    console.log(
-      "useEffect 실행됨, accessToken:",
-      accessToken,
-      "authLoading:",
-      authLoading,
-      "user.isLoggedIn:",
-      user.isLoggedIn,
-    );
-
     const getUserPersonasData = async () => {
       // 인증 로딩 중이면 대기
       if (authLoading) {
-        console.log("인증 처리 중이므로 대기");
         return;
       }
 
       // 이미 데이터를 가져왔으면 중복 실행 방지
       if (hasFetched.current) {
-        console.log("이미 데이터를 가져왔으므로 실행하지 않음");
         return;
       }
 
       // 로그인되지 않은 상태면 에러 설정하고 리턴
       if (!user.isLoggedIn || !accessToken) {
-        console.log("로그인되지 않은 상태");
         setError("로그인이 필요합니다.");
         setLoading(false);
         return;
       }
 
-      console.log("getUserPersonasData 함수 시작, accessToken:", accessToken);
-
       try {
-        console.log("API 호출 시작");
         setLoading(true);
         setError(null);
 
         // 데이터 가져오기 시작 표시
         hasFetched.current = true;
 
-        const response = await getUserPersonas(accessToken);
-        const dashboardResponse = await getRoleDashBoardData(accessToken);
+        // 기본 데이터부터 먼저 가져오기
+        const [response, dashboardResponse] = await Promise.all([
+          getUserPersonas(accessToken),
+          getRoleDashBoardData(accessToken),
+        ]);
+
         if (
           !response ||
           !response.data ||
@@ -94,11 +99,21 @@ const AnalysisPage = () => {
         ) {
           throw new Error("유효하지 않은 응답 데이터");
         }
-        console.log("API 응답:", response);
+
         setUserData(response.data);
         setDashBoardData(dashboardResponse.data);
-        console.log("userdata 설정 후:", response.data);
-        console.log("대쉬보드 설정 후:", dashboardResponse.data);
+
+        // 페르소나 텍스트는 별도로 비동기 처리
+        getPersonaText(accessToken)
+          .then((personaTextResponse) => {
+            if (personaTextResponse) {
+              setPersonaText(personaTextResponse.data);
+            }
+          })
+          .catch((error) => {
+            console.error("페르소나 텍스트 가져오기 실패:", error);
+            // 페르소나 텍스트 실패는 전체 렌더링을 막지 않음
+          });
       } catch (error) {
         console.error("페르소나 데이터 가져오기 실패:", error);
         setError("데이터를 불러오는데 실패했습니다.");
@@ -123,7 +138,10 @@ const AnalysisPage = () => {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
-          <div>인증 확인 중...</div>
+          <div>
+            <Spinner />
+            인증 확인 중...
+          </div>
         </div>
       </main>
     );
@@ -140,12 +158,15 @@ const AnalysisPage = () => {
     );
   }
 
-  // 로딩 중일 때
+  // 기본 데이터 로딩 중일 때
   if (loading) {
     return (
       <main className="pretendard">
         <div className="flex h-screen items-center justify-center">
-          <div>데이터를 불러오는 중...</div>
+          <div>
+            <Spinner />
+            나의 취향을 분석중입니다. 잠시만 기다려주세요...
+          </div>
         </div>
       </main>
     );
@@ -162,7 +183,7 @@ const AnalysisPage = () => {
     );
   }
 
-  // userData가 null일 때
+  // 기본 userData와 dashBoardData가 없을 때
   if (!userData || !dashBoardData || !accessToken) {
     return (
       <main className="pretendard">
@@ -173,43 +194,59 @@ const AnalysisPage = () => {
     );
   }
 
-  // 정상적으로 데이터가 있을 때만 렌더링
+  // 기본 데이터가 있으면 바로 렌더링 (personaText는 없어도 됨)
   return (
     <main className="pretendard">
-      <AnalysisHeroSection
-        mainPersonaImgPath={userData.mainPersonaImgPath}
-        mainPersonaName={userData.mainPersonaName}
-        mainPersonaPercent={userData.mainPersonaPercent}
-        myPersonaImgPath={userData.myPersonaImgPath}
-        myPersonaName={userData.myPersonaName}
-        subPersonaImgPath={userData.subPersonaImgPath}
-        subPersonaName={userData.subPersonaName}
-        subPersonaPercent={userData.subPersonaPercent}
-      />
-      <MyStyleSection
-        myPersonaTags={userData.myPersonaTags}
-        myPersonaDescription={userData.myPersonaDescription}
-        myPersonaGenres={userData.myPersonaGenres}
-      />
-      <RoleDashBoard
-        genderPercent={dashBoardData.genderPercent}
-        agePercent={dashBoardData.agePercent}
-        userId={user.userId}
-        personaName={userData.myPersonaName}
-      />
-      <MyWatchingStyleBoard
-        ratingPercent={dashBoardData.ratingPercent}
-        eventPercent={dashBoardData.eventPercent}
-        eventCount={dashBoardData.eventCount}
-        reviewPercent={dashBoardData.reviewPercent}
-        myLikePercent={dashBoardData.myLikePercent}
-        personaName={userData.myPersonaName}
-      />
-      <LikeContentSection
-        userId={user.userId}
-        personaName={userData.myPersonaName}
-        accessToken={accessToken}
-      />
+      <Suspense fallback={<Spinner />}>
+        <AnalysisHeroSection
+          mainPersonaImgPath={userData.mainPersonaImgPath}
+          mainPersonaName={userData.mainPersonaName}
+          mainPersonaPercent={userData.mainPersonaPercent}
+          myPersonaImgPath={userData.myPersonaImgPath}
+          myPersonaName={userData.myPersonaName}
+          subPersonaImgPath={userData.subPersonaImgPath}
+          subPersonaName={userData.subPersonaName}
+          subPersonaPercent={userData.subPersonaPercent}
+          personaText1={personaText?.text1}
+          personaText2={personaText?.text2}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <MyStyleSection
+          myPersonaTags={userData.myPersonaTags}
+          myPersonaDescription={userData.myPersonaDescription}
+          myPersonaGenres={userData.myPersonaGenres}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <RoleDashBoard
+          genderPercent={dashBoardData.genderPercent}
+          agePercent={dashBoardData.agePercent}
+          userId={user.userId}
+          personaName={userData.myPersonaName}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <MyWatchingStyleBoard
+          ratingPercent={dashBoardData.ratingPercent}
+          eventPercent={dashBoardData.eventPercent}
+          eventCount={dashBoardData.eventCount}
+          reviewPercent={dashBoardData.reviewPercent}
+          myLikePercent={dashBoardData.myLikePercent}
+          personaName={userData.myPersonaName}
+        />
+      </Suspense>
+
+      <Suspense fallback={<Spinner />}>
+        <LikeContentSection
+          userId={user.userId}
+          personaName={userData.myPersonaName}
+          accessToken={accessToken}
+        />
+      </Suspense>
     </main>
   );
 };

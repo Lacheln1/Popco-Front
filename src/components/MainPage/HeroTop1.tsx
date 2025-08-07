@@ -28,6 +28,7 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
     type,
     accessToken,
   );
+
   // useMemo를 통해 contentList 생성 (data가 있을 때만)
   const contentList = useMemo(
     () =>
@@ -37,8 +38,9 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
       })),
     [data],
   );
+
   // useContentReaction은 data가 준비된 이후에 실행
-  const { reactionMap, handleReaction } = useContentReaction({
+  const { reactionMap, handleReaction, isLoading: isReactionLoading } = useContentReaction({
     userId,
     accessToken,
     contentList,
@@ -112,6 +114,7 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
                       content.content_type,
                     )
                   }
+                  disabled={isReactionLoading} // disabled prop 추가
                 />
               </SwiperSlide>
             ))}

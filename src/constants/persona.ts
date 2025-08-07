@@ -12,6 +12,7 @@ import babyimaginepopco from "../assets/baby-imagine-popco.svg";
 import imaginepopco from "../assets/imagine-popco.svg";
 import babymoviesherlock from "../assets/baby-movie-sherlock.svg";
 import moviesherlock from "../assets/movie-sherlock.svg";
+
 export const PERSONA_IMAGES: { [key: string]: string } = {
   "아기 액션헌터": babyactionhunter,
   액션헌터: actionhunter,
@@ -28,3 +29,13 @@ export const PERSONA_IMAGES: { [key: string]: string } = {
   "아기 무비셜록": babymoviesherlock,
   무비셜록: moviesherlock,
 };
+
+export const PERSONA_NAME_TO_ID: Record<string, number> = {
+  액션헌터: 1,
+  무비셜록: 2,
+  시네파울보: 3,
+  온기수집가: 4,
+  이세계유랑자: 5,
+  무서워도본다맨: 6,
+  레트로캡틴: 7,
+} as const;

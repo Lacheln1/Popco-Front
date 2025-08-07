@@ -113,7 +113,6 @@ export const getUserDetail = async (accessToken: string) => {
       },
       withCredentials: true,
     });
-    console.log("유저 디테일", response.data);
 
     return response.data;
   } catch (error) {
@@ -131,7 +130,6 @@ export const getUserPersonas = async (accessToken: string) => {
       withCredentials: true,
     });
 
-    console.log("유저 페르소나 get", response.data);
 
     return response.data;
   } catch (error) {
@@ -155,7 +153,6 @@ export const updateUserProfile = async (
       },
       withCredentials: true,
     });
-    console.log("프로필 업데이트 성공:", response.data);
     return response.data;
   } catch (error) {
     console.error("updateUserProfile 실패:", error);
@@ -176,7 +173,6 @@ export const getMonthlyReviews = async (
       withCredentials: true,
     });
 
-    console.log(`월별 리뷰 조회 성공 (${month}):`, response.data);
     return response.data;
   } catch (error) {
     console.error("getMonthlyReviews 실패:", error);
@@ -192,8 +188,6 @@ export const getRoleDashBoardData = async (accessToken: string) => {
       },
       withCredentials: true,
     });
-
-    console.log("roleDashboardData get", response.data);
 
     return response.data;
   } catch (error) {

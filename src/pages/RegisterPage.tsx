@@ -1,7 +1,7 @@
 import React from "react";
 import spotlightImg from "@/assets/spotlight.svg";
 import spotlightWithLogoImg from "@/assets/spotlight-with-logo.svg";
-import loginPopcoImg from "@/assets/login-popco.svg";
+import loginPopcoImg from "@/assets/login-popco.webp";
 import RegisterForm from "@/components/LoginResgisterPage/RegisterForm";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
