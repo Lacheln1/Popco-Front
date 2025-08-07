@@ -15,6 +15,7 @@ import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useNavigate } from "react-router-dom";
 import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 import Spinner from "../common/Spinner";
+import HeroRankingSkeleton from "../common/HeroRankingSkeleton";
 
 interface HeroRankingProps {
   onTop1Change: (type: ContentCategory, title: string) => void;
@@ -95,14 +96,13 @@ const HeroRanking = ({
     contentList,
   });
 
-  if (isLoading || !data?.length) return <Spinner />;
+  if (isLoading || !data?.length) return <HeroRankingSkeleton />;
 
   // 1등 / 나머지 등수
   const first = data[0];
   const contentsRank = data.slice(1);
 
   if (!Array.isArray(data)) {
-    console.error("HeroRanking Error", data);
     return <div>데이터가 없습니다.</div>;
   }
 

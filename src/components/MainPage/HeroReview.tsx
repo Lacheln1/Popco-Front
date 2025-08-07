@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import ReviewCard from "../common/ReviewCard";
 import { useWeeklyReview } from "@/hooks/queries/review/useWeeklyReview";
+import HeroReviewSkeleton from "../common/HeroReviewSkeleton";
 
 const HeroReview = () => {
   const wrapperRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -100,9 +101,7 @@ const HeroReview = () => {
       </div>
 
       {/* 로딩 중 */}
-      {isLoading && (
-        <div className="py-10 text-center text-white">불러오는 중입니다...</div>
-      )}
+      {isLoading && <HeroReviewSkeleton />}
 
       {/* 에러 발생 */}
       {isError && (

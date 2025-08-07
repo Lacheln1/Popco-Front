@@ -11,6 +11,7 @@ import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import LoginBlur from "../common/LoginBlur";
 import { ReactionType } from "@/types/Contents.types";
 import { useContentReaction } from "@/hooks/queries/contents/usePopcorithmFeedback";
+import RecommendationSectionSkeleton from "../common/RecommendationSectionSkeleton";
 
 interface Props {
   accessToken: string;
@@ -98,7 +99,9 @@ const HeroPopcorithm = ({ accessToken, userId }: Props) => {
               고객님을 위한 <br /> 맞춤 추천 작품을 <br /> 확인해 보세요 !
             </p>
           </div>
-          {!accessToken ? (
+          {isFetching || !data?.length ? (
+            <RecommendationSectionSkeleton />
+          ) : !accessToken ? (
             <LoginBlur
               className="w-1/2 md:min-h-[400px] xl:w-3/5"
               text="내가 좋아할 거같은 영화를 추천받고 싶다면?"
