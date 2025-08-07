@@ -147,7 +147,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                 placement="bottomLeft"
                 arrow
               >
-                <button className="ml-2 inline-flex items-center rounded-md bg-white py-1 text-sm sm:text-xl">
+                <button className="ml-2 inline-flex items-center rounded-md bg-white px-2 py-1 text-base md:text-2xl">
                   {categoryMap[selected]} <DownOutlined className="ml-1" />
                 </button>
               </Dropdown>
