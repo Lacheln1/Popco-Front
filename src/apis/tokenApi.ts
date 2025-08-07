@@ -5,7 +5,6 @@ const API_URL = "/api/client";
 
 //토큰 갱신 시도(성공: 새로운 토큰 발급, 실패: 재로그인)
 export const refreshTokens = async () => {
-  if (!localStorage.getItem("userId")) return;
   try {
     const response = await axios.post(
       `${API_URL}/auth/refresh`,
