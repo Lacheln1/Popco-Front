@@ -33,14 +33,11 @@ const PageLoading = () => {
 
 const router = createBrowserRouter([
   {
-    path: "/entry",
-    element: <EntryRouter />,
-  },
-  {
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <MainPage /> },
+      { index: true, element: <EntryRouter /> },
+      { path: "/home", element: <MainPage /> },
       { path: "/list", element: <ListPage /> },
       { path: "/detail/:type/:id", element: <DetailPage /> },
       { path: "/collections", element: <CollectionPage /> },

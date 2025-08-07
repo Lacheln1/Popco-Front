@@ -13,7 +13,7 @@ const EntryRouter = () => {
     const visitedDate = localStorage.getItem("visitedDate");
 
     if (visitedDate === today) {
-      navigate("/", { replace: true });
+      navigate("/home", { replace: true });
     } else {
       navigate("/intro", { replace: true });
 

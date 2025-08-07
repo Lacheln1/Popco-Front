@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({
 
   //헤더 탭 메뉴들
   const navItems: NavItem[] = [
-    { name: "홈", path: "/" },
+    { name: "홈", path: "/home" },
     { name: "전체 콘텐츠", path: "/list" },
     { name: "컬렉션", path: "/collections" },
     { name: "취향 분석", path: "/analysis" },
