@@ -4,6 +4,7 @@ import { Navigation } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import Poster from "../common/Poster";
+import PosterSkeleton from "../common/PosterSkeleton";
 import { ContentCategory, ReactionType } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useStoryBasedRecommendations } from "@/hooks/queries/contents/useStoryBasedRecommendations";
@@ -40,7 +41,11 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
   );
 
   // useContentReaction은 data가 준비된 이후에 실행
-  const { reactionMap, handleReaction, isLoading: isReactionLoading } = useContentReaction({
+  const {
+    reactionMap,
+    handleReaction,
+    isLoading: isReactionLoading,
+  } = useContentReaction({
     userId,
     accessToken,
     contentList,
@@ -55,6 +60,36 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
   const handleSlideChange = (swiper: SwiperType) => {
     setIsBeginning(swiper.isBeginning);
     setIsEnd(swiper.isEnd);
+  };
+
+  // 스켈레톤 렌더링 함수
+  const renderSkeletons = () => {
+    return (
+      <Swiper
+        modules={[Navigation]}
+        spaceBetween={15}
+        breakpoints={{
+          0: {
+            slidesPerView: 2.5,
+          },
+          768: {
+            slidesPerView: 3.5,
+          },
+          1024: {
+            slidesPerView: 4.5,
+          },
+          1200: {
+            slidesPerView: 5,
+          },
+        }}
+      >
+        {Array.from({ length: 10 }).map((_, index) => (
+          <SwiperSlide key={index} className="flex justify-center">
+            <PosterSkeleton />
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    );
   };
 
   return (
@@ -74,7 +109,7 @@ const HeroTop1 = ({ accessToken, userId, type, title }: Props) => {
           />
         </div>
         {isLoading ? (
-          <div className="text-center text-white">로딩 중...</div>
+          renderSkeletons()
         ) : (
           <Swiper
             modules={[Navigation]}

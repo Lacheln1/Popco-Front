@@ -18,6 +18,8 @@ import { useFilterStore } from "@/store/useFilterStore";
 import { useFilteredContents } from "@/hooks/queries/search/useFilteredContents";
 import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
 import useAuthCheck from "@/hooks/useAuthCheck";
+import PosterSkeleton from "@/components/common/PosterSkeleton";
+import { BackTop } from "antd/lib";
 
 type SearchType = "keyword" | "actors";
 type SortType = "recent" | "popular";
@@ -484,18 +486,13 @@ const ListPage = () => {
           )}
         </>
       )}
+      <BackTop
+        visibilityHeight={100}
+        onClick={() => console.log("clicked")}
+        style={{ right: 80, bottom: 50 }}
+      />
     </PageLayout>
   );
 };
 
 export default ListPage;
-
-const PosterSkeleton = () => {
-  return (
-    <div className="w-[260px] animate-pulse">
-      <div className="aspect-[7/10] w-full rounded-md bg-gray-300" />
-      <div className="mt-2 h-4 w-3/4 rounded bg-gray-300" />
-      <div className="mt-1 h-4 w-1/2 rounded bg-gray-300" />
-    </div>
-  );
-};

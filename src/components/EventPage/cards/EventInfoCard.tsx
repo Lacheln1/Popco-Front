@@ -11,7 +11,7 @@ import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
 import dayjs from "dayjs";
 import axiosInstance from "@/apis/axiosInstance";
 import TimeBlock from "../TimeBlock";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // 소켓 타이머 데이터 타입 정의
 interface SocketTimerData {
@@ -33,6 +33,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
   const { message } = App.useApp();
   const { data, isLoading } = useQuizInfo(accessToken);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // 소켓으로 받을 실시간 데이터
   const [socketTimer, setSocketTimer] = useState<{
@@ -49,6 +50,19 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
   const [isStarting, setIsStarting] = useState(false);
 
   const quizDetail = data?.quizDetail;
+
+  useEffect(() => {
+    if (isLoading) return; // 로딩 중이면 실행 안 함
+
+    const timer = setTimeout(() => {
+      if (!quizDetail) {
+        message.info("퀴즈는 회원만 가능합니다 !");
+        navigate("/");
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer); // 언마운트 시 타이머 정리
+  }, [quizDetail, accessToken, isLoading, message, navigate]);
 
   // 소켓 데이터 핸들러를 useCallback으로 메모이제이션
   const handleSocketData = useCallback(
@@ -255,7 +269,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
             </div>
             <button
               onClick={handleEnter}
-              disabled={isButtonActive || isStarting}
+              disabled={!isButtonActive || !isStarting}
               className={`mt-4 w-fit self-center rounded-full px-14 py-3 text-white shadow-md transition ${
                 !isButtonActive || isStarting
                   ? "cursor-not-allowed bg-gray-300"
@@ -276,7 +290,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
           </div>
         </>
       ) : (
-        <div>퀴즈 정보를 불러올 수 없습니다.</div>
+        <div>퀴즈 정보가 없습니다.</div>
       )}
     </aside>
   );

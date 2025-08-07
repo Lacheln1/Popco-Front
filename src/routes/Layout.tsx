@@ -6,6 +6,7 @@ import Spinner from "@/components/common/Spinner";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { useQuizInfo } from "@/hooks/queries/quiz/useQuizInfo";
 import dayjs from "dayjs";
+import ScrollToTop from "@/components/common/ScrollTop";
 
 const Layout = () => {
   const [notification, setNotification] = useState(false);
@@ -150,6 +151,7 @@ const Layout = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ScrollToTop />
       <Header user={user} onLogin={handleLogin} onLogout={handleLogout} />
       <main className="flex-grow">
         <Outlet />
