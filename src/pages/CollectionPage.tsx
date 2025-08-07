@@ -99,7 +99,7 @@ const CollectionPage: React.FC = () => {
         ) : (
           <section className="px-6 pt-4 sm:px-8">
             <h2 className="text-xl font-bold sm:text-2xl">HOT</h2>
-            <div className="relative mt-4 h-[340px] md:ml-12 md:h-[360px]">
+            <div className="relative mt-4 h-[240px] md:ml-12 md:h-[360px]">
               <SwiperNavigation
                 swiper={swiper}
                 isBeginning={isBeginning}
@@ -130,6 +130,7 @@ const CollectionPage: React.FC = () => {
                       onSaveToggle={() =>
                         handleSaveToggle(collection.collectionId)
                       }
+                      size="small" 
                     />
                   </SwiperSlide>
                 ))}

@@ -16,7 +16,7 @@ import moviesherlock from "../assets/movie-sherlock.svg";
 export const PERSONA_IMAGES: { [key: string]: string } = {
   "아기 액션헌터": babyactionhunter,
   액션헌터: actionhunter,
-  "아기 시네파 울보": babycrypopco,
+  "아기 시네파울보": babycrypopco,
   시네파울보: crypopco,
   "아기 온기수집가": babywarmpopco,
   온기수집가: warmpopco,
