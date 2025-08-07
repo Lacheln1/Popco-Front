@@ -83,8 +83,6 @@ const handleQuestionStart = (data: any) => {
 const handleWinnerAnnounced = (data: any) => {
   const { setWinnerInfo, setStep } = useQuizStore.getState();
 
-  console.log("🏆 우승자 발표:", data);
-
   if (data.winnerName && data.winnerRank) {
     setWinnerInfo({
       type: "WINNER_ANNOUNCED",
@@ -134,8 +132,6 @@ export const subscribeToQuestion = (
   currentSubscription = stompClient.subscribe(topic, (message: IMessage) => {
     try {
       const data = JSON.parse(message.body);
-      console.log("소켓 메시지 수신:", data);
-
       // type 필드로 먼저 구분
       switch (data.type) {
         case "QUESTION_START":
