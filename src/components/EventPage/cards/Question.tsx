@@ -205,7 +205,7 @@ export const Question = () => {
         { headers: { Authorization: `Bearer ${accessToken}` } },
       );
 
-      const { survived, rank, nickname } = res.data.data;
+      const { survived, nickname } = res.data.data;
       setNickname(nickname);
 
       // 일반 문제인 경우

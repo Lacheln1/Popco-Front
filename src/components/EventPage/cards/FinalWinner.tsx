@@ -4,7 +4,7 @@ import { useQuizStore } from "@/stores/useQuizStore";
 import { useNavigate } from "react-router-dom";
 
 export const FinalWinner = () => {
-  const { isConnected, setConnected, nickname, winnerInfo } = useQuizStore();
+  const { isConnected, setConnected, winnerInfo } = useQuizStore();
   const navigate = useNavigate();
 
   useEffect(() => {
