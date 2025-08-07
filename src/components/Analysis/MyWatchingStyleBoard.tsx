@@ -111,7 +111,7 @@ const MyWatchingStyleBoard: React.FC<MyWatchingStyleBoardProps> = ({
             className="flex flex-col items-center text-base"
             variants={itemVariants}
           >
-            <span className="text-base md:text-2xl">이번달 시청 컨텐츠</span>
+            <span className="text-base md:text-2xl">이번달 시청 콘텐츠</span>
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
