@@ -102,18 +102,12 @@ const handleWinnerAnnounced = (data: any) => {
   }
 };
 
-const handleQuestionTimeout = (data: any) => {
+const handleQuestionTimeout = () => {
   console.log("문제 시간 종료 ");
 };
 
 const handleQuizStatus = (data: any) => {
   console.log("퀴즈 상태 업데이트:", data);
-
-  if (data.quizId && data.questionId) {
-    // QuizStatusResponseDto로 간주
-    const { setStep } = useQuizStore.getState();
-    // 필요한 경우 추가 로직 구현
-  }
 };
 
 // 2. 문제 채널 구독 (개선된 버전)

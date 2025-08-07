@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { disconnectSocket } from "@/utils/socket";
 import { useQuizStore } from "@/stores/useQuizStore";
 import { useNavigate } from "react-router-dom";
