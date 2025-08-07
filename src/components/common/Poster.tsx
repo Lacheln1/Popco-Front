@@ -4,6 +4,7 @@ import { HiCursorClick } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import { App } from "antd";
+import { useState } from "react";
 
 type LikeState = "LIKE" | "DISLIKE" | "NEUTRAL";
 
@@ -97,6 +98,8 @@ const Poster = ({
     );
   };
 
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
   return (
     <div
       className={`group flex w-[35vw] min-w-[100px] max-w-[210px] flex-col gap-1 md:w-[210px] ${className} ${
@@ -108,14 +111,25 @@ const Poster = ({
         role="button"
         className={`relative w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
       >
-        <img
-          className="relative aspect-[7/10] w-full rounded-md object-cover"
-          src={posterUrl}
-          alt="poster"
-          onError={(e) =>
-            (e.currentTarget.src = "/images/popco/default_poster.png")
-          }
-        />
+        <div className="relative w-full">
+          {!isImageLoaded && (
+            <div className="absolute inset-0 aspect-[7/10] w-full animate-pulse rounded-md bg-gray-200" />
+          )}
+          <img
+            loading="lazy"
+            className={`aspect-[7/10] w-full rounded-md object-cover transition-opacity duration-300 ${
+              isImageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            src={posterUrl}
+            alt="poster"
+            onLoad={() => setIsImageLoaded(true)}
+            onError={(e) => {
+              e.currentTarget.src = "/images/popco/default_poster.png";
+              setIsImageLoaded(true);
+            }}
+          />
+        </div>
+
         {/* PC 호버용 오버레이 */}
         {!disableHover && !disabled && (
           <div className="absolute inset-0 hidden items-center justify-center gap-4 rounded-md bg-black/40 p-2 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100 sm:flex">
