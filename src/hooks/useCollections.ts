@@ -172,7 +172,7 @@ export const useDeleteCollection = () => {
       message.success("컬렉션이 삭제되었습니다.");
       // 전체 목록 캐시를 무효화
       queryClient.invalidateQueries({ queryKey: ["collections", "list"] });
-      navigate("/");
+      navigate("/home");
     },
     onError: () => {
       message.error("삭제에 실패했습니다. 다시 시도해주세요.");

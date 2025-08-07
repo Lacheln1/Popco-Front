@@ -94,7 +94,7 @@ const useAuthCheck = () => {
           if (refreshResult?.data?.accessToken) {
             const newToken = refreshResult.data.accessToken;
             localStorage.setItem("accessToken", newToken);
-            
+
             //  새 토큰으로 계속 진행
             setAccessToken(newToken);
             const decoded = jwtDecode<JwtPayload>(newToken);
@@ -108,8 +108,10 @@ const useAuthCheck = () => {
 
             // 프로필 완료 상태 확인
             let profileComplete = false;
-            const justCompleted = sessionStorage.getItem("profileJustCompleted") === "true";
-            const loginProfileComplete = localStorage.getItem("profileComplete") === "true";
+            const justCompleted =
+              sessionStorage.getItem("profileJustCompleted") === "true";
+            const loginProfileComplete =
+              localStorage.getItem("profileComplete") === "true";
             profileComplete = justCompleted || loginProfileComplete;
 
             try {
@@ -135,7 +137,10 @@ const useAuthCheck = () => {
                 });
               }
             } catch (userDetailError) {
-              console.error("🔍 사용자 상세 정보 가져오기 실패:", userDetailError);
+              console.error(
+                "🔍 사용자 상세 정보 가져오기 실패:",
+                userDetailError,
+              );
               setUser({
                 userId: userIdFromToken,
                 email: "",
@@ -149,13 +154,15 @@ const useAuthCheck = () => {
             if (profileComplete) {
               if (currentPath === "/test") {
                 message.info("이미 취향 진단을 완료했습니다.");
-                navigate("/");
+                navigate("/home");
                 return;
               }
               sessionStorage.removeItem("profileJustCompleted");
             } else {
               if (currentPath !== "/test") {
-                console.log("🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동");
+                console.log(
+                  "🔍 미완료 사용자 다른 페이지 접근 - 테스트로 이동",
+                );
                 message.info("취향 진단을 먼저 완료해주세요.");
                 navigate("/test");
                 return;
@@ -179,8 +186,10 @@ const useAuthCheck = () => {
 
           // 프로필 완료 상태 확인
           let profileComplete = false;
-          const justCompleted = sessionStorage.getItem("profileJustCompleted") === "true";
-          const loginProfileComplete = localStorage.getItem("profileComplete") === "true";
+          const justCompleted =
+            sessionStorage.getItem("profileJustCompleted") === "true";
+          const loginProfileComplete =
+            localStorage.getItem("profileComplete") === "true";
           profileComplete = justCompleted || loginProfileComplete;
 
           try {
@@ -206,7 +215,10 @@ const useAuthCheck = () => {
               });
             }
           } catch (userDetailError) {
-            console.error("🔍 사용자 상세 정보 가져오기 실패:", userDetailError);
+            console.error(
+              "🔍 사용자 상세 정보 가져오기 실패:",
+              userDetailError,
+            );
             setUser({
               userId: userIdFromToken,
               email: "",
@@ -220,7 +232,7 @@ const useAuthCheck = () => {
           if (profileComplete) {
             if (currentPath === "/test") {
               message.info("이미 취향 진단을 완료했습니다.");
-              navigate("/");
+              navigate("/home");
               return;
             }
             sessionStorage.removeItem("profileJustCompleted");
@@ -265,7 +277,7 @@ const useAuthCheck = () => {
     if (user.isLoggedIn) {
       if (user.profileComplete && currentPath === "/test") {
         message.info("이미 취향 진단을 완료했습니다.");
-        navigate("/");
+        navigate("/home");
       } else if (!user.profileComplete && currentPath !== "/test") {
         message.info("취향 진단을 먼저 완료해주세요.");
         navigate("/test");
