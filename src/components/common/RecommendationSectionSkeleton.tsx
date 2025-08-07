@@ -1,6 +1,3 @@
-// src/components/skeleton/RecommendationSectionSkeleton.tsx
-
-import React from "react";
 import PosterSkeleton from "../common/PosterSkeleton"; // 이미 만든 컴포넌트 사용
 
 const RecommendationSectionSkeleton = () => {

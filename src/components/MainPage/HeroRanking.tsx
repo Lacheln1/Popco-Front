@@ -14,7 +14,6 @@ import { ContentCategory, ReactionType } from "@/types/Contents.types";
 import { TMDB_IMAGE_BASE_URL } from "@/constants/contents";
 import { useNavigate } from "react-router-dom";
 import { useContentReaction } from "@/hooks/queries/contents/useContentReaction";
-import Spinner from "../common/Spinner";
 import HeroRankingSkeleton from "../common/HeroRankingSkeleton";
 
 interface HeroRankingProps {
