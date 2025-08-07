@@ -8,6 +8,7 @@ const LoginPage = lazy(() => import("@/pages/LoginPage"));
 const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
+import EventPage from "@/pages/EventPage";
 import CollectionPage from "@/pages/CollectionPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 import { ConfigProvider } from "antd";
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <MainPage /> },
       { path: "/list", element: <ListPage /> },
+      { path: "/event", element: <EventPage /> },
       { path: "/detail/:type/:id", element: <DetailPage /> },
       { path: "/collections", element: <CollectionPage /> },
       { path: "/collections/create", element: <CollectionCreatePage /> },
