@@ -1,4 +1,7 @@
+// src/components/MainPage/HeroReview.tsx
+
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import ReviewCard from "../common/ReviewCard";
 import { useWeeklyReview } from "@/hooks/queries/review/useWeeklyReview";
@@ -6,6 +9,7 @@ import { useWeeklyReview } from "@/hooks/queries/review/useWeeklyReview";
 const HeroReview = () => {
   const wrapperRefs = useRef<(HTMLDivElement | null)[]>([]);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const navigate = useNavigate();
 
   const { data = [], isLoading, isError } = useWeeklyReview();
 
@@ -16,7 +20,7 @@ const HeroReview = () => {
       const section = sectionRefs.current[index];
       if (!wrapper || !section) return;
 
-      const distance = wrapper.scrollWidth / 2; // 복제된 길이 기준
+      const distance = wrapper.scrollWidth / 2;
       const isEven = index % 2 === 0;
 
       gsap.to(wrapper, {
@@ -34,24 +38,36 @@ const HeroReview = () => {
   const topRowData = data?.slice(0, 10);
   const bottomRowData = data?.slice(10, 20);
 
+  const handleCardClick = (contentType: string, contentId: number) => {
+    navigate(`/detail/${contentType}/${contentId}`);
+  };
+
   const duplicatedCards = (rowData: typeof data) =>
     Array.from({ length: 4 }).flatMap((_, i) =>
       rowData.map((review, idx) => (
         <div key={`${i}-${idx}`} className="flex-shrink-0">
           <ReviewCard
-            reviewData={{
-              movieTitle: review.contentTitle,
+            {...{
+              contentTitle: review.contentTitle,
               score: review.score,
               reviewText: review.reviewText,
-              nickname: review.userNickname,
+              authorNickname: review.userNickname,
               likeCount: review.likeCount,
-              isSpoiler: false,
+              reviewId: review.reviewId,
+              status: review.status,
               isOwnReview: false,
               isLiked: false,
               hasAlreadyReported: false,
+              contentId: review.contentId,
+              contentType: review.contentType,
             }}
-            contentId={review.contentId}
-            contentType={review.contentType}
+            onCardClick={() =>
+              handleCardClick(review.contentType, review.contentId)
+            }
+            onLikeClick={() => {}}
+            onReport={() => {}}
+            onEdit={() => {}}
+            onDelete={() => {}}
           />
         </div>
       )),
@@ -65,7 +81,7 @@ const HeroReview = () => {
       }}
     >
       <div
-        className="flex gap-4 px-4 md:px-8"
+        className="flex gap-4" // 좌우 패딩 제거 (전체 너비 사용)
         ref={(el) => {
           wrapperRefs.current[rowIndex] = el as HTMLDivElement | null;
         }}
@@ -77,9 +93,11 @@ const HeroReview = () => {
 
   return (
     <div className="bg-footerBlue overflow-x-hidden py-10">
-      <h3 className="gmarket mx-auto px-4 py-8 text-xl leading-snug text-white sm:text-2xl md:text-[28px] xl:w-[1200px]">
-        최근 뜨고 있는 리뷰
-      </h3>
+      <div className="mx-auto px-4 xl:w-[1200px]">
+        <h3 className="gmarket py-8 text-xl leading-snug text-white sm:text-2xl md:text-[28px]">
+          최근 뜨고 있는 리뷰
+        </h3>
+      </div>
 
       {/* 로딩 중 */}
       {isLoading && (

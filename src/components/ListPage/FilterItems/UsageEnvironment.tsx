@@ -12,14 +12,21 @@ const UsageEnvironment = ({
 }) => {
   const [form] = Form.useForm();
   const [year, setYear] = useState<[number, number]>([1980, 2025]);
+  const [isYearTouched, setIsYearTouched] = useState(false); // 슬라이더 터치 여부 추적
 
   useEffect(() => {
     if (value) {
       form.setFieldsValue({
         platform: value.platform,
       });
-      if (Array.isArray(value.year)) {
+
+      // value에서 year가 null이 아닌 실제 값이 있을 때만 설정
+      if (value.year && Array.isArray(value.year)) {
         setYear(value.year as [number, number]);
+        setIsYearTouched(true);
+      } else {
+        // null이면 터치되지 않은 상태로 초기화
+        setIsYearTouched(false);
       }
     }
   }, [form, value]);
@@ -27,16 +34,10 @@ const UsageEnvironment = ({
   const handleFormChange = (_: unknown, allValues: Record<string, unknown>) => {
     const final = {
       ...allValues,
-      year: value?.year, // 슬라이더는 따로 관리됨
+      year: isYearTouched ? year : null, // 터치된 경우에만 year 포함
     };
     onChange("이용환경", final);
   };
-
-  useEffect(() => {
-    if (value?.year && Array.isArray(value.year)) {
-      setYear(value.year as [number, number]);
-    }
-  }, [value?.year]);
 
   return (
     <motion.div
@@ -79,6 +80,7 @@ const UsageEnvironment = ({
             value={year}
             onChange={(val) => setYear(val as [number, number])}
             onChangeComplete={(val) => {
+              setIsYearTouched(true); // 사용자가 조작했음을 표시
               const current = form.getFieldsValue();
               onChange("이용환경", {
                 ...current,
@@ -92,5 +94,4 @@ const UsageEnvironment = ({
     </motion.div>
   );
 };
-
 export default UsageEnvironment;

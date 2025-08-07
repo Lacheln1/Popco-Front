@@ -5,9 +5,11 @@ import { Swiper as SwiperType } from "swiper";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
 import { Dropdown } from "antd";
 import { DownOutlined } from "@ant-design/icons";
-import { fetchHeroPersona } from "@/apis/personaApi";
 import { PersonaRecommendation } from "@/types/Persona.types";
+import { motion } from "framer-motion";
+import { pageVariants } from "@/components/LoginResgisterPage/Animation";
 import "swiper/swiper-bundle.css";
+import axios from "axios";
 
 interface LikeContentSectionProps {
   userId: number;
@@ -50,43 +52,25 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   ];
 
   // API 호출 함수
+  // 수정된 API 호출 함수
   const fetchRecommendations = async (contentType: "movie" | "tv") => {
-    if (!accessToken) {
-      return;
-    }
+    if (!accessToken) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      // contentType을 "all"로 먼저 시도해보기
-      const response = await fetchHeroPersona(userId, accessToken, contentType);
-
-      // 만약 "all"로도 데이터가 없다면 contentType 파라미터 없이 시도
-      if (!response.recommendations || response.recommendations.length === 0) {
-        const fallbackResponse = await fetchHeroPersona(userId, accessToken);
-
-        if (
-          fallbackResponse.recommendations &&
-          fallbackResponse.recommendations.length > 0
-        ) {
-          // 선택된 타입에 맞는 데이터만 필터링
-          const filteredRecommendations =
-            fallbackResponse.recommendations.filter(
-              (item) => item.type === contentType,
-            );
-
-          setRecommendations(filteredRecommendations);
-          return;
-        }
-      }
-
-      // 선택된 타입에 맞는 데이터만 필터링
-      const filteredRecommendations = response.recommendations.filter(
-        (item) => item.type === contentType,
+      // axios로 직접 호출
+      const response = await axios.get(
+        `http://3.37.182.52:8000/recommends/personas/users/${userId}/recommendations?content_type=${contentType}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
       );
 
-      setRecommendations(filteredRecommendations);
+      setRecommendations(response.data.recommendations || []);
     } catch (err) {
       console.error("추천 데이터 가져오기 실패:", err);
       setError("데이터를 불러오는데 실패했습니다.");
@@ -128,14 +112,24 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
   };
 
   return (
-    <div className="pretendard flex justify-center px-3 py-8 md:px-8">
+    <motion.div
+      className="pretendard flex justify-center px-3 py-8 md:px-8"
+      variants={pageVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+    >
       <div className="flex w-full max-w-[1200px] flex-col bg-slate-50 px-4 py-5">
         {/* 헤더 섹션 */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="gmarket text-lg text-gray-800">
-              <span className="gmarket-bold">'{personaName}'</span>
-              <span className="ml-1">들이 장르불문 좋아하는</span>
+            <div className="gmarket break-keep text-base text-gray-800">
+              <span className="gmarket-bold text-base md:text-2xl">
+                '{personaName}'
+              </span>
+              <span className="ml-1 text-base md:text-2xl">
+                들이 장르불문 좋아하는
+              </span>
 
               <Dropdown
                 menu={{
@@ -224,7 +218,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                         {item.title}
                       </h3>
                       <div className="mt-1 flex flex-wrap gap-1">
-                        {item.genres.slice(0, 2).map((genre, index) => (
+                        {item.genres.map((genre, index) => (
                           <span
                             key={index}
                             className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
@@ -232,9 +226,6 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                             {genre}
                           </span>
                         ))}
-                      </div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        평점: {item.predicted_rating.toFixed(1)}
                       </div>
                     </div>
                   </div>
@@ -244,7 +235,7 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

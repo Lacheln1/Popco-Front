@@ -11,11 +11,12 @@ import "swiper/css/navigation";
 
 // --- 컴포넌트 & 훅 ---
 import PageLayout from "@/layout/PageLayout";
-import Spinner from "@/components/common/Spinner";
 import SectionHeader from "@/components/common/SectionHeader";
 import HotCollection from "@/components/common/HotCollection";
 import NewCollection from "@/components/common/NewCollection";
 import { SwiperNavigation } from "@/components/common/SwiperButton";
+import HotCollectionSkeleton from "@/components/common/HotCollectionSkeleton";
+import NewCollectionSkeleton from "@/components/common/NewCollectionSkeleton";
 import useAuthCheck from "@/hooks/useAuthCheck";
 import {
   useFetchCollections,
@@ -31,16 +32,15 @@ const CollectionPage: React.FC = () => {
   const { message } = App.useApp();
   const { user, accessToken } = useAuthCheck();
   const navigate = useNavigate();
+
   // --- Swiper 상태 관리 ---
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const { isBeginning, isEnd } = useSwiperResize(swiper);
 
   // --- 데이터 페칭 ---
-  // 1. HOT 컬렉션 데이터 (주간 인기)
   const { data: hotCollections, isLoading: isLoadingHot } =
     useFetchCollectionsWeekly(10, accessToken);
 
-  // 2. NEW 컬렉션 데이터 (최신순, 무한 스크롤)
   const {
     data: newCollectionsData,
     fetchNextPage,
@@ -49,7 +49,6 @@ const CollectionPage: React.FC = () => {
     isFetchingNextPage,
   } = useFetchCollections(10, accessToken);
 
-  // 3. 컬렉션 저장(마크) 토글 뮤테이션
   const { mutate: toggleMark } = useToggleMarkCollection();
 
   // --- 무한 스크롤 로직 ---
@@ -76,7 +75,7 @@ const CollectionPage: React.FC = () => {
         accessToken: accessToken!,
       });
     },
-    [user.isLoggedIn, accessToken, toggleMark],
+    [user.isLoggedIn, accessToken, toggleMark, message],
   );
 
   return (
@@ -88,13 +87,18 @@ const CollectionPage: React.FC = () => {
         />
       }
       floatingBoxContent={
-        <section className="px-6 pt-4 sm:px-8">
-          <h2 className="text-xl font-bold sm:text-2xl">HOT</h2>
-          {isLoadingHot ? (
-            <div className="flex h-[340px] items-center justify-center md:h-[360px]">
-              <Spinner />
+        isLoadingHot ? (
+          <section className="px-6 pt-4 sm:px-8">
+            <div className="mb-4 h-8 w-16 animate-pulse rounded bg-gray-200"></div>
+            <div className="flex gap-8 overflow-hidden pt-12">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <HotCollectionSkeleton key={index} />
+              ))}
             </div>
-          ) : (
+          </section>
+        ) : (
+          <section className="px-6 pt-4 sm:px-8">
+            <h2 className="text-xl font-bold sm:text-2xl">HOT</h2>
             <div className="relative mt-4 h-[340px] md:ml-12 md:h-[360px]">
               <SwiperNavigation
                 swiper={swiper}
@@ -131,27 +135,35 @@ const CollectionPage: React.FC = () => {
                 ))}
               </Swiper>
             </div>
-          )}
-        </section>
+          </section>
+        )
       }
     >
-      <section>
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold sm:text-2xl">NEW</h2>
-          <button
-            type="button"
-            onClick={() => navigate("/collections/create")}
-            className="rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
-          >
-            컬렉션 만들기
-          </button>
-        </div>
-
-        {isLoadingNew ? (
-          <div className="flex h-screen items-center justify-center">
-            <Spinner />
+      {isLoadingNew ? (
+        <section>
+          <div className="mb-10 flex items-center justify-between">
+            <div className="h-8 w-20 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-10 w-32 animate-pulse rounded-3xl bg-gray-200"></div>
           </div>
-        ) : (
+          <div className="grid grid-cols-1 justify-items-center gap-x-24 gap-y-16 lg:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <NewCollectionSkeleton key={index} />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold sm:text-2xl">NEW</h2>
+            <button
+              type="button"
+              onClick={() => navigate("/collections/create")}
+              className="rounded-3xl bg-[var(--colorpopcoHairColor)] px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm transition hover:brightness-95"
+            >
+              컬렉션 만들기
+            </button>
+          </div>
+
           <div className="mt-10 grid grid-cols-1 justify-items-center gap-x-24 gap-y-16 lg:grid-cols-2">
             {newCollectionsData?.pages.map((page, i) => (
               <React.Fragment key={i}>
@@ -176,14 +188,19 @@ const CollectionPage: React.FC = () => {
               </React.Fragment>
             ))}
           </div>
-        )}
 
-        {/* 무한 스크롤 감지를 위한 요소 */}
-        <div ref={ref} style={{ height: "50px" }} />
-
-        {/* 로딩 텍스트를 Spinner 컴포넌트로 교체 */}
-        {isFetchingNextPage && <Spinner />}
-      </section>
+          {/* 무한 스크롤 감지를 위한 요소 */}
+          <div ref={ref} style={{ height: "50px" }} />
+          {/* 추가 로딩 시 스켈레톤 표시 */}
+          {isFetchingNextPage && (
+            <div className="mt-16 grid grid-cols-1 justify-items-center gap-x-24 gap-y-16 lg:grid-cols-2">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <NewCollectionSkeleton key={`loading-${index}`} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </PageLayout>
   );
 };

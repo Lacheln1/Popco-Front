@@ -7,6 +7,7 @@ interface RatingDisplayProps {
   size: number;
   initialRating?: number;
   onRatingChange?: (rating: number) => void;
+  disabled?: boolean;
 }
 
 const RatingDisplay = ({

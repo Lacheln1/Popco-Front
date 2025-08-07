@@ -12,18 +12,24 @@ export interface ContentItem {
 
 export type ContentCategory = "all" | "movie" | "tv";
 
+// AllContentItem에 userLiked, userDisliked 필드 추가
 export interface AllContentItem {
   id: number;
   type: ContentCategory;
   title: string;
   releaseDate: string;
   posterPath: string;
+  userLiked?: boolean; // 추가
+  userDisliked?: boolean; // 추가
 }
 
+// FetchAllContentsParams에 userId, accessToken 추가
 export interface FetchAllContentsParams {
-  pageNumber?: number;
-  pageSize?: number;
+  page?: number;
+  size?: number;
   sort?: string;
+  userId?: number; // 추가
+  accessToken?: string; // 추가
 }
 
 export interface FetchAllContentsResponse {
@@ -36,7 +42,7 @@ export interface FetchAllContentsResponse {
   last: boolean;
 }
 
-// 상세 페이지 API 응답 데이터 타입
+// 상세 페이지 API 응답 데이터 타입에 userReaction 추가
 export interface ContentsDetail {
   id: number;
   type: "movie" | "tv";
@@ -53,6 +59,7 @@ export interface ContentsDetail {
   crews: Crew[];
   videos: any[]; // 필요시 video 상세 타입 정의
   watchProviders: WatchProvider[];
+  userReaction?: "LIKE" | "DISLIKE" | "NEUTRAL"; // 추가
 }
 
 export interface Genre {

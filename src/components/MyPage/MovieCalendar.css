@@ -1,5 +1,4 @@
 /* MovieCalendar.css */
-
 .react-calendar {
   width: 100%;
   background: transparent;
@@ -18,6 +17,8 @@
   border: none; /* 기본 테두리 제거 */
   border-right: 1px solid #e5e7eb; /* 오른쪽에만 테두리 */
   border-bottom: 1px solid #e5e7eb; /* 아래쪽에만 테두리 */
+  pointer-events: none; /* 클릭 비활성화 */
+  cursor: default; /* 기본 커서로 변경 */
 }
 
 /* 마지막 열(토요일)은 오른쪽 테두리 제거 */
@@ -30,18 +31,24 @@
   border-bottom: none;
 }
 
+/* 호버 효과 제거 */
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
-  background-color: #f3f4f6;
+  background-color: transparent;
 }
 
+/* 현재 날짜 스타일 - 더 선명하게 */
 .react-calendar__tile--now {
-  background: #dbeafe;
+  background: #fef3c7; /* 연한 노란색 배경 */
+  color: #92400e; /* 갈색 텍스트 */
+  font-weight: 600; /* 굵은 글씨 */
+  border: 2px solid #f59e0b; /* 노란색 테두리 */
 }
 
+/* 활성화된 날짜 스타일 비활성화 */
 .react-calendar__tile--active {
-  background: #ffffff3a;
-  color: white;
+  background: transparent;
+  color: inherit;
 }
 
 /* 요일 헤더 스타일 */
@@ -61,14 +68,12 @@
 
 /* 요일별 색상 설정 */
 /* 일요일 (첫 번째 열) - 빨간색 */
-.react-calendar__month-view__weekdays__weekday:nth-child(1) abbr,
-.react-calendar__month-view__days__day--weekend:first-child {
+.react-calendar__month-view__weekdays__weekday:nth-child(1) abbr {
   color: #dc2626 !important;
 }
 
 /* 토요일 (마지막 열) - 파란색 */
-.react-calendar__month-view__weekdays__weekday:nth-child(7) abbr,
-.react-calendar__month-view__days__day--weekend:last-child {
+.react-calendar__month-view__weekdays__weekday:nth-child(7) abbr {
   color: #2563eb !important;
 }
 
@@ -81,15 +86,17 @@
   color: #dc2626; /* 일요일 */
 }
 
-/* 활성화된 상태일 때도 색상 유지 */
-.react-calendar__tile--active.react-calendar__month-view__days__day:nth-child(
-    7n
-  ) {
-  color: white;
+/* 현재 날짜가 토요일/일요일인 경우 색상 유지 */
+.react-calendar__tile--now.react-calendar__month-view__days__day:nth-child(7n) {
+  color: #2563eb; /* 토요일 */
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
 }
 
-.react-calendar__tile--active.react-calendar__month-view__days__day:nth-child(
+.react-calendar__tile--now.react-calendar__month-view__days__day:nth-child(
     7n + 1
   ) {
-  color: white;
+  color: #dc2626; /* 일요일 */
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
 }

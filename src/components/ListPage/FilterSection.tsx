@@ -1,156 +1,170 @@
 import { DownOutlined } from "@ant-design/icons";
-import { JSX, useState } from "react";
-import { Button, Tag, Space } from "antd";
+import { useEffect, useState } from "react";
+import { Button, Space } from "antd";
 import { AnimatePresence } from "framer-motion";
 import { TAB_LIST, TabKey } from "@/constants/FilterTabs";
 import BasicInfo from "./FilterItems/BasicInfo";
 import UsageEnvironment from "./FilterItems/UsageEnvironment";
 import Personalization from "./FilterItems/Personalization";
-import {
-  formatRatingTag,
-  formatAgeTag,
-  formatYearTag,
-} from "@/utils/filterUtils";
+import { buildFilterRequestBody } from "@/utils/buildFilterRequestBody";
+import { useFilterStore } from "@/store/useFilterStore";
 
 const FilterSection = () => {
   const [activeKey, setActiveKey] = useState<number | null>(null);
 
-  const [selectedTags, setSelectedTags] = useState<Record<TabKey, string[]>>({
-    기본정보: [],
-    이용환경: [],
-    개인화: [],
-  });
+  // 초기값
+  const INITIAL_BASIC_INFO = {
+    type: "" as string,
+    genre: [] as string[],
+    rating: null as [number, number] | null,
+  };
 
-  const [ratingRange, setRatingRange] = useState<[number, number]>();
-  const [yearRange, setYearRange] = useState<[number, number]>();
-  const [ageRange, setAgeRange] = useState<[number, number]>();
+  const INITIAL_USAGE_ENV = {
+    platform: [] as string[],
+    year: null as [number, number] | null,
+  };
 
-  const handleTagChange = (key: TabKey, value: Record<string, unknown>) => {
-    const labels = Object.entries(value).flatMap(([k, v]) => {
-      if (v == null) return [];
+  const INITIAL_PERSONALIZATION = {
+    age: null as [number, number] | null,
+    persona: [] as string[],
+    algorithm: [] as string[],
+  };
 
-      if (Array.isArray(v)) {
-        if (k === "rating" && typeof v[0] === "number") {
-          setRatingRange(v as [number, number]);
-          return [formatRatingTag(v as [number, number])];
-        }
-        if (k === "year" && typeof v[0] === "number") {
-          setYearRange(v as [number, number]);
-          return [formatYearTag(v as [number, number])];
-        }
-        if (k === "age" && typeof v[0] === "number") {
-          setAgeRange(v as [number, number]);
-          return [formatAgeTag(v as [number, number])];
-        }
-        return (v as string[]).map((item) => String(item));
+  const [basicInfo, setBasicInfo] = useState(INITIAL_BASIC_INFO);
+  const [usageEnv, setUsageEnv] = useState(INITIAL_USAGE_ENV);
+  const [personalization, setPersonalization] = useState(
+    INITIAL_PERSONALIZATION,
+  );
+
+  const { setFilter, markTouched } = useFilterStore();
+
+  const isValidValue = (value: any): boolean => {
+    if (value === null || value === undefined) return false;
+    if (typeof value === "string") {
+      // 빈 문자열이 아닌 문자열은 유효
+      return value.trim() !== "";
+    }
+    if (Array.isArray(value)) {
+      if (value.length === 0) return false;
+      // 슬라이더 범위값인 경우 (숫자 배열이고 길이가 2)
+      if (value.length === 2 && value.every((v) => typeof v === "number")) {
+        return true; // 슬라이더 값은 항상 유효
       }
-      return [v];
+      return value.length > 0;
+    }
+    return true;
+  };
+
+  const getChangedValues = () => {
+    const changedBasicInfo: any = {};
+    const changedUsageEnv: any = {};
+    const changedPersonalization: any = {};
+
+    // basicInfo 처리
+    Object.entries(basicInfo).forEach(([key, value]) => {
+      const initialValue =
+        INITIAL_BASIC_INFO[key as keyof typeof INITIAL_BASIC_INFO];
+      const isDifferent =
+        JSON.stringify(value) !== JSON.stringify(initialValue);
+      const isValid = isValidValue(value);
+
+      if (isDifferent && isValid) {
+        changedBasicInfo[key] = value;
+      }
     });
 
-    setSelectedTags((prev) => ({
-      ...prev,
-      [key]: labels,
-    }));
-  };
+    // usageEnv 처리
+    Object.entries(usageEnv).forEach(([key, value]) => {
+      const initialValue =
+        INITIAL_USAGE_ENV[key as keyof typeof INITIAL_USAGE_ENV];
+      const isDifferent =
+        JSON.stringify(value) !== JSON.stringify(initialValue);
+      const isValid = isValidValue(value);
 
-  const handleClose = (tabKey: TabKey, tagValue: string) => {
-    setSelectedTags((prev) => {
-      const updated = prev[tabKey].filter((tag) => tag !== tagValue);
-
-      if (tabKey === "기본정보" && tagValue.includes("점")) {
-        setRatingRange(undefined);
+      if (isDifferent && isValid) {
+        changedUsageEnv[key] = value;
       }
-
-      if (tabKey === "이용환경" && tagValue.includes("년")) {
-        setYearRange(undefined);
-      }
-
-      if (tabKey === "개인화" && tagValue.includes("살")) {
-        setAgeRange(undefined);
-      }
-
-      return {
-        ...prev,
-        [tabKey]: updated,
-      };
     });
+
+    // personalization 처리
+    Object.entries(personalization).forEach(([key, value]) => {
+      const initialValue =
+        INITIAL_PERSONALIZATION[key as keyof typeof INITIAL_PERSONALIZATION];
+      const isDifferent =
+        JSON.stringify(value) !== JSON.stringify(initialValue);
+      const isValid = isValidValue(value);
+
+      if (isDifferent && isValid) {
+        changedPersonalization[key] = value;
+      }
+    });
+
+    const result = {
+      basicInfo: changedBasicInfo,
+      usageEnv: changedUsageEnv,
+      personalization: changedPersonalization,
+    };
+
+    return result;
   };
 
-  const filterComponentMap: Record<TabKey, JSX.Element> = {
-    기본정보: (() => {
-      const tags = selectedTags["기본정보"];
-      return (
-        <BasicInfo
-          onChange={handleTagChange}
-          value={{
-            type: tags.filter((v) => ["영화", "시리즈/드라마"].includes(v)),
-            genre: tags.filter((v) =>
-              [
-                "액션",
-                "드라마",
-                "가족",
-                "코미디",
-                "로맨스",
-                "공포",
-                "미스터리",
-              ].includes(v),
-            ),
-            rating: ratingRange,
-          }}
-          key="기본정보"
-        />
-      );
-    })(),
-
-    이용환경: (() => {
-      const tags = selectedTags["이용환경"];
-      return (
-        <UsageEnvironment
-          onChange={handleTagChange}
-          value={{
-            platform: tags.filter((v) =>
-              [
-                "넷플릭스",
-                "웨이브",
-                "티빙",
-                "디즈니플러스",
-                "쿠팡플레이",
-                "Apple TV",
-                "U+모바일tv",
-              ].includes(v),
-            ),
-            year: yearRange,
-          }}
-          key="이용환경"
-        />
-      );
-    })(),
-
-    개인화: (() => {
-      const tags = selectedTags["개인화"];
-      return (
-        <Personalization
-          onChange={handleTagChange}
-          value={{
-            algorithm: tags.filter((v) => ["나에게 딱인 컨텐츠 !"].includes(v)),
-            persona: tags.filter((v) =>
-              [
-                "온기수집가",
-                "무서워도 본다맨",
-                "액션헌터",
-                "코미디",
-                "로맨스",
-                "공포",
-                "미스터리",
-              ].includes(v),
-            ),
-            age: ageRange,
-          }}
-          key="개인화"
-        />
-      );
-    })(),
+  const filterComponentMap: Record<TabKey, React.ReactNode> = {
+    기본정보: (
+      <BasicInfo
+        onChange={(_, val) => {
+          const newBasicInfo = {
+            type: val.type as string,
+            genre: val.genre as string[],
+            rating: val.rating as [number, number] | null,
+          };
+          setBasicInfo(newBasicInfo);
+        }}
+        value={basicInfo}
+      />
+    ),
+    이용환경: (
+      <UsageEnvironment
+        onChange={(_, val) => {
+          const newUsageEnv = {
+            platform: val.platform as string[],
+            year: val.year as [number, number] | null,
+          };
+          setUsageEnv(newUsageEnv);
+        }}
+        value={usageEnv}
+      />
+    ),
+    개인화: (
+      <Personalization
+        onChange={(_, val) => {
+          const newPersonalization = {
+            age: val.age as [number, number] | null,
+            persona: val.persona as string[],
+            algorithm: val.algorithm as string[],
+          };
+          setPersonalization(newPersonalization);
+        }}
+        value={personalization}
+      />
+    ),
   };
+
+  useEffect(() => {
+    const changedValues = getChangedValues();
+    const hasChanges =
+      Object.keys(changedValues.basicInfo).length > 0 ||
+      Object.keys(changedValues.usageEnv).length > 0 ||
+      Object.keys(changedValues.personalization).length > 0;
+
+    if (hasChanges) {
+      const newBody = buildFilterRequestBody(changedValues);
+      setFilter(newBody);
+      markTouched();
+    } else {
+      setFilter({});
+    }
+  }, [basicInfo, usageEnv, personalization, setFilter, markTouched]);
+
   return (
     <div className="m-auto mt-6 px-4 md:w-[700px]">
       <Space className="mb-2 gap-4">
@@ -181,21 +195,6 @@ const FilterSection = () => {
         {typeof activeKey === "number" &&
           filterComponentMap[TAB_LIST[activeKey]]}
       </AnimatePresence>
-
-      <div className="flex w-full flex-wrap break-words">
-        {TAB_LIST.flatMap((tabKey) =>
-          selectedTags[tabKey].map((tagValue) => (
-            <Tag
-              key={`${tabKey}-${tagValue}`}
-              closable
-              className="mb-2 max-w-full whitespace-normal break-words"
-              onClose={() => handleClose(tabKey, tagValue)}
-            >
-              {tagValue}
-            </Tag>
-          )),
-        )}
-      </div>
     </div>
   );
 };

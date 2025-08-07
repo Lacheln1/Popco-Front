@@ -5,6 +5,14 @@ import {
   getMovieRecommendations,
   getTvRecommendations,
 } from "@/apis/contentsApi";
+import { motion } from "framer-motion";
+import {
+  pageVariants,
+  headerVariants,
+  itemVariants,
+  formVariants,
+} from "@/components/LoginResgisterPage/Animation";
+import Spinner from "../common/Spinner";
 
 interface RoleDashBoardProps {
   genderPercent: number[];
@@ -26,8 +34,10 @@ interface RecommendationItem {
 // 로딩 스피너 컴포넌트
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center space-x-2">
-    <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
-    <span className="text-gray-600">가져오는 중...</span>
+    <span className="text-gray-600">
+      <Spinner />
+      가져오는 중...
+    </span>
   </div>
 );
 
@@ -95,7 +105,6 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
   useEffect(() => {
     const fetchRecommendations = async () => {
       if (!userId) {
-        console.log("userId가 없어서 기본 데이터를 사용합니다.");
         setMovieData(defaultMovieList);
         setSeriesData(defaultMovieList);
         return;
@@ -139,48 +148,81 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center px-3 md:px-8">
-      <div className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 pt-4 text-center">
+    <motion.div
+      className="flex flex-col items-center px-3 md:px-8"
+      variants={pageVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+    >
+      <motion.div
+        className="bg-footerBlue mt-10 flex w-full max-w-[1200px] flex-col overflow-hidden rounded-tl-3xl rounded-tr-3xl py-5 pt-4 text-center"
+        variants={headerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
         <div className="gmarket-medium pt-2 text-xl text-white md:text-3xl">
           <span>나와 같은&nbsp;</span>
           <span className="gmarket-bold">{personaName}</span>
           <span>&nbsp;들은?</span>
         </div>
-      </div>
-      <div
+      </motion.div>
+
+      <motion.div
         className="pretendard flex w-full max-w-[1200px] flex-col items-center bg-slate-50 py-10"
         style={{ boxShadow: "0 0px 10px rgba(0, 0, 0, 0.1)" }}
+        variants={formVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
       >
-        <div className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-48">
-          <div className="flex flex-col items-center text-center">
-            <span className="text-2xl">성별</span>
-            <div>
-              <GenderChart genderPercent={genderPercent} />
-            </div>
-          </div>
-          <div className="flex flex-col items-center text-center">
-            <span className="text-2xl">연령대</span>
-            <div>
-              <AgeChart agePercent={agePercent} />
-            </div>
-          </div>
-        </div>
+        <motion.div
+          className="flex flex-col gap-8 pt-5 sm:flex-row sm:items-center sm:gap-20"
+          variants={formVariants}
+        >
+          <motion.div
+            className="flex flex-col items-center text-center"
+            variants={itemVariants}
+          >
+            <span className="text-base md:text-2xl">성별</span>
+            <GenderChart genderPercent={genderPercent} />
+          </motion.div>
 
-        {/* 전체 에러 메시지 */}
+          <motion.div
+            className="flex flex-col items-center text-center"
+            variants={itemVariants}
+          >
+            <span className="text-base md:text-2xl">연령대</span>
+            <AgeChart agePercent={agePercent} />
+          </motion.div>
+        </motion.div>
+
         {error && !loading && (
-          <div className="mt-4 text-center text-red-500">
+          <motion.div
+            className="mt-4 text-center text-red-500"
+            variants={itemVariants}
+          >
             <span>{error}</span>
-          </div>
+          </motion.div>
         )}
 
-        <div className="mt-4 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-36 lg:gap-24">
-          {/* 선호영화 */}
+        <motion.div
+          className="mt-14 flex w-full max-w-[1200px] justify-center gap-3 text-center sm:gap-20 lg:gap-24"
+          variants={formVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           {loading ? (
             <LoadingSection title="선호영화" />
           ) : (
-            <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="sm:text-3xl lg:text-4xl">선호영화</span>
-              <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
+            <motion.div
+              className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4"
+              variants={itemVariants}
+            >
+              <span className="text-base md:text-2xl">선호영화</span>
+              <div className="mt-2 rounded-xl bg-white px-4 sm:mt-4 lg:px-7">
                 {movieData.map((movie, index) => (
                   <div
                     key={movie.contentId}
@@ -200,16 +242,18 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {/* 선호 시리즈 */}
           {loading ? (
             <LoadingSection title="선호 시리즈" />
           ) : (
-            <div className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4">
-              <span className="sm:text-3xl lg:text-4xl">선호 시리즈</span>
-              <div className="mt-2 rounded-xl bg-white sm:mt-4 lg:px-7">
+            <motion.div
+              className="flex flex-col items-center justify-center sm:mt-2 lg:mt-4"
+              variants={itemVariants}
+            >
+              <span className="text-base md:text-2xl">선호 시리즈</span>
+              <div className="mt-2 rounded-xl bg-white px-4 sm:mt-4 lg:px-7">
                 {seriesData.map((series, index) => (
                   <div
                     key={series.contentId}
@@ -229,11 +273,11 @@ const RoleDashBoard: React.FC<RoleDashBoardProps> = ({
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

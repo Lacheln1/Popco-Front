@@ -81,7 +81,7 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
 
   return (
     <div>
-      <div>
+      <div className="pb-5">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="gmarket-bold py-2 text-base md:text-2xl">
             내가 좋아해요
@@ -169,6 +169,9 @@ const LikeContents: React.FC<LikeContentsProps> = ({ accessToken }) => {
                       <h3 className="truncate text-sm font-medium text-gray-800">
                         {content.title}
                       </h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {content.contentType === "movie" ? "영화" : "TV 시리즈"}
+                      </p>
                     </div>
                   </div>
                 </SwiperSlide>

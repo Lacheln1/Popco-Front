@@ -53,11 +53,6 @@ export const getOnboardingPersona = async (
   accessToken: string,
 ): Promise<OnboardingResponse> => {
   try {
-    console.log("🔍 온보딩 요청 디버그:", {
-      url: "/client/recommends/personas/onboard",
-      params,
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
 
     const response = await recommendInstance.post<OnboardingResponse>(
       "/recommends/personas/onboard",
@@ -71,7 +66,6 @@ export const getOnboardingPersona = async (
       },
     );
 
-    console.log("✅ 온보딩 응답:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("❌ 페르소나 온보딩 실패 상세:", {
@@ -97,12 +91,6 @@ export const getOnboardingPersonaAlternative = async (
       import.meta.env.VITE_API_BASE_URL ||
       process.env.REACT_APP_API_BASE_URL ||
       "http://localhost:8080";
-
-    console.log("🔍 온보딩 요청 (대안) 디버그:", {
-      baseURL,
-      url: `${baseURL}/api/client/recommends/personas/onboard`,
-      params,
-    });
 
     const response = await axios.post<OnboardingResponse>(
       `${baseURL}/api/client/recommends/personas/onboard`,
@@ -202,5 +190,26 @@ export const fetchLikedFeedback = async (
   } catch (error) {
     console.error("fetchLikedFeedback 실패:", error);
     throw new Error("좋아요 반영 실패");
+  }
+};
+
+// 좋아요/싫어요 취소 API 추가
+export const deleteContentReaction = async (
+  user_id: number,
+  content_id: number,
+  content_type: string,
+  token?: string,
+): Promise<void> => {
+  try {
+    const endpoint = `/recommends/personas/users/${user_id}/contents/${content_id}/reaction/${content_type}`;
+    const headers = {
+      accept: "*/*",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+    
+    await recommendInstance.delete(endpoint, { headers });
+  } catch (error) {
+    console.error("deleteContentReaction 실패:", error);
+    throw new Error("반응 취소에 실패했습니다.");
   }
 };

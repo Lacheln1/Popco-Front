@@ -1,10 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import Layout from "./Layout";
 import TestLayout from "@/layout/TestLayout";
 import TestPage from "@/pages/TestPage"; // 선호도 진단 페이지
 import MainPage from "@/pages/MainPage";
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
 import ListPage from "@/pages/ListPage";
 import DetailPage from "@/pages/DetailPage";
 import CollectionPage from "@/pages/CollectionPage";
@@ -12,12 +11,25 @@ import IntroPage from "@/pages/IntroPage";
 import WithoutHeaderFooterLayout from "./WithoutHeaderFooterLayout";
 import { ConfigProvider } from "antd";
 import koKR from "antd/locale/ko_KR";
-import AnalysisPage from "@/pages/AnalysisPage";
-import KakaoCallback from "@/pages/KakaoCallback";
-import MyPage from "@/pages/MyPage";
 import CollectionDetailPage from "@/pages/CollectionDetailPage";
 import CollectionCreatePage from "@/pages/CollectionCreatePage";
 import EntryRouter from "@/pages/EntryPage";
+
+import Spinner from "@/components/common/Spinner";
+
+const LoginPage = lazy(() => import("@/pages/LoginPage"));
+const RegisterPage = lazy(() => import("@/pages/RegisterPage"));
+const AnalysisPage = lazy(() => import("@/pages/AnalysisPage"));
+const KakaoCallback = lazy(() => import("@/pages/KakaoCallback"));
+const MyPage = lazy(() => import("@/pages/MyPage"));
+
+const PageLoading = () => {
+  return (
+    <div>
+      <Spinner />
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
@@ -29,22 +41,64 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <MainPage /> },
-      { path: "list", element: <ListPage /> },
-      { path: "detail/:type/:id", element: <DetailPage /> },
-      { path: "collections", element: <CollectionPage /> },
-      { path: "collections/create", element: <CollectionCreatePage /> },
-      { path: "collections/:collectionId", element: <CollectionDetailPage /> },
-      { path: "analysis", element: <AnalysisPage /> },
-      { path: "mypage", element: <MyPage /> },
+      { path: "/list", element: <ListPage /> },
+      { path: "/detail/:type/:id", element: <DetailPage /> },
+      { path: "/collections", element: <CollectionPage /> },
+      { path: "/collections/create", element: <CollectionCreatePage /> },
+      { path: "/collections/:collectionId", element: <CollectionDetailPage /> },
+      {
+        path: "/analysis",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <AnalysisPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/mypage",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <MyPage />
+          </Suspense>
+        ),
+      },
     ],
   },
   {
     element: <WithoutHeaderFooterLayout />,
     children: [
-      { path: "/intro", element: <IntroPage /> },
-      { path: "/login", element: <LoginPage /> },
-      { path: "/register", element: <RegisterPage /> },
-      { path: "/auth/kakao/login", element: <KakaoCallback /> },
+      {
+        path: "/intro",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <IntroPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/login",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/register",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <RegisterPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/auth/kakao/login",
+        element: (
+          <Suspense fallback={<PageLoading />}>
+            <KakaoCallback />
+          </Suspense>
+        ),
+      },
     ],
   },
   {

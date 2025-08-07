@@ -95,7 +95,6 @@ const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
             </div>
           ) : myCollectionsData?.collections?.length > 0 ? (
             myCollectionsData.collections.map((collection: CollectionProps) => {
-              // --- 핵심 수정 사항 ---
               const isAlreadyAdded = collection.contentPosters.some(
                 (poster) => poster.contentId === contentToAdd.id,
               );

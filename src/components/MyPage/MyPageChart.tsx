@@ -203,6 +203,9 @@ const MyPageChart: React.FC<MyPageChartProps> = ({ accessToken }) => {
           display: true,
           text: "평점",
         },
+        grid: {
+          display: false,
+        },
       },
     },
   };
