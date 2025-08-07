@@ -15,7 +15,7 @@ import {
 const RegisterPage: React.FC = () => {
   return (
     <motion.main
-      className="pretendard relative h-full bg-[#0F1525]"
+      className="pretendard relative min-h-screen bg-[#0F1525]"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -102,7 +102,7 @@ const RegisterPage: React.FC = () => {
       </div>
 
       {/* 모바일 */}
-      <div className="flex flex-col lg:hidden">
+      <div className="flex min-h-screen flex-col lg:hidden">
         {/* 로고 이미지 */}
         <div className="relative flex flex-1 flex-col items-center justify-center">
           <Link to="/">
@@ -161,7 +161,7 @@ const RegisterPage: React.FC = () => {
           </motion.div>
         </div>
         {/* 하단 - 캐릭터들 */}
-        <div className="flex justify-center pb-8">
+        <div className="flex flex-shrink-0 justify-center pb-8">
           <img src={loginPopcoImg} alt="" className="w-[600px]" />
         </div>
       </div>
