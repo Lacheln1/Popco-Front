@@ -13,11 +13,30 @@ const UsageEnvironment = ({
   const [form] = Form.useForm();
   const [year, setYear] = useState<[number, number]>([1980, 2025]);
   const [isYearTouched, setIsYearTouched] = useState(false); // 슬라이더 터치 여부 추적
+  const platformOptions = [
+    { label: "넷플릭스", value: "Netflix" },
+    { label: "웨이브", value: "wavve" },
+    { label: "Disney Plus", value: "Disney Plus" },
+    { label: "APPLE TV+", value: "APPLE TV+" },
+    { label: "왓챠", value: "Watcha" },
+  ];
+
+  const PLATFORM_LABEL_TO_VALUE = Object.fromEntries(
+    platformOptions.map(({ label, value }) => [label, value]),
+  );
 
   useEffect(() => {
     if (value) {
+      const rawPlatforms = value.platform;
+
+      const mappedPlatforms = Array.isArray(rawPlatforms)
+        ? rawPlatforms.map(
+            (label) => PLATFORM_LABEL_TO_VALUE[label as string] || label,
+          )
+        : [];
+
       form.setFieldsValue({
-        platform: value.platform,
+        platform: mappedPlatforms,
       });
 
       // value에서 year가 null이 아닌 실제 값이 있을 때만 설정
@@ -58,17 +77,7 @@ const UsageEnvironment = ({
           label={<span className="text-gray-400">플랫폼</span>}
           name="platform"
         >
-          <Checkbox.Group
-            options={[
-              "넷플릭스",
-              "웨이브",
-              "티빙",
-              "디즈니플러스",
-              "쿠팡플레이",
-              "Apple TV",
-              "U+모바일tv",
-            ]}
-          />
+          <Checkbox.Group options={platformOptions} />
         </Form.Item>
 
         <Form.Item label={<span className="text-gray-400">공개연도</span>}>

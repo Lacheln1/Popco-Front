@@ -39,7 +39,7 @@ export const buildFilterRequestBody = ({
 
   // 플랫폼은 빈 배열이 아닐 때만 포함
   if (usageEnv.platform && usageEnv.platform.length > 0) {
-    body.platforms = usageEnv.platform;
+    body.platform = usageEnv.platform;
   }
 
   // year가 null이 아닐 때만 포함

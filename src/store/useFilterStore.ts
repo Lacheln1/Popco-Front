@@ -15,7 +15,7 @@ export const useFilterStore = create<FilterStore>((set) => ({
   filter: {
     contentType: undefined,
     genres: [],
-    platforms: [],
+    platform: [],
     personaFilter: {},
     popcorithmFilter: {},
     ageGroupFilter: {},
@@ -27,7 +27,7 @@ export const useFilterStore = create<FilterStore>((set) => ({
       filter: {
         contentType: "",
         genres: [],
-        platforms: [],
+        platform: [],
         personaFilter: {},
         popcorithmFilter: {},
         ageGroupFilter: {},

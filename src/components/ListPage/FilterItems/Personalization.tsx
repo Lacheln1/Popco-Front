@@ -2,6 +2,7 @@ import { TabKey } from "@/constants/FilterTabs";
 import { Form, Checkbox, Slider } from "antd";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { PERSONA_NAME_TO_ID } from "@/constants/persona";
 
 const Personalization = ({
   onChange,
@@ -86,7 +87,15 @@ const Personalization = ({
           name="persona"
         >
           <Checkbox.Group
-            options={["액션헌터", "온기수집가", "무서워도 본다맨"]}
+            options={[
+              "액션헌터",
+              "무비셜록",
+              "시네파울보",
+              "온기수집가",
+              "이세계유랑자",
+              "무서워도본다맨",
+              "레트로캡틴",
+            ]}
           />
         </Form.Item>
       </Form>
