@@ -255,7 +255,7 @@ export const EventInfoCard = ({ isButtonActive, onCountdownEnd }: Props) => {
             </div>
             <button
               onClick={handleEnter}
-              disabled={isButtonActive || isStarting}
+              disabled={!isButtonActive || isStarting}
               className={`mt-4 w-fit self-center rounded-full px-14 py-3 text-white shadow-md transition ${
                 !isButtonActive || isStarting
                   ? "cursor-not-allowed bg-gray-300"
