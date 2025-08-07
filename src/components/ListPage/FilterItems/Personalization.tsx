@@ -2,7 +2,6 @@ import { TabKey } from "@/constants/FilterTabs";
 import { Form, Checkbox, Slider } from "antd";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { PERSONA_NAME_TO_ID } from "@/constants/persona";
 
 const Personalization = ({
   onChange,
