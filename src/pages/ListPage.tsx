@@ -442,6 +442,8 @@ const ListPage = () => {
               <div className="mt-2 text-sm text-gray-400">{error.message}</div>
             )}
           </div>
+        ) : isLoading ? (
+          Array.from({ length: 12 }).map((_, i) => <PosterSkeleton key={i} />)
         ) : !isEmpty ? (
           displayContents.map((content) => (
             <Poster
@@ -463,9 +465,7 @@ const ListPage = () => {
             />
           ))
         ) : (
-          <div className="py-8 text-center text-gray-500">
-            {isLoading ? "로딩 중..." : "결과가 없습니다."}
-          </div>
+          <div className="py-8 text-center text-gray-500">결과가 없습니다.</div>
         )}
       </div>
 
@@ -489,3 +489,13 @@ const ListPage = () => {
 };
 
 export default ListPage;
+
+const PosterSkeleton = () => {
+  return (
+    <div className="w-[260px] animate-pulse">
+      <div className="aspect-[7/10] w-full rounded-md bg-gray-300" />
+      <div className="mt-2 h-4 w-3/4 rounded bg-gray-300" />
+      <div className="mt-1 h-4 w-1/2 rounded bg-gray-300" />
+    </div>
+  );
+};
