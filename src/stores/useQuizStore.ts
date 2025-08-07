@@ -19,8 +19,10 @@ interface QuizStore {
   };
   quizStatus: QuizStatus | null;
   winnerInfo: WinnerInfo | null;
+  nickname: string;
 
   // Actions
+  setNickname: (name: string) => void;
   setQuizStatus: (status: QuizStatus) => void;
   setQuizId: (id: number) => void;
   nextQuestion: () => void;
@@ -51,8 +53,10 @@ export const useQuizStore = create<QuizStore>((set) => ({
   },
   quizStatus: null,
   winnerInfo: null,
+  nickname: "",
 
   // Actions
+  setNickname: (nickname) => set({ nickname }),
   setStep: (step) => set({ step }),
   setQuizId: (id) => set({ quizId: id }),
   setQuestionId: (id: number) => set({ questionId: id }),
