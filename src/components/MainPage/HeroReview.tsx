@@ -42,7 +42,6 @@ const HeroReview = () => {
   const handleCardClick = (contentType: string, contentId: number) => {
     navigate(`/detail/${contentType}/${contentId}`);
   };
-
   const duplicatedCards = (rowData: typeof data) =>
     Array.from({ length: 4 }).flatMap((_, i) =>
       rowData.map((review, idx) => (

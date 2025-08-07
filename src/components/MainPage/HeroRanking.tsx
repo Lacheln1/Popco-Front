@@ -118,7 +118,7 @@ const HeroRanking = ({
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1200px] px-3 md:px-6 lg:px-0">
+    <div className="mx-auto mt-24 w-full max-w-[1200px] px-3 md:px-6 lg:px-0">
       <h3 className="gmarket flex flex-wrap items-center gap-2 text-xl leading-snug sm:text-2xl md:text-[28px]">
         주간 POPCO의
         <Dropdown

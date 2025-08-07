@@ -9,10 +9,10 @@ import { useState } from "react";
 const banners = [
   { src: "/images/main/banner-popco.png", link: "/" },
   { src: "/images/main/banner-event.png", link: "/event" },
-  { src: "/images/main/banner-persona.png", link: "/persona" },
+  { src: "/images/main/banner-persona.png", link: "/analysis" },
   { src: "/images/main/banner-popco.png", link: "/" },
   { src: "/images/main/banner-event.png", link: "/event" },
-  { src: "/images/main/banner-persona.png", link: "/persona" },
+  { src: "/images/main/banner-persona.png", link: "/analysis" },
 ];
 
 const HeroCarousel = () => {
