@@ -79,6 +79,12 @@ export const loginUser = async ({ email, password }: LoginParams) => {
       withCredentials: true,
     },
   );
+  
+  // 로그인 성공 시 profileComplete 상태를 로컬스토리지에 저장
+  if (response.data && response.data.data) {
+    localStorage.setItem("profileComplete", response.data.data.profileComplete.toString());
+  }
+  
   return response.data;
 };
 
