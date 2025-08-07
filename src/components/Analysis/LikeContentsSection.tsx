@@ -213,19 +213,25 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                         }}
                       />
                     </div>
-                    <div className="p-3">
-                      <h3 className="truncate text-sm font-medium text-gray-800">
+                    {/* 고정 높이를 가진 텍스트 영역 */}
+                    <div className="flex h-20 flex-col justify-between p-3">
+                      <h3 className="line-clamp-2 text-sm font-medium leading-tight text-gray-800">
                         {item.title}
                       </h3>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {item.genres.map((genre, index) => (
+                      <div className="mt-1 flex flex-wrap gap-1 overflow-hidden">
+                        {item.genres.slice(0, 2).map((genre, index) => (
                           <span
                             key={index}
-                            className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
+                            className="whitespace-nowrap rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
                           >
                             {genre}
                           </span>
                         ))}
+                        {item.genres.length > 2 && (
+                          <span className="rounded-full bg-gray-200 px-2 py-1 text-xs text-gray-500">
+                            +{item.genres.length - 2}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
