@@ -121,34 +121,6 @@ const HeroNewRanking = ({
               <div className="z-50 mr-4 hidden h-full w-64 flex-shrink-0 rounded-lg bg-black sm:block">
                 <div className="info_container_inner flex h-full flex-col p-6">
                   {/* Number Image */}
-                  <div
-                    className="flex items-center justify-center"
-                    style={{ height: "60%" }}
-                  >
-                    <div className="rounded-lg bg-gray-800 p-6 text-9xl font-bold text-white shadow-2xl"></div>
-                  </div>
-
-                  {/* Info Text */}
-                  <div className="flex flex-1 flex-col justify-center px-4 text-center">
-                    <div
-                      className="mb-4 text-xl font-semibold leading-relaxed text-white"
-                      style={{ color: "rgba(255,255,255,.9)" }}
-                    >
-                      Watched for{" "}
-                      <strong className="mt-2 block text-2xl font-extrabold"></strong>
-                      this week.
-                      <a
-                        href="#"
-                        className="mt-4 block text-lg font-light transition-colors duration-200 hover:text-white"
-                        style={{
-                          color: "rgba(229,9,20,.9)",
-                          fontWeight: "300",
-                        }}
-                      >
-                        Watch now
-                      </a>
-                    </div>
-                  </div>
                 </div>
               </div>
               <div className="flex flex-1">
