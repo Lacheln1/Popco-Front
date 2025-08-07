@@ -225,24 +225,39 @@ const LikeContentSection: React.FC<LikeContentSectionProps> = ({
                       />
                     </div>
                     {/* 고정 높이를 가진 텍스트 영역 */}
-                    <div className="flex h-20 flex-col justify-between p-3">
-                      <h3 className="line-clamp-2 text-sm font-medium leading-tight text-gray-800">
+                    <div className="flex h-20 flex-col justify-between p-2 sm:p-3">
+                      <h3 className="line-clamp-2 text-xs font-medium leading-tight text-gray-800 sm:text-sm">
                         {item.title}
                       </h3>
-                      <div className="mt-1 flex flex-wrap gap-1 overflow-hidden">
-                        {item.genres.slice(0, 2).map((genre, index) => (
-                          <span
-                            key={index}
-                            className="whitespace-nowrap rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
-                          >
-                            {genre}
-                          </span>
-                        ))}
-                        {item.genres.length > 2 && (
-                          <span className="rounded-full bg-gray-200 px-2 py-1 text-xs text-gray-500">
-                            +{item.genres.length - 2}
-                          </span>
-                        )}
+                      <div className="mt-1">
+                        {/* 모바일용 장르 */}
+                        <div className="flex flex-nowrap gap-1 overflow-hidden sm:hidden">
+                          {item.genres.slice(0, 2).map((genre, index) => (
+                            <span
+                              key={index}
+                              className="flex-shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-600"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                          {item.genres.length > 2 && (
+                            <span className="flex-shrink-0 rounded-full bg-gray-200 px-1.5 py-0.5 text-[11px] text-gray-500">
+                              +{item.genres.length - 2}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* PC용 장르*/}
+                        <div className="hidden sm:flex sm:flex-wrap sm:gap-1">
+                          {item.genres.map((genre, index) => (
+                            <span
+                              key={index}
+                              className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
