@@ -163,7 +163,7 @@ POPCO는 사용자가 자신만의 OTT 콘텐츠 취향을 발견하고, 개인�
         </a>
          <hr/>
         <div style="height:45px"></div>
-        <p># 제작중</p>
+        <p>로그인/회원가입 페이지 <br> 취향 분석 페이지 <br> 마이 페이지 </p>
       </td>
     </tr>
   </tbody>
